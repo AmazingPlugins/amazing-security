@@ -30,4 +30,10 @@ final class CheckResultTest extends TestCase {
             'evidence' => ['enabled' => true],
         ], $result->toArray());
     }
+
+    public function test_file_finding_id_survives_serialization_without_absolute_path(): void {
+        $result = new CheckResult('integrity-file', State::WARN, 'Changed release file', 'https://api.wordpress.org/', new DateTimeImmutable('2026-09-28T00:00:00Z'), 'high', 'complete', ['package' => 'core', 'path' => 'wp-includes/version.php'], 'safe-id');
+        self::assertSame('safe-id', CheckResult::fromArray($result->toArray())->findingId);
+        self::assertStringNotContainsString('/var/www/', json_encode($result->toArray()));
+    }
 }

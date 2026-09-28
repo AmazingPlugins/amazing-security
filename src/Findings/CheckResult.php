@@ -17,8 +17,9 @@ final class CheckResult {
 	public readonly string $confidence;
 	public readonly string $coverage;
 	public readonly array $evidence;
+	public readonly ?string $findingId;
 
-	public function __construct( string $checkId, string $state, string $summary, string $sourceUrl, DateTimeImmutable $testedAt, string $confidence, string $coverage, array $evidence ) {
+	public function __construct( string $checkId, string $state, string $summary, string $sourceUrl, DateTimeImmutable $testedAt, string $confidence, string $coverage, array $evidence, ?string $findingId = null ) {
 		if ( ! State::isValid( $state ) ) {
 			throw new InvalidArgumentException( 'Invalid finding state.' );
 		}
@@ -35,6 +36,9 @@ final class CheckResult {
 				throw new InvalidArgumentException( 'Evidence must contain metadata scalars only.' );
 			}
 		}
+		if ( null !== $findingId && ! preg_match( '/^[a-zA-Z0-9-]{1,80}$/D', $findingId ) ) {
+			throw new InvalidArgumentException( 'Invalid finding identity.' );
+		}
 		$this->checkId    = $checkId;
 		$this->state      = $state;
 		$this->summary    = $summary;
@@ -43,10 +47,11 @@ final class CheckResult {
 		$this->confidence = $confidence;
 		$this->coverage   = $coverage;
 		$this->evidence   = $evidence;
+		$this->findingId  = $findingId;
 	}
 
 	public function toArray(): array {
-		return array(
+		$data = array(
 			'check_id'   => $this->checkId,
 			'state'      => $this->state,
 			'summary'    => $this->summary,
@@ -56,9 +61,13 @@ final class CheckResult {
 			'coverage'   => $this->coverage,
 			'evidence'   => $this->evidence,
 		);
+		if ( null !== $this->findingId ) {
+			$data['finding_id'] = $this->findingId;
+		}
+		return $data;
 	}
 
 	public static function fromArray( array $value ): self {
-		return new self( $value['check_id'], $value['state'], $value['summary'], $value['source_url'], new DateTimeImmutable( $value['tested_at'] ), $value['confidence'], $value['coverage'], $value['evidence'] );
+		return new self( $value['check_id'], $value['state'], $value['summary'], $value['source_url'], new DateTimeImmutable( $value['tested_at'] ), $value['confidence'], $value['coverage'], $value['evidence'], $value['finding_id'] ?? null );
 	}
 }
