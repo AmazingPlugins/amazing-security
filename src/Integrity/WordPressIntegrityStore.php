@@ -17,12 +17,13 @@ final class WordPressIntegrityStore implements IntegrityStore {
 		if ( ! preg_match( '/^[a-zA-Z0-9-]{1,80}$/D', $scanId ) || $scanId !== $cursor->scanId ) {
 			return false;
 		}
-		$active = $this->active();
-		if ( null !== $active && $active['expires'] >= time() && ! (bool) ( $active['finished'] ?? false ) ) {
+		$previous = $this->options->get( self::ACTIVE );
+		$active   = $this->decodeActive( $previous );
+		if ( null !== $active && $active['expires'] >= time() && ( (bool) ( $active['completing'] ?? false ) || ! (bool) ( $active['finished'] ?? false ) ) ) {
 			return false;
 		}
-		if ( null !== $active ) {
-			$this->options->delete( self::ACTIVE );
+		if ( is_string( $previous ) && ! $this->options->deleteIfSame( self::ACTIVE, $previous ) ) {
+			return false;
 		}
 		return $this->options->add(
 			self::ACTIVE,
@@ -38,34 +39,43 @@ final class WordPressIntegrityStore implements IntegrityStore {
 	}
 
 	public function saveProgress( string $scanId, IntegrityStep $step ): void {
-		$active = $this->active();
-		if ( null === $active || $scanId !== $active['scan_id'] || $scanId !== $step->cursor->scanId || $active['expires'] < time() ) {
+		$previous = $this->options->get( self::ACTIVE );
+		$active   = $this->decodeActive( $previous );
+		if ( null === $active || ! is_string( $previous ) || $scanId !== $active['scan_id'] || $scanId !== $step->cursor->scanId || $active['expires'] < time() || (bool) ( $active['completing'] ?? false ) ) {
 			throw new RuntimeException( 'Integrity scan lock changed.' );
 		}
 		$active['cursor']   = $step->cursor->toArray();
 		$active['finished'] = $step->finished;
 		$active['expires']  = time() + 1800;
 		$value              = $this->encode( $active );
-		if ( $this->options->get( self::ACTIVE ) === $value ) {
+		if ( $previous === $value ) {
 			return;
 		}
-		if ( ! $this->options->set( self::ACTIVE, $value ) ) {
+		if ( ! $this->options->replaceIfSame( self::ACTIVE, $previous, $value ) ) {
 			throw new RuntimeException( 'Could not save integrity progress.' );
 		}
 	}
 
 	public function complete( string $scanId, ScanRun $run ): void {
-		$active = $this->active();
-		if ( null === $active || $scanId !== $active['scan_id'] || ! $active['finished'] || $run->partial || $active['expires'] < time() ) {
+		$previousActive = $this->options->get( self::ACTIVE );
+		$active         = $this->decodeActive( $previousActive );
+		if ( null === $active || ! is_string( $previousActive ) || $scanId !== $active['scan_id'] || ! $active['finished'] || $run->partial || $active['expires'] < time() || (bool) ( $active['completing'] ?? false ) ) {
 			throw new RuntimeException( 'Cannot replace completed integrity report.' );
+		}
+		$active['completing'] = true;
+		$active['expires']    = time() + 60;
+		$claimed              = $this->encode( $active );
+		if ( ! $this->options->replaceIfSame( self::ACTIVE, $previousActive, $claimed ) ) {
+			throw new RuntimeException( 'Integrity scan lock changed before completion.' );
 		}
 		$value    = $this->encode( $run->toArray() );
 		$previous = $this->options->get( self::COMPLETED );
-		$saved    = null === $previous ? $this->options->add( self::COMPLETED, $value ) : $this->options->set( self::COMPLETED, $value );
+		$saved    = $previous === $value || ( null === $previous ? $this->options->add( self::COMPLETED, $value ) : $this->options->set( self::COMPLETED, $value ) );
 		if ( ! $saved ) {
+			$this->options->replaceIfSame( self::ACTIVE, $claimed, $previousActive );
 			throw new RuntimeException( 'Could not save completed integrity report.' );
 		}
-		$this->options->delete( self::ACTIVE );
+		$this->options->deleteIfSame( self::ACTIVE, $claimed );
 	}
 
 	public function latestProgress(): ?IntegrityStep {
@@ -98,8 +108,11 @@ final class WordPressIntegrityStore implements IntegrityStore {
 	}
 
 	private function active(): ?array {
-		$value = $this->options->get( self::ACTIVE );
-		$data  = is_string( $value ) ? json_decode( $value, true ) : null;
+		return $this->decodeActive( $this->options->get( self::ACTIVE ) );
+	}
+
+	private function decodeActive( mixed $value ): ?array {
+		$data = is_string( $value ) ? json_decode( $value, true ) : null;
 		return is_array( $data ) && isset( $data['scan_id'], $data['expires'], $data['cursor'] ) ? $data : null;
 	}
 

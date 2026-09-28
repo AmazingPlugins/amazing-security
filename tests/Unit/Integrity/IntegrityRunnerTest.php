@@ -36,4 +36,12 @@ final class IntegrityRunnerTest extends TestCase {
 		unlink( $root . '/changed.php' );
 		rmdir( $root );
 	}
+
+	public function test_cumulative_deadline_ends_scan_as_partial(): void {
+		$manifest = new Manifest( 'core', '6.6:en_US', 'https://api.wordpress.org/', new DateTimeImmutable(), 'md5', array( 'index.php' => array( str_repeat( 'a', 32 ) ) ) );
+		$cursor = new IntegrityCursor( 'scan-2', elapsed: 30.0 );
+		$step = ( new IntegrityRunner( new FileReader() ) )->step( array( new IntegrityTarget( $manifest, sys_get_temp_dir() ) ), $cursor, new ScanContext() );
+		self::assertTrue( $step->finished );
+		self::assertTrue( $step->cursor->partial );
+	}
 }

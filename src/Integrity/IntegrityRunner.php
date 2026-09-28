@@ -14,7 +14,11 @@ final class IntegrityRunner {
 
 	/** @param IntegrityTarget[] $targets */
 	public function step( array $targets, IntegrityCursor $cursor, ScanContext $context ): IntegrityStep {
-		$started   = microtime( true );
+		$started = microtime( true );
+		if ( $cursor->processed >= 5000 || $cursor->bytes >= 134217728 || $cursor->elapsed >= 30.0 ) {
+			$cursor->partial = true;
+			return new IntegrityStep( $cursor, true );
+		}
 		$budget    = new IntegrityBudget( min( 250, $context->entryLimit ), min( 33554432, max( 0, 134217728 - $cursor->bytes ) ), min( 5.0, max( 0.0, 30.0 - $cursor->elapsed ), max( 0.0, $context->deadline - $started ) ) );
 		$stepCount = 0;
 		foreach ( $targets as $target ) {
@@ -41,16 +45,16 @@ final class IntegrityRunner {
 				if ( $targetIndex === $cursor->targetIndex && $fileIndex < $cursor->fileIndex ) {
 					continue;
 				}
-				if ( $stepCount >= min( 250, $context->entryLimit ) || ! $budget->hasTime() ) {
-					$cursor->bytes   += $budget->bytes();
-					$cursor->elapsed += microtime( true ) - $started;
-					return new IntegrityStep( $cursor, false );
-				}
-				if ( $cursor->processed >= 5000 || $cursor->bytes >= 134217728 || $cursor->elapsed >= 30.0 ) {
+				if ( $cursor->processed >= 5000 || $cursor->bytes + $budget->bytes() >= 134217728 || $cursor->elapsed + microtime( true ) - $started >= 30.0 ) {
 					$cursor->partial  = true;
 					$cursor->bytes   += $budget->bytes();
 					$cursor->elapsed += microtime( true ) - $started;
 					return new IntegrityStep( $cursor, true );
+				}
+				if ( $stepCount >= min( 250, $context->entryLimit ) || ! $budget->hasTime() ) {
+					$cursor->bytes   += $budget->bytes();
+					$cursor->elapsed += microtime( true ) - $started;
+					return new IntegrityStep( $cursor, false );
 				}
 				$result = $this->reader->hash( $target->root, $path, $target->manifest->algorithm, $budget );
 				if ( 'budget' === $result->state ) {

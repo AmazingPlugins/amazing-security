@@ -42,6 +42,19 @@ final class IntegrityCursor {
 		if ( ! is_array( $data['packages'] ?? array() ) || count( $data['packages'] ?? array() ) > 11 ) {
 			return null;
 		}
+		foreach ( $data['packages'] ?? array() as $package => $counts ) {
+			if ( ! is_string( $package ) || ! is_array( $counts ) || ! isset( $counts['total'], $counts['checked'], $counts['matched'], $counts['warn'], $counts['inconclusive'], $counts['source_url'], $counts['fetched_at'] ) ) {
+				return null;
+			}
+			foreach ( array( 'total', 'checked', 'matched', 'warn', 'inconclusive' ) as $counter ) {
+				if ( ! is_int( $counts[ $counter ] ) || $counts[ $counter ] < 0 ) {
+					return null;
+				}
+			}
+			if ( $counts['checked'] > $counts['total'] || $counts['matched'] > $counts['checked'] || $counts['warn'] + $counts['inconclusive'] + $counts['matched'] > $counts['checked'] || ! is_string( $counts['source_url'] ) || ! str_starts_with( $counts['source_url'], 'https://' ) || ! filter_var( $counts['source_url'], FILTER_VALIDATE_URL ) || ! is_string( $counts['fetched_at'] ) ) {
+				return null;
+			}
+		}
 		try {
 			return new self( (string) $data['scan_id'], (int) $data['target_index'], (int) $data['file_index'], (int) $data['processed'], (int) $data['matched'], (int) $data['bytes'], (float) $data['elapsed'], array_map( array( CheckResult::class, 'fromArray' ), $data['findings'] ), new DateTimeImmutable( $data['started_at'] ), (bool) ( $data['partial'] ?? false ), (string) ( $data['target_signature'] ?? '' ), $data['packages'] ?? array() );
 		} catch ( \Throwable $error ) {

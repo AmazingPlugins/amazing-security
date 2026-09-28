@@ -9,4 +9,6 @@ interface OptionGateway {
 	public function add( string $key, string $value ): bool;
 	public function set( string $key, string $value ): bool;
 	public function delete( string $key ): void;
+	public function replaceIfSame( string $key, string $expected, string $replacement ): bool;
+	public function deleteIfSame( string $key, string $expected ): bool;
 }

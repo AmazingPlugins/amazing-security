@@ -13,7 +13,7 @@ final class IntegrityReportRenderer {
 		$html .= '<p>On request, this check fetches release checksums from api.wordpress.org and downloads.wordpress.org. Site file contents stay on this server. A checksum difference is not a malware verdict.</p>';
 		if ( null !== $completed ) {
 			$html .= '<h3>Last completed report</h3><p>Tested <time datetime="' . esc_attr( $completed->finishedAt->format( 'c' ) ) . '">' . esc_html( $completed->finishedAt->format( 'Y-m-d H:i:s' ) . ' UTC' ) . '</time>.</p>';
-			$html .= $this->findings( $completed->results );
+			$html .= $this->findings( $completed->results, 'Completed integrity findings' );
 		}
 		if ( null !== $progress ) {
 			$cursor = $progress->cursor;
@@ -26,18 +26,18 @@ final class IntegrityReportRenderer {
 				}
 				$html .= '</ul>';
 			}
-			$html .= $this->findings( $cursor->findings );
+			$html .= $this->findings( $cursor->findings, 'Current integrity findings' );
 		} elseif ( null === $completed ) {
 			$html .= '<p>No integrity scan has run yet.</p>';
 		}
 		return $html . '</section>';
 	}
 
-	private function findings( array $findings ): string {
+	private function findings( array $findings, string $label ): string {
 		if ( array() === $findings ) {
 			return '<p>No file differences recorded in this report. Coverage depends on the package and scan status above.</p>';
 		}
-		$html = '<div class="amazing-security-table-scroll" role="region" tabindex="0" aria-label="Integrity findings"><table class="widefat striped"><thead><tr><th scope="col">State</th><th scope="col">Package</th><th scope="col">File</th><th scope="col">Finding</th><th scope="col">Source</th></tr></thead><tbody>';
+		$html = '<div class="amazing-security-table-scroll" role="region" tabindex="0" aria-label="' . esc_attr( $label ) . '"><table class="widefat striped"><thead><tr><th scope="col">State</th><th scope="col">Package</th><th scope="col">File</th><th scope="col">Finding</th><th scope="col">Source</th></tr></thead><tbody>';
 		foreach ( $findings as $finding ) {
 			$html .= '<tr><td>' . esc_html( $finding->state ) . '</td><td>' . esc_html( (string) ( $finding->evidence['package'] ?? '' ) ) . '</td><td>' . esc_html( (string) ( $finding->evidence['path'] ?? '' ) ) . '</td><td>' . esc_html( $finding->summary ) . '</td><td><a href="' . esc_url( $finding->sourceUrl ) . '" target="_blank" rel="noopener noreferrer">Published source</a></td></tr>';
 		}

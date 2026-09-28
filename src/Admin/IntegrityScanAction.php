@@ -10,6 +10,7 @@ use AmazingPlugins\Security\Integrity\IntegrityCursor;
 use AmazingPlugins\Security\Integrity\IntegrityRunner;
 use AmazingPlugins\Security\Integrity\IntegrityStep;
 use AmazingPlugins\Security\Integrity\TargetDiscovery;
+use AmazingPlugins\Security\Integrity\WorkerLock;
 use AmazingPlugins\Security\Integrity\WordPressHttpClient;
 use AmazingPlugins\Security\Integrity\WordPressIntegrityStore;
 use AmazingPlugins\Security\Integrity\WordPressOptions;
@@ -50,20 +51,8 @@ final class IntegrityScanAction {
 	}
 
 	private function execute( WordPressIntegrityStore $store, IntegrityCursor $cursor, bool $isStart ): void {
-		$workerLock  = 'amazing_security_integrity_worker_lock';
-		$priorWorker = get_option( $workerLock, null );
-		if ( is_array( $priorWorker ) && (int) ( $priorWorker['expires'] ?? 0 ) < time() ) {
-			delete_option( $workerLock );
-		}
-		if ( ! add_option(
-			$workerLock,
-			array(
-				'scan_id' => $cursor->scanId,
-				'expires' => time() + 60,
-			),
-			'',
-			false
-		) ) {
+		$workerLock = new WorkerLock( new WordPressOptions() );
+		if ( ! $workerLock->acquire( $cursor->scanId ) ) {
 			$this->redirect( true );
 		}
 		$error = false;
@@ -86,7 +75,7 @@ final class IntegrityScanAction {
 					$store->complete( $cursor->scanId, ( new CompletedIntegrityReport() )->fromCursor( $cursor ) );
 				}
 			}
-		} catch ( Throwable $error ) {
+		} catch ( Throwable $failure ) {
 			$error           = true;
 			$cursor->partial = true;
 			try {
@@ -96,7 +85,7 @@ final class IntegrityScanAction {
 				$error = true;
 			}
 		} finally {
-			delete_option( $workerLock );
+			$workerLock->release();
 		}
 		$this->redirect( $error );
 	}

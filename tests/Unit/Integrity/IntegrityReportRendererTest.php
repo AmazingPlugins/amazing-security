@@ -8,6 +8,7 @@ use AmazingPlugins\Security\Admin\IntegrityReportRenderer;
 use AmazingPlugins\Security\Findings\CheckResult;
 use AmazingPlugins\Security\Integrity\IntegrityCursor;
 use AmazingPlugins\Security\Integrity\IntegrityStep;
+use AmazingPlugins\Security\Scan\ScanRun;
 use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 
@@ -21,5 +22,9 @@ final class IntegrityReportRendererTest extends TestCase {
 		self::assertStringNotContainsString( '<script>', $html );
 		self::assertStringContainsString( 'Partial', $html );
 		self::assertStringContainsString( '250 of 3000', $html );
+		$completed = new ScanRun( new DateTimeImmutable( '2026-09-27T00:00:00Z' ), new DateTimeImmutable( '2026-09-27T00:01:00Z' ), array( $finding ), false );
+		$both = ( new IntegrityReportRenderer() )->render( $completed, new IntegrityStep( $cursor, true ) );
+		self::assertStringContainsString( 'aria-label="Completed integrity findings"', $both );
+		self::assertStringContainsString( 'aria-label="Current integrity findings"', $both );
 	}
 }
