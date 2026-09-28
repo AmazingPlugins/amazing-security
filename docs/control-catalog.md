@@ -11,3 +11,11 @@ These five checks read local WordPress state only. Their source is the [WordPres
 | `default-admin-login` | Inspect at most 500 administrator logins for `admin`. | Query invalid or over 500 users. | Review privileged accounts. |
 
 The update result depends on the last WordPress update cache refresh. HTTPS checks the configured admin URL, not an external TLS handshake or enforcement on every request. The account check does not assess password strength or 2FA and reports unknown if no administrators can be found.
+
+## Release file integrity
+
+An administrator can request a checksum comparison for WordPress core and plugins with a supported WordPress.org checksum manifest. The core package locale comes from the installed package, not the site's selected language. The plugin fetches manifests over HTTPS from `api.wordpress.org` and `downloads.wordpress.org` and hashes local files in bounded chunks. It does not upload file contents.
+
+A changed file or missing core PHP file is `warn`. A missing plugin file, missing optional core file, unreadable path, or symlink is `inconclusive`. A package without a usable official manifest is `unknown`. An interrupted or capped scan is `partial`. Matching files count toward coverage; the scanner does not inspect unlisted extra files. A checksum match does not mean the site is malware-free.
+
+Each request compares up to 250 files and reads up to 32 MiB within a cooperative five-second budget. The whole scan stops at 5,000 files, 128 MiB, or 30 seconds of accumulated work. At most 250 file findings are stored. The last completed integrity report stays visible if a later run is partial.
