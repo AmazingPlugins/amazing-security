@@ -52,7 +52,7 @@ final class WordPressValues implements Values {
 		if ( ! is_array( $users ) ) {
 			return null;
 		}
-		if ( count( $users ) > 500 ) {
+		if ( array() === $users || count( $users ) > 500 ) {
 			return null;
 		}
 		foreach ( $users as $user ) {

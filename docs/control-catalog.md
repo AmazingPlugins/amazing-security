@@ -6,8 +6,8 @@ These five checks read local WordPress state only. Their source is the [WordPres
 | --- | --- | --- | --- |
 | `core-updates` | Read cached core update response. | Cache unavailable or malformed. | Review Dashboard > Updates. |
 | `debug-display` | Read `WP_DEBUG_DISPLAY` with `WP_DEBUG`. | Display setting unavailable. | Disable public debug display in configuration. |
-| `file-editor` | Read `DISALLOW_FILE_EDIT`. | Setting cannot be inspected. | Consider disabling the built-in file editor. |
+| `file-editor` | Read `DISALLOW_FILE_EDIT`. | Setting cannot be inspected. | Consider enabling this configuration guard. Other controls may also restrict the editor. |
 | `https-admin` | Check administrator URL scheme. | URL scheme unavailable. | Configure HTTPS and test admin login. |
 | `default-admin-login` | Inspect at most 500 administrator logins for `admin`. | Query invalid or over 500 users. | Review privileged accounts. |
 
-The update result depends on the last WordPress update cache refresh. HTTPS checks the configured admin URL, not an external TLS handshake. The account check does not assess password strength or 2FA.
+The update result depends on the last WordPress update cache refresh. HTTPS checks the configured admin URL, not an external TLS handshake or enforcement on every request. The account check does not assess password strength or 2FA and reports unknown if no administrators can be found.
