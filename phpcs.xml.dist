@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<ruleset name="Amazing Security">
+  <file>src</file>
+  <file>amazing-security.php</file>
+  <!-- PSR-4 class names and public result APIs use camel case. -->
+  <rule ref="WordPress-Core">
+    <exclude name="WordPress.Files.FileName"/>
+    <exclude name="WordPress.NamingConventions.ValidFunctionName"/>
+    <exclude name="WordPress.NamingConventions.ValidVariableName"/>
+  </rule>
+  <rule ref="WordPress-Extra">
+    <exclude name="WordPress.Files.FileName"/>
+    <exclude name="WordPress.NamingConventions.ValidFunctionName"/>
+    <exclude name="WordPress.NamingConventions.ValidVariableName"/>
+  </rule>
+  <config name="text_domain" value="amazing-security"/>
+</ruleset>
