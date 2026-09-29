@@ -54,6 +54,16 @@ add_action(
 		);
 		add_filter( 'authenticate', array( $hooks, 'authenticate' ), 25, 3 );
 		add_action( 'wp_login_failed', array( $hooks, 'failed' ), 10, 2 );
+		$totp = new AmazingPlugins\Security\Login\TotpAuthentication(
+			new AmazingPlugins\Security\Login\WordPressTotpStore( $GLOBALS['wpdb'] ),
+			new AmazingPlugins\Security\Login\SecretCipher( wp_salt( 'auth' ) ),
+			new AmazingPlugins\Security\Login\Totp()
+		);
+		add_filter( 'authenticate', array( $totp, 'authenticate' ), 30, 3 );
+		$fields = new AmazingPlugins\Security\Login\LoginFormFields();
+		add_action( 'login_form', array( $fields, 'render' ) );
+		add_action( 'woocommerce_login_form', array( $fields, 'render' ) );
+		add_filter( 'xmlrpc_enabled', array( new AmazingPlugins\Security\Login\XmlRpcPolicy( $settings ), 'enabled' ) );
 	}
 );
 
