@@ -35,7 +35,7 @@ final class TotpAction {
 		}
 		// This action already verified its nonce above.
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing
-		$code  = isset( $_POST['code'] ) && is_string( $_POST['code'] ) ? wp_unslash( $_POST['code'] ) : '';
+		$code  = isset( $_POST['code'] ) && is_string( $_POST['code'] ) ? sanitize_text_field( wp_unslash( $_POST['code'] ) ) : '';
 		$codes = $this->enrollment()->confirm( $userId, $code );
 		if ( array() === $codes ) {
 			$this->refuse();
@@ -73,8 +73,8 @@ final class TotpAction {
 	}
 
 	private function reauthenticate( int $userId ): void {
-		// This action already verified its nonce above.
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing
+		// Nonce checked by authorize(); password bytes must stay intact for wp_check_password().
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		$password = isset( $_POST['password'] ) && is_string( $_POST['password'] ) ? wp_unslash( $_POST['password'] ) : '';
 		$user     = get_userdata( $userId );
 		if ( ! $user || ! wp_check_password( $password, $user->user_pass, $userId ) ) {
@@ -85,7 +85,7 @@ final class TotpAction {
 	private function factor(): string {
 		// This action already verified its nonce above.
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing
-		return isset( $_POST['factor'] ) && is_string( $_POST['factor'] ) ? wp_unslash( $_POST['factor'] ) : '';
+		return isset( $_POST['factor'] ) && is_string( $_POST['factor'] ) ? sanitize_text_field( wp_unslash( $_POST['factor'] ) ) : '';
 	}
 
 	private function enrollment(): TotpEnrollment {

@@ -141,7 +141,8 @@ final class WordPressTotpStore implements TotpStore {
 		if ( $userId < 1 ) {
 			return null;
 		}
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Reading raw rows detects duplicates and permits atomic writes.
+		// The user_id index bounds this lookup to one account; raw rows detect duplicates for atomic writes.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.SlowDBQuery.slow_db_query_meta_key
 		$rows = $this->db->get_results( $this->db->prepare( "SELECT umeta_id, meta_value FROM {$this->db->usermeta} WHERE user_id = %d AND meta_key = %s LIMIT 2", $userId, self::KEY ), 'ARRAY_A' );
 		if ( ! is_array( $rows ) || ( isset( $this->db->last_error ) && '' !== $this->db->last_error ) ) {
 			throw new RuntimeException( 'TOTP enrollment state is unavailable.' );

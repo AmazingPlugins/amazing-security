@@ -23,7 +23,7 @@ final class TotpAuthentication {
 			}
 			// Login forms use WordPress authentication instead of a plugin admin nonce.
 			// phpcs:ignore WordPress.Security.NonceVerification.Missing
-			$factor    = isset( $_POST['amsec_otp'] ) && is_string( $_POST['amsec_otp'] ) ? wp_unslash( $_POST['amsec_otp'] ) : '';
+			$factor    = isset( $_POST['amsec_otp'] ) && is_string( $_POST['amsec_otp'] ) ? sanitize_text_field( wp_unslash( $_POST['amsec_otp'] ) ) : '';
 			$encrypted = $this->store->encryptedSecret( $user->ID );
 			$seed      = null === $encrypted ? null : $this->cipher->decrypt( $encrypted );
 			if ( null !== $seed ) {

@@ -22,6 +22,9 @@ namespace {
 	if ( ! function_exists( 'wp_unslash' ) ) {
 		function wp_unslash( string $value ): string { return stripslashes( $value ); }
 	}
+	if ( ! function_exists( 'sanitize_text_field' ) ) {
+		function sanitize_text_field( string $value ): string { return strip_tags( $value ); }
+	}
 }
 
 namespace AmazingPlugins\Security\Tests\Unit\Login {
