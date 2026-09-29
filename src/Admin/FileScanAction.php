@@ -19,6 +19,7 @@ use AmazingPlugins\Security\Integrity\WordPressOptions;
 use AmazingPlugins\Security\Integrity\WordPressOrgManifestProvider;
 use AmazingPlugins\Security\Integrity\WordPressOrgThemeManifestProvider;
 use AmazingPlugins\Security\Scan\ScanContext;
+use AmazingPlugins\Security\Schedule\SuiteCycle;
 use Throwable;
 
 final class FileScanAction {
@@ -46,7 +47,12 @@ final class FileScanAction {
 	}
 
 	public function scheduled(): void {
-		$store    = new WordPressFileScanStore( new WordPressOptions() );
+		$options = new WordPressOptions();
+		$cycle   = new SuiteCycle( $options );
+		if ( ! $cycle->claim( 'files', time() ) ) {
+			return;
+		}
+		$store    = new WordPressFileScanStore( $options );
 		$progress = $store->latestProgress();
 		if ( null !== $progress && ! $progress->finished ) {
 			$error = $this->execute( $store, $progress->cursor, false );
@@ -54,14 +60,36 @@ final class FileScanAction {
 			$scanId = wp_generate_uuid4();
 			$cursor = new FileScanCursor( $scanId );
 			if ( ! $store->begin( $scanId, $cursor ) ) {
-				$this->scheduleNext();
+				if ( $cycle->retry( 'files', time() ) ) {
+					$this->scheduleNext( 300 );
+				}
 				return;
 			}
 			$error = $this->execute( $store, $cursor, true );
 		}
 		$progress = $store->latestProgress();
-		if ( ! $error && null !== $progress && ! $progress->finished ) {
-			$this->scheduleNext();
+		if ( $error ) {
+			if ( null !== $progress && $progress->finished ) {
+				$cycle->fail( 'files', time() );
+			} elseif ( $cycle->retry( 'files', time() ) ) {
+				$this->scheduleNext( 300 );
+			}
+			return;
+		}
+		if ( null === $progress ) {
+			$cycle->complete( time() );
+			return;
+		}
+		if ( ! $progress->finished ) {
+			if ( $cycle->continueStage( 'files', time() ) ) {
+				$this->scheduleNext();
+			}
+			return;
+		}
+		if ( $progress->cursor->partial ) {
+			$cycle->fail( 'files', time() );
+		} else {
+			$cycle->complete( time() );
 		}
 	}
 
@@ -139,9 +167,9 @@ final class FileScanAction {
 		return $error;
 	}
 
-	private function scheduleNext(): void {
+	private function scheduleNext( int $delay = 60 ): void {
 		if ( ! wp_next_scheduled( 'amsec_file_tick' ) ) {
-			wp_schedule_single_event( time() + 60, 'amsec_file_tick' );
+			wp_schedule_single_event( time() + $delay, 'amsec_file_tick' );
 		}
 	}
 

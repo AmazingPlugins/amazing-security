@@ -18,6 +18,7 @@ use AmazingPlugins\Security\Login\WordPressTotpStore;
 use AmazingPlugins\Security\Mcp\McpPreferences;
 use AmazingPlugins\Security\Schedule\LocalSchedule;
 use AmazingPlugins\Security\Schedule\ScheduleStatusRenderer;
+use AmazingPlugins\Security\Schedule\SuiteCycle;
 use AmazingPlugins\Security\Vulnerabilities\VulnerabilityPreferences;
 use AmazingPlugins\Security\Vulnerabilities\WordPressVulnerabilityReportStore;
 
@@ -65,6 +66,9 @@ final class AdminPage {
 		// ScheduleStatusRenderer escapes dynamic values.
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		echo ( new ScheduleStatusRenderer() )->render( ( new LocalSchedule( $options ) )->status( time() ) );
+		// ScheduleStatusRenderer escapes dynamic values.
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo ( new ScheduleStatusRenderer() )->renderSuite( ( new SuiteCycle( $options ) )->status( time() ) );
 		echo '<section class="amsec-overview" aria-labelledby="amsec-overview-title"><h2 id="amsec-overview-title">Security overview</h2><div class="amsec-ledger">';
 		$this->ledgerRow( 'Local hardening', $run?->results ?? null, $run?->finishedAt?->format( 'Y-m-d H:i:s' ), '#amsec-hardening' );
 		$this->ledgerRow( 'Release files', $integrity?->results ?? null, $integrity?->finishedAt?->format( 'Y-m-d H:i:s' ), '#amsec-integrity' );

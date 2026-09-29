@@ -26,8 +26,8 @@ final class AlertNotifierTest extends TestCase {
 		};
 		$notifier = new AlertNotifier( new AlertPolicy(), new AlertDelivery( $options, static function (): never { throw new \RuntimeException( 'Unexpected email.' ); }, 'owner@example.test', 'https://example.test/report' ) );
 		$now = new DateTimeImmutable( '@1000' );
-		self::assertSame( 'none', $notifier->integrity( new ScanRun( $now, $now, array(), true ), 1000 ) );
-		self::assertSame( 'none', $notifier->files( new FileScanReport( 'scan-1', 'inconclusive', $now, true, 0, 0, 0, 0, 0, 0, 0, 0, array() ), 1000 ) );
+		self::assertSame( 'partial', $notifier->integrity( new ScanRun( $now, $now, array(), true ), 1000 ) );
+		self::assertSame( 'partial', $notifier->files( new FileScanReport( 'scan-1', 'inconclusive', $now, true, 0, 0, 0, 0, 0, 0, 0, 0, array() ), 1000 ) );
 		self::assertSame( array(), $options->values );
 	}
 }

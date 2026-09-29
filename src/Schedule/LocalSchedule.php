@@ -15,25 +15,30 @@ use Throwable;
 final class LocalSchedule {
 	private const STATE_OPTION = 'amsec_local_schedule_state';
 	private readonly Closure $run;
+	private readonly Closure $nextEvent;
 
-	public function __construct( private readonly OptionGateway $options, ?callable $run = null ) {
-		$this->run = Closure::fromCallable( $run ?? static fn(): ScanRun => ( new LocalHardeningScanService() )->run() );
+	public function __construct( private readonly OptionGateway $options, ?callable $run = null, ?callable $nextEvent = null ) {
+		$this->run       = Closure::fromCallable( $run ?? static fn(): ScanRun => ( new LocalHardeningScanService() )->run() );
+		$this->nextEvent = Closure::fromCallable( $nextEvent ?? static fn(): int|false => function_exists( 'wp_next_scheduled' ) ? wp_next_scheduled( 'amsec_local_daily_scan' ) : false );
 	}
 
 	public function status( int $now ): array {
 		$raw  = $this->options->get( self::STATE_OPTION );
 		$data = is_string( $raw ) ? json_decode( $raw, true ) : null;
 		if ( ! is_array( $data ) || ! isset( $data['attempted_at'], $data['state'] ) ) {
+			$due = ( $this->nextEvent )();
 			return array(
-				'state'        => 'never',
+				'state'        => is_int( $due ) && $now > $due + 3600 ? 'missed' : 'never',
 				'attempted_at' => null,
-				'next_due'     => null,
+				'next_due'     => is_int( $due ) ? $due : null,
+				'overdue'      => is_int( $due ) && $now > $due + 3600,
 			);
 		}
 		$attemptedAt = (int) $data['attempted_at'];
 		$nextDue     = $attemptedAt + 86400;
 		$state       = (string) $data['state'];
-		if ( $now > $nextDue + 3600 && 'running' !== $state ) {
+		$overdue     = $now > $nextDue + 3600;
+		if ( $overdue && 'complete' === $state ) {
 			$state = 'missed';
 		} elseif ( 'running' === $state && $now > $attemptedAt + 3600 ) {
 			$state = 'partial';
@@ -42,6 +47,7 @@ final class LocalSchedule {
 			'state'        => $state,
 			'attempted_at' => $attemptedAt,
 			'next_due'     => $nextDue,
+			'overdue'      => $overdue,
 		);
 	}
 

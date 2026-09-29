@@ -5,8 +5,14 @@ use AmazingPlugins\Security\Admin\IntegrityScanAction;
 use AmazingPlugins\Security\Integrity\IntegrityCursor;
 use AmazingPlugins\Security\Integrity\WordPressIntegrityStore;
 use AmazingPlugins\Security\Integrity\WordPressOptions;
+use AmazingPlugins\Security\Schedule\SuiteCycle;
 
 $options = new WordPressOptions();
+$options->delete( 'amsec_suite_cycle' );
+$cycle = new SuiteCycle( $options );
+if ( ! $cycle->start( time() ) ) {
+	throw new RuntimeException( 'Could not start scheduled suite.' );
+}
 $options->delete( 'amazing_security_integrity_active' );
 $store = new WordPressIntegrityStore( $options );
 $id = wp_generate_uuid4();
@@ -24,6 +30,9 @@ try {
 	( new IntegrityScanAction() )->scheduled();
 	if ( false !== wp_next_scheduled( 'amsec_file_tick' ) ) {
 		throw new RuntimeException( 'File scan started while integrity worker was busy.' );
+	}
+	if ( false === wp_next_scheduled( 'amsec_integrity_tick' ) ) {
+		throw new RuntimeException( 'Busy integrity worker has no retry.' );
 	}
 } finally {
 	$options->delete( $lock );

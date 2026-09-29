@@ -19,6 +19,7 @@ use AmazingPlugins\Security\Integrity\WordPressOrgManifestProvider;
 use AmazingPlugins\Security\Integrity\WordPressOrgThemeManifestProvider;
 use AmazingPlugins\Security\Integrity\ThemeArchiveParser;
 use AmazingPlugins\Security\Scan\ScanContext;
+use AmazingPlugins\Security\Schedule\SuiteCycle;
 use DateTimeImmutable;
 use Throwable;
 
@@ -47,7 +48,12 @@ final class IntegrityScanAction {
 	}
 
 	public function scheduled(): void {
-		$store    = new WordPressIntegrityStore( new WordPressOptions() );
+		$options = new WordPressOptions();
+		$cycle   = new SuiteCycle( $options );
+		if ( ! $cycle->claim( 'integrity', time() ) ) {
+			return;
+		}
+		$store    = new WordPressIntegrityStore( $options );
 		$progress = $store->latestProgress();
 		if ( null !== $progress && ! $progress->finished ) {
 			$error = $this->execute( $store, $progress->cursor, false );
@@ -55,19 +61,41 @@ final class IntegrityScanAction {
 			$scanId = wp_generate_uuid4();
 			$cursor = new IntegrityCursor( $scanId, startedAt: new DateTimeImmutable() );
 			if ( ! $store->begin( $scanId, $cursor ) ) {
-				$this->schedule( 300, 'amsec_integrity_tick' );
+				if ( $cycle->retry( 'integrity', time() ) ) {
+					$this->schedule( 300, 'amsec_integrity_tick' );
+				}
 				return;
 			}
 			$error = $this->execute( $store, $cursor, true );
 		}
 		$progress = $store->latestProgress();
-		if ( null !== $progress && ! $progress->finished ) {
-			if ( ! $error ) {
+		if ( $error ) {
+			if ( null !== $progress && $progress->finished ) {
+				$cycle->fail( 'integrity', time() );
+			} elseif ( $cycle->retry( 'integrity', time() ) ) {
+				$this->schedule( 300, 'amsec_integrity_tick' );
+			}
+			return;
+		}
+		if ( null === $progress ) {
+			if ( $cycle->advance( 'integrity', 'files', time() ) ) {
+				$this->schedule( 60, 'amsec_file_tick' );
+			}
+			return;
+		}
+		if ( ! $progress->finished ) {
+			if ( $cycle->continueStage( 'integrity', time() ) ) {
 				$this->schedule( 60, 'amsec_integrity_tick' );
 			}
 			return;
 		}
-		$this->schedule( 60, 'amsec_file_tick' );
+		if ( $progress->cursor->partial ) {
+			$cycle->fail( 'integrity', time() );
+			return;
+		}
+		if ( $cycle->advance( 'integrity', 'files', time() ) ) {
+			$this->schedule( 60, 'amsec_file_tick' );
+		}
 	}
 
 	private function authorize( string $nonceAction ): void {

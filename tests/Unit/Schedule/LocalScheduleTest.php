@@ -58,6 +58,17 @@ final class LocalScheduleTest extends TestCase {
 		self::assertSame( 'never', $schedule->status( 1001 )['state'] );
 	}
 
+	public function test_initial_overdue_event_is_visible_and_partial_is_preserved(): void {
+		$options = $this->options();
+		$schedule = new LocalSchedule( $options, null, static fn(): int => 1000 );
+		self::assertSame( 'missed', $schedule->status( 5000 )['state'] );
+		self::assertTrue( $schedule->status( 5000 )['overdue'] );
+		$partial = new ScanRun( new DateTimeImmutable( '@1000' ), new DateTimeImmutable( '@1001' ), array(), true );
+		self::assertTrue( ( new LocalSchedule( $options, static fn(): ScanRun => $partial, static fn(): int => 1000 ) )->tick( 2000 ) );
+		self::assertSame( 'partial', $schedule->status( 2000 + 86400 + 3601 )['state'] );
+		self::assertTrue( $schedule->status( 2000 + 86400 + 3601 )['overdue'] );
+	}
+
 	private function options(): OptionGateway {
 		return new class implements OptionGateway {
 			public array $values = array();

@@ -23,54 +23,80 @@ final class AlertDelivery {
 		return is_array( $data ) ? $data : array();
 	}
 
-	public function sendNew( array $ids, int $now ): string {
+	public function sendNew( array $ids, int $now, string $source = 'general' ): string {
 		if ( '0' === $this->options->get( 'amsec_alerts_enabled' ) ) {
 			return 'off';
 		}
-		$ids = array_values( array_unique( array_filter( $ids, static fn( mixed $id ): bool => is_string( $id ) && (bool) preg_match( '/^[a-zA-Z0-9-]{1,80}$/D', $id ) ) ) );
-		if ( array() === $ids ) {
-			return 'none';
-		}
+		$ids  = array_values( array_unique( array_filter( $ids, static fn( mixed $id ): bool => is_string( $id ) && (bool) preg_match( '/^[a-zA-Z0-9-]{1,80}$/D', $id ) ) ) );
 		$lock = new WorkerLock( $this->options, 'amsec_alert_lock' );
 		if ( ! $lock->acquire( 'mail-' . $now ) ) {
 			return 'busy';
 		}
 		try {
-			$state = $this->status();
-			$sent  = is_array( $state['sent'] ?? null ) ? $state['sent'] : array();
-			$sent  = array_filter( $sent, static fn( mixed $at ): bool => is_int( $at ) && $at >= $now - 90 * 86400 );
-			$new   = array_slice( array_values( array_filter( $ids, static fn( string $id ): bool => ! isset( $sent[ $id ] ) ) ), 0, 50 );
-			if ( array() === $new ) {
-				return 'none';
-			}
-			if ( false === filter_var( $this->email, FILTER_VALIDATE_EMAIL ) ) {
-				return 'failed';
-			}
-			$body = "New security findings need review.\n\nFinding IDs:\n" . implode( "\n", $new ) . "\n\nOpen the Amazing Security dashboard:\n" . $this->dashboardUrl;
-			try {
-				$accepted = ( $this->send )( $this->email, 'Amazing Security: findings need review', $body );
-			} catch ( Throwable ) {
-				$accepted = false;
-			}
-			if ( $accepted ) {
-				foreach ( $new as $id ) {
-					$sent[ $id ] = $now;
-				}
-				$sent = array_slice( $sent, -250, null, true );
-			}
-			$state = array(
-				'sent'         => $sent,
-				'last_attempt' => array(
-					'at'     => $now,
-					'status' => $accepted ? 'accepted' : 'failed',
-					'count'  => count( $new ),
-				),
-			);
-			// phpcs:ignore WordPress.WP.AlternativeFunctions.json_encode_json_encode -- Pure PHP option gateway tests run without WordPress.
-			$encoded = json_encode( $state, JSON_THROW_ON_ERROR );
-			return $this->options->set( self::STATE, $encoded ) ? ( $accepted ? 'accepted' : 'failed' ) : 'failed';
+			$state             = $this->status();
+			$active            = is_array( $state['active'] ?? null ) ? $state['active'] : array();
+			$previous          = is_array( $active[ $source ] ?? null ) ? $active[ $source ] : array();
+			$pending           = is_array( $state['pending'] ?? null ) ? $state['pending'] : array();
+			$pending           = array_values( array_filter( $pending, static fn( string $id ): bool => ! in_array( $id, $previous, true ) || in_array( $id, $ids, true ) ) );
+			$new               = array_values( array_diff( $ids, $previous ) );
+			$active[ $source ] = $ids;
+			$state['active']   = $active;
+			$state['pending']  = array_values( array_unique( array_merge( $pending, $new ) ) );
+			return $this->deliver( $state, $now );
 		} finally {
 			$lock->release();
 		}
+	}
+
+	public function retry( int $now ): string {
+		if ( '0' === $this->options->get( 'amsec_alerts_enabled' ) ) {
+			return 'off';
+		}
+		$lock = new WorkerLock( $this->options, 'amsec_alert_lock' );
+		if ( ! $lock->acquire( 'mail-retry-' . $now ) ) {
+			return 'busy';
+		}
+		try {
+			return $this->deliver( $this->status(), $now );
+		} finally {
+			$lock->release();
+		}
+	}
+
+	private function deliver( array $state, int $now ): string {
+		$pending = is_array( $state['pending'] ?? null ) ? $state['pending'] : array();
+		if ( array() === $pending ) {
+			$this->save( $state );
+			return 'none';
+		}
+		$batch    = array_slice( $pending, 0, 50 );
+		$accepted = false;
+		if ( false !== filter_var( $this->email, FILTER_VALIDATE_EMAIL ) ) {
+			$body = "New security findings need review.\n\nFinding IDs:\n" . implode( "\n", $batch ) . "\n\nOpen the Amazing Security dashboard:\n" . $this->dashboardUrl;
+			try {
+				$accepted = (bool) ( $this->send )( $this->email, 'Amazing Security: findings need review', $body );
+			} catch ( Throwable ) {
+				$accepted = false;
+			}
+		}
+		$state['pending']      = $accepted ? array_slice( $pending, 50 ) : $pending;
+		$state['last_attempt'] = array(
+			'at'     => $now,
+			'status' => $accepted ? 'accepted' : 'failed',
+			'count'  => count( $batch ),
+		);
+		$state['failures']     = $accepted ? 0 : min( 3, (int) ( $state['failures'] ?? 0 ) + 1 );
+		if ( ! $this->save( $state ) ) {
+			return 'failed';
+		}
+		if ( array() !== $state['pending'] && ( $accepted || $state['failures'] < 3 ) && function_exists( 'wp_next_scheduled' ) && ! wp_next_scheduled( 'amsec_alert_retry' ) ) {
+			wp_schedule_single_event( time() + ( $accepted ? 60 : 3600 ), 'amsec_alert_retry' );
+		}
+		return $accepted ? 'accepted' : 'failed';
+	}
+
+	private function save( array $state ): bool {
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.json_encode_json_encode -- Pure PHP option gateway tests run without WordPress.
+		return $this->options->set( self::STATE, json_encode( $state, JSON_THROW_ON_ERROR ) );
 	}
 }

@@ -11,10 +11,10 @@ final class AlertNotifier {
 	public function __construct( private readonly AlertPolicy $policy, private readonly AlertDelivery $delivery ) {}
 
 	public function integrity( ScanRun $run, int $now ): string {
-		return $this->delivery->sendNew( $this->policy->fromIntegrity( $run ), $now );
+		return $run->partial ? 'partial' : $this->delivery->sendNew( $this->policy->fromIntegrity( $run ), $now, 'integrity' );
 	}
 
 	public function files( FileScanReport $report, int $now ): string {
-		return $this->delivery->sendNew( $this->policy->fromFiles( $report ), $now );
+		return $report->partial ? 'partial' : $this->delivery->sendNew( $this->policy->fromFiles( $report ), $now, 'files' );
 	}
 }

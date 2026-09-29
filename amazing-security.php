@@ -53,18 +53,40 @@ add_action(
 );
 add_action( 'init', array( AmazingPlugins\Security\Login\WordPressRateCounterStore::class, 'ensureScheduled' ) );
 add_action( 'init', array( AmazingPlugins\Security\Fixes\FixTables::class, 'ensureScheduled' ) );
-add_action( 'init', array( new AmazingPlugins\Security\Schedule\ScheduleHooks(), 'ensure' ) );
+add_action(
+	'init',
+	static function (): void {
+		( new AmazingPlugins\Security\Schedule\ScheduleHooks() )->ensure();
+		$cycle  = new AmazingPlugins\Security\Schedule\SuiteCycle( new AmazingPlugins\Security\Integrity\WordPressOptions() );
+		$status = $cycle->status( time() );
+		if ( 'running' === $status['state'] && (int) ( $status['lease_until'] ?? 0 ) <= time() ) {
+			$hook = 'integrity' === $status['stage'] ? 'amsec_integrity_tick' : 'amsec_file_tick';
+			if ( ! wp_next_scheduled( $hook ) ) {
+				wp_schedule_single_event( time() + 60, $hook );
+			}
+		}
+	}
+);
 add_action(
 	'amsec_local_daily_scan',
 	static function (): void {
-		( new AmazingPlugins\Security\Schedule\LocalSchedule( new AmazingPlugins\Security\Integrity\WordPressOptions() ) )->tick( time() );
-		if ( ! wp_next_scheduled( 'amsec_integrity_tick' ) ) {
+		$options  = new AmazingPlugins\Security\Integrity\WordPressOptions();
+		$schedule = new AmazingPlugins\Security\Schedule\LocalSchedule( $options );
+		$success  = $schedule->tick( time() );
+		$cycle    = new AmazingPlugins\Security\Schedule\SuiteCycle( $options );
+		if ( $success && 'complete' === $schedule->status( time() )['state'] && $cycle->start( time() ) ) {
 			wp_schedule_single_event( time() + 60, 'amsec_integrity_tick' );
 		}
 	}
 );
 add_action( 'amsec_integrity_tick', array( new AmazingPlugins\Security\Admin\IntegrityScanAction(), 'scheduled' ) );
 add_action( 'amsec_file_tick', array( new AmazingPlugins\Security\Admin\FileScanAction(), 'scheduled' ) );
+add_action(
+	'amsec_alert_retry',
+	static function (): void {
+		( new AmazingPlugins\Security\Alerts\WordPressAlertNotifier() )->delivery()->retry( time() );
+	}
+);
 add_action(
 	'amsec_fix_cleanup',
 	static function (): void {

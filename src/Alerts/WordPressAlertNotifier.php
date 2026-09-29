@@ -8,12 +8,15 @@ use AmazingPlugins\Security\Integrity\WordPressOptions;
 
 final class WordPressAlertNotifier {
 	public function create(): AlertNotifier {
-		$delivery = new AlertDelivery(
+		return new AlertNotifier( new AlertPolicy(), $this->delivery() );
+	}
+
+	public function delivery(): AlertDelivery {
+		return new AlertDelivery(
 			new WordPressOptions(),
 			static fn( string $to, string $subject, string $message ): bool => wp_mail( $to, $subject, $message ),
 			(string) get_option( 'admin_email', '' ),
 			admin_url( 'admin.php?page=amazing-security' )
 		);
-		return new AlertNotifier( new AlertPolicy(), $delivery );
 	}
 }

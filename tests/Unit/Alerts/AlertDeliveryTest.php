@@ -37,6 +37,33 @@ final class AlertDeliveryTest extends TestCase {
 		self::assertSame( array(), $delivery->status() );
 	}
 
+	public function test_resolved_finding_can_alert_again_when_it_returns(): void {
+		$sent = array();
+		$delivery = new AlertDelivery( $this->options(), static function ( string $to, string $subject, string $body ) use ( &$sent ): bool { $sent[] = $body; return true; }, 'owner@example.test', 'https://example.test/report' );
+		self::assertSame( 'accepted', $delivery->sendNew( array( 'finding-one' ), 1000 ) );
+		self::assertSame( 'none', $delivery->sendNew( array(), 1001 ) );
+		self::assertSame( 'accepted', $delivery->sendNew( array( 'finding-one' ), 1002 ) );
+		self::assertCount( 2, $sent );
+	}
+
+	public function test_overflow_is_kept_for_a_later_batch(): void {
+		$sent = array();
+		$delivery = new AlertDelivery( $this->options(), static function ( string $to, string $subject, string $body ) use ( &$sent ): bool { $sent[] = $body; return true; }, 'owner@example.test', 'https://example.test/report' );
+		$ids = array_map( static fn( int $n ): string => 'finding-' . $n, range( 1, 51 ) );
+		self::assertSame( 'accepted', $delivery->sendNew( $ids, 1000 ) );
+		self::assertCount( 1, $delivery->status()['pending'] );
+		self::assertSame( 'accepted', $delivery->retry( 1001 ) );
+		self::assertSame( array(), $delivery->status()['pending'] );
+		self::assertCount( 2, $sent );
+	}
+
+	public function test_invalid_email_records_failure_and_preserves_pending(): void {
+		$delivery = new AlertDelivery( $this->options(), static fn(): bool => true, 'bad-email', 'https://example.test/report' );
+		self::assertSame( 'failed', $delivery->sendNew( array( 'finding-one' ), 1000 ) );
+		self::assertSame( 'failed', $delivery->status()['last_attempt']['status'] );
+		self::assertSame( array( 'finding-one' ), $delivery->status()['pending'] );
+	}
+
 	private function options(): OptionGateway {
 		return new class implements OptionGateway {
 			public array $values = array();
