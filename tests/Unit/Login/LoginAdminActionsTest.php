@@ -16,8 +16,9 @@ final class LoginAdminActionsTest extends TestCase {
 	}
 
 	public function test_totp_actions_are_for_current_administrator_only(): void {
-		self::assertFalse( TotpAction::canManage( 7, 8, true ) );
-		self::assertFalse( TotpAction::canManage( 7, 7, false ) );
-		self::assertTrue( TotpAction::canManage( 7, 7, true ) );
+		self::assertFalse( TotpAction::canManage( 7, 8, true, true ) );
+		self::assertFalse( TotpAction::canManage( 7, 7, false, true ) );
+		self::assertFalse( TotpAction::canManage( 7, 7, true, false ) );
+		self::assertTrue( TotpAction::canManage( 7, 7, true, true ) );
 	}
 }

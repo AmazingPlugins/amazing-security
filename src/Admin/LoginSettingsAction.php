@@ -6,6 +6,7 @@ namespace AmazingPlugins\Security\Admin;
 
 use AmazingPlugins\Security\Integrity\WordPressOptions;
 use AmazingPlugins\Security\Login\WordPressLoginSettings;
+use AmazingPlugins\Security\Login\WordPressRateCounterStore;
 use InvalidArgumentException;
 
 final class LoginSettingsAction {
@@ -30,6 +31,9 @@ final class LoginSettingsAction {
 			list( $mode, $xmlRpc, $erase ) = self::parse( wp_unslash( $_POST ) );
 			$settings                      = new WordPressLoginSettings( new WordPressOptions() );
 			$settings->setRateMode( $mode );
+			if ( 'off' === $mode ) {
+				( new WordPressRateCounterStore( $GLOBALS['wpdb'] ) )->purge();
+			}
 			$settings->setXmlRpcAuthDisabled( $xmlRpc );
 			$settings->setEraseOnUninstall( $erase );
 		} catch ( \Throwable ) {

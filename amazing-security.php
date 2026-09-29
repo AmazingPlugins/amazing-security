@@ -35,6 +35,20 @@ spl_autoload_register(
 );
 
 register_activation_hook( __FILE__, array( AmazingPlugins\Security\Login\WordPressRateCounterStore::class, 'install' ) );
+register_deactivation_hook(
+	__FILE__,
+	static function (): void {
+		wp_clear_scheduled_hook( 'amsec_login_cleanup' );
+		( new AmazingPlugins\Security\Login\WordPressRateCounterStore( $GLOBALS['wpdb'] ) )->purge();
+	}
+);
+add_action(
+	'amsec_login_cleanup',
+	static function (): void {
+		( new AmazingPlugins\Security\Login\WordPressRateCounterStore( $GLOBALS['wpdb'] ) )->clearExpired( time() );
+	}
+);
+add_action( 'init', array( AmazingPlugins\Security\Login\WordPressRateCounterStore::class, 'ensureScheduled' ) );
 add_action(
 	'admin_init',
 	static function (): void {

@@ -53,10 +53,11 @@ namespace AmazingPlugins\Security\Tests\Unit\Login {
 			$_POST = array();
 		}
 
-		public function test_api_scope_excludes_rest_and_cli(): void {
-			self::assertTrue( TotpAuthentication::isApiRequest( true, false ) );
-			self::assertTrue( TotpAuthentication::isApiRequest( false, true ) );
-			self::assertFalse( TotpAuthentication::isApiRequest( false, false ) );
+		public function test_api_scope_excludes_rest_cli_and_xml_rpc(): void {
+			self::assertTrue( TotpAuthentication::isApiRequest( true, false, false ) );
+			self::assertTrue( TotpAuthentication::isApiRequest( false, true, false ) );
+			self::assertTrue( TotpAuthentication::isApiRequest( false, false, true ) );
+			self::assertFalse( TotpAuthentication::isApiRequest( false, false, false ) );
 		}
 
 		private function store( string $encrypted ): TotpStore {

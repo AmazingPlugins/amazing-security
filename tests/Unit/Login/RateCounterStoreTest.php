@@ -29,7 +29,7 @@ final class RateCounterStoreTest extends TestCase {
 			public string $lastQuery = '';
 			public function prepare( string $sql, mixed ...$values ): string { return vsprintf( str_replace( array( '%s', '%d' ), array( "'%s'", '%d' ), $sql ), $values ); }
 			public function query( string $sql ): bool { $this->lastQuery = $sql; return false; }
-			public function get_var( string $sql ): int { return 0; }
+			public function get_var( string $sql ): int { return str_contains( $sql, 'GET_LOCK' ) ? 1 : 0; }
 			public function get_row( string $sql, string $mode ): ?array { return null; }
 		};
 		$store = new WordPressRateCounterStore( $db );
@@ -42,8 +42,33 @@ final class RateCounterStoreTest extends TestCase {
 			public string $prefix = 'wp_';
 			public string $last_error = 'table missing';
 			public function prepare( string $query, mixed ...$args ): string { return $query; }
+			public function query( string $sql ): bool { return false; }
 			public function get_row( string $query, string $mode ): ?array { return null; }
 		};
 		self::assertSame( array( 'available' => false, 'observed' => 0, 'blocked' => 0 ), ( new WordPressRateCounterStore( $db ) )->summary( 1000 ) );
+	}
+
+	public function test_capacity_denies_new_address_and_reports_unknown_coverage(): void {
+		$db = new class {
+			public string $prefix = 'wp_';
+			public string $last_error = '';
+			public array $queries = array();
+			public function prepare( string $sql, mixed ...$values ): string { return vsprintf( str_replace( array( '%s', '%d' ), array( "'%s'", '%d' ), $sql ), $values ); }
+			public function query( string $sql ): int { $this->queries[] = $sql; return 1; }
+			public function get_var( string $sql ): ?int {
+				$this->queries[] = $sql;
+				if ( str_contains( $sql, 'GET_LOCK' ) || str_contains( $sql, 'RELEASE_LOCK' ) ) { return 1; }
+				if ( str_contains( $sql, 'COUNT(*)' ) ) { return 10000; }
+				return null;
+			}
+			public function get_row( string $sql, string $mode ): ?array {
+				return str_contains( $sql, 'AS observed' ) ? array( 'observed' => 10000, 'blocked' => 0 ) : null;
+			}
+		};
+		$store = new WordPressRateCounterStore( $db );
+		self::assertFalse( $store->recordFailure( str_repeat( 'a', 64 ), 100000 )->available );
+		self::assertFalse( $store->summary( 100000 )['available'] );
+		self::assertCount( 1, array_filter( $db->queries, fn( string $query ): bool => str_contains( $query, 'GET_LOCK' ) ) );
+		self::assertCount( 1, array_filter( $db->queries, fn( string $query ): bool => str_contains( $query, 'RELEASE_LOCK' ) ) );
 	}
 }

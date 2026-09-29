@@ -12,8 +12,8 @@ use AmazingPlugins\Security\Login\WordPressPendingEnrollmentStore;
 use AmazingPlugins\Security\Login\WordPressTotpStore;
 
 final class TotpAction {
-	public static function canManage( int $userId, int $currentId, bool $hasCapability ): bool {
-		return $userId > 0 && $userId === $currentId && $hasCapability;
+	public static function canManage( int $userId, int $currentId, bool $hasCapability, bool $https ): bool {
+		return $userId > 0 && $userId === $currentId && $hasCapability && $https;
 	}
 
 	public function begin(): void {
@@ -65,7 +65,7 @@ final class TotpAction {
 
 	private function authorize( string $action ): int {
 		$id = get_current_user_id();
-		if ( ! self::canManage( $id, $id, current_user_can( 'manage_options' ) ) ) {
+		if ( ! self::canManage( $id, $id, current_user_can( 'manage_options' ), is_ssl() ) ) {
 			wp_die( esc_html__( 'You cannot change this account.', 'amazing-security' ), '', array( 'response' => 403 ) );
 		}
 		check_admin_referer( $action );

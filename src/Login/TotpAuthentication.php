@@ -9,12 +9,12 @@ use RuntimeException;
 final class TotpAuthentication {
 	public function __construct( private TotpStore $store, private SecretCipher $cipher, private Totp $totp ) {}
 
-	public static function isApiRequest( bool $rest, bool $cli ): bool {
-		return $rest || $cli;
+	public static function isApiRequest( bool $rest, bool $cli, bool $xmlRpc ): bool {
+		return $rest || $cli || $xmlRpc;
 	}
 
 	public function authenticate( mixed $user, string $username, string $password ): mixed {
-		if ( '' === $username || '' === $password || ! $user instanceof \WP_User || ! user_can( $user, 'manage_options' ) || self::isApiRequest( defined( 'REST_REQUEST' ) && REST_REQUEST, defined( 'WP_CLI' ) && WP_CLI ) ) {
+		if ( '' === $username || '' === $password || ! $user instanceof \WP_User || ! user_can( $user, 'manage_options' ) || self::isApiRequest( defined( 'REST_REQUEST' ) && REST_REQUEST, defined( 'WP_CLI' ) && WP_CLI, defined( 'XMLRPC_REQUEST' ) && XMLRPC_REQUEST ) ) {
 			return $user;
 		}
 		try {

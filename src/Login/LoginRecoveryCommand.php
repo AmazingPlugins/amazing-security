@@ -13,6 +13,7 @@ final class LoginRecoveryCommand {
 		}
 		$settings = new WordPressLoginSettings( new WordPressOptions() );
 		$settings->setRateMode( 'off' );
+		( new WordPressRateCounterStore( $GLOBALS['wpdb'] ) )->purge();
 		$settings->setXmlRpcAuthDisabled( false );
 		\WP_CLI::success( 'Amazing Security login rate blocking and XML-RPC restriction are off.' );
 	}
