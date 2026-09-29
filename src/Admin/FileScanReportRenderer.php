@@ -7,6 +7,7 @@ namespace AmazingPlugins\Security\Admin;
 use AmazingPlugins\Security\FileScan\BundledRulePack;
 use AmazingPlugins\Security\FileScan\FileScanReport;
 use AmazingPlugins\Security\FileScan\FileScanStep;
+use AmazingPlugins\Security\FileScan\RuleGuidance;
 use DateTimeImmutable;
 
 final class FileScanReportRenderer {
@@ -18,7 +19,7 @@ final class FileScanReportRenderer {
 		$age      = false === $released ? 0 : max( 0, (int) floor( ( time() - $released->getTimestamp() ) / 86400 ) );
 		$html     = '<section class="amsec-file-scan" aria-labelledby="amsec-file-scan"><div class="amsec-file-heading"><div><h2 id="amsec-file-scan">Suspicious files</h2><p>Checks unfamiliar PHP files on this site. A match needs review; no match does not prove the site is clean.</p></div><span class="amsec-file-rule-age">Bundled rules ' . esc_html( $version ) . ' (' . esc_html( (string) $age ) . ' days old)</span></div>';
 		if ( null === $completed && null === $progress ) {
-			return $html . '<p class="amsec-file-empty">No file scan has run. Start one to check for extra files and three suspicious code patterns.</p></section>';
+			return $html . '<p class="amsec-file-empty">No file scan has run. Start one to check for extra files and the bundled suspicious-code patterns.</p></section>';
 		}
 		if ( null !== $progress ) {
 			$cursor = $progress->cursor;
@@ -79,7 +80,13 @@ final class FileScanReportRenderer {
 			if ( (int) ( $finding['line'] ?? 0 ) > 0 ) {
 				$html .= '<span class="amsec-file-line">Line ' . esc_html( (string) (int) $finding['line'] ) . '</span>';
 			}
-			$html  .= '<p>' . esc_html( (string) ( $finding['summary'] ?? '' ) ) . '</p>';
+			$html .= '<p>' . esc_html( (string) ( $finding['summary'] ?? '' ) ) . '</p>';
+			if ( 'unscanned' === $kind && 'rule_memory_limit' === ( $finding['reason'] ?? '' ) ) {
+				$html .= '<p>This file exceeded the code check memory budget. It has not been cleared. Compare it with its trusted release or ask your developer to inspect it separately.</p>';
+			}
+			if ( 'suspected' === $kind ) {
+				$html .= '<details class="amsec-rule-guidance"><summary>Why this needs review and what to do</summary><p>' . esc_html( RuleGuidance::forRule( (string) ( $finding['rule_id'] ?? '' ) ) ) . '</p><p>Back up the site before making changes. Compare the exact installed version with its trusted release, and ask the plugin or theme developer to review differences. Do not delete a file based only on this match. Use the review note below to record your assessment.</p></details>';
+			}
 			$id     = (string) ( $finding['id'] ?? '' );
 			$formId = 'amsec-note-' . substr( hash( 'sha256', $label ), 0, 8 ) . '-' . $id;
 			if ( isset( $this->notes[ $id ] ) ) {

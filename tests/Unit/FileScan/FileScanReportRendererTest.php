@@ -12,6 +12,17 @@ use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 
 final class FileScanReportRendererTest extends TestCase {
+    public function test_suspicious_finding_has_rule_guidance_and_safe_next_steps(): void {
+        $cursor = new FileScanCursor( 'guidance' );
+        $cursor->findings[] = array( 'kind' => 'suspected', 'rule_id' => 'AS-PHP-012', 'path' => 'plugin.php', 'summary' => 'Request redirect' );
+        $html = ( new FileScanReportRenderer() )->render( null, new FileScanStep( $cursor, false ), array() );
+        self::assertStringContainsString( 'Why this needs review', $html );
+        self::assertStringContainsString( 'wp_safe_redirect', $html );
+        self::assertStringContainsString( 'Back up the site', $html );
+        self::assertStringContainsString( 'Do not delete a file based only on this match', $html );
+        self::assertStringNotContainsString( 'three suspicious', ( new FileScanReportRenderer() )->render( null, null, array() ) );
+    }
+
 	public function test_empty_state_invites_manual_scan_without_all_clear(): void {
 		$html = ( new FileScanReportRenderer() )->render( null, null, array() );
 		self::assertStringContainsString( 'No file scan has run', $html );

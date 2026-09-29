@@ -1,0 +1,661 @@
+{
+  "provenance": "Original synthetic fixtures authored for Amazing Security; never execute these samples. Known gaps are explicit and not benign verdicts.",
+  "cases": [
+    {
+      "name": "eval-decode",
+      "kind": "suspected",
+      "code": "<?php eval(base64_decode('fixture'));",
+      "expected": [
+        "AS-PHP-001"
+      ]
+    },
+    {
+      "name": "eval-decode-newline",
+      "kind": "suspected",
+      "code": "<?php\n\neval(\nbase64_decode('fixture'));",
+      "expected": [
+        "AS-PHP-001"
+      ]
+    },
+    {
+      "name": "eval-decode-comment",
+      "kind": "suspected",
+      "code": "<?php eval( /* fixture only */ base64_decode('fixture'));",
+      "expected": [
+        "AS-PHP-001"
+      ]
+    },
+    {
+      "name": "eval-decode-documentation",
+      "kind": "benign",
+      "code": "<?php /* eval(base64_decode('fixture')); */",
+      "expected": []
+    },
+    {
+      "name": "command",
+      "kind": "suspected",
+      "code": "<?php system($_GET['cmd']);",
+      "expected": [
+        "AS-PHP-002"
+      ]
+    },
+    {
+      "name": "command-newline",
+      "kind": "suspected",
+      "code": "<?php\n\nsystem(\n$_GET['cmd']);",
+      "expected": [
+        "AS-PHP-002"
+      ]
+    },
+    {
+      "name": "command-comment",
+      "kind": "suspected",
+      "code": "<?php system( /* fixture only */ $_GET['cmd']);",
+      "expected": [
+        "AS-PHP-002"
+      ]
+    },
+    {
+      "name": "command-documentation",
+      "kind": "benign",
+      "code": "<?php /* system($_GET['cmd']); */",
+      "expected": []
+    },
+    {
+      "name": "remote-include",
+      "kind": "suspected",
+      "code": "<?php include(file_get_contents('https://example.invalid/fixture'));",
+      "expected": [
+        "AS-PHP-003"
+      ]
+    },
+    {
+      "name": "remote-include-newline",
+      "kind": "suspected",
+      "code": "<?php\n\ninclude(\nfile_get_contents('https://example.invalid/fixture'));",
+      "expected": [
+        "AS-PHP-003"
+      ]
+    },
+    {
+      "name": "remote-include-comment",
+      "kind": "suspected",
+      "code": "<?php include( /* fixture only */ file_get_contents('https://example.invalid/fixture'));",
+      "expected": [
+        "AS-PHP-003"
+      ]
+    },
+    {
+      "name": "remote-include-documentation",
+      "kind": "benign",
+      "code": "<?php /* include(file_get_contents('https://example.invalid/fixture')); */",
+      "expected": []
+    },
+    {
+      "name": "request-eval",
+      "kind": "suspected",
+      "code": "<?php eval($_POST['code']);",
+      "expected": [
+        "AS-PHP-004"
+      ]
+    },
+    {
+      "name": "request-eval-newline",
+      "kind": "suspected",
+      "code": "<?php\n\neval(\n$_POST['code']);",
+      "expected": [
+        "AS-PHP-004"
+      ]
+    },
+    {
+      "name": "request-eval-comment",
+      "kind": "suspected",
+      "code": "<?php eval( /* fixture only */ $_POST['code']);",
+      "expected": [
+        "AS-PHP-004"
+      ]
+    },
+    {
+      "name": "request-eval-documentation",
+      "kind": "benign",
+      "code": "<?php /* eval($_POST['code']); */",
+      "expected": []
+    },
+    {
+      "name": "request-include",
+      "kind": "suspected",
+      "code": "<?php require $_REQUEST['file'];",
+      "expected": [
+        "AS-PHP-005"
+      ]
+    },
+    {
+      "name": "request-include-newline",
+      "kind": "suspected",
+      "code": "<?php\n\nrequire $_REQUEST['file'];",
+      "expected": [
+        "AS-PHP-005"
+      ]
+    },
+    {
+      "name": "request-include-comment",
+      "kind": "suspected",
+      "code": "<?php require $_REQUEST['file'];",
+      "expected": [
+        "AS-PHP-005"
+      ]
+    },
+    {
+      "name": "request-include-documentation",
+      "kind": "benign",
+      "code": "<?php /* require $_REQUEST['file']; */",
+      "expected": []
+    },
+    {
+      "name": "compressed",
+      "kind": "suspected",
+      "code": "<?php eval(gzinflate(base64_decode('fixture')));",
+      "expected": [
+        "AS-PHP-006"
+      ]
+    },
+    {
+      "name": "compressed-newline",
+      "kind": "suspected",
+      "code": "<?php\n\neval(\ngzinflate(base64_decode('fixture')));",
+      "expected": [
+        "AS-PHP-006"
+      ]
+    },
+    {
+      "name": "compressed-comment",
+      "kind": "suspected",
+      "code": "<?php eval( /* fixture only */ gzinflate(base64_decode('fixture')));",
+      "expected": [
+        "AS-PHP-006"
+      ]
+    },
+    {
+      "name": "compressed-documentation",
+      "kind": "benign",
+      "code": "<?php /* eval(gzinflate(base64_decode('fixture'))); */",
+      "expected": []
+    },
+    {
+      "name": "cookie",
+      "kind": "suspected",
+      "code": "<?php eval($_COOKIE['code']);",
+      "expected": [
+        "AS-PHP-007"
+      ]
+    },
+    {
+      "name": "cookie-newline",
+      "kind": "suspected",
+      "code": "<?php\n\neval(\n$_COOKIE['code']);",
+      "expected": [
+        "AS-PHP-007"
+      ]
+    },
+    {
+      "name": "cookie-comment",
+      "kind": "suspected",
+      "code": "<?php eval( /* fixture only */ $_COOKIE['code']);",
+      "expected": [
+        "AS-PHP-007"
+      ]
+    },
+    {
+      "name": "cookie-documentation",
+      "kind": "benign",
+      "code": "<?php /* eval($_COOKIE['code']); */",
+      "expected": []
+    },
+    {
+      "name": "header",
+      "kind": "suspected",
+      "code": "<?php header('Location: ' . $_GET['next']);",
+      "expected": [
+        "AS-PHP-008"
+      ]
+    },
+    {
+      "name": "header-newline",
+      "kind": "suspected",
+      "code": "<?php\n\nheader(\n'Location: ' . $_GET['next']);",
+      "expected": [
+        "AS-PHP-008"
+      ]
+    },
+    {
+      "name": "header-comment",
+      "kind": "suspected",
+      "code": "<?php header( /* fixture only */ 'Location: ' . $_GET['next']);",
+      "expected": [
+        "AS-PHP-008"
+      ]
+    },
+    {
+      "name": "header-documentation",
+      "kind": "benign",
+      "code": "<?php /* header('Location: ' . $_GET['next']); */",
+      "expected": []
+    },
+    {
+      "name": "hidden-link",
+      "kind": "suspected",
+      "code": "<?php echo '<a href=\"https://example.invalid\" style=\"display:none\">fixture</a>';",
+      "expected": [
+        "AS-PHP-009"
+      ]
+    },
+    {
+      "name": "hidden-link-newline",
+      "kind": "suspected",
+      "code": "<?php\n\necho '<a href=\"https://example.invalid\" style=\"display:none\">fixture</a>';",
+      "expected": [
+        "AS-PHP-009"
+      ]
+    },
+    {
+      "name": "hidden-link-comment",
+      "kind": "suspected",
+      "code": "<?php echo '<a href=\"https://example.invalid\" style=\"display:none\">fixture</a>';",
+      "expected": [
+        "AS-PHP-009"
+      ]
+    },
+    {
+      "name": "hidden-link-documentation",
+      "kind": "benign",
+      "code": "<?php /* echo '<a href=\"https://example.invalid\" style=\"display:none\">fixture</a>'; */",
+      "expected": []
+    },
+    {
+      "name": "deserialize",
+      "kind": "suspected",
+      "code": "<?php unserialize($_POST['data']);",
+      "expected": [
+        "AS-PHP-010"
+      ]
+    },
+    {
+      "name": "deserialize-newline",
+      "kind": "suspected",
+      "code": "<?php\n\nunserialize(\n$_POST['data']);",
+      "expected": [
+        "AS-PHP-010"
+      ]
+    },
+    {
+      "name": "deserialize-comment",
+      "kind": "suspected",
+      "code": "<?php unserialize( /* fixture only */ $_POST['data']);",
+      "expected": [
+        "AS-PHP-010"
+      ]
+    },
+    {
+      "name": "deserialize-documentation",
+      "kind": "benign",
+      "code": "<?php /* unserialize($_POST['data']); */",
+      "expected": []
+    },
+    {
+      "name": "callback",
+      "kind": "suspected",
+      "code": "<?php call_user_func($_REQUEST['callback'], 'fixture');",
+      "expected": [
+        "AS-PHP-011"
+      ]
+    },
+    {
+      "name": "callback-newline",
+      "kind": "suspected",
+      "code": "<?php\n\ncall_user_func(\n$_REQUEST['callback'], 'fixture');",
+      "expected": [
+        "AS-PHP-011"
+      ]
+    },
+    {
+      "name": "callback-comment",
+      "kind": "suspected",
+      "code": "<?php call_user_func( /* fixture only */ $_REQUEST['callback'], 'fixture');",
+      "expected": [
+        "AS-PHP-011"
+      ]
+    },
+    {
+      "name": "callback-documentation",
+      "kind": "benign",
+      "code": "<?php /* call_user_func($_REQUEST['callback'], 'fixture'); */",
+      "expected": []
+    },
+    {
+      "name": "redirect",
+      "kind": "suspected",
+      "code": "<?php wp_redirect($_GET['next']);",
+      "expected": [
+        "AS-PHP-012"
+      ]
+    },
+    {
+      "name": "redirect-newline",
+      "kind": "suspected",
+      "code": "<?php\n\nwp_redirect(\n$_GET['next']);",
+      "expected": [
+        "AS-PHP-012"
+      ]
+    },
+    {
+      "name": "redirect-comment",
+      "kind": "suspected",
+      "code": "<?php wp_redirect( /* fixture only */ $_GET['next']);",
+      "expected": [
+        "AS-PHP-012"
+      ]
+    },
+    {
+      "name": "redirect-documentation",
+      "kind": "benign",
+      "code": "<?php /* wp_redirect($_GET['next']); */",
+      "expected": []
+    },
+    {
+      "name": "encoded-data",
+      "kind": "benign",
+      "code": "<?php $data = base64_decode($input);",
+      "expected": []
+    },
+    {
+      "name": "constant-shell",
+      "kind": "benign",
+      "code": "<?php system('date');",
+      "expected": []
+    },
+    {
+      "name": "escaped-command",
+      "kind": "benign",
+      "code": "<?php system(escapeshellarg($_GET['cmd']));",
+      "expected": []
+    },
+    {
+      "name": "validated-route",
+      "kind": "benign",
+      "code": "<?php $routes = ['home'=>'home.php']; include $routes[$_GET['route']];",
+      "expected": []
+    },
+    {
+      "name": "remote-json",
+      "kind": "benign",
+      "code": "<?php $data=json_decode(file_get_contents('https://example.invalid/data'),true);",
+      "expected": []
+    },
+    {
+      "name": "safe-redirect",
+      "kind": "benign",
+      "code": "<?php wp_safe_redirect($_GET['next']);",
+      "expected": []
+    },
+    {
+      "name": "validated-redirect",
+      "kind": "benign",
+      "code": "<?php wp_redirect(wp_validate_redirect($_GET['next'],home_url('/')));",
+      "expected": []
+    },
+    {
+      "name": "constant-redirect",
+      "kind": "benign",
+      "code": "<?php wp_redirect(home_url('/'));",
+      "expected": []
+    },
+    {
+      "name": "visible-link",
+      "kind": "benign",
+      "code": "<?php echo '<a href=\"https://example.invalid\">fixture</a>';",
+      "expected": []
+    },
+    {
+      "name": "hidden-internal-link",
+      "kind": "benign",
+      "code": "<?php echo '<a href=\"/help\" style=\"display:none\">fixture</a>';",
+      "expected": []
+    },
+    {
+      "name": "hidden-template-only",
+      "kind": "benign",
+      "code": "<?php $template='<a href=\"https://example.invalid\" style=\"display:none\">fixture</a>';",
+      "expected": []
+    },
+    {
+      "name": "trusted-deserialize",
+      "kind": "benign",
+      "code": "<?php unserialize(get_option('trusted_data'));",
+      "expected": []
+    },
+    {
+      "name": "json-input",
+      "kind": "benign",
+      "code": "<?php json_decode($_POST['data']);",
+      "expected": []
+    },
+    {
+      "name": "constant-callback",
+      "kind": "benign",
+      "code": "<?php call_user_func('sanitize_text_field',$_POST['name']);",
+      "expected": []
+    },
+    {
+      "name": "method-command",
+      "kind": "benign",
+      "code": "<?php $builder->system($_GET['cmd']);",
+      "expected": []
+    },
+    {
+      "name": "static-command",
+      "kind": "benign",
+      "code": "<?php Example::system($_GET['cmd']);",
+      "expected": []
+    },
+    {
+      "name": "method-deserialize",
+      "kind": "benign",
+      "code": "<?php $serializer->unserialize($_POST['data']);",
+      "expected": []
+    },
+    {
+      "name": "static-redirect",
+      "kind": "benign",
+      "code": "<?php Helper::wp_redirect($_GET['next']);",
+      "expected": []
+    },
+    {
+      "name": "namespaced-function",
+      "kind": "benign",
+      "code": "<?php Demo\\system($_GET['cmd']);",
+      "expected": []
+    },
+    {
+      "name": "heredoc-docs",
+      "kind": "benign",
+      "code": "<?php $docs=<<<'TEXT'\nsystem($_POST['cmd']);\nTEXT;",
+      "expected": []
+    },
+    {
+      "name": "double-string-docs",
+      "kind": "benign",
+      "code": "<?php $docs=\"system($_POST[cmd])\";",
+      "expected": []
+    },
+    {
+      "name": "backtick-text",
+      "kind": "benign",
+      "code": "<?php $out=`echo system(hello)`;",
+      "expected": []
+    },
+    {
+      "name": "member-name-only",
+      "kind": "benign",
+      "code": "<?php $x->exec;",
+      "expected": []
+    },
+    {
+      "name": "function-declaration",
+      "kind": "benign",
+      "code": "<?php function system($input) { return $input; }",
+      "expected": []
+    },
+    {
+      "name": "css-other-tag",
+      "kind": "benign",
+      "code": "<?php echo '<span style=\"display:none\">text</span><a href=\"https://example.invalid\">visible</a>';",
+      "expected": []
+    },
+    {
+      "name": "blank",
+      "kind": "benign",
+      "code": "<?php\n",
+      "expected": []
+    },
+    {
+      "name": "html-documentation",
+      "kind": "benign",
+      "code": "<pre>eval(base64_decode(placeholder))</pre>",
+      "expected": []
+    },
+    {
+      "name": "indirect-call",
+      "kind": "known-gap",
+      "code": "<?php $f=$_POST['callback']; $f();",
+      "expected": []
+    },
+    {
+      "name": "indirect-eval",
+      "kind": "known-gap",
+      "code": "<?php $x=$_POST['code']; eval($x);",
+      "expected": []
+    },
+    {
+      "name": "inline-html-spam",
+      "kind": "known-gap",
+      "code": "<a href=\"https://example.invalid\" style=\"display:none\">fixture</a>",
+      "expected": []
+    },
+    {
+      "name": "split-url-link",
+      "kind": "known-gap",
+      "code": "<?php $tag='<a href='; echo $tag.$url;",
+      "expected": []
+    },
+    {
+      "name": "encoded-function-name",
+      "kind": "known-gap",
+      "code": "<?php $fn='sy'.'stem'; $fn($_POST['cmd']);",
+      "expected": []
+    },
+    {
+      "name": "indirect-redirect",
+      "kind": "known-gap",
+      "code": "<?php $next=$_GET['next']; wp_redirect($next);",
+      "expected": []
+    },
+    {
+      "name": "ordinary-location-constant",
+      "kind": "benign",
+      "code": "<?php header(LOCATION . $_GET[\"next\"]);",
+      "expected": []
+    },
+    {
+      "name": "ordinary-url-constant",
+      "kind": "benign",
+      "code": "<?php include(file_get_contents(URL));",
+      "expected": []
+    },
+    {
+      "name": "ordinary-hidden-link-constant",
+      "kind": "benign",
+      "code": "<?php echo HIDDEN_EXTERNAL_LINK;",
+      "expected": []
+    },
+    {
+      "name": "variable-system",
+      "kind": "benign",
+      "code": "<?php $system($_POST[\"value\"]);",
+      "expected": []
+    },
+    {
+      "name": "namespaced-system",
+      "kind": "benign",
+      "code": "<?php \\Demo\\system($_POST[\"value\"]);",
+      "expected": []
+    },
+    {
+      "name": "global-system",
+      "kind": "suspected",
+      "code": "<?php \\system($_POST[\"value\"]);",
+      "expected": [
+        "AS-PHP-002"
+      ]
+    },
+    {
+      "name": "variable-unserialize",
+      "kind": "benign",
+      "code": "<?php $unserialize($_POST[\"value\"]);",
+      "expected": []
+    },
+    {
+      "name": "namespaced-unserialize",
+      "kind": "benign",
+      "code": "<?php \\Demo\\unserialize($_POST[\"value\"]);",
+      "expected": []
+    },
+    {
+      "name": "global-unserialize",
+      "kind": "suspected",
+      "code": "<?php \\unserialize($_POST[\"value\"]);",
+      "expected": [
+        "AS-PHP-010"
+      ]
+    },
+    {
+      "name": "variable-call_user_func",
+      "kind": "benign",
+      "code": "<?php $call_user_func($_POST[\"value\"]);",
+      "expected": []
+    },
+    {
+      "name": "namespaced-call_user_func",
+      "kind": "benign",
+      "code": "<?php \\Demo\\call_user_func($_POST[\"value\"]);",
+      "expected": []
+    },
+    {
+      "name": "global-call_user_func",
+      "kind": "suspected",
+      "code": "<?php \\call_user_func($_POST[\"value\"]);",
+      "expected": [
+        "AS-PHP-011"
+      ]
+    },
+    {
+      "name": "variable-wp_redirect",
+      "kind": "benign",
+      "code": "<?php $wp_redirect($_POST[\"value\"]);",
+      "expected": []
+    },
+    {
+      "name": "namespaced-wp_redirect",
+      "kind": "benign",
+      "code": "<?php \\Demo\\wp_redirect($_POST[\"value\"]);",
+      "expected": []
+    },
+    {
+      "name": "global-wp_redirect",
+      "kind": "suspected",
+      "code": "<?php \\wp_redirect($_POST[\"value\"]);",
+      "expected": [
+        "AS-PHP-012"
+      ]
+    }
+  ]
+}
