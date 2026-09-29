@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Admin;
 
+use AmazingPlugins\Security\Alerts\WordPressAlertNotifier;
 use AmazingPlugins\Security\FileScan\FileScanCursor;
 use AmazingPlugins\Security\FileScan\FileScanPlanBuilder;
 use AmazingPlugins\Security\FileScan\FileScanReport;
@@ -113,7 +114,14 @@ final class FileScanAction {
 			$step    = ( new FileScanRunner() )->step( $targets, $cursor, new ScanContext() );
 			$store->saveProgress( $cursor->scanId, $step );
 			if ( $step->finished ) {
-				$store->complete( $cursor->scanId, FileScanReport::fromCursor( $step->cursor ) );
+				$report = FileScanReport::fromCursor( $step->cursor );
+				$store->complete( $cursor->scanId, $report );
+				try {
+					( new WordPressAlertNotifier() )->create()->files( $report, time() );
+				} catch ( Throwable ) {
+					// Mail cannot undo a completed file report.
+					return false;
+				}
 			}
 		} catch ( Throwable $failure ) {
 			$error            = true;

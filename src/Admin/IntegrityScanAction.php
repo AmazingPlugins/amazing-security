@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Admin;
 
+use AmazingPlugins\Security\Alerts\WordPressAlertNotifier;
 use AmazingPlugins\Security\Integrity\FileReader;
 use AmazingPlugins\Security\Integrity\CompletedIntegrityReport;
 use AmazingPlugins\Security\Integrity\IntegrityCursor;
@@ -99,7 +100,14 @@ final class IntegrityScanAction {
 				$step = ( new IntegrityRunner( new FileReader() ) )->step( $discovery->targets, $cursor, new ScanContext() );
 				$store->saveProgress( $cursor->scanId, $step );
 				if ( $step->finished && ! $step->cursor->partial ) {
-					$store->complete( $cursor->scanId, ( new CompletedIntegrityReport() )->fromCursor( $cursor ) );
+					$report = ( new CompletedIntegrityReport() )->fromCursor( $cursor );
+					$store->complete( $cursor->scanId, $report );
+					try {
+						( new WordPressAlertNotifier() )->create()->integrity( $report, time() );
+					} catch ( Throwable ) {
+						// Mail cannot undo a completed integrity report.
+						return false;
+					}
 				}
 			}
 		} catch ( Throwable $failure ) {

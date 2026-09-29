@@ -83,6 +83,28 @@
   line-height: 1.5;
 }
 
+.amazing-security-admin .amsec-alert-settings {
+  padding: 0 0 18px;
+  border-bottom: 1px solid var(--amsec-line);
+}
+
+.amazing-security-admin .amsec-alert-settings p {
+  max-width: 70ch;
+  line-height: 1.5;
+}
+
+.amazing-security-admin .amsec-alert-settings fieldset {
+  display: flex;
+  gap: 18px;
+  margin: 12px 0;
+}
+
+.amazing-security-admin .amsec-alert-settings label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
 .amazing-security-admin .amsec-overview h2 {
   margin-bottom: 12px;
 }

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Admin;
 
+use AmazingPlugins\Security\Alerts\AlertDelivery;
+use AmazingPlugins\Security\Alerts\AlertSettingsRenderer;
 use AmazingPlugins\Security\FileScan\WordPressFileScanStore;
 use AmazingPlugins\Security\Firewall\FirewallStatusRenderer;
 use AmazingPlugins\Security\Firewall\ObservationStore;
@@ -74,6 +76,10 @@ final class AdminPage {
 		// FirewallStatusRenderer escapes dynamic values.
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		echo ( new FirewallStatusRenderer() )->render( ( new ObservationStore( $options ) )->summary() );
+		$alertState = ( new AlertDelivery( $options, static fn(): bool => false, '', '' ) )->status();
+		// AlertSettingsRenderer escapes dynamic values.
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo ( new AlertSettingsRenderer() )->render( '0' !== $options->get( 'amsec_alerts_enabled' ), $alertState, admin_url( 'admin-post.php' ), wp_create_nonce( 'amsec_alert_settings' ) );
 		$loginSettings = new WordPressLoginSettings( $options );
 		$loginStore    = new WordPressTotpStore( $GLOBALS['wpdb'] );
 		try {
