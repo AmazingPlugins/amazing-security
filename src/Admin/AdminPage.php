@@ -7,6 +7,8 @@ namespace AmazingPlugins\Security\Admin;
 use AmazingPlugins\Security\Findings\FindingsRepository;
 use AmazingPlugins\Security\Integrity\WordPressIntegrityStore;
 use AmazingPlugins\Security\Integrity\WordPressOptions;
+use AmazingPlugins\Security\Login\WordPressLoginSettings;
+use AmazingPlugins\Security\Login\WordPressTotpStore;
 use AmazingPlugins\Security\Vulnerabilities\VulnerabilityPreferences;
 use AmazingPlugins\Security\Vulnerabilities\WordPressVulnerabilityReportStore;
 
@@ -47,6 +49,32 @@ final class AdminPage {
 		echo '</div>';
 		$this->attentionList( $run?->results ?? array(), $integrity?->results ?? array(), $direct ? $vulnCurrent?->results ?? array() : array() );
 		echo '</section>';
+		$loginSettings = new WordPressLoginSettings( $options );
+		$loginStore    = new WordPressTotpStore( $GLOBALS['wpdb'] );
+		try {
+			$loginEnrolled = $loginStore->isEnrolled( get_current_user_id() );
+		} catch ( \RuntimeException ) {
+			$loginEnrolled = true;
+			echo '<div class="notice notice-error"><p>Administrator verification status could not be read. Use the documented WP-CLI recovery route if sign-in is affected.</p></div>';
+		}
+		$loginView = new LoginView(
+			admin_url( 'admin-post.php' ),
+			array(
+				'settings'   => wp_create_nonce( 'amsec_login_settings' ),
+				'begin'      => wp_create_nonce( 'amsec_totp_begin' ),
+				'disable'    => wp_create_nonce( 'amsec_totp_disable' ),
+				'regenerate' => wp_create_nonce( 'amsec_totp_regenerate' ),
+			),
+			$loginSettings->rateMode(),
+			$loginSettings->xmlRpcAuthDisabled(),
+			$loginEnrolled,
+			is_ssl(),
+			wp_get_current_user()->user_login,
+			$loginSettings->eraseOnUninstall()
+		);
+		// LoginProtectionRenderer escapes all dynamic values.
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo ( new LoginProtectionRenderer() )->render( $loginView );
 		// This flag selects a static message and does not change state or enter output.
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		if ( isset( $_GET['amazing_security_error'] ) ) {

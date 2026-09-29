@@ -65,4 +65,9 @@ add_action( 'admin_post_amazing_security_vulnerability_scan', array( new Amazing
 add_action( 'admin_post_amazing_security_vulnerability_enable', array( new AmazingPlugins\Security\Admin\VulnerabilityConsentAction(), 'enable' ) );
 add_action( 'admin_post_amazing_security_vulnerability_disable', array( new AmazingPlugins\Security\Admin\VulnerabilityConsentAction(), 'disable' ) );
 add_action( 'admin_post_amazing_security_vulnerability_clear', array( new AmazingPlugins\Security\Admin\VulnerabilityConsentAction(), 'clearReports' ) );
+add_action( 'admin_post_amsec_login_settings', array( new AmazingPlugins\Security\Admin\LoginSettingsAction(), 'save' ) );
+add_action( 'admin_post_amsec_totp_begin', array( new AmazingPlugins\Security\Admin\TotpAction(), 'begin' ) );
+add_action( 'admin_post_amsec_totp_confirm', array( new AmazingPlugins\Security\Admin\TotpAction(), 'confirm' ) );
+add_action( 'admin_post_amsec_totp_disable', array( new AmazingPlugins\Security\Admin\TotpAction(), 'disable' ) );
+add_action( 'admin_post_amsec_totp_regenerate', array( new AmazingPlugins\Security\Admin\TotpAction(), 'regenerate' ) );
 add_action( 'amsec_vuln_tick', array( new AmazingPlugins\Security\Admin\VulnerabilityScanAction(), 'scheduled' ) );
