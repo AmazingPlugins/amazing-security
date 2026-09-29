@@ -98,10 +98,10 @@ final class FindingsGateway {
 				$seen[ $projected['id'] ] = true;
 			}
 		}
-		if ( null !== $files && $files->partial ) {
+		if ( null === $files || $files->partial ) {
 			$kept = 0;
 			foreach ( array_reverse( ( $this->fileHistory )() ) as $historical ) {
-				if ( ! $historical instanceof FileScanReport || $historical->scanId === $files->scanId ) {
+				if ( ! $historical instanceof FileScanReport || $historical->scanId === $files?->scanId ) {
 					continue;
 				}
 				foreach ( $historical->findings as $result ) {
