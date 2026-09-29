@@ -64,4 +64,12 @@ $repo->create( $optOut );
 if ( 'unavailable' !== $repo->apply( $optOutId, 1, $now + 1 ) || 'off' !== get_option( 'amsec_login_rate_mode' ) || 'pending' !== $repo->get( $optOutId )->status || array() !== $repo->audit( $optOutId ) ) {
 	throw new RuntimeException( 'Approval committed after MCP opt-out.' );
 }
+( new McpPreferences( new WordPressOptions() ) )->setEnabled( true );
+if ( 'applied' !== $repo->apply( $optOutId, 1, $now + 2 ) ) {
+	throw new RuntimeException( 'Opted-in approval failed.' );
+}
+( new McpPreferences( new WordPressOptions() ) )->setEnabled( false );
+if ( 'rolled_back' !== $repo->rollback( $optOutId, 1, $now + 3 ) || 'off' !== get_option( 'amsec_login_rate_mode' ) ) {
+	throw new RuntimeException( 'Recovery was blocked by MCP opt-out.' );
+}
 echo "Fix storage case passed.\n";
