@@ -15,10 +15,10 @@ final class InstalledSoftware {
 
 	public function toArray(): array {
 		return array(
-			'type'     => $this->type,
-			'slug'     => $this->slug,
-			'version'  => $this->version,
-			'eligible' => $this->eligible,
+			'type'             => $this->type,
+			'slug'             => $this->slug,
+			'version'          => $this->version,
+			'eligible'         => $this->eligible,
 			'proof_checked_at' => $this->proofCheckedAt,
 		);
 	}
