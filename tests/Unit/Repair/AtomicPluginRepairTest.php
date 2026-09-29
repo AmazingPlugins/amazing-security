@@ -93,6 +93,30 @@ final class AtomicPluginRepairTest extends TestCase {
 		}
 	}
 
+	public function test_missing_private_backup_directory_refuses_without_changing_file(): void {
+		$missing = dirname( $this->backup ) . '/missing';
+		$repair = new AtomicPluginRepair( $this->site, $missing );
+		$clean = new RepairBytes( 'clean', hash( 'sha256', 'clean' ), 'https://downloads.wordpress.org/plugin/hello-dolly.1.7.2.zip' );
+		self::assertNull( $repair->apply( 'hello.php', hash( 'sha256', 'changed' ), $clean->sha256, $clean ) );
+		self::assertSame( 'changed', file_get_contents( $this->site . '/hello.php' ) );
+	}
+
+	public function test_symlinked_parent_refuses_repair(): void {
+		mkdir( $this->site . '/real', 0700 );
+		file_put_contents( $this->site . '/real/file.php', 'changed' );
+		symlink( $this->site . '/real', $this->site . '/linked' );
+		try {
+			$repair = new AtomicPluginRepair( $this->site, $this->backup );
+			$clean = new RepairBytes( 'clean', hash( 'sha256', 'clean' ), 'https://downloads.wordpress.org/plugin/hello-dolly.1.7.2.zip' );
+			self::assertNull( $repair->apply( 'linked/file.php', hash( 'sha256', 'changed' ), $clean->sha256, $clean ) );
+			self::assertSame( 'changed', file_get_contents( $this->site . '/real/file.php' ) );
+		} finally {
+			unlink( $this->site . '/linked' );
+			unlink( $this->site . '/real/file.php' );
+			rmdir( $this->site . '/real' );
+		}
+	}
+
 	public function test_obsolete_backup_requires_a_changed_replacement_before_discard(): void {
 		$repair = new AtomicPluginRepair( $this->site, $this->backup );
 		$clean = new RepairBytes( 'clean', hash( 'sha256', 'clean' ), 'https://downloads.wordpress.org/plugin/hello-dolly.1.7.2.zip' );
