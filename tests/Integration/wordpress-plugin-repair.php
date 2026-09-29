@@ -1,6 +1,7 @@
 <?php
 
 // Run only with wp eval-file on a disposable WordPress site. It alters an inactive repository plugin file and restores it.
+if ( ! defined( 'WP_CLI' ) || ! WP_CLI ) { exit( 1 ); }
 use AmazingPlugins\Security\Findings\CheckResult;
 use AmazingPlugins\Security\Integrity\IntegrityCursor;
 use AmazingPlugins\Security\Integrity\IntegrityStep;
@@ -39,6 +40,16 @@ try {
 	if ( hash( 'sha256', $original ) !== $preview->replacement->sha256 ) {
 		throw new RuntimeException( 'Release archive did not match disposable fixture.' );
 	}
+	// A competing request prepares a receipt after this process caches its absence.
+	get_option( $receiptOption, null );
+	$rivalReceipt = wp_json_encode( array( 'status' => 'prepared', 'owner' => 'rival-test' ) );
+	$GLOBALS['wpdb']->insert( $GLOBALS['wpdb']->options, array( 'option_name' => $receiptOption, 'option_value' => $rivalReceipt, 'autoload' => 'no' ) );
+	if ( null !== $repair->apply( $preview, $observed, $preview->replacement->sha256 ) || $observed !== hash_file( 'sha256', $path ) ) {
+		throw new RuntimeException( 'Repair overwrote a competing prepared receipt or changed its file.' );
+	}
+	wp_cache_delete( $receiptOption, 'options' );
+	if ( $rivalReceipt !== get_option( $receiptOption ) ) { throw new RuntimeException( 'Competing receipt was not preserved.' ); }
+	delete_option( $receiptOption );
 	$receipt = $repair->apply( $preview, $observed, $preview->replacement->sha256 );
 	if ( null === $receipt || $preview->replacement->sha256 !== hash_file( 'sha256', $path ) || null === $repair->receipt( $id ) ) {
 		throw new RuntimeException( 'Verified repair did not apply.' );

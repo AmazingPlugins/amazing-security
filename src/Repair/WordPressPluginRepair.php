@@ -37,7 +37,7 @@ final class WordPressPluginRepair {
 			return null;
 		}
 		$key = $this->receiptOption( $preview->candidate->findingId );
-		if ( ! add_option( $key, wp_json_encode( array( 'status' => 'pending' ) ), '', false ) ) {
+		if ( ! ( new WordPressOptions() )->add( $key, wp_json_encode( array( 'status' => 'pending' ) ) ) ) {
 			return null;
 		}
 		$atomic = new AtomicPluginRepair( $preview->root, $backupRoot, beforeReplace: fn( RepairReceipt $receipt ): bool => $this->saveReceipt( $key, $preview, $receipt, 'prepared' ) );
