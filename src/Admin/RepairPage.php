@@ -8,7 +8,15 @@ use AmazingPlugins\Security\Repair\WordPressPluginRepair;
 
 final class RepairPage {
 	public function register(): void {
-		add_submenu_page( null, 'Review file repair', 'Review file repair', 'manage_options', 'amsec-repair', array( $this, 'render' ) );
+		$hook = add_submenu_page( null, 'Review file repair', 'Review file repair', 'manage_options', 'amsec-repair', array( $this, 'render' ) );
+		add_action(
+			'admin_enqueue_scripts',
+			static function ( string $currentHook ) use ( $hook ): void {
+				if ( $hook === $currentHook ) {
+					wp_enqueue_style( 'amazing-security-admin', plugins_url( 'assets/admin.css', AMAZING_SECURITY_FILE ), array(), '0.1.0' );
+				}
+			}
+		);
 	}
 
 	public function render(): void {
@@ -24,7 +32,7 @@ final class RepairPage {
 		$receipt = $repair->receipt( $id );
 		echo '<div class="wrap amazing-security-admin"><h1>Review plugin file repair</h1><p><a href="' . esc_url( admin_url( 'admin.php?page=amazing-security#amsec-integrity' ) ) . '">Back to Amazing Security</a></p>';
 		if ( null !== $receipt ) {
-			if ( 'needs_recovery' === $receipt['status'] ) {
+			if ( in_array( $receipt['status'], array( 'prepared', 'needs_recovery' ), true ) ) {
 				echo '<div class="notice notice-error"><p>Replacement verification did not finish. The installed file may have changed. The private backup was retained. Inspect the current file and its SHA-256, then use WP-CLI recovery with that exact hash. Do not repeat the repair.</p><p><code>' . esc_html( 'wp amazing-security repair recover ' . $id . ' --current-sha256=<hash> --confirm' ) . '</code></p></div></div>';
 				return;
 			}

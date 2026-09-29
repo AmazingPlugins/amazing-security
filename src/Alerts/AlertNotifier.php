@@ -6,6 +6,7 @@ namespace AmazingPlugins\Security\Alerts;
 
 use AmazingPlugins\Security\FileScan\FileScanReport;
 use AmazingPlugins\Security\Scan\ScanRun;
+use AmazingPlugins\Security\Vulnerabilities\VulnerabilityReport;
 
 final class AlertNotifier {
 	public function __construct( private readonly AlertPolicy $policy, private readonly AlertDelivery $delivery ) {}
@@ -16,5 +17,9 @@ final class AlertNotifier {
 
 	public function files( FileScanReport $report, int $now ): string {
 		return $report->partial ? 'partial' : $this->delivery->sendNew( $this->policy->fromFiles( $report ), $now, 'files' );
+	}
+
+	public function vulnerabilities( VulnerabilityReport $report, int $now ): string {
+		return $this->delivery->sendNew( $this->policy->fromVulnerabilities( $report ), $now, 'vulnerabilities', ! $report->partial );
 	}
 }

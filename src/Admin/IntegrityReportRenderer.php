@@ -38,11 +38,11 @@ final class IntegrityReportRenderer {
 		if ( array() === $findings ) {
 			return '<p>No file differences recorded in this report. Coverage depends on the package and scan status above.</p>';
 		}
-		$html = '<div class="amazing-security-table-scroll" role="region" tabindex="0" aria-label="' . esc_attr( $label ) . '"><table class="widefat striped"><thead><tr><th scope="col">State</th><th scope="col">Package</th><th scope="col">File</th><th scope="col">Finding</th><th scope="col">Source</th></tr></thead><tbody>';
+		$html = '<div class="amazing-security-table-scroll" role="region" tabindex="0" aria-label="' . esc_attr( $label ) . '"><table class="widefat striped amsec-stacked-table"><thead><tr><th scope="col">State</th><th scope="col">Package</th><th scope="col">File</th><th scope="col">Finding</th><th scope="col">Source</th></tr></thead><tbody>';
 		foreach ( $findings as $finding ) {
 			$repair     = $allowRepair && is_string( $finding->findingId ) ? RepairCandidate::fromFindings( array( $finding ), $finding->findingId ) : null;
 			$repairLink = null === $repair ? '' : ' <a href="' . esc_url( admin_url( 'admin.php?page=amsec-repair&finding=' . rawurlencode( $repair->findingId ) ) ) . '">Review repair</a>';
-			$html      .= '<tr><td>' . esc_html( $finding->state ) . '</td><td>' . esc_html( (string) ( $finding->evidence['package'] ?? '' ) ) . '</td><td>' . esc_html( (string) ( $finding->evidence['path'] ?? '' ) ) . '</td><td>' . esc_html( $finding->summary ) . $repairLink . '</td><td><a href="' . esc_url( $finding->sourceUrl ) . '" target="_blank" rel="noopener noreferrer">Published source</a></td></tr>';
+			$html      .= '<tr><td data-label="State">' . esc_html( $finding->state ) . '</td><td data-label="Package">' . esc_html( (string) ( $finding->evidence['package'] ?? '' ) ) . '</td><td data-label="File">' . esc_html( (string) ( $finding->evidence['path'] ?? '' ) ) . '</td><td data-label="Finding">' . esc_html( $finding->summary ) . $repairLink . '</td><td data-label="Source"><a href="' . esc_url( $finding->sourceUrl ) . '" target="_blank" rel="noopener noreferrer">Published source</a></td></tr>';
 		}
 		return $html . '</tbody></table></div>';
 	}

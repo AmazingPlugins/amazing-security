@@ -12,10 +12,41 @@ use AmazingPlugins\Security\Integrity\OptionGateway;
 use AmazingPlugins\Security\Scan\ScanRun;
 use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
+use AmazingPlugins\Security\Findings\CheckResult;
+use AmazingPlugins\Security\Vulnerabilities\VulnerabilityReport;
 
 final class AlertNotifierTest extends TestCase {
+	public function test_confirmed_serious_vulnerability_alerts_survive_partial_scans_without_repeats(): void {
+		$options = $this->options();
+		$messages = array();
+		$notifier = new AlertNotifier( new AlertPolicy(), new AlertDelivery( $options, static function ( $to, $subject, $body ) use ( &$messages ): bool { $messages[] = $body; return true; }, 'owner@example.test', 'https://example.test/report' ) );
+		$finding = static fn ( string $id, string $severity, string $coverage = 'complete' ): CheckResult => new CheckResult( 'vulnerability', 'warn', 'Untrusted issue title', 'https://www.wpvulnerability.com/', new DateTimeImmutable(), 'medium', $coverage, array( 'severity' => $severity ), $id );
+		$high = $finding( 'high-finding', 'high' );
+		$critical = $finding( 'critical-finding', 'critical' );
+		self::assertSame( 'accepted', $notifier->vulnerabilities( new VulnerabilityReport( array( $high, $finding( 'possible', 'critical', 'partial' ), $finding( 'medium', 'medium' ) ), true, 'Partial' ), 1000 ) );
+		self::assertSame( 'accepted', $notifier->vulnerabilities( new VulnerabilityReport( array( $critical ), true, 'Partial' ), 1001 ) );
+		self::assertSame( 'none', $notifier->vulnerabilities( new VulnerabilityReport( array( $high, $critical ), false, 'Complete' ), 1002 ) );
+		self::assertCount( 2, $messages );
+		self::assertStringContainsString( 'high-finding', $messages[0] );
+		self::assertStringNotContainsString( 'Untrusted issue title', implode( '', $messages ) );
+		self::assertStringNotContainsString( 'possible', implode( '', $messages ) );
+		self::assertSame( 'none', $notifier->vulnerabilities( new VulnerabilityReport( array(), false, 'Complete' ), 1003 ) );
+		self::assertSame( 'accepted', $notifier->vulnerabilities( new VulnerabilityReport( array( $high ), false, 'Complete' ), 1004 ) );
+		$options->values['amsec_alerts_enabled'] = '0';
+		self::assertSame( 'off', $notifier->vulnerabilities( new VulnerabilityReport( array( $critical ), false, 'Complete' ), 1005 ) );
+	}
+
 	public function test_partial_reports_do_not_send_or_clear_alert_history(): void {
-		$options = new class implements OptionGateway {
+		$options = $this->options();
+		$notifier = new AlertNotifier( new AlertPolicy(), new AlertDelivery( $options, static function (): never { throw new \RuntimeException( 'Unexpected email.' ); }, 'owner@example.test', 'https://example.test/report' ) );
+		$now = new DateTimeImmutable( '@1000' );
+		self::assertSame( 'partial', $notifier->integrity( new ScanRun( $now, $now, array(), true ), 1000 ) );
+		self::assertSame( 'partial', $notifier->files( new FileScanReport( 'scan-1', 'inconclusive', $now, true, 0, 0, 0, 0, 0, 0, 0, 0, array() ), 1000 ) );
+		self::assertSame( array(), $options->values );
+	}
+
+	private function options(): OptionGateway {
+		return new class implements OptionGateway {
 			public array $values = array();
 			public function get( string $key ): mixed { return $this->values[ $key ] ?? null; }
 			public function add( string $key, string $value ): bool { $this->values[ $key ] = $value; return true; }
@@ -24,10 +55,5 @@ final class AlertNotifierTest extends TestCase {
 			public function replaceIfSame( string $key, string $expected, string $replacement ): bool { $this->values[ $key ] = $replacement; return true; }
 			public function deleteIfSame( string $key, string $expected ): bool { unset( $this->values[ $key ] ); return true; }
 		};
-		$notifier = new AlertNotifier( new AlertPolicy(), new AlertDelivery( $options, static function (): never { throw new \RuntimeException( 'Unexpected email.' ); }, 'owner@example.test', 'https://example.test/report' ) );
-		$now = new DateTimeImmutable( '@1000' );
-		self::assertSame( 'partial', $notifier->integrity( new ScanRun( $now, $now, array(), true ), 1000 ) );
-		self::assertSame( 'partial', $notifier->files( new FileScanReport( 'scan-1', 'inconclusive', $now, true, 0, 0, 0, 0, 0, 0, 0, 0, array() ), 1000 ) );
-		self::assertSame( array(), $options->values );
 	}
 }

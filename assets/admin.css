@@ -6,6 +6,59 @@
   color: var(--amsec-ink);
 }
 
+.amazing-security-admin code,
+.amazing-security-admin .widefat td {
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+@media (max-width: 782px) {
+  .amazing-security-admin .amazing-security-table-scroll .amsec-stacked-table {
+    min-width: 0;
+    background: transparent;
+    border: 0;
+  }
+  .amsec-stacked-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+  .amsec-stacked-table tbody,
+  .amsec-stacked-table tr {
+    display: block;
+  }
+  .amsec-stacked-table tr {
+    margin: 0 0 12px;
+    padding: 12px;
+    background: #fff;
+    border: 1px solid #dcdcde;
+  }
+  .amsec-stacked-table :is(td, th[scope="row"]) {
+    display: grid;
+    grid-template-columns: 66px minmax(0, 1fr);
+    gap: 8px;
+    padding: 5px 0;
+    overflow-wrap: anywhere;
+    border: 0;
+  }
+  .amsec-stacked-table [data-label]::before {
+    content: attr(data-label);
+    color: #50575e;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .amsec-stacked-table td[data-label="Finding"] {
+    display: block;
+    line-height: 1.5;
+  }
+  .amsec-stacked-table td[data-label="Finding"]::before {
+    display: block;
+    margin-bottom: 4px;
+  }
+}
+
 .amazing-security-admin .amsec-header {
   display: flex;
   justify-content: space-between;

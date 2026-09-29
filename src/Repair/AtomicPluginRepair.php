@@ -6,12 +6,15 @@ namespace AmazingPlugins\Security\Repair;
 
 use AmazingPlugins\Security\Integrity\WordPressOrgManifestProvider;
 use Closure;
+use Throwable;
 
 final class AtomicPluginRepair {
 	private readonly ?Closure $afterReplace;
+	private readonly ?Closure $beforeReplace;
 
-	public function __construct( private readonly string $root, private readonly string $backupRoot, ?callable $afterReplace = null ) {
-		$this->afterReplace = null === $afterReplace ? null : Closure::fromCallable( $afterReplace );
+	public function __construct( private readonly string $root, private readonly string $backupRoot, ?callable $afterReplace = null, ?callable $beforeReplace = null ) {
+		$this->afterReplace  = null === $afterReplace ? null : Closure::fromCallable( $afterReplace );
+		$this->beforeReplace = null === $beforeReplace ? null : Closure::fromCallable( $beforeReplace );
 	}
 
 	public function currentSha256( string $relativePath ): ?string {
@@ -86,22 +89,32 @@ final class AtomicPluginRepair {
 			if ( null === $temp || $target !== $this->safeTarget( $relativePath ) || $beforeSha256 !== hash_file( 'sha256', $target ) ) {
 				return null;
 			}
+			$receipt = new RepairReceipt( $relativePath, $backup, $beforeSha256, $approvedSha256 );
+			if ( null !== $this->beforeReplace && true !== ( $this->beforeReplace )( $receipt ) ) {
+				return null;
+			}
+			// Recheck after durable receipt persistence, which may take time.
+			// phpcs:ignore WordPress.PHP.YodaConditions.NotYoda -- Dynamic path and hash comparisons.
+			if ( $target !== $this->safeTarget( $relativePath ) || $beforeSha256 !== hash_file( 'sha256', $target ) ) {
+				return null;
+			}
 			// phpcs:ignore WordPress.WP.AlternativeFunctions.rename_rename -- Atomic same-directory replacement after hash, inode, and symlink checks.
 			if ( ! rename( $temp, $target ) ) {
 				return null;
 			}
-			$temp = null;
-			if ( null !== $this->afterReplace ) {
-				( $this->afterReplace )( $target );
-			}
-			// phpcs:ignore WordPress.PHP.YodaConditions.NotYoda -- The approved and observed hashes are dynamic.
-			if ( $approvedSha256 !== hash_file( 'sha256', $target ) ) {
-				$receipt = new RepairReceipt( $relativePath, $backup, $beforeSha256, $approvedSha256 );
-				$backup  = null;
+			$temp   = null;
+			$backup = null; // The persisted receipt owns the backup once replacement starts.
+			try {
+				if ( null !== $this->afterReplace ) {
+					( $this->afterReplace )( $target );
+				}
+				// phpcs:ignore WordPress.PHP.YodaConditions.NotYoda -- The approved and observed hashes are dynamic.
+				if ( $approvedSha256 !== hash_file( 'sha256', $target ) ) {
+					throw new RepairVerificationFailure( $receipt );
+				}
+			} catch ( Throwable ) {
 				throw new RepairVerificationFailure( $receipt );
 			}
-			$receipt = new RepairReceipt( $relativePath, $backup, $beforeSha256, $approvedSha256 );
-			$backup  = null;
 			return $receipt;
 		} finally {
 			flock( $handle, LOCK_UN );

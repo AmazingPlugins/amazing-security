@@ -6,8 +6,19 @@ namespace AmazingPlugins\Security\Alerts;
 
 use AmazingPlugins\Security\FileScan\FileScanReport;
 use AmazingPlugins\Security\Scan\ScanRun;
+use AmazingPlugins\Security\Vulnerabilities\VulnerabilityReport;
 
 final class AlertPolicy {
+	public function fromVulnerabilities( VulnerabilityReport $report ): array {
+		$ids = array();
+		foreach ( $report->results as $finding ) {
+			if ( 'vulnerability' === $finding->checkId && 'warn' === $finding->state && 'complete' === $finding->coverage && in_array( $finding->evidence['severity'] ?? null, array( 'high', 'critical' ), true ) && null !== $finding->findingId ) {
+				$ids[] = $finding->findingId;
+			}
+		}
+		return array_values( array_unique( $ids ) );
+	}
+
 	public function fromIntegrity( ScanRun $run ): array {
 		if ( $run->partial ) {
 			return array();

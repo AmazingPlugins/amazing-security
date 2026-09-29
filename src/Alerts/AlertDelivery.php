@@ -23,7 +23,7 @@ final class AlertDelivery {
 		return is_array( $data ) ? $data : array();
 	}
 
-	public function sendNew( array $ids, int $now, string $source = 'general' ): string {
+	public function sendNew( array $ids, int $now, string $source = 'general', bool $complete = true ): string {
 		if ( '0' === $this->options->get( 'amsec_alerts_enabled' ) ) {
 			return 'off';
 		}
@@ -33,9 +33,12 @@ final class AlertDelivery {
 			return 'busy';
 		}
 		try {
-			$state             = $this->status();
-			$active            = is_array( $state['active'] ?? null ) ? $state['active'] : array();
-			$previous          = is_array( $active[ $source ] ?? null ) ? $active[ $source ] : array();
+			$state    = $this->status();
+			$active   = is_array( $state['active'] ?? null ) ? $state['active'] : array();
+			$previous = is_array( $active[ $source ] ?? null ) ? $active[ $source ] : array();
+			if ( ! $complete ) {
+				$ids = array_values( array_unique( array_merge( $ids, $previous ) ) );
+			}
 			$pending           = is_array( $state['pending'] ?? null ) ? $state['pending'] : array();
 			$pending           = array_values( array_filter( $pending, static fn( string $id ): bool => ! in_array( $id, $previous, true ) || in_array( $id, $ids, true ) ) );
 			$new               = array_values( array_diff( $ids, $previous ) );

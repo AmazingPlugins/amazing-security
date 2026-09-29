@@ -9,6 +9,18 @@ use AmazingPlugins\Security\Integrity\OptionGateway;
 use PHPUnit\Framework\TestCase;
 
 final class AlertDeliveryTest extends TestCase {
+	public function test_partial_history_does_not_drop_sent_or_pending_ids(): void {
+		$options = $this->options();
+		$ids = array_map( static fn( int $n ): string => 'finding-' . $n, range( 1, 1000 ) );
+		$options->set( 'amsec_alert_state', json_encode( array( 'active' => array( 'vulnerabilities' => $ids ), 'pending' => array( 'finding-1000' ) ) ) );
+		$messages = array();
+		$delivery = new AlertDelivery( $options, static function ( $to, $subject, $body ) use ( &$messages ): bool { $messages[] = $body; return true; }, 'owner@example.test', 'https://example.test/report' );
+		self::assertSame( 'accepted', $delivery->sendNew( array( 'finding-1001' ), 1000, 'vulnerabilities', false ) );
+		self::assertStringContainsString( "finding-1000\n", $messages[0] );
+		self::assertSame( 'none', $delivery->sendNew( array( 'finding-1000' ), 1001, 'vulnerabilities', false ) );
+		self::assertCount( 1001, $delivery->status()['active']['vulnerabilities'] );
+	}
+
 	public function test_accepted_alert_is_deduplicated_by_finding_id(): void {
 		$options = $this->options();
 		$sent = array();

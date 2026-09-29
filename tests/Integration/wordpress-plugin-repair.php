@@ -66,7 +66,26 @@ try {
 	if ( ! $repair->rollback( $id ) || $secondHash !== hash_file( 'sha256', $path ) ) {
 		throw new RuntimeException( 'Verified rollback did not restore second changed bytes.' );
 	}
-	echo 'Exact plugin repair, changed-file refusal, fresh-scan retirement, and rollback passed.';
+	$denyApplied = static function ( $value, $old ) {
+		$data = is_string( $value ) ? json_decode( $value, true ) : null;
+		return 'applied' === ( $data['status'] ?? null ) ? $old : $value;
+	};
+	add_filter( 'pre_update_option_' . $receiptOption, $denyApplied, 10, 2 );
+	try {
+		if ( null !== $repair->apply( $secondPreview, $secondHash, $secondPreview->replacement->sha256 ) ) {
+			throw new RuntimeException( 'Failed final receipt persistence reported success.' );
+		}
+		$prepared = $repair->receipt( $id );
+		if ( 'prepared' !== ( $prepared['status'] ?? null ) || ! is_file( $prepared['receipt']['backup_path'] ) ) {
+			throw new RuntimeException( 'Final receipt write failure lost its prepared recovery backup.' );
+		}
+	} finally {
+		remove_filter( 'pre_update_option_' . $receiptOption, $denyApplied, 10 );
+	}
+	if ( ! $repair->recover( $id, hash_file( 'sha256', $path ) ) || $secondHash !== hash_file( 'sha256', $path ) ) {
+		throw new RuntimeException( 'Prepared repair recovery failed.' );
+	}
+	echo 'Exact repair, changed-file refusal, retirement, rollback, and failed final receipt recovery passed.';
 } finally {
 	file_put_contents( $path, $original );
 	$options->delete( 'amazing_security_integrity_active' );

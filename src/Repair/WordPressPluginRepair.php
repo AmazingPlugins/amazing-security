@@ -40,7 +40,7 @@ final class WordPressPluginRepair {
 		if ( ! add_option( $key, wp_json_encode( array( 'status' => 'pending' ) ), '', false ) ) {
 			return null;
 		}
-		$atomic = new AtomicPluginRepair( $preview->root, $backupRoot );
+		$atomic = new AtomicPluginRepair( $preview->root, $backupRoot, beforeReplace: fn( RepairReceipt $receipt ): bool => $this->saveReceipt( $key, $preview, $receipt, 'prepared' ) );
 		try {
 			$receipt = $atomic->apply( $preview->candidate->relativePath, $approvedBefore, $approvedAfter, $preview->replacement );
 		} catch ( RepairVerificationFailure $failure ) {
@@ -52,11 +52,8 @@ final class WordPressPluginRepair {
 			return null;
 		}
 		if ( ! $this->saveReceipt( $key, $preview, $receipt, 'applied' ) ) {
-			if ( $atomic->rollback( $receipt ) ) {
-				delete_option( $key );
-			} else {
-				$this->saveReceipt( $key, $preview, $receipt, 'needs_recovery' );
-			}
+			// Keep the prepared receipt and backup usable while database writes are unavailable.
+			// An operator can recover using the exact observed file hash once storage is healthy.
 			return null;
 		}
 		return $receipt;
@@ -76,7 +73,7 @@ final class WordPressPluginRepair {
 	public function receipt( string $findingId ): ?array {
 		$raw  = get_option( $this->receiptOption( $findingId ), null );
 		$data = is_string( $raw ) ? json_decode( $raw, true ) : null;
-		return is_array( $data ) && in_array( $data['status'] ?? null, array( 'applied', 'needs_recovery' ), true ) && isset( $data['slug'], $data['version'], $data['receipt'] ) && is_array( $data['receipt'] ) ? $data : null;
+		return is_array( $data ) && in_array( $data['status'] ?? null, array( 'prepared', 'applied', 'needs_recovery' ), true ) && isset( $data['slug'], $data['version'], $data['receipt'] ) && is_array( $data['receipt'] ) ? $data : null;
 	}
 
 	public function rollback( string $findingId ): bool {
@@ -96,7 +93,7 @@ final class WordPressPluginRepair {
 
 	public function recover( string $findingId, string $observedSha256 ): bool {
 		$data = $this->receipt( $findingId );
-		if ( null === $data || 'needs_recovery' !== $data['status'] || ! preg_match( '/^[a-f0-9]{64}$/D', $observedSha256 ) ) {
+		if ( null === $data || ! in_array( $data['status'], array( 'prepared', 'needs_recovery' ), true ) || ! preg_match( '/^[a-f0-9]{64}$/D', $observedSha256 ) ) {
 			return false;
 		}
 		$receipt    = RepairReceipt::fromArray( $data['receipt'] );

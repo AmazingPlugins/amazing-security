@@ -10,6 +10,43 @@ use AmazingPlugins\Security\Repair\RepairVerificationFailure;
 use PHPUnit\Framework\TestCase;
 
 final class AtomicPluginRepairTest extends TestCase {
+	public function test_recovery_receipt_must_be_saved_before_replacing_file(): void {
+		$seen = false;
+		$repair = new AtomicPluginRepair( $this->site, $this->backup, beforeReplace: function ( $receipt ) use ( &$seen ): bool {
+			$seen = true;
+			self::assertSame( 'changed', file_get_contents( $this->site . '/hello.php' ) );
+			self::assertSame( 'changed', file_get_contents( $receipt->backupPath ) );
+			return false;
+		} );
+		$clean = new RepairBytes( 'clean', hash( 'sha256', 'clean' ), 'https://downloads.wordpress.org/plugin/example.zip' );
+		self::assertNull( $repair->apply( 'hello.php', hash( 'sha256', 'changed' ), $clean->sha256, $clean ) );
+		self::assertTrue( $seen );
+		self::assertSame( 'changed', file_get_contents( $this->site . '/hello.php' ) );
+		self::assertSame( array(), glob( $this->backup . '/*' ) );
+	}
+
+	public function test_concurrent_change_during_receipt_persistence_refuses_replacement(): void {
+		$repair = new AtomicPluginRepair( $this->site, $this->backup, beforeReplace: function (): bool {
+			file_put_contents( $this->site . '/hello.php', 'concurrent update' );
+			return true;
+		} );
+		$clean = new RepairBytes( 'clean', hash( 'sha256', 'clean' ), 'https://downloads.wordpress.org/plugin/example.zip' );
+		self::assertNull( $repair->apply( 'hello.php', hash( 'sha256', 'changed' ), $clean->sha256, $clean ) );
+		self::assertSame( 'concurrent update', file_get_contents( $this->site . '/hello.php' ) );
+		self::assertSame( array(), glob( $this->backup . '/*' ) );
+	}
+
+	public function test_exception_after_rename_keeps_backup_for_recovery(): void {
+		$repair = new AtomicPluginRepair( $this->site, $this->backup, static function (): never { throw new \RuntimeException( 'Interrupted after rename.' ); } );
+		$clean = new RepairBytes( 'clean', hash( 'sha256', 'clean' ), 'https://downloads.wordpress.org/plugin/example.zip' );
+		try {
+			$repair->apply( 'hello.php', hash( 'sha256', 'changed' ), $clean->sha256, $clean );
+			self::fail( 'Expected recoverable failure.' );
+		} catch ( RepairVerificationFailure $failure ) {
+			self::assertFileExists( $failure->receipt->backupPath );
+			self::assertTrue( $repair->recover( $failure->receipt, $clean->sha256 ) );
+		}
+	}
 	private string $site;
 	private string $backup;
 
