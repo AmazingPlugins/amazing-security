@@ -39,7 +39,7 @@ final class IntegrityCursor {
 		if ( $data['target_index'] < 0 || $data['file_index'] < 0 || $data['processed'] < 0 || $data['processed'] > 5000 || $data['matched'] < 0 || $data['matched'] > $data['processed'] || $data['bytes'] < 0 || $data['bytes'] > 134217728 || (float) $data['elapsed'] < 0 || count( $data['findings'] ) > 250 ) {
 			return null;
 		}
-		if ( ! is_array( $data['packages'] ?? array() ) || count( $data['packages'] ?? array() ) > 11 ) {
+		if ( ! is_array( $data['packages'] ?? array() ) || count( $data['packages'] ?? array() ) > 14 ) {
 			return null;
 		}
 		foreach ( $data['packages'] ?? array() as $package => $counts ) {

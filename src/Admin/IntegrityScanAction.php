@@ -15,6 +15,8 @@ use AmazingPlugins\Security\Integrity\WordPressHttpClient;
 use AmazingPlugins\Security\Integrity\WordPressIntegrityStore;
 use AmazingPlugins\Security\Integrity\WordPressOptions;
 use AmazingPlugins\Security\Integrity\WordPressOrgManifestProvider;
+use AmazingPlugins\Security\Integrity\WordPressOrgThemeManifestProvider;
+use AmazingPlugins\Security\Integrity\ThemeArchiveParser;
 use AmazingPlugins\Security\Scan\ScanContext;
 use DateTimeImmutable;
 use Throwable;
@@ -58,7 +60,8 @@ final class IntegrityScanAction {
 		$error = false;
 		try {
 			$started          = microtime( true );
-			$discovery        = ( new TargetDiscovery( new WordPressOrgManifestProvider( new WordPressHttpClient() ) ) )->discover( $this->coreVersion(), $this->coreLocale(), ABSPATH, $this->plugins() );
+			$client           = new WordPressHttpClient();
+			$discovery        = ( new TargetDiscovery( new WordPressOrgManifestProvider( $client ), new WordPressOrgThemeManifestProvider( $client, new ThemeArchiveParser() ) ) )->discover( $this->coreVersion(), $this->coreLocale(), ABSPATH, $this->plugins(), $this->themes() );
 			$cursor->elapsed += microtime( true ) - $started;
 			if ( $isStart ) {
 				$cursor->targetSignature = $discovery->signature;
@@ -127,6 +130,20 @@ final class IntegrityScanAction {
 			);
 		}
 		return $plugins;
+	}
+
+	private function themes(): array {
+		$themes = array();
+		foreach ( wp_get_themes() as $slug => $theme ) {
+			$themes[] = array(
+				'slug'       => (string) $slug,
+				'version'    => (string) $theme->get( 'Version' ),
+				'root'       => $theme->get_stylesheet_directory(),
+				'update_uri' => (string) $theme->get( 'UpdateURI' ),
+				'child'      => $theme->parent() instanceof \WP_Theme,
+			);
+		}
+		return $themes;
 	}
 
 	private function redirect( bool $error ): never {
