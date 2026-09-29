@@ -27,7 +27,13 @@ final class RuleMatcher {
 			if ( in_array( $token[0], array( T_COMMENT, T_DOC_COMMENT, T_INLINE_HTML ), true ) ) {
 				$code .= ' ' . str_repeat( "\n", substr_count( $token[1], "\n" ) );
 			} elseif ( T_CONSTANT_ENCAPSED_STRING === $token[0] ) {
-				$code .= preg_match( '/^[\'\"]https?:\/\//i', $token[1] ) ? 'URL' : 'S';
+				if ( $this->hiddenExternalLink( $token[1] ) ) {
+					$code .= 'HIDDEN_EXTERNAL_LINK';
+				} elseif ( preg_match( '/^[\'\"]Location:\s*[\'\"]$/i', $token[1] ) ) {
+					$code .= 'LOCATION';
+				} else {
+					$code .= preg_match( '/^[\'\"]https?:\/\//i', $token[1] ) ? 'URL' : 'S';
+				}
 				$code .= str_repeat( "\n", substr_count( $token[1], "\n" ) );
 			} else {
 				$code .= $token[1];
@@ -44,5 +50,18 @@ final class RuleMatcher {
 			}
 		}
 		return $hits;
+	}
+
+	private function hiddenExternalLink( string $literal ): bool {
+		if ( strlen( $literal ) > 4096 || ! str_contains( strtolower( $literal ), '<a' ) ) {
+			return false;
+		}
+		preg_match_all( '/<a\b[^>]{0,1024}>/i', $literal, $tags );
+		foreach ( $tags[0] as $tag ) {
+			if ( preg_match( '/\bhref\s*=\s*[\'\"]?https?:\/\//i', $tag ) && preg_match( '/\bstyle\s*=\s*[\'\"]?[^>]{0,512}\b(?:display\s*:\s*none|visibility\s*:\s*hidden)/i', $tag ) ) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

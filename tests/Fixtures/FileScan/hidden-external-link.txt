@@ -1,0 +1,1 @@
+<?php echo '<a href="https://bad.example/buy" style="display:none">cheap pills</a>';

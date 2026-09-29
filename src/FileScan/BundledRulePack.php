@@ -6,7 +6,7 @@ namespace AmazingPlugins\Security\FileScan;
 
 final class BundledRulePack {
 	public function version(): string {
-		return '2026.09.29.2';
+		return '2026.09.29.3';
 	}
 
 	public function rules(): array {
@@ -34,6 +34,18 @@ final class BundledRulePack {
 			'AS-PHP-006' => array(
 				'pattern' => '/(*LIMIT_MATCH=100000)(*LIMIT_RECURSION=1000)\beval\s*\(\s*gzinflate\s*\(\s*base64_decode\s*\(/i',
 				'summary' => 'Compressed, decoded input is evaluated as PHP code.',
+			),
+			'AS-PHP-007' => array(
+				'pattern' => '/(*LIMIT_MATCH=100000)(*LIMIT_RECURSION=1000)\beval\s*\(\s*\$_COOKIE\s*\[/i',
+				'summary' => 'Cookie input is directly evaluated as PHP code.',
+			),
+			'AS-PHP-008' => array(
+				'pattern' => '/(*LIMIT_MATCH=100000)(*LIMIT_RECURSION=1000)\bheader\s*\(\s*LOCATION\s*\.\s*\$_(?:GET|POST|REQUEST)\s*\[/i',
+				'summary' => 'Request input is used directly in a Location header.',
+			),
+			'AS-PHP-009' => array(
+				'pattern' => '/(*LIMIT_MATCH=100000)(*LIMIT_RECURSION=1000)\b(?:echo|print)\s*HIDDEN_EXTERNAL_LINK\b/i',
+				'summary' => 'PHP emits a hidden link to an external site.',
 			),
 		);
 	}

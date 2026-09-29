@@ -1,0 +1,6 @@
+<?php
+wp_safe_redirect( $_GET['next'] );
+header( 'Location: ' . home_url( '/about/' ) );
+echo '<a href="https://good.example/help">Help</a>';
+echo '<a href="/private" style="display:none">Private</a>';
+$docs = 'header("Location: " . $_GET["next"])';

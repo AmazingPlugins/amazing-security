@@ -18,6 +18,9 @@ final class RuleMatcherTest extends TestCase {
 			'AS-PHP-004' => 'request-eval.txt',
 			'AS-PHP-005' => 'request-include.txt',
 			'AS-PHP-006' => 'compressed-eval.txt',
+			'AS-PHP-007' => 'cookie-eval.txt',
+			'AS-PHP-008' => 'request-location-header.txt',
+			'AS-PHP-009' => 'hidden-external-link.txt',
 		);
 		foreach ( $cases as $id => $filename ) {
 			$code = file_get_contents( dirname( __DIR__, 2 ) . '/Fixtures/FileScan/' . $filename );
@@ -37,6 +40,7 @@ final class RuleMatcherTest extends TestCase {
 			file_get_contents( dirname( __DIR__, 2 ) . '/Fixtures/FileScan/benign-encoding.txt' ),
 			file_get_contents( dirname( __DIR__, 2 ) . '/Fixtures/FileScan/benign-remote-data.txt' ),
 			file_get_contents( dirname( __DIR__, 2 ) . '/Fixtures/FileScan/benign-request-routing.txt' ),
+			file_get_contents( dirname( __DIR__, 2 ) . '/Fixtures/FileScan/benign-redirects-and-links.txt' ),
 		);
 		foreach ( $benign as $code ) {
 			self::assertSame( array(), $matcher->match( $code, 'demo.php' ) );

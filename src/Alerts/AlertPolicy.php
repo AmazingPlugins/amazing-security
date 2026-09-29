@@ -29,7 +29,7 @@ final class AlertPolicy {
 		foreach ( $report->findings as $finding ) {
 			$id   = $finding['id'] ?? null;
 			$rule = $finding['rule_id'] ?? null;
-			if ( 'suspected' === ( $finding['kind'] ?? null ) && 'warn' === ( $finding['state'] ?? null ) && is_string( $id ) && preg_match( '/^[a-f0-9]{32}$/D', $id ) && in_array( $rule, array( 'AS-PHP-001', 'AS-PHP-002', 'AS-PHP-003', 'AS-PHP-004', 'AS-PHP-005', 'AS-PHP-006' ), true ) ) {
+			if ( 'suspected' === ( $finding['kind'] ?? null ) && 'warn' === ( $finding['state'] ?? null ) && is_string( $id ) && preg_match( '/^[a-f0-9]{32}$/D', $id ) && in_array( $rule, array( 'AS-PHP-001', 'AS-PHP-002', 'AS-PHP-003', 'AS-PHP-004', 'AS-PHP-005', 'AS-PHP-006', 'AS-PHP-007', 'AS-PHP-008', 'AS-PHP-009' ), true ) ) {
 				$ids[] = $id;
 			}
 		}

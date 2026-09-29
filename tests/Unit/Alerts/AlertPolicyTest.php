@@ -27,10 +27,11 @@ final class AlertPolicyTest extends TestCase {
 		$now = new DateTimeImmutable( '@1000' );
 		$findings = array(
 			array( 'id' => str_repeat( 'a', 32 ), 'kind' => 'suspected', 'rule_id' => 'AS-PHP-004', 'state' => 'warn' ),
+			array( 'id' => str_repeat( 'c', 32 ), 'kind' => 'suspected', 'rule_id' => 'AS-PHP-009', 'state' => 'warn' ),
 			array( 'id' => str_repeat( 'b', 32 ), 'kind' => 'extra', 'rule_id' => '', 'state' => 'warn' ),
 		);
 		$report = new FileScanReport( 'scan-1', 'warn', $now, false, 2, 100, 0, 0, 1, 0, 1, 0, $findings );
-		self::assertSame( array( str_repeat( 'a', 32 ) ), $policy->fromFiles( $report ) );
+		self::assertSame( array( str_repeat( 'a', 32 ), str_repeat( 'c', 32 ) ), $policy->fromFiles( $report ) );
 		$partial = new FileScanReport( 'scan-2', 'warn', $now, true, 2, 100, 1, 0, 1, 0, 1, 0, $findings );
 		self::assertSame( array(), $policy->fromFiles( $partial ) );
 	}
