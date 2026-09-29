@@ -13,20 +13,21 @@ final class SoftwareInventoryTest extends TestCase {
 			static fn (): array => array(
 				'core' => array( 'version' => '6.9.4', 'locale' => 'en_US' ),
 				'plugins' => array(
-					array( 'file' => 'akismet/akismet.php', 'version' => '5.3', 'update_uri' => '', 'repository_slug' => 'akismet' ),
+					array( 'file' => 'akismet/akismet.php', 'version' => '5.3', 'update_uri' => '', 'repository_slug' => 'akismet', 'verified_release' => true ),
+					array( 'file' => 'akismet/custom.php', 'version' => '5.3', 'update_uri' => '', 'repository_slug' => 'akismet' ),
 					array( 'file' => 'paid/paid.php', 'version' => '2.0', 'update_uri' => 'https://vendor.example', 'repository_slug' => 'paid' ),
 					array( 'file' => 'other/other.php', 'version' => '1.0', 'update_uri' => '', 'repository_slug' => '' ),
 				),
 				'themes' => array(
-					array( 'slug' => 'twentytwentyfive', 'version' => '1.2', 'repository_slug' => 'twentytwentyfive' ),
+					array( 'slug' => 'twentytwentyfive', 'version' => '1.2', 'repository_slug' => 'twentytwentyfive', 'verified_release' => true ),
 					array( 'slug' => 'custom', 'version' => '1.0', 'repository_slug' => '' ),
 				),
 			)
 		);
 		$items = $inventory->collect();
-		self::assertCount( 6, $items );
-		self::assertSame( array( true, true, false, false, true, false ), array_map( static fn ( $item ): bool => $item->eligible, $items ) );
-		self::assertSame( array( 'wordpress', 'akismet', 'paid', 'other', 'twentytwentyfive', 'custom' ), array_map( static fn ( $item ): string => $item->slug, $items ) );
+		self::assertCount( 7, $items );
+		self::assertSame( array( true, true, false, false, false, true, false ), array_map( static fn ( $item ): bool => $item->eligible, $items ) );
+		self::assertSame( array( 'wordpress', 'akismet', 'akismet', 'paid', 'other', 'twentytwentyfive', 'custom' ), array_map( static fn ( $item ): string => $item->slug, $items ) );
 		self::assertSame( 'plugin', $items[2]->type );
 	}
 
