@@ -127,6 +127,7 @@ add_action( 'admin_post_amsec_totp_confirm', array( new AmazingPlugins\Security\
 add_action( 'admin_post_amsec_totp_disable', array( new AmazingPlugins\Security\Admin\TotpAction(), 'disable' ) );
 add_action( 'admin_post_amsec_totp_regenerate', array( new AmazingPlugins\Security\Admin\TotpAction(), 'regenerate' ) );
 add_action( 'amsec_vuln_tick', array( new AmazingPlugins\Security\Admin\VulnerabilityScanAction(), 'scheduled' ) );
+add_filter( 'rest_pre_dispatch', array( new AmazingPlugins\Security\Firewall\RestFirewallHook(), 'filter' ), 5, 3 );
 
 $amsec_fix_repository = new AmazingPlugins\Security\Fixes\WordPressFixRepository( $GLOBALS['wpdb'] );
 $amsec_abilities      = new AmazingPlugins\Security\Mcp\AbilityRegistrar(

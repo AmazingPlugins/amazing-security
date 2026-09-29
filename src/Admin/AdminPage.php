@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace AmazingPlugins\Security\Admin;
 
 use AmazingPlugins\Security\FileScan\WordPressFileScanStore;
+use AmazingPlugins\Security\Firewall\FirewallStatusRenderer;
+use AmazingPlugins\Security\Firewall\ObservationStore;
 use AmazingPlugins\Security\Findings\FindingsRepository;
 use AmazingPlugins\Security\Integrity\WordPressIntegrityStore;
 use AmazingPlugins\Security\Integrity\WordPressOptions;
@@ -69,6 +71,9 @@ final class AdminPage {
 		echo '</div>';
 		$this->attentionList( $run?->results ?? array(), $integrity?->results ?? array(), $direct ? $vulnCurrent?->results ?? array() : array(), $fileAttention );
 		echo '</section>';
+		// FirewallStatusRenderer escapes dynamic values.
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo ( new FirewallStatusRenderer() )->render( ( new ObservationStore( $options ) )->summary() );
 		$loginSettings = new WordPressLoginSettings( $options );
 		$loginStore    = new WordPressTotpStore( $GLOBALS['wpdb'] );
 		try {

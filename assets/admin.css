@@ -67,6 +67,22 @@
   margin: 26px 0;
 }
 
+.amazing-security-admin .amsec-firewall-status {
+  padding: 18px 0;
+  border-top: 1px solid var(--amsec-line);
+  border-bottom: 1px solid var(--amsec-line);
+}
+
+.amazing-security-admin .amsec-firewall-status h2 {
+  margin: 0 0 8px;
+}
+
+.amazing-security-admin .amsec-firewall-status p {
+  max-width: 70ch;
+  margin: 0 0 8px;
+  line-height: 1.5;
+}
+
 .amazing-security-admin .amsec-overview h2 {
   margin-bottom: 12px;
 }
