@@ -117,10 +117,15 @@ add_action( 'admin_post_amsec_totp_disable', array( new AmazingPlugins\Security\
 add_action( 'admin_post_amsec_totp_regenerate', array( new AmazingPlugins\Security\Admin\TotpAction(), 'regenerate' ) );
 add_action( 'amsec_vuln_tick', array( new AmazingPlugins\Security\Admin\VulnerabilityScanAction(), 'scheduled' ) );
 
-$amsec_abilities = new AmazingPlugins\Security\Mcp\AbilityRegistrar(
+$amsec_fix_repository = new AmazingPlugins\Security\Fixes\WordPressFixRepository( $GLOBALS['wpdb'] );
+$amsec_abilities      = new AmazingPlugins\Security\Mcp\AbilityRegistrar(
 	new AmazingPlugins\Security\Mcp\McpPreferences( new AmazingPlugins\Security\Integrity\WordPressOptions() ),
 	new AmazingPlugins\Security\Mcp\FindingsGateway(),
-	new AmazingPlugins\Security\Mcp\ScanGateway( new AmazingPlugins\Security\Integrity\WordPressOptions() )
+	new AmazingPlugins\Security\Mcp\ScanGateway( new AmazingPlugins\Security\Integrity\WordPressOptions() ),
+	null,
+	null,
+	new AmazingPlugins\Security\Fixes\FixProposalService( $amsec_fix_repository ),
+	new AmazingPlugins\Security\Mcp\FixGateway( $amsec_fix_repository )
 );
 add_action( 'wp_abilities_api_categories_init', array( $amsec_abilities, 'registerCategory' ) );
 add_action( 'wp_abilities_api_init', array( $amsec_abilities, 'registerAbilities' ) );

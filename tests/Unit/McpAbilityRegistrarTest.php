@@ -12,7 +12,7 @@ use AmazingPlugins\Security\Mcp\ScanGateway;
 use PHPUnit\Framework\TestCase;
 
 final class McpAbilityRegistrarTest extends TestCase {
-	public function test_registers_only_four_explicit_mcp_abilities_and_rechecks_access(): void {
+	public function test_registers_only_six_explicit_mcp_abilities_and_rechecks_access(): void {
 		$options = new class implements OptionGateway {
 			public array $values = array();
 			public function get( string $key ): mixed { return $this->values[ $key ] ?? null; }
@@ -30,7 +30,8 @@ final class McpAbilityRegistrarTest extends TestCase {
 		$prefs->setEnabled( true );
 		self::assertTrue( $registrar->allowed() );
 		$definitions = $registrar->definitions();
-		self::assertSame( array( 'amazing-security/list-findings', 'amazing-security/get-finding', 'amazing-security/start-scan', 'amazing-security/get-scan' ), array_keys( $definitions ) );
+		self::assertSame( array( 'amazing-security/list-findings', 'amazing-security/get-finding', 'amazing-security/start-scan', 'amazing-security/get-scan', 'amazing-security/propose-fix', 'amazing-security/get-fix-status' ), array_keys( $definitions ) );
+		self::assertFalse( $definitions['amazing-security/propose-fix']['input_schema']['additionalProperties'] );
 		foreach ( $definitions as $definition ) {
 			self::assertTrue( $definition['meta']['mcp']['public'] );
 			self::assertArrayNotHasKey( 'public', $definition['meta'] );

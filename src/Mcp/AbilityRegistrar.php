@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace AmazingPlugins\Security\Mcp;
 
 use Closure;
+use AmazingPlugins\Security\Fixes\FixProposalService;
 
 final class AbilityRegistrar {
 	private readonly Closure $canManage;
 	private readonly Closure $userId;
 
-	public function __construct( private readonly McpPreferences $preferences, private readonly FindingsGateway $findings, private readonly ScanGateway $scans, ?callable $canManage = null, ?callable $userId = null ) {
+	public function __construct( private readonly McpPreferences $preferences, private readonly FindingsGateway $findings, private readonly ScanGateway $scans, ?callable $canManage = null, ?callable $userId = null, private readonly ?FixProposalService $proposals = null, private readonly ?FixGateway $fixes = null ) {
 		$this->canManage = Closure::fromCallable( $canManage ?? static fn(): bool => current_user_can( 'manage_options' ) );
 		$this->userId    = Closure::fromCallable( $userId ?? static fn(): int => get_current_user_id() );
 	}
@@ -42,7 +43,7 @@ final class AbilityRegistrar {
 
 	public function definitions(): array {
 		$schemas = array(
-			'list-findings' => array(
+			'list-findings'  => array(
 				'type'                 => 'object',
 				'properties'           => array(
 					'offset' => array(
@@ -58,7 +59,7 @@ final class AbilityRegistrar {
 				),
 				'additionalProperties' => false,
 			),
-			'get-finding'   => array(
+			'get-finding'    => array(
 				'type'                 => 'object',
 				'properties'           => array(
 					'finding_id' => array(
@@ -69,7 +70,7 @@ final class AbilityRegistrar {
 				'required'             => array( 'finding_id' ),
 				'additionalProperties' => false,
 			),
-			'start-scan'    => array(
+			'start-scan'     => array(
 				'type'                 => 'object',
 				'properties'           => array(
 					'type' => array(
@@ -80,7 +81,7 @@ final class AbilityRegistrar {
 				'required'             => array( 'type' ),
 				'additionalProperties' => false,
 			),
-			'get-scan'      => array(
+			'get-scan'       => array(
 				'type'                 => 'object',
 				'properties'           => array(
 					'scan_id' => array(
@@ -91,12 +92,40 @@ final class AbilityRegistrar {
 				'required'             => array( 'scan_id' ),
 				'additionalProperties' => false,
 			),
+			'propose-fix'    => array(
+				'type'                 => 'object',
+				'properties'           => array(
+					'finding_id' => array(
+						'type'    => 'string',
+						'pattern' => '^[a-f0-9]{32}$',
+					),
+					'recipe_id'  => array(
+						'type' => 'string',
+						'enum' => array( 'login-rate-observe', 'login-rate-block' ),
+					),
+				),
+				'required'             => array( 'finding_id', 'recipe_id' ),
+				'additionalProperties' => false,
+			),
+			'get-fix-status' => array(
+				'type'                 => 'object',
+				'properties'           => array(
+					'proposal_id' => array(
+						'type'    => 'string',
+						'pattern' => '^[a-f0-9]{32}$',
+					),
+				),
+				'required'             => array( 'proposal_id' ),
+				'additionalProperties' => false,
+			),
 		);
 		$labels  = array(
-			'list-findings' => 'List security findings',
-			'get-finding'   => 'Get a security finding',
-			'start-scan'    => 'Run local hardening checks',
-			'get-scan'      => 'Get a local hardening scan',
+			'list-findings'  => 'List security findings',
+			'get-finding'    => 'Get a security finding',
+			'start-scan'     => 'Run local hardening checks',
+			'get-scan'       => 'Get a local hardening scan',
+			'propose-fix'    => 'Propose a login protection setting change',
+			'get-fix-status' => 'Get a proposed fix status',
 		);
 		$out     = array();
 		foreach ( $schemas as $short => $schema ) {
@@ -160,6 +189,22 @@ final class AbilityRegistrar {
 					break;
 				}
 				return $this->scans->get( $input['scan_id'] );
+			case 'propose-fix':
+				if ( 2 !== count( $input ) || array_diff( array_keys( $input ), array( 'finding_id', 'recipe_id' ) ) || ! is_string( $input['finding_id'] ?? null ) || ! is_string( $input['recipe_id'] ?? null ) || ! preg_match( '/^[a-f0-9]{32}$/D', $input['finding_id'] ) || ! in_array( $input['recipe_id'], array( 'login-rate-observe', 'login-rate-block' ), true ) ) {
+					break;
+				}
+				return null === $this->proposals ? array(
+					'schema_version' => 1,
+					'state'          => 'unavailable',
+				) : $this->proposals->propose( $input['finding_id'], $input['recipe_id'], ( $this->userId )(), time() );
+			case 'get-fix-status':
+				if ( array_keys( $input ) !== array( 'proposal_id' ) || ! is_string( $input['proposal_id'] ) || ! preg_match( '/^[a-f0-9]{32}$/D', $input['proposal_id'] ) ) {
+					break;
+				}
+				return null === $this->fixes ? array(
+					'schema_version' => 1,
+					'state'          => 'unavailable',
+				) : $this->fixes->status( $input['proposal_id'], time() );
 		}
 		return array(
 			'schema_version' => 1,
