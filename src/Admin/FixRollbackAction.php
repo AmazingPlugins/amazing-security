@@ -10,7 +10,8 @@ use Throwable;
 
 final class FixRollbackAction {
 	public function handle(): void {
-		if ( 'POST' !== ( $_SERVER['REQUEST_METHOD'] ?? '' ) || ! current_user_can( 'manage_options' ) || ! FixApprovalAction::cookieAuthenticated() ) {
+		$method = is_string( $_SERVER['REQUEST_METHOD'] ?? null ) ? sanitize_key( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) : '';
+		if ( 'post' !== $method || ! current_user_can( 'manage_options' ) || ! FixApprovalAction::cookieAuthenticated() ) {
 			wp_die( esc_html__( 'A current administrator session is required.', 'amazing-security' ), '', array( 'response' => 403 ) );
 		}
 		// The nonce is verified below before these fields affect a write.
