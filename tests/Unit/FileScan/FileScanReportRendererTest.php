@@ -50,7 +50,23 @@ final class FileScanReportRendererTest extends TestCase {
 		self::assertStringContainsString( 'includes/loader.php', $html );
 		self::assertStringContainsString( 'AS-PHP-001', $html );
 		self::assertStringContainsString( '2026-09-28T00:00:00+00:00', $html );
-		self::assertStringContainsString( 'Not rechecked by a complete scan', $html );
+		self::assertStringContainsString( 'Current status unknown; latest scan was partial', $html );
+	}
+
+	public function test_every_retained_warning_is_reviewable(): void {
+		$history = array();
+		for ( $reportIndex = 0; $reportIndex < 6; ++$reportIndex ) {
+			$findings = array();
+			for ( $findingIndex = 0; $findingIndex < 4; ++$findingIndex ) {
+				$findings[] = array( 'id' => substr( hash( 'sha256', $reportIndex . ':' . $findingIndex ), 0, 32 ), 'state' => 'warn', 'kind' => 'suspected', 'package' => 'plugin-' . $reportIndex, 'path' => 'path-' . $findingIndex . '.php', 'rule_id' => 'AS-PHP-001', 'tested_at' => '2026-09-28T00:00:00+00:00' );
+			}
+			$history[] = new FileScanReport( 'old-' . $reportIndex, 'warn', new DateTimeImmutable( '2026-09-28T00:00:00Z' ), false, 4, 40, 0, 0, 0, 0, 4, 0, $findings );
+		}
+		$latest = new FileScanReport( 'latest', 'pass', new DateTimeImmutable( '2026-09-29T00:00:00Z' ), false, 1, 10, 0, 0, 0, 0, 1, 0, array() );
+		$html = ( new FileScanReportRenderer() )->render( $latest, null, $history );
+		self::assertStringContainsString( 'plugin-0', $html );
+		self::assertStringContainsString( 'path-3.php', $html );
+		self::assertStringContainsString( 'Not reported in the last complete scan', $html );
 	}
 
 	public function test_partial_report_escapes_findings_and_keeps_previous_warning_date(): void {

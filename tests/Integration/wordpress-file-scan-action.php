@@ -30,6 +30,10 @@ if ( 'plan' === $case ) {
 	if ( ! in_array( 'amazing-security', $slugs, true ) || ! in_array( 'hello.php', array_column( $plugins, 'single_file' ), true ) ) {
 		throw new RuntimeException( 'The file scan omitted its own package or a single-file plugin.' );
 	}
+	$candidates = ( new ReflectionMethod( FileScanAction::class, 'manifestPlugins' ) )->invoke( new FileScanAction(), $plugins );
+	if ( in_array( 'amazing-security', array_column( $candidates, 'slug' ), true ) || in_array( 'hello.php', array_column( $candidates, 'slug' ), true ) ) {
+		throw new RuntimeException( 'Local-only plugins consumed repository manifest slots.' );
+	}
 	echo 'File action: own and single-file plugins are in the local scan plan.' . PHP_EOL;
 	return;
 }

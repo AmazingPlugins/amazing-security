@@ -38,18 +38,19 @@ final class FileScanReportRenderer {
 		$older = array_values( array_filter( $history, static fn( mixed $report ): bool => $report instanceof FileScanReport && ( null === $completed || $report->scanId !== $completed->scanId ) ) );
 		if ( array() !== $older ) {
 			$html .= '<details class="amsec-file-history"><summary>Earlier warnings</summary><ul>';
-			foreach ( array_slice( $older, -5 ) as $report ) {
-				$html .= '<li><time datetime="' . esc_attr( $report->finishedAt->format( 'c' ) ) . '">' . esc_html( $report->finishedAt->format( 'Y-m-d H:i:s' ) . ' UTC' ) . '</time>: ' . esc_html( (string) count( $report->findings ) ) . ' findings.<ul>';
-				foreach ( array_slice( $report->findings, 0, 3 ) as $finding ) {
+			foreach ( $older as $report ) {
+				$count = count( $report->findings );
+				$html .= '<li><details><summary><time datetime="' . esc_attr( $report->finishedAt->format( 'c' ) ) . '">' . esc_html( $report->finishedAt->format( 'Y-m-d H:i:s' ) . ' UTC' ) . '</time>: ' . esc_html( (string) $count ) . ' ' . ( 1 === $count ? 'finding' : 'findings' ) . '</summary><ul>';
+				foreach ( $report->findings as $finding ) {
 					$id      = (string) ( $finding['id'] ?? '' );
 					$present = false;
 					foreach ( $completed?->findings ?? array() as $current ) {
 						$present = $present || (string) ( $current['id'] ?? '' ) === $id;
 					}
-					$status = null === $completed || $completed->partial ? 'Not rechecked by a complete scan' : ( $present ? 'Still reported in the last complete scan' : 'Not reported in the last complete scan' );
+					$status = null === $completed ? 'No later complete comparison available' : ( $completed->partial ? 'Current status unknown; latest scan was partial' : ( $present ? 'Still reported in the last complete scan' : 'Not reported in the last complete scan' ) );
 					$html  .= '<li><strong>' . esc_html( (string) ( $finding['package'] ?? '' ) ) . '</strong> <code>' . esc_html( (string) ( $finding['path'] ?? '' ) ) . '</code> ' . esc_html( (string) ( $finding['rule_id'] ?? '' ) ) . ' <time datetime="' . esc_attr( (string) ( $finding['tested_at'] ?? '' ) ) . '">' . esc_html( (string) ( $finding['tested_at'] ?? '' ) ) . '</time>. ' . esc_html( $status ) . '.</li>';
 				}
-				$html .= '</ul></li>';
+				$html .= '</ul></details></li>';
 			}
 			$html .= '</ul></details>';
 		}

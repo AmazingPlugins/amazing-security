@@ -63,7 +63,7 @@ final class FileScanAction {
 			$plugins          = $this->plugins();
 			$themes           = $this->themes();
 			$client           = new WordPressHttpClient();
-			$discovery        = ( new TargetDiscovery( new WordPressOrgManifestProvider( $client ), new WordPressOrgThemeManifestProvider( $client, new ThemeArchiveParser() ) ) )->discover( $this->coreVersion(), $this->coreLocale(), ABSPATH, $plugins, $themes );
+			$discovery        = ( new TargetDiscovery( new WordPressOrgManifestProvider( $client ), new WordPressOrgThemeManifestProvider( $client, new ThemeArchiveParser() ) ) )->discover( $this->coreVersion(), $this->coreLocale(), ABSPATH, $this->manifestPlugins( $plugins ), $themes );
 			$cursor->elapsed += microtime( true ) - $started;
 			if ( $isStart ) {
 				$cursor->partial = $discovery->partial;
@@ -143,9 +143,14 @@ final class FileScanAction {
 				'version'    => (string) ( $data['Version'] ?? '' ),
 				'root'       => WP_PLUGIN_DIR . '/' . $slug,
 				'update_uri' => (string) ( $data['UpdateURI'] ?? '' ),
+				'local_only' => plugin_basename( AMAZING_SECURITY_FILE ) === $file,
 			);
 		}
 		return $plugins;
+	}
+
+	private function manifestPlugins( array $plugins ): array {
+		return array_values( array_filter( $plugins, static fn( array $row ): bool => ! (bool) ( $row['local_only'] ?? false ) && 'unsupported_local_path' !== ( $row['update_uri'] ?? '' ) ) );
 	}
 
 	private function themes(): array {
