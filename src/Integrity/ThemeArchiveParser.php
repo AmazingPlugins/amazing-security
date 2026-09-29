@@ -20,10 +20,15 @@ final class ThemeArchiveParser {
 		if ( false === $temp ) {
 			return new ManifestResult( null, 'archive_unavailable' );
 		}
-		$zip = new ZipArchive();
+		$zip    = new ZipArchive();
+		$opened = false;
 		try {
 			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents -- Temporary archive, never extracted into the site.
-			if ( strlen( $zipBytes ) !== file_put_contents( $temp, $zipBytes ) || true !== $zip->open( $temp, ZipArchive::RDONLY ) ) {
+			if ( strlen( $zipBytes ) !== file_put_contents( $temp, $zipBytes ) ) {
+				return new ManifestResult( null, 'invalid_archive' );
+			}
+			$opened = true === $zip->open( $temp, ZipArchive::RDONLY );
+			if ( ! $opened ) {
 				return new ManifestResult( null, 'invalid_archive' );
 			}
 			if ( $zip->numFiles < 1 || $zip->numFiles > 10000 ) {
@@ -101,7 +106,9 @@ final class ThemeArchiveParser {
 			}
 			return new ManifestResult( new Manifest( 'theme', $slug . ':' . $version, $sourceUrl, new DateTimeImmutable(), 'sha256', $files ) );
 		} finally {
-			$zip->close();
+			if ( $opened ) {
+				$zip->close();
+			}
 			// phpcs:ignore WordPress.WP.AlternativeFunctions.unlink_unlink -- Delete only our private temporary archive.
 			unlink( $temp );
 		}

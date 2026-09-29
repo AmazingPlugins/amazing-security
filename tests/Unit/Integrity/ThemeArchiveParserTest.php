@@ -40,6 +40,12 @@ final class ThemeArchiveParserTest extends TestCase {
 		}
 	}
 
+	public function test_invalid_archive_returns_unknown_without_throwing(): void {
+		$result = ( new ThemeArchiveParser() )->parse( 'theme', '1.0', 'not a zip', 'https://downloads.wordpress.org/theme/theme.1.0.zip' );
+		self::assertNull( $result->manifest );
+		self::assertSame( 'invalid_archive', $result->reason );
+	}
+
 	public function test_rejects_symlink_and_compression_bomb(): void {
 		$parser = new ThemeArchiveParser();
 		self::assertNull( $parser->parse( 'theme', '1.0', $this->archive( array( 'theme/link.php' => 'outside' ), true ), 'https://downloads.wordpress.org/theme/theme.1.0.zip' )->manifest );
@@ -62,5 +68,20 @@ final class ThemeArchiveParserTest extends TestCase {
 		$bytes = file_get_contents( $path );
 		unlink( $path );
 		self::assertNull( ( new ThemeArchiveParser() )->parse( 'theme', '1.0', $bytes, 'https://downloads.wordpress.org/theme/theme.1.0.zip' )->manifest );
+	}
+
+	public function test_rejects_more_than_sixty_four_megabytes_expanded(): void {
+		$path = tempnam( sys_get_temp_dir(), 'amsec-expanded-' );
+		$zip = new ZipArchive();
+		self::assertTrue( $zip->open( $path, ZipArchive::OVERWRITE ) );
+		$body = str_repeat( random_bytes( 10000 ), 50 );
+		for ( $i = 0; $i < 140; ++$i ) {
+			$zip->addFromString( 'theme/file-' . $i . '.php', $body );
+		}
+		$zip->close();
+		$bytes = file_get_contents( $path );
+		unlink( $path );
+		$result = ( new ThemeArchiveParser() )->parse( 'theme', '1.0', $bytes, 'https://downloads.wordpress.org/theme/theme.1.0.zip' );
+		self::assertSame( 'oversized_archive', $result->reason );
 	}
 }
