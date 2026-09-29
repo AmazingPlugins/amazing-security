@@ -26,7 +26,9 @@ final class FileReaderTest extends TestCase {
 	public function test_hashes_contained_file_and_rejects_escape(): void {
 		$budget = new IntegrityBudget();
 		$reader = new FileReader();
-		self::assertSame( md5( 'safe' ), $reader->hash( $this->root, 'safe.php', 'md5', $budget )->digest );
+		$result = $reader->hash( $this->root, 'safe.php', 'md5', $budget );
+		self::assertSame( md5( 'safe' ), $result->digest );
+		self::assertSame( hash( 'sha256', 'safe' ), $result->sha256 );
 		self::assertSame( 'unsafe', $reader->hash( $this->root, '../safe.php', 'md5', $budget )->state );
 		self::assertSame( 'missing', $reader->hash( $this->root, 'missing.php', 'md5', $budget )->state );
 	}

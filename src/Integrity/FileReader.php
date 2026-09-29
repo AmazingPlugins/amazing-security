@@ -38,7 +38,8 @@ final class FileReader {
 		if ( false === $stream ) {
 			return new FileHashResult( 'unavailable' );
 		}
-		$hash = hash_init( $algorithm );
+		$hash   = hash_init( $algorithm );
+		$sha256 = hash_init( 'sha256' );
 		try {
 			while ( ! feof( $stream ) ) {
 				if ( ! $budget->hasTime() ) {
@@ -63,11 +64,12 @@ final class FileReader {
 					return new FileHashResult( 'budget' );
 				}
 				hash_update( $hash, $chunk );
+				hash_update( $sha256, $chunk );
 			}
 		} finally {
 			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose -- Close the bounded stream.
 			fclose( $stream );
 		}
-		return new FileHashResult( 'ok', hash_final( $hash ) );
+		return new FileHashResult( 'ok', hash_final( $hash ), hash_final( $sha256 ) );
 	}
 }

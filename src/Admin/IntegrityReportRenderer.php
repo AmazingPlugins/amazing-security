@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace AmazingPlugins\Security\Admin;
 
 use AmazingPlugins\Security\Integrity\IntegrityStep;
+use AmazingPlugins\Security\Repair\RepairCandidate;
 use AmazingPlugins\Security\Scan\ScanRun;
 
 final class IntegrityReportRenderer {
@@ -13,7 +14,7 @@ final class IntegrityReportRenderer {
 		$html .= '<p>On request, this check fetches release checksums from api.wordpress.org and downloads.wordpress.org. Site file contents stay on this server. A checksum difference is not a malware verdict.</p>';
 		if ( null !== $completed ) {
 			$html .= '<h3>Last completed report</h3><p>Tested <time datetime="' . esc_attr( $completed->finishedAt->format( 'c' ) ) . '">' . esc_html( $completed->finishedAt->format( 'Y-m-d H:i:s' ) . ' UTC' ) . '</time>.</p>';
-			$html .= $this->findings( $completed->results, 'Completed integrity findings' );
+			$html .= $this->findings( $completed->results, 'Completed integrity findings', true );
 		}
 		if ( null !== $progress ) {
 			$cursor = $progress->cursor;
@@ -26,20 +27,22 @@ final class IntegrityReportRenderer {
 				}
 				$html .= '</ul>';
 			}
-			$html .= $this->findings( $cursor->findings, 'Current integrity findings' );
+			$html .= $this->findings( $cursor->findings, 'Current integrity findings', $progress->finished );
 		} elseif ( null === $completed ) {
 			$html .= '<p>No integrity scan has run yet.</p>';
 		}
 		return $html . '</section>';
 	}
 
-	private function findings( array $findings, string $label ): string {
+	private function findings( array $findings, string $label, bool $allowRepair ): string {
 		if ( array() === $findings ) {
 			return '<p>No file differences recorded in this report. Coverage depends on the package and scan status above.</p>';
 		}
 		$html = '<div class="amazing-security-table-scroll" role="region" tabindex="0" aria-label="' . esc_attr( $label ) . '"><table class="widefat striped"><thead><tr><th scope="col">State</th><th scope="col">Package</th><th scope="col">File</th><th scope="col">Finding</th><th scope="col">Source</th></tr></thead><tbody>';
 		foreach ( $findings as $finding ) {
-			$html .= '<tr><td>' . esc_html( $finding->state ) . '</td><td>' . esc_html( (string) ( $finding->evidence['package'] ?? '' ) ) . '</td><td>' . esc_html( (string) ( $finding->evidence['path'] ?? '' ) ) . '</td><td>' . esc_html( $finding->summary ) . '</td><td><a href="' . esc_url( $finding->sourceUrl ) . '" target="_blank" rel="noopener noreferrer">Published source</a></td></tr>';
+			$repair     = $allowRepair && is_string( $finding->findingId ) ? RepairCandidate::fromFindings( array( $finding ), $finding->findingId ) : null;
+			$repairLink = null === $repair ? '' : ' <a href="' . esc_url( admin_url( 'admin.php?page=amsec-repair&finding=' . rawurlencode( $repair->findingId ) ) ) . '">Review repair</a>';
+			$html      .= '<tr><td>' . esc_html( $finding->state ) . '</td><td>' . esc_html( (string) ( $finding->evidence['package'] ?? '' ) ) . '</td><td>' . esc_html( (string) ( $finding->evidence['path'] ?? '' ) ) . '</td><td>' . esc_html( $finding->summary ) . $repairLink . '</td><td><a href="' . esc_url( $finding->sourceUrl ) . '" target="_blank" rel="noopener noreferrer">Published source</a></td></tr>';
 		}
 		return $html . '</tbody></table></div>';
 	}

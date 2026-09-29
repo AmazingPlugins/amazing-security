@@ -88,9 +88,11 @@ final class IntegrityRunner {
 					'high',
 					State::INCONCLUSIVE === $state ? 'partial' : 'complete',
 					array(
+						'package_type'        => $target->manifest->type,
 						'package'             => $target->manifest->identity,
 						'path'                => $path,
 						'reason'              => $result->state,
+						'observed_sha256'     => $result->sha256,
 						'algorithm'           => $target->manifest->algorithm,
 						'manifest_fetched_at' => $target->manifest->fetchedAt->format( 'c' ),
 					),
