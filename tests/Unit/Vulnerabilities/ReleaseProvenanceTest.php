@@ -42,6 +42,14 @@ final class ReleaseProvenanceTest extends TestCase {
 		self::assertFalse( ( new ReleaseProvenance() )->verify( $manifest, $this->root ) );
 	}
 
+	public function test_file_state_changes_after_same_size_edit(): void {
+		$proof  = new ReleaseProvenance();
+		$before = $proof->fileState( $this->root );
+		file_put_contents( $this->root . '/main.php', '<?php echo 2;' );
+		self::assertNotNull( $before );
+		self::assertNotSame( $before, $proof->fileState( $this->root ) );
+	}
+
 	private function manifest(): Manifest {
 		return new Manifest( 'plugin', 'akismet:5.6', 'https://downloads.wordpress.org/plugin-checksums/akismet/5.6.json', new DateTimeImmutable(), 'sha256', array( 'main.php' => array( hash( 'sha256', '<?php echo 1;' ) ) ) );
 	}

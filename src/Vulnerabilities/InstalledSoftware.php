@@ -9,7 +9,8 @@ final class InstalledSoftware {
 		public readonly string $type,
 		public readonly string $slug,
 		public readonly string $version,
-		public readonly bool $eligible
+		public readonly bool $eligible,
+		public readonly ?int $proofCheckedAt = null
 	) {}
 
 	public function toArray(): array {
@@ -18,6 +19,7 @@ final class InstalledSoftware {
 			'slug'     => $this->slug,
 			'version'  => $this->version,
 			'eligible' => $this->eligible,
+			'proof_checked_at' => $this->proofCheckedAt,
 		);
 	}
 }

@@ -25,6 +25,11 @@ final class DirectFeedResponseTest extends TestCase {
 		self::assertSame( array(), $data->records );
 	}
 
+	public function test_missing_vulnerability_field_is_invalid_not_empty(): void {
+		$json = '{"error":0,"updated":1790675900,"data":{"plugin":"sample"}}';
+		self::assertNull( DirectFeedResponse::parse( 'plugin', 'sample', $json, 1790676000 ) );
+	}
+
 	public function test_rejects_wrong_component_and_invalid_envelope(): void {
 		$json = file_get_contents( dirname( __DIR__, 2 ) . '/Fixtures/WPVulnerability/plugin-akismet.json' );
 		self::assertNull( DirectFeedResponse::parse( 'plugin', 'woocommerce', $json, 1790676000 ) );

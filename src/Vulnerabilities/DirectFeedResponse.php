@@ -28,7 +28,10 @@ final class DirectFeedResponse {
 		if ( $updated <= 0 || $updated > $fetchedAt + 300 || ( $data['data'][ $key ] ?? null ) !== $slug ) {
 			return null;
 		}
-		$raw = $data['data']['vulnerability'] ?? null;
+		if ( ! array_key_exists( 'vulnerability', $data['data'] ) ) {
+			return null;
+		}
+		$raw = $data['data']['vulnerability'];
 		if ( null !== $raw && ( ! is_array( $raw ) || count( $raw ) > 250 || ! array_is_list( $raw ) ) ) {
 			return null;
 		}

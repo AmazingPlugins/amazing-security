@@ -14,6 +14,39 @@ use RecursiveIteratorIterator;
 final class ReleaseProvenance {
 	public function __construct( private readonly FileReader $reader = new FileReader() ) {}
 
+	public function fileState( string $root ): ?string {
+		if ( is_link( $root ) || ! is_dir( $root ) ) {
+			return null;
+		}
+		$base = realpath( $root );
+		if ( false === $base ) {
+			return null;
+		}
+		$paths = array();
+		try {
+			$files = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $base, FilesystemIterator::SKIP_DOTS ) );
+			foreach ( $files as $file ) {
+				if ( count( $paths ) >= 250 || $file->isLink() || ! $file->isFile() ) {
+					return null;
+				}
+				$paths[] = str_replace( DIRECTORY_SEPARATOR, '/', substr( $file->getPathname(), strlen( $base ) + 1 ) );
+			}
+		} catch ( \Throwable $error ) {
+			return null;
+		}
+		sort( $paths );
+		$budget = new IntegrityBudget( 250, 33554432, 5.0, 5.0 );
+		$hash   = hash_init( 'sha256' );
+		foreach ( $paths as $path ) {
+			$result = $this->reader->hash( $base, $path, 'sha256', $budget );
+			if ( 'ok' !== $result->state ) {
+				return null;
+			}
+			hash_update( $hash, $path . "\0" . $result->digest . "\0" );
+		}
+		return hash_final( $hash );
+	}
+
 	public function verify( Manifest $manifest, string $root ): bool {
 		if ( 'plugin' !== $manifest->type || 'sha256' !== $manifest->algorithm || array() === $manifest->files || count( $manifest->files ) > 250 || is_link( $root ) || ! is_dir( $root ) ) {
 			return false;
