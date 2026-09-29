@@ -28,6 +28,6 @@ final class ScheduleHooksTest extends TestCase {
 		$hooks->ensure();
 		self::assertSame( 1, $scheduled );
 		$hooks->clear();
-		self::assertSame( array( 'amsec_local_daily_scan', 'amsec_integrity_tick', 'amsec_file_tick' ), $cleared );
+		self::assertSame( array( 'amsec_local_daily_scan', 'amsec_integrity_tick', 'amsec_file_tick', 'amsec_vuln_tick' ), $cleared );
 	}
 }

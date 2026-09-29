@@ -24,7 +24,7 @@ final class ScheduleHooks {
 	}
 
 	public function clear(): void {
-		foreach ( array( 'amsec_local_daily_scan', 'amsec_integrity_tick', 'amsec_file_tick' ) as $hook ) {
+		foreach ( array( 'amsec_local_daily_scan', 'amsec_integrity_tick', 'amsec_file_tick', 'amsec_vuln_tick' ) as $hook ) {
 			( $this->clear )( $hook );
 		}
 	}
