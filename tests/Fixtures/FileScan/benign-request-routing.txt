@@ -1,0 +1,6 @@
+<?php
+$page = $_GET['page'] ?? 'home';
+if (in_array($page, ['home', 'about'], true)) {
+    include __DIR__ . '/' . $page . '.php';
+}
+$message = 'eval($_POST[payload])';

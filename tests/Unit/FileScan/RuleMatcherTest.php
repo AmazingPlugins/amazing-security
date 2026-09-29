@@ -9,12 +9,15 @@ use AmazingPlugins\Security\FileScan\RuleMatcher;
 use PHPUnit\Framework\TestCase;
 
 final class RuleMatcherTest extends TestCase {
-	public function test_three_suspicious_constructs_have_stable_ids_and_no_snippets(): void {
+	public function test_suspicious_constructs_have_stable_ids_and_no_snippets(): void {
 		$matcher = new RuleMatcher( new BundledRulePack() );
 		$cases = array(
 			'AS-PHP-001' => 'obfuscated-eval.txt',
 			'AS-PHP-002' => 'request-command.txt',
 			'AS-PHP-003' => 'remote-include.txt',
+			'AS-PHP-004' => 'request-eval.txt',
+			'AS-PHP-005' => 'request-include.txt',
+			'AS-PHP-006' => 'compressed-eval.txt',
 		);
 		foreach ( $cases as $id => $filename ) {
 			$code = file_get_contents( dirname( __DIR__, 2 ) . '/Fixtures/FileScan/' . $filename );
@@ -33,6 +36,7 @@ final class RuleMatcherTest extends TestCase {
 			'<?php $docs = "system(\\$_POST[cmd])";',
 			file_get_contents( dirname( __DIR__, 2 ) . '/Fixtures/FileScan/benign-encoding.txt' ),
 			file_get_contents( dirname( __DIR__, 2 ) . '/Fixtures/FileScan/benign-remote-data.txt' ),
+			file_get_contents( dirname( __DIR__, 2 ) . '/Fixtures/FileScan/benign-request-routing.txt' ),
 		);
 		foreach ( $benign as $code ) {
 			self::assertSame( array(), $matcher->match( $code, 'demo.php' ) );
