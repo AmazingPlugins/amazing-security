@@ -44,13 +44,18 @@ add_action(
 	}
 );
 
-$amsec_login_settings = new AmazingPlugins\Security\Login\WordPressLoginSettings( new AmazingPlugins\Security\Integrity\WordPressOptions() );
-$amsec_login_hooks    = new AmazingPlugins\Security\Login\LoginHooks(
-	new AmazingPlugins\Security\Login\RateLimiter( $amsec_login_settings, new AmazingPlugins\Security\Login\WordPressRateCounterStore( $GLOBALS['wpdb'] ) ),
-	new AmazingPlugins\Security\Login\AddressKey( wp_salt( 'auth' ) )
+add_action(
+	'plugins_loaded',
+	static function (): void {
+		$settings = new AmazingPlugins\Security\Login\WordPressLoginSettings( new AmazingPlugins\Security\Integrity\WordPressOptions() );
+		$hooks    = new AmazingPlugins\Security\Login\LoginHooks(
+			new AmazingPlugins\Security\Login\RateLimiter( $settings, new AmazingPlugins\Security\Login\WordPressRateCounterStore( $GLOBALS['wpdb'] ) ),
+			new AmazingPlugins\Security\Login\AddressKey( wp_salt( 'auth' ) )
+		);
+		add_filter( 'authenticate', array( $hooks, 'authenticate' ), 25, 3 );
+		add_action( 'wp_login_failed', array( $hooks, 'failed' ), 10, 2 );
+	}
 );
-add_filter( 'authenticate', array( $amsec_login_hooks, 'authenticate' ), 5, 3 );
-add_action( 'wp_login_failed', array( $amsec_login_hooks, 'failed' ), 10, 2 );
 
 add_action( 'admin_menu', array( new AmazingPlugins\Security\Admin\AdminPage(), 'register' ) );
 add_action( 'admin_post_amazing_security_scan', array( new AmazingPlugins\Security\Admin\ScanAction(), 'handle' ) );
