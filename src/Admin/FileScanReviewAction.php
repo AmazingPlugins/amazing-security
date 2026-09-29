@@ -36,8 +36,7 @@ final class FileScanReviewAction {
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce was checked above.
 		$id = isset( $_POST['finding_id'] ) && is_string( $_POST['finding_id'] ) ? sanitize_text_field( wp_unslash( $_POST['finding_id'] ) ) : '';
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce was checked above.
-		$raw       = isset( $_POST['note'] ) && is_string( $_POST['note'] ) ? wp_unslash( $_POST['note'] ) : '';
-		$note      = sanitize_textarea_field( $raw );
+		$note      = isset( $_POST['note'] ) && is_string( $_POST['note'] ) ? sanitize_textarea_field( wp_unslash( $_POST['note'] ) ) : '';
 		$store     = new WordPressFileScanStore( new WordPressOptions() );
 		$progress  = $store->latestProgress();
 		$completed = $store->latestCompleted();
