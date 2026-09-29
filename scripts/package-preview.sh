@@ -8,7 +8,8 @@ staging_dir="$(mktemp -d)"
 trap 'rm -rf "${staging_dir}"' EXIT
 mkdir -p "${staging_dir}/amazing-security"
 rsync -a "${plugin_dir}/amazing-security.php" "${plugin_dir}/uninstall.php" "${plugin_dir}/readme.txt" "${plugin_dir}/LICENSE" "${plugin_dir}/src" "${plugin_dir}/assets" "${staging_dir}/amazing-security/"
+find "${staging_dir}/amazing-security" -type f -exec touch -t 202001010000 {} +
 rm -f "${output_path}"
-( cd "${staging_dir}" && zip -qr "${output_path}" amazing-security )
+( cd "${staging_dir}" && find amazing-security -type f -print | LC_ALL=C sort | zip -Xq "${output_path}" -@ )
 unzip -tq "${output_path}"
 shasum -a 256 "${output_path}"
