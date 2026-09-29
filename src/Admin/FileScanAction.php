@@ -92,7 +92,7 @@ final class FileScanAction {
 			$targets = ( new FileScanPlanBuilder() )->build( $discovery, $plugins, $themes, (string) ( $uploads['basedir'] ?? '' ) );
 			$step    = ( new FileScanRunner() )->step( $targets, $cursor, new ScanContext() );
 			$store->saveProgress( $cursor->scanId, $step );
-			if ( $step->finished && ! $step->cursor->partial ) {
+			if ( $step->finished ) {
 				$store->complete( $cursor->scanId, FileScanReport::fromCursor( $step->cursor ) );
 			}
 		} catch ( Throwable $failure ) {
@@ -127,16 +127,14 @@ final class FileScanAction {
 		}
 		$plugins = array();
 		foreach ( get_plugins() as $file => $data ) {
-			if ( str_starts_with( $file, 'amazing-security/' ) ) {
-				continue;
-			}
 			$slug = dirname( $file );
 			if ( '.' === $slug || ! preg_match( '/^[a-z0-9]+(?:-[a-z0-9]+)*$/D', $slug ) ) {
 				$plugins[] = array(
-					'slug'       => basename( $file ),
-					'version'    => (string) ( $data['Version'] ?? '' ),
-					'root'       => WP_PLUGIN_DIR,
-					'update_uri' => 'unsupported_local_path',
+					'slug'        => basename( $file ),
+					'version'     => (string) ( $data['Version'] ?? '' ),
+					'root'        => WP_PLUGIN_DIR,
+					'update_uri'  => 'unsupported_local_path',
+					'single_file' => '.' === $slug ? basename( $file ) : null,
 				);
 				continue;
 			}

@@ -23,6 +23,17 @@ if ( 'editor' === $case ) {
 
 add_filter( 'pre_http_request', static fn() => new WP_Error( 'amsec_fixture_offline', 'Fixture keeps outbound requests offline.' ) );
 
+if ( 'plan' === $case ) {
+	$method = new ReflectionMethod( FileScanAction::class, 'plugins' );
+	$plugins = $method->invoke( new FileScanAction() );
+	$slugs = array_column( $plugins, 'slug' );
+	if ( ! in_array( 'amazing-security', $slugs, true ) || ! in_array( 'hello.php', array_column( $plugins, 'single_file' ), true ) ) {
+		throw new RuntimeException( 'The file scan omitted its own package or a single-file plugin.' );
+	}
+	echo 'File action: own and single-file plugins are in the local scan plan.' . PHP_EOL;
+	return;
+}
+
 if ( 'inspect' === $case ) {
 	require_once ABSPATH . 'wp-admin/includes/template.php';
 	$progress = ( new WordPressFileScanStore( new WordPressOptions() ) )->latestProgress();

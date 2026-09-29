@@ -28,19 +28,28 @@ final class FileScanReportRenderer {
 			$html  .= $this->findings( $cursor->findings, 'Current file scan findings' );
 		}
 		if ( null !== $completed ) {
-			$html .= '<h3>Last completed scan</h3><p>Tested <time datetime="' . esc_attr( $completed->finishedAt->format( 'c' ) ) . '">' . esc_html( $completed->finishedAt->format( 'Y-m-d H:i:s' ) . ' UTC' ) . '</time>. ' . esc_html( (string) $completed->processed ) . ' files checked.</p>';
+			$html .= '<h3>Last finished scan</h3><p>Tested <time datetime="' . esc_attr( $completed->finishedAt->format( 'c' ) ) . '">' . esc_html( $completed->finishedAt->format( 'Y-m-d H:i:s' ) . ' UTC' ) . '</time>. ' . esc_html( (string) $completed->processed ) . ' files checked.</p>';
 			if ( null === $progress ) {
+				$html .= '<div class="amsec-file-status amsec-file-status-' . esc_attr( $completed->partial ? 'partial' : 'progress' ) . '" role="status"><strong>' . esc_html( $completed->partial ? 'Partial coverage' : ( 'warn' === $completed->state ? 'Findings need review' : 'Scan finished' ) ) . '</strong></div>';
 				$html .= $this->coverage( $completed->processed, $completed->verified, $completed->scanned, $completed->extra, $completed->excluded, $completed->unknown, $completed->omitted );
 			}
 			$html .= $this->findings( $completed->findings, 'Completed file scan findings', null === $progress );
 		}
-		if ( array() !== $history ) {
+		$older = array_values( array_filter( $history, static fn( mixed $report ): bool => $report instanceof FileScanReport && ( null === $completed || $report->scanId !== $completed->scanId ) ) );
+		if ( array() !== $older ) {
 			$html .= '<details class="amsec-file-history"><summary>Earlier warnings</summary><ul>';
-			foreach ( array_slice( $history, -5 ) as $report ) {
-				if ( ! $report instanceof FileScanReport ) {
-					continue;
+			foreach ( array_slice( $older, -5 ) as $report ) {
+				$html .= '<li><time datetime="' . esc_attr( $report->finishedAt->format( 'c' ) ) . '">' . esc_html( $report->finishedAt->format( 'Y-m-d H:i:s' ) . ' UTC' ) . '</time>: ' . esc_html( (string) count( $report->findings ) ) . ' findings.<ul>';
+				foreach ( array_slice( $report->findings, 0, 3 ) as $finding ) {
+					$id      = (string) ( $finding['id'] ?? '' );
+					$present = false;
+					foreach ( $completed?->findings ?? array() as $current ) {
+						$present = $present || (string) ( $current['id'] ?? '' ) === $id;
+					}
+					$status = null === $completed || $completed->partial ? 'Not rechecked by a complete scan' : ( $present ? 'Still reported in the last complete scan' : 'Not reported in the last complete scan' );
+					$html  .= '<li><strong>' . esc_html( (string) ( $finding['package'] ?? '' ) ) . '</strong> <code>' . esc_html( (string) ( $finding['path'] ?? '' ) ) . '</code> ' . esc_html( (string) ( $finding['rule_id'] ?? '' ) ) . ' <time datetime="' . esc_attr( (string) ( $finding['tested_at'] ?? '' ) ) . '">' . esc_html( (string) ( $finding['tested_at'] ?? '' ) ) . '</time>. ' . esc_html( $status ) . '.</li>';
 				}
-				$html .= '<li><time datetime="' . esc_attr( $report->finishedAt->format( 'c' ) ) . '">' . esc_html( $report->finishedAt->format( 'Y-m-d H:i:s' ) . ' UTC' ) . '</time>: ' . esc_html( (string) count( $report->findings ) ) . ' findings.</li>';
+				$html .= '</ul></li>';
 			}
 			$html .= '</ul></details>';
 		}
@@ -48,7 +57,7 @@ final class FileScanReportRenderer {
 	}
 
 	private function coverage( int $processed, int $verified, int $scanned, int $extra, int $excluded, int $unknown, int $omitted ): string {
-		return '<dl class="amsec-file-coverage"><div><dt>Files seen</dt><dd>' . esc_html( (string) $processed ) . '</dd></div><div><dt>Release matches</dt><dd>' . esc_html( (string) $verified ) . '</dd></div><div><dt>Code checked</dt><dd>' . esc_html( (string) $scanned ) . '</dd></div><div><dt>Extra files</dt><dd>' . esc_html( (string) $extra ) . '</dd></div><div><dt>Excluded</dt><dd>' . esc_html( (string) $excluded ) . '</dd></div><div><dt>Could not check</dt><dd>' . esc_html( (string) $unknown ) . '</dd></div>' . ( $omitted > 0 ? '<div><dt>Findings omitted</dt><dd>' . esc_html( (string) $omitted ) . '</dd></div>' : '' ) . '</dl>';
+		return '<dl class="amsec-file-coverage"><div><dt>Files seen</dt><dd>' . esc_html( (string) $processed ) . '</dd></div><div><dt>Release-matched PHP</dt><dd>' . esc_html( (string) $verified ) . '</dd></div><div><dt>Code checked</dt><dd>' . esc_html( (string) $scanned ) . '</dd></div><div><dt>Extra files</dt><dd>' . esc_html( (string) $extra ) . '</dd></div><div><dt>Excluded</dt><dd>' . esc_html( (string) $excluded ) . '</dd></div><div><dt>Could not check</dt><dd>' . esc_html( (string) $unknown ) . '</dd></div>' . ( $omitted > 0 ? '<div><dt>Findings omitted</dt><dd>' . esc_html( (string) $omitted ) . '</dd></div>' : '' ) . '</dl>';
 	}
 
 	private function findings( array $findings, string $label, bool $allowNotes = true ): string {
@@ -60,8 +69,9 @@ final class FileScanReportRenderer {
 			$kind  = (string) ( $finding['kind'] ?? '' );
 			$title = 'suspected' === $kind ? 'Suspected code' : ( 'extra' === $kind ? 'Review file' : ( 'package' === $kind ? 'Release unavailable' : 'Could not check file' ) );
 			$html .= '<li class="amsec-file-finding"><div class="amsec-file-finding-top"><strong>' . esc_html( $title ) . '</strong><span>' . esc_html( (string) ( $finding['rule_id'] ?? '' ) ) . '</span></div>';
+			$html .= '<span class="amsec-file-package">' . esc_html( (string) ( $finding['package'] ?? '' ) ) . '</span>';
 			if ( 'package' === $kind ) {
-				$html .= '<span class="amsec-file-package">' . esc_html( (string) ( $finding['package'] ?? '' ) ) . '</span><span class="amsec-file-reason">' . esc_html( (string) ( $finding['reason'] ?? '' ) ) . '</span>';
+				$html .= '<span class="amsec-file-reason">' . esc_html( (string) ( $finding['reason'] ?? '' ) ) . '</span>';
 			} else {
 				$html .= '<code>' . esc_html( (string) ( $finding['path'] ?? '' ) ) . '</code>';
 			}

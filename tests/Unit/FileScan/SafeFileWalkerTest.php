@@ -126,4 +126,16 @@ final class SafeFileWalkerTest extends TestCase {
 		self::assertTrue( $second->cursor->partial );
 		self::assertSame( array(), $second->observations );
 	}
+
+	public function test_single_file_target_reads_only_its_file_once(): void {
+		$root = $this->root();
+		file_put_contents( $root . '/hello.php', '<?php echo 1;' );
+		file_put_contents( $root . '/other.php', '<?php echo 2;' );
+		$target = new FileScanTarget( 'hello.php:1.0', 'plugin', $root, null, 'hello.php' );
+		$first = ( new SafeFileWalker() )->step( array( $target ), new FileScanCursor( 'scan-1' ), new ScanContext( null, 1 ) );
+		$second = ( new SafeFileWalker() )->step( array( $target ), $first->cursor, new ScanContext() );
+		self::assertSame( array( 'hello.php' ), array_column( $first->observations, 'path' ) );
+		self::assertSame( array(), $second->observations );
+		self::assertSame( 1, $second->cursor->processed );
+	}
 }

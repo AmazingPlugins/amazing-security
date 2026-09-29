@@ -6,6 +6,7 @@ namespace AmazingPlugins\Security\FileScan;
 
 use AmazingPlugins\Security\Integrity\OptionGateway;
 use RuntimeException;
+use Throwable;
 
 final class WordPressFileScanStore implements FileScanStore {
 	private const ACTIVE    = 'amazing_security_file_scan_active';
@@ -58,7 +59,7 @@ final class WordPressFileScanStore implements FileScanStore {
 	public function complete( string $scanId, FileScanReport $report ): void {
 		$previous = $this->options->get( self::ACTIVE );
 		$active   = $this->decode( $previous );
-		if ( ! is_string( $previous ) || null === $active || $active['scan_id'] !== $scanId || ! $active['finished'] || $report->scanId !== $scanId || $report->partial || (int) $active['expires'] < time() ) {
+		if ( ! is_string( $previous ) || null === $active || $active['scan_id'] !== $scanId || ! $active['finished'] || $report->scanId !== $scanId || ( $report->partial && 'pass' === $report->state ) || (int) $active['expires'] < time() ) {
 			throw new RuntimeException( 'Cannot complete file scan.' );
 		}
 		$active['completing'] = true;
@@ -67,26 +68,30 @@ final class WordPressFileScanStore implements FileScanStore {
 		if ( ! $this->options->replaceIfSame( self::ACTIVE, $previous, $claimed ) ) {
 			throw new RuntimeException( 'File scan lock changed before completion.' );
 		}
-		$previousReport = $this->options->get( self::COMPLETED );
-		$value          = $this->encode( $report->toArray() );
-		$saved          = null === $previousReport ? $this->options->add( self::COMPLETED, $value ) : $this->options->set( self::COMPLETED, $value );
-		if ( ! $saved ) {
-			$this->options->replaceIfSame( self::ACTIVE, $claimed, $previous );
-			throw new RuntimeException( 'Could not save completed file scan.' );
-		}
-		if ( 'warn' === $report->state ) {
-			$history    = array_map( static fn( FileScanReport $item ): array => $item->toArray(), $this->historicalWarnings() );
-			$history[]  = $report->toArray();
-			$cutoff     = time() - 90 * 86400;
-			$history    = array_values( array_filter( $history, static fn( array $item ): bool => strtotime( $item['finished_at'] ) >= $cutoff ) );
-			$history    = array_slice( $history, -20 );
-			$oldHistory = $this->options->get( self::HISTORY );
-			$encoded    = $this->encode( $history );
-			if ( null === $oldHistory ) {
-				$this->options->add( self::HISTORY, $encoded );
-			} else {
-				$this->options->set( self::HISTORY, $encoded );
+		try {
+			if ( 'warn' === $report->state ) {
+				$history    = array_map( static fn( FileScanReport $item ): array => $item->toArray(), $this->historicalWarnings() );
+				$history    = array_values( array_filter( $history, static fn( array $item ): bool => $item['scan_id'] !== $report->scanId ) );
+				$history[]  = $report->toArray();
+				$cutoff     = time() - 90 * 86400;
+				$history    = array_values( array_filter( $history, static fn( array $item ): bool => strtotime( $item['finished_at'] ) >= $cutoff ) );
+				$history    = array_slice( $history, -20 );
+				$oldHistory = $this->options->get( self::HISTORY );
+				$encoded    = $this->encode( $history );
+				$saved      = null === $oldHistory ? $this->options->add( self::HISTORY, $encoded ) : ( $oldHistory === $encoded || $this->options->set( self::HISTORY, $encoded ) );
+				if ( ! $saved ) {
+					throw new RuntimeException( 'Could not save file scan warning history.' );
+				}
 			}
+			$previousReport = $this->options->get( self::COMPLETED );
+			$value          = $this->encode( $report->toArray() );
+			$saved          = null === $previousReport ? $this->options->add( self::COMPLETED, $value ) : ( $previousReport === $value || $this->options->set( self::COMPLETED, $value ) );
+			if ( ! $saved ) {
+				throw new RuntimeException( 'Could not save finished file scan.' );
+			}
+		} catch ( Throwable $error ) {
+			$this->options->replaceIfSame( self::ACTIVE, $claimed, $previous );
+			throw $error;
 		}
 		$this->options->deleteIfSame( self::ACTIVE, $claimed );
 	}

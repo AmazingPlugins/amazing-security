@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\FileScan;
 
+use AmazingPlugins\Security\Integrity\WordPressOrgManifestProvider;
 use AmazingPlugins\Security\Scan\ScanContext;
 use Throwable;
 
@@ -62,6 +63,32 @@ final class SafeFileWalker {
 				++$cursor->targetIndex;
 				$cursor->stack = array();
 				continue;
+			}
+			if ( null !== $target->singleFile ) {
+				$relative = $target->singleFile;
+				++$cursor->targetIndex;
+				$cursor->stack = array();
+				if ( '' === $relative || str_contains( $relative, '/' ) || ! WordPressOrgManifestProvider::safePath( $relative ) ) {
+					++$cursor->unknown;
+					$cursor->partial = true;
+					continue;
+				}
+				$path     = $root . '/' . $relative;
+				$stat     = lstat( $path );
+				$resolved = realpath( $path );
+				if ( false === $stat || false === $resolved || is_link( $path ) || 0100000 !== ( $stat['mode'] & 0170000 ) || ! str_starts_with( $resolved, $root . DIRECTORY_SEPARATOR ) ) {
+					++$cursor->unknown;
+					$cursor->partial = true;
+					continue;
+				}
+				++$cursor->processed;
+				return array(
+					'target_index' => $cursor->targetIndex - 1,
+					'path'         => $relative,
+					'extra'        => false,
+					'size'         => (int) $stat['size'],
+					'kind'         => $target->kind,
+				);
 			}
 			if ( array() === $cursor->stack ) {
 				$cursor->stack[] = array(
@@ -192,7 +219,7 @@ final class SafeFileWalker {
 			$files = $target->manifest?->files ?? array();
 			ksort( $files );
 			// phpcs:ignore WordPress.WP.AlternativeFunctions.json_encode_json_encode -- Pure deterministic fingerprint also runs outside WordPress.
-			$parts[] = $target->identity . ':' . $target->kind . ':' . hash( 'sha256', $target->root ) . ':' . hash( 'sha256', json_encode( $files, JSON_THROW_ON_ERROR ) );
+			$parts[] = $target->identity . ':' . $target->kind . ':' . hash( 'sha256', $target->root ) . ':' . ( $target->singleFile ?? '' ) . ':' . hash( 'sha256', json_encode( $files, JSON_THROW_ON_ERROR ) );
 		}
 		return hash( 'sha256', implode( '|', $parts ) );
 	}

@@ -112,4 +112,15 @@ final class FileScanRunnerTest extends TestCase {
 		self::assertTrue( $step->cursor->partial );
 		self::assertSame( 'inconclusive', $step->cursor->state() );
 	}
+
+	public function test_single_file_plugin_content_is_checked_without_scanning_its_neighbors(): void {
+		$root = $this->root();
+		file_put_contents( $root . '/single.php', '<?php eval(base64_decode("ZWNobyAxOw=="));' );
+		file_put_contents( $root . '/neighbor.php', '<?php echo 1;' );
+		$target = new FileScanTarget( 'single.php:1.0', 'plugin', $root, null, 'single.php' );
+		$step = ( new FileScanRunner() )->step( array( $target ), new FileScanCursor( 'scan-1' ), new ScanContext() );
+		self::assertTrue( $step->finished );
+		self::assertSame( 1, $step->cursor->processed );
+		self::assertSame( array( 'AS-PHP-001' ), array_column( $step->cursor->findings, 'rule_id' ) );
+	}
 }

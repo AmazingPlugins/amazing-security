@@ -42,4 +42,32 @@ if ( null === $previousCompleted ) {
 if ( ! $preserved ) {
 	throw new RuntimeException( 'Partial scan hid a prior warning or displayed a stale state.' );
 }
+$historyKey = 'amazing_security_file_scan_history';
+$previousHistory = get_option( $historyKey, null );
+$partial = new FileScanReport( 'partial-fixture', 'inconclusive', new DateTimeImmutable( '2026-09-29T00:00:00Z' ), true, 2, 20, 1, 0, 0, 0, 1, 0, array() );
+delete_option( $key );
+update_option( $completedKey, wp_json_encode( $partial->toArray() ), false );
+update_option( $historyKey, wp_json_encode( array( $prior->toArray() ) ), false );
+ob_start();
+( new AdminPage() )->render();
+$html = ob_get_clean();
+$preserved = str_contains( $html, 'href="#amsec-file-scan">Suspected code: prior/loader.php' ) && str_contains( $html, '<strong>Partial coverage</strong>' );
+if ( null === $previous ) {
+	delete_option( $key );
+} else {
+	update_option( $key, $previous, false );
+}
+if ( null === $previousCompleted ) {
+	delete_option( $completedKey );
+} else {
+	update_option( $completedKey, $previousCompleted, false );
+}
+if ( null === $previousHistory ) {
+	delete_option( $historyKey );
+} else {
+	update_option( $historyKey, $previousHistory, false );
+}
+if ( ! $preserved ) {
+	throw new RuntimeException( 'A finished partial scan hid the prior warning.' );
+}
 echo 'File attention: suspected file appears in security overview.' . PHP_EOL;

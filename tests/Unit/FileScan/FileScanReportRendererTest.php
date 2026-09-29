@@ -27,7 +27,7 @@ final class FileScanReportRendererTest extends TestCase {
 		$html = ( new FileScanReportRenderer( 'https://example.test/wp-admin/admin-post.php', 'nonce' ) )->render( $report, new FileScanStep( $cursor, false ), array() );
 		preg_match_all( '/id="(amsec-note-[^"]+)"/', $html, $matches );
 		self::assertCount( 1, $matches[1] );
-		self::assertStringContainsString( 'Last completed scan', $html );
+		self::assertStringContainsString( 'Last finished scan', $html );
 	}
 
 	public function test_package_gap_names_the_package_and_reason(): void {
@@ -38,6 +38,19 @@ final class FileScanReportRendererTest extends TestCase {
 		self::assertStringContainsString( 'example:1.2', $html );
 		self::assertStringContainsString( 'custom_theme', $html );
 		self::assertStringNotContainsString( '<code></code>', $html );
+	}
+
+	public function test_historical_warning_shows_evidence_and_later_status(): void {
+		$id = str_repeat( 'd', 32 );
+		$old = new FileScanReport( 'old', 'warn', new DateTimeImmutable( '2026-09-28T00:00:00Z' ), false, 1, 10, 0, 0, 0, 0, 1, 0, array( array( 'id' => $id, 'state' => 'warn', 'kind' => 'suspected', 'package' => 'plugin-one:1.0', 'path' => 'includes/loader.php', 'rule_id' => 'AS-PHP-001', 'tested_at' => '2026-09-28T00:00:00+00:00', 'summary' => 'Suspected code' ) ) );
+		$new = new FileScanReport( 'new', 'inconclusive', new DateTimeImmutable( '2026-09-29T00:00:00Z' ), true, 1, 10, 1, 0, 0, 0, 0, 0, array() );
+		$html = ( new FileScanReportRenderer() )->render( $new, null, array( $old ) );
+		self::assertStringContainsString( 'Partial coverage', $html );
+		self::assertStringContainsString( 'plugin-one:1.0', $html );
+		self::assertStringContainsString( 'includes/loader.php', $html );
+		self::assertStringContainsString( 'AS-PHP-001', $html );
+		self::assertStringContainsString( '2026-09-28T00:00:00+00:00', $html );
+		self::assertStringContainsString( 'Not rechecked by a complete scan', $html );
 	}
 
 	public function test_partial_report_escapes_findings_and_keeps_previous_warning_date(): void {
@@ -53,5 +66,6 @@ final class FileScanReportRendererTest extends TestCase {
 		self::assertStringNotContainsString( '<script>', $html );
 		self::assertStringContainsString( '2026-09-28', $html );
 		self::assertStringContainsString( 'Suspected code', $html );
+		self::assertStringContainsString( 'demo', $html );
 	}
 }

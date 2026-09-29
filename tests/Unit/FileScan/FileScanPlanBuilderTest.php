@@ -17,8 +17,23 @@ final class FileScanPlanBuilderTest extends TestCase {
 		$discovery = new DiscoveryResult( array( new IntegrityTarget( $manifest, '/tmp/repo' ) ), array(), 'signature', false );
 		$targets = ( new FileScanPlanBuilder() )->build( $discovery, array( array( 'slug' => 'repo', 'version' => '1.0', 'root' => '/tmp/repo' ), array( 'slug' => 'custom', 'version' => '1.0', 'root' => '/tmp/not-there' ) ), array(), '/tmp/uploads' );
 		self::assertCount( 3, $targets );
-		self::assertSame( $manifest, $targets[0]->manifest );
+		self::assertSame( 'uploads', $targets[0]->kind );
+		self::assertSame( $manifest, $targets[1]->manifest );
+		self::assertNull( $targets[2]->manifest );
+	}
+
+	public function test_single_file_plugin_is_a_bounded_local_target(): void {
+		$discovery = new DiscoveryResult( array(), array(), 'signature', true );
+		$targets = ( new FileScanPlanBuilder() )->build( $discovery, array( array( 'slug' => 'hello.php', 'version' => '1.0', 'root' => '/tmp/plugins', 'update_uri' => 'unsupported_local_path', 'single_file' => 'hello.php' ) ), array(), '/tmp/uploads' );
+		self::assertSame( 'hello.php', $targets[1]->singleFile );
+		self::assertSame( '/tmp/plugins', $targets[1]->root );
 		self::assertNull( $targets[1]->manifest );
-		self::assertSame( 'uploads', $targets[2]->kind );
+	}
+
+	public function test_core_inventory_runs_after_uploads_and_extensions(): void {
+		$core = new Manifest( 'core', '6.6:en_US', 'https://wordpress.org/', new DateTimeImmutable(), 'sha256', array() );
+		$discovery = new DiscoveryResult( array( new IntegrityTarget( $core, '/tmp/core' ) ), array(), 'signature', false );
+		$targets = ( new FileScanPlanBuilder() )->build( $discovery, array( array( 'slug' => 'demo', 'version' => '1.0', 'root' => '/tmp/demo' ) ), array(), '/tmp/uploads' );
+		self::assertSame( array( 'uploads', 'plugin', 'core' ), array_column( $targets, 'kind' ) );
 	}
 }

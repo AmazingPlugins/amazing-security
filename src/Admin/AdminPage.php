@@ -39,10 +39,17 @@ final class AdminPage {
 		$fileStore     = new WordPressFileScanStore( $options );
 		$fileProgress  = $fileStore->latestProgress();
 		$fileCompleted = $fileStore->latestCompleted();
-		$fileState     = null !== $fileProgress ? ( $fileProgress->cursor->partial ? 'Partial coverage' : ( $fileProgress->finished ? 'Scan finished' : 'In progress' ) ) : ( $fileCompleted?->state ?? 'Not checked' );
-		$vulnStore     = new WordPressVulnerabilityReportStore( $options );
-		$vulnCurrent   = $vulnStore->current();
-		$direct        = ( new VulnerabilityPreferences( $options ) )->enabled();
+		$fileHistory   = $fileStore->historicalWarnings();
+		$fileState     = null !== $fileProgress ? ( $fileProgress->cursor->partial ? 'Partial coverage' : ( $fileProgress->finished ? 'Scan finished' : 'In progress' ) ) : ( $fileCompleted?->partial ? 'Partial coverage' : ( $fileCompleted?->state ?? 'Not checked' ) );
+		$fileAttention = array_merge( $fileProgress?->cursor->findings ?? array(), $fileCompleted?->findings ?? array() );
+		if ( $fileCompleted?->partial ) {
+			foreach ( array_slice( $fileHistory, -5 ) as $oldWarning ) {
+				$fileAttention = array_merge( $fileAttention, array_slice( $oldWarning->findings, 0, 3 ) );
+			}
+		}
+		$vulnStore   = new WordPressVulnerabilityReportStore( $options );
+		$vulnCurrent = $vulnStore->current();
+		$direct      = ( new VulnerabilityPreferences( $options ) )->enabled();
 		echo '<div class="wrap amazing-security-admin"><header class="amsec-header"><div><h1>Amazing Security</h1><p>See what needs attention and when each check last ran. These reports cover only the checks shown below.</p></div>';
 		echo '<form action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" method="post"><input type="hidden" name="action" value="amazing_security_scan">';
 		wp_nonce_field( 'amazing_security_scan' );
@@ -54,7 +61,7 @@ final class AdminPage {
 		echo '<div class="amsec-ledger-row"><span class="amsec-ledger-name">Suspicious files</span><strong>' . esc_html( $fileState ) . '</strong><span class="amsec-ledger-date">' . esc_html( $fileCompleted?->finishedAt->format( 'Y-m-d H:i:s' ) ?? 'No completed check' ) . '</span><span class="amsec-ledger-coverage">' . esc_html( null === $fileProgress ? ( null === $fileCompleted ? 'No check yet' : (string) $fileCompleted->processed . ' files seen' ) : (string) $fileProgress->cursor->processed . ' files seen' ) . '</span><a href="#amsec-file-scan">Details</a></div>';
 		$this->ledgerRow( 'Vulnerabilities', $direct ? $vulnCurrent?->results : null, $vulnCurrent?->snapshotGeneratedAt, '#amsec-vulnerabilities' );
 		echo '</div>';
-		$this->attentionList( $run?->results ?? array(), $integrity?->results ?? array(), $direct ? $vulnCurrent?->results ?? array() : array(), array_merge( $fileProgress?->cursor->findings ?? array(), $fileCompleted?->findings ?? array() ) );
+		$this->attentionList( $run?->results ?? array(), $integrity?->results ?? array(), $direct ? $vulnCurrent?->results ?? array() : array(), $fileAttention );
 		echo '</section>';
 		$loginSettings = new WordPressLoginSettings( $options );
 		$loginStore    = new WordPressTotpStore( $GLOBALS['wpdb'] );
@@ -136,7 +143,7 @@ final class AdminPage {
 		echo '</form></div>';
 		// FileScanReportRenderer escapes dynamic values, including saved notes.
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		echo ( new FileScanReportRenderer( admin_url( 'admin-post.php' ), wp_create_nonce( 'amsec_file_scan_note' ), $fileStore->notes() ) )->render( $fileCompleted, $fileProgress, $fileStore->historicalWarnings() );
+		echo ( new FileScanReportRenderer( admin_url( 'admin-post.php' ), wp_create_nonce( 'amsec_file_scan_note' ), $fileStore->notes() ) )->render( $fileCompleted, $fileProgress, $fileHistory );
 		if ( $direct ) {
 			echo '<form action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" method="post"><input type="hidden" name="action" value="amazing_security_vulnerability_scan">';
 			wp_nonce_field( 'amazing_security_vulnerability_scan' );
@@ -195,9 +202,15 @@ final class AdminPage {
 				}
 			}
 		}
+		$seenFiles = array();
 		foreach ( $files as $finding ) {
 			if ( 'warn' === ( $finding['state'] ?? '' ) ) {
-				$items[] = array(
+				$key = (string) ( $finding['package'] ?? '' ) . ':' . (string) ( $finding['path'] ?? '' ) . ':' . (string) ( $finding['kind'] ?? '' );
+				if ( isset( $seenFiles[ $key ] ) ) {
+					continue;
+				}
+				$seenFiles[ $key ] = true;
+				$items[]           = array(
 					'href'    => '#amsec-file-scan',
 					'summary' => ( 'suspected' === ( $finding['kind'] ?? '' ) ? 'Suspected code' : 'Review file' ) . ': ' . (string) ( $finding['path'] ?? '' ),
 					'state'   => 'warn',

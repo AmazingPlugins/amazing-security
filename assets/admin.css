@@ -273,6 +273,9 @@
 .amsec-file-empty { padding: 12px 16px; background: #f6f7f7; }
 .amsec-file-history { margin-top: 18px; border-top: 1px solid #e2e8ed; padding-top: 12px; }
 .amsec-file-history summary { cursor: pointer; font-weight: 600; }
+.amsec-file-history ul { margin: 8px 0 12px 20px; }
+.amsec-file-history li { margin: 7px 0; overflow-wrap: anywhere; }
+.amsec-file-history code { white-space: normal; overflow-wrap: anywhere; }
 .amsec-file-scan :is(a, button, textarea, summary):focus-visible, .amsec-file-actionbar button:focus-visible { outline: 2px solid #135e96; outline-offset: 3px; }
 @media (max-width: 782px) { .amsec-file-actionbar { justify-content: flex-start; } .amsec-file-heading { display: block; } .amsec-file-rule-age { display: block; margin-bottom: 16px; } .amsec-file-coverage { grid-template-columns: repeat(2, minmax(0, 1fr)); } .amsec-file-scan { padding: 18px; } }
 @media (max-width: 420px) { .amsec-file-coverage { grid-template-columns: 1fr 1fr; gap: 0 10px; } .amsec-file-finding-top { display: block; } .amsec-file-finding-top span { display: block; margin-top: 3px; } }
