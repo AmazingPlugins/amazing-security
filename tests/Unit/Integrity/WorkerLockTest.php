@@ -22,6 +22,9 @@ final class WorkerLockTest extends TestCase {
 		};
 		$lock = new WorkerLock( $options );
 		self::assertTrue( $lock->acquire( 'scan-1' ) );
+		$fileLock = new WorkerLock( $options, 'amazing_security_file_scan_worker_lock' );
+		self::assertTrue( $fileLock->acquire( 'file-scan-1' ) );
+		$fileLock->release();
 		self::assertFalse( ( new WorkerLock( $options ) )->acquire( 'scan-2' ) );
 		$lock->release();
 		self::assertTrue( ( new WorkerLock( $options ) )->acquire( 'scan-2' ) );

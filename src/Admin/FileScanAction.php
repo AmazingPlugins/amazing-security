@@ -1,0 +1,171 @@
+<?php
+
+declare(strict_types=1);
+
+namespace AmazingPlugins\Security\Admin;
+
+use AmazingPlugins\Security\FileScan\FileScanCursor;
+use AmazingPlugins\Security\FileScan\FileScanPlanBuilder;
+use AmazingPlugins\Security\FileScan\FileScanReport;
+use AmazingPlugins\Security\FileScan\FileScanRunner;
+use AmazingPlugins\Security\FileScan\FileScanStep;
+use AmazingPlugins\Security\FileScan\WordPressFileScanStore;
+use AmazingPlugins\Security\Integrity\TargetDiscovery;
+use AmazingPlugins\Security\Integrity\ThemeArchiveParser;
+use AmazingPlugins\Security\Integrity\WorkerLock;
+use AmazingPlugins\Security\Integrity\WordPressHttpClient;
+use AmazingPlugins\Security\Integrity\WordPressOptions;
+use AmazingPlugins\Security\Integrity\WordPressOrgManifestProvider;
+use AmazingPlugins\Security\Integrity\WordPressOrgThemeManifestProvider;
+use AmazingPlugins\Security\Scan\ScanContext;
+use Throwable;
+
+final class FileScanAction {
+	public function start(): void {
+		$this->authorize( 'amazing_security_file_scan_start' );
+		$store  = new WordPressFileScanStore( new WordPressOptions() );
+		$scanId = wp_generate_uuid4();
+		$cursor = new FileScanCursor( $scanId );
+		if ( ! $store->begin( $scanId, $cursor ) ) {
+			$this->redirect( true );
+		}
+		$this->execute( $store, $cursor, true );
+	}
+
+	public function resume(): void {
+		$this->authorize( 'amazing_security_file_scan_resume' );
+		$store    = new WordPressFileScanStore( new WordPressOptions() );
+		$progress = $store->latestProgress();
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce was checked above.
+		$scanId = isset( $_POST['scan_id'] ) && is_string( $_POST['scan_id'] ) ? sanitize_text_field( wp_unslash( $_POST['scan_id'] ) ) : '';
+		if ( null === $progress || $progress->finished || ! hash_equals( $progress->cursor->scanId, $scanId ) ) {
+			$this->redirect( true );
+		}
+		$this->execute( $store, $progress->cursor, false );
+	}
+
+	private function authorize( string $nonceAction ): void {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'You are not allowed to run a file scan.', 'amazing-security' ), '', array( 'response' => 403 ) );
+		}
+		check_admin_referer( $nonceAction );
+	}
+
+	private function execute( WordPressFileScanStore $store, FileScanCursor $cursor, bool $isStart ): void {
+		$options = new WordPressOptions();
+		$lock    = new WorkerLock( $options, 'amazing_security_file_scan_worker_lock' );
+		if ( ! $lock->acquire( $cursor->scanId ) ) {
+			$this->redirect( true );
+		}
+		$error = false;
+		try {
+			$started          = microtime( true );
+			$plugins          = $this->plugins();
+			$themes           = $this->themes();
+			$client           = new WordPressHttpClient();
+			$discovery        = ( new TargetDiscovery( new WordPressOrgManifestProvider( $client ), new WordPressOrgThemeManifestProvider( $client, new ThemeArchiveParser() ) ) )->discover( $this->coreVersion(), $this->coreLocale(), ABSPATH, $plugins, $themes );
+			$cursor->elapsed += microtime( true ) - $started;
+			if ( $isStart ) {
+				$cursor->partial = $discovery->partial;
+				foreach ( $discovery->findings as $finding ) {
+					++$cursor->unknown;
+					if ( count( $cursor->findings ) < 250 ) {
+						$cursor->findings[] = array(
+							'id'        => $finding->findingId ?? substr( hash( 'sha256', (string) ( $finding->evidence['package'] ?? '' ) ), 0, 32 ),
+							'state'     => 'inconclusive',
+							'kind'      => 'package',
+							'package'   => $finding->evidence['package'] ?? '',
+							'path'      => '',
+							'rule_id'   => '',
+							'version'   => '',
+							'line'      => 0,
+							'reason'    => $finding->evidence['reason'] ?? '',
+							'summary'   => 'Published release could not be verified.',
+							'tested_at' => $finding->testedAt->format( 'c' ),
+						);
+					} else {
+						++$cursor->omitted;
+					}
+				}
+			}
+			$uploads = wp_upload_dir();
+			$targets = ( new FileScanPlanBuilder() )->build( $discovery, $plugins, $themes, (string) ( $uploads['basedir'] ?? '' ) );
+			$step    = ( new FileScanRunner() )->step( $targets, $cursor, new ScanContext() );
+			$store->saveProgress( $cursor->scanId, $step );
+			if ( $step->finished && ! $step->cursor->partial ) {
+				$store->complete( $cursor->scanId, FileScanReport::fromCursor( $step->cursor ) );
+			}
+		} catch ( Throwable $failure ) {
+			$error            = true;
+			$cursor->partial  = true;
+			$cursor->finished = true;
+			try {
+				$store->saveProgress( $cursor->scanId, new FileScanStep( $cursor, true ) );
+			} catch ( Throwable $ignored ) {
+				// Keep the last completed report if progress cannot be saved.
+				$error = true;
+			}
+		} finally {
+			$lock->release();
+		}
+		$this->redirect( $error );
+	}
+
+	private function coreVersion(): string {
+		global $wp_version;
+		return (string) $wp_version;
+	}
+
+	private function coreLocale(): string {
+		global $wp_local_package;
+		return isset( $wp_local_package ) && is_string( $wp_local_package ) && '' !== $wp_local_package ? $wp_local_package : 'en_US';
+	}
+
+	private function plugins(): array {
+		if ( ! function_exists( 'get_plugins' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/plugin.php';
+		}
+		$plugins = array();
+		foreach ( get_plugins() as $file => $data ) {
+			if ( str_starts_with( $file, 'amazing-security/' ) ) {
+				continue;
+			}
+			$slug = dirname( $file );
+			if ( '.' === $slug || ! preg_match( '/^[a-z0-9]+(?:-[a-z0-9]+)*$/D', $slug ) ) {
+				$plugins[] = array(
+					'slug'       => basename( $file ),
+					'version'    => (string) ( $data['Version'] ?? '' ),
+					'root'       => WP_PLUGIN_DIR,
+					'update_uri' => 'unsupported_local_path',
+				);
+				continue;
+			}
+			$plugins[] = array(
+				'slug'       => $slug,
+				'version'    => (string) ( $data['Version'] ?? '' ),
+				'root'       => WP_PLUGIN_DIR . '/' . $slug,
+				'update_uri' => (string) ( $data['UpdateURI'] ?? '' ),
+			);
+		}
+		return $plugins;
+	}
+
+	private function themes(): array {
+		$themes = array();
+		foreach ( wp_get_themes() as $slug => $theme ) {
+			$themes[] = array(
+				'slug'       => (string) $slug,
+				'version'    => (string) $theme->get( 'Version' ),
+				'root'       => $theme->get_stylesheet_directory(),
+				'update_uri' => (string) $theme->get( 'UpdateURI' ),
+				'child'      => $theme->parent() instanceof \WP_Theme,
+			);
+		}
+		return $themes;
+	}
+
+	private function redirect( bool $error ): never {
+		wp_safe_redirect( admin_url( 'admin.php?page=amazing-security' . ( $error ? '&amazing_security_file_scan_error=1' : '' ) . '#amsec-file-scan' ) );
+		exit;
+	}
+}

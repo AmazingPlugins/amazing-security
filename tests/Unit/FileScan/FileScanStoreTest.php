@@ -21,7 +21,7 @@ final class FileScanStoreTest extends TestCase {
 			public function add( string $key, string $value ): bool { if ( isset( $this->values[ $key ] ) ) { return false; } $this->values[ $key ] = $value; return true; }
 			public function set( string $key, string $value ): bool { $this->values[ $key ] = $value; return true; }
 			public function delete( string $key ): void { unset( $this->values[ $key ] ); }
-			public function replaceIfSame( string $key, string $expected, string $replacement ): bool { if ( $this->failNextCas ) { $this->failNextCas = false; return false; } if ( ( $this->values[ $key ] ?? null ) !== $expected ) { return false; } $this->values[ $key ] = $replacement; return true; }
+			public function replaceIfSame( string $key, string $expected, string $replacement ): bool { if ( $this->failNextCas ) { $this->failNextCas = false; return false; } if ( ( $this->values[ $key ] ?? null ) !== $expected || $expected === $replacement ) { return false; } $this->values[ $key ] = $replacement; return true; }
 			public function deleteIfSame( string $key, string $expected ): bool { if ( ( $this->values[ $key ] ?? null ) !== $expected ) { return false; } unset( $this->values[ $key ] ); return true; }
 		};
 	}
@@ -57,5 +57,15 @@ final class FileScanStoreTest extends TestCase {
 		$options->failNextCas = true;
 		$this->expectException( RuntimeException::class );
 		$one->saveProgress( 'scan-1', new FileScanStep( $cursor, false ) );
+	}
+
+	public function test_notes_are_bounded_and_do_not_remove_findings(): void {
+		$store = new WordPressFileScanStore( $this->options() );
+		$id = str_repeat( 'a', 32 );
+		self::assertTrue( $store->saveNote( $id, 'Reviewed with developer.' ) );
+		self::assertTrue( $store->saveNote( $id, 'Reviewed with developer.' ) );
+		self::assertSame( 'Reviewed with developer.', $store->notes()[ $id ] );
+		self::assertFalse( $store->saveNote( $id, str_repeat( 'x', 501 ) ) );
+		self::assertSame( 'Reviewed with developer.', $store->notes()[ $id ] );
 	}
 }

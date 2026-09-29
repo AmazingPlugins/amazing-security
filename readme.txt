@@ -12,9 +12,11 @@ WordPress hardening checks, release file checks, opt-in vulnerability lookups, a
 
 == Description ==
 
-Run five local hardening checks from wp-admin. An administrator can also compare WordPress core and eligible WordPress.org plugin files with published release checksums. That scan contacts api.wordpress.org and downloads.wordpress.org. It doesn't send file contents.
+Run five local hardening checks from wp-admin. An administrator can also compare WordPress core and eligible WordPress.org plugin files with published checksums. Eligible WordPress.org themes are compared with their exact release ZIP. These checks contact api.wordpress.org and downloads.wordpress.org. They don't send file contents.
 
-A changed checksum means a file differs from the published release. It doesn't identify malware. Missing or unsupported packages show an unknown or partial result. The integrity scan reads a bounded number of files per request and asks you to continue when more work remains.
+A changed checksum means a file differs from the published release. It doesn't identify malware. Missing or unsupported packages show an unknown or partial result. A custom or child theme stays unknown for release comparison. The integrity scan reads a bounded number of files per request and asks you to continue when more work remains.
+
+The manual file scan checks for extra files in compared packages and scans PHP-like files in plugins, themes, and uploads for three bundled suspicious-code patterns. It scans only unexpected executable files under core directories. A hit is suspected code, not proof of malware. A scan without hits does not prove the site is clean. The rules update with plugin releases; this preview has no maintained malware feed. Files stay on your server. The scan stops after 5,000 files, 128 MiB read, or 30 seconds of work, and may need several button presses. Unreadable, oversized, changed, or skipped files show partial coverage. You can save a note on a finding; notes do not hide it from later scans.
 
 Vulnerability checks are off until an administrator enables them. When enabled, this site asks the public WPVulnerability API for its WordPress core version and installed plugin and theme slugs. Requests go directly from your server to https://www.wpvulnerability.net/. The provider can see the request IP and requested component. AmazingPlugins does not receive your inventory. The plugin stores responses and reports locally. You can turn off future lookups in wp-admin; older reports remain until separately cleared. See the provider's privacy policy at https://www.wpvulnerability.com/privacy/ and license at https://www.wpvulnerability.com/license/. Data is credited to WPVulnerability and linked to its original sources.
 
@@ -28,4 +30,4 @@ The XML-RPC setting blocks methods that require authentication. It does not turn
 
 If you lose admin access, run `wp amazing-security login disable` from the site's WP-CLI environment. To remove one administrator's TOTP requirement, run `wp amazing-security totp disable --user=<id>`. These commands act locally; they do not need an AmazingPlugins account. The plugin keeps login settings and enrollment data on uninstall unless you select **Erase login protection data on uninstall** first.
 
-This preview has no repair action, firewall, malware signature scan, or MCP endpoint.
+This preview has no repair action, firewall, maintained malware signature feed, or MCP endpoint.

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Admin;
 
+use AmazingPlugins\Security\FileScan\WordPressFileScanStore;
 use AmazingPlugins\Security\Findings\FindingsRepository;
 use AmazingPlugins\Security\Integrity\WordPressIntegrityStore;
 use AmazingPlugins\Security\Integrity\WordPressOptions;
@@ -30,14 +31,18 @@ final class AdminPage {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_die( esc_html__( 'You are not allowed to view this report.', 'amazing-security' ), '', array( 'response' => 403 ) );
 		}
-		$run         = ( new FindingsRepository() )->latest();
-		$options     = new WordPressOptions();
-		$store       = new WordPressIntegrityStore( $options );
-		$progress    = $store->latestProgress();
-		$integrity   = $store->latestCompleted();
-		$vulnStore   = new WordPressVulnerabilityReportStore( $options );
-		$vulnCurrent = $vulnStore->current();
-		$direct      = ( new VulnerabilityPreferences( $options ) )->enabled();
+		$run           = ( new FindingsRepository() )->latest();
+		$options       = new WordPressOptions();
+		$store         = new WordPressIntegrityStore( $options );
+		$progress      = $store->latestProgress();
+		$integrity     = $store->latestCompleted();
+		$fileStore     = new WordPressFileScanStore( $options );
+		$fileProgress  = $fileStore->latestProgress();
+		$fileCompleted = $fileStore->latestCompleted();
+		$fileState     = null !== $fileProgress ? ( $fileProgress->cursor->partial ? 'Partial coverage' : ( $fileProgress->finished ? 'Scan finished' : 'In progress' ) ) : ( $fileCompleted?->state ?? 'Not checked' );
+		$vulnStore     = new WordPressVulnerabilityReportStore( $options );
+		$vulnCurrent   = $vulnStore->current();
+		$direct        = ( new VulnerabilityPreferences( $options ) )->enabled();
 		echo '<div class="wrap amazing-security-admin"><header class="amsec-header"><div><h1>Amazing Security</h1><p>See what needs attention and when each check last ran. These reports cover only the checks shown below.</p></div>';
 		echo '<form action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" method="post"><input type="hidden" name="action" value="amazing_security_scan">';
 		wp_nonce_field( 'amazing_security_scan' );
@@ -46,9 +51,10 @@ final class AdminPage {
 		echo '<section class="amsec-overview" aria-labelledby="amsec-overview-title"><h2 id="amsec-overview-title">Security overview</h2><div class="amsec-ledger">';
 		$this->ledgerRow( 'Local hardening', $run?->results ?? null, $run?->finishedAt?->format( 'Y-m-d H:i:s' ), '#amsec-hardening' );
 		$this->ledgerRow( 'Release files', $integrity?->results ?? null, $integrity?->finishedAt?->format( 'Y-m-d H:i:s' ), '#amsec-integrity' );
+		echo '<div class="amsec-ledger-row"><span class="amsec-ledger-name">Suspicious files</span><strong>' . esc_html( $fileState ) . '</strong><span class="amsec-ledger-date">' . esc_html( $fileCompleted?->finishedAt->format( 'Y-m-d H:i:s' ) ?? 'No completed check' ) . '</span><span class="amsec-ledger-coverage">' . esc_html( null === $fileProgress ? ( null === $fileCompleted ? 'No check yet' : (string) $fileCompleted->processed . ' files seen' ) : (string) $fileProgress->cursor->processed . ' files seen' ) . '</span><a href="#amsec-file-scan">Details</a></div>';
 		$this->ledgerRow( 'Vulnerabilities', $direct ? $vulnCurrent?->results : null, $vulnCurrent?->snapshotGeneratedAt, '#amsec-vulnerabilities' );
 		echo '</div>';
-		$this->attentionList( $run?->results ?? array(), $integrity?->results ?? array(), $direct ? $vulnCurrent?->results ?? array() : array() );
+		$this->attentionList( $run?->results ?? array(), $integrity?->results ?? array(), $direct ? $vulnCurrent?->results ?? array() : array(), array_merge( $fileProgress?->cursor->findings ?? array(), $fileCompleted?->findings ?? array() ) );
 		echo '</section>';
 		$loginSettings = new WordPressLoginSettings( $options );
 		$loginStore    = new WordPressTotpStore( $GLOBALS['wpdb'] );
@@ -88,6 +94,11 @@ final class AdminPage {
 		if ( isset( $_GET['amazing_security_integrity_error'] ) ) {
 			echo '<div class="notice notice-error"><p>Integrity scan could not finish. The previous completed report remains available.</p></div>';
 		}
+		// This flag selects a static message only.
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( isset( $_GET['amazing_security_file_scan_error'] ) ) {
+			echo '<div class="notice notice-error"><p>File scan could not finish. The previous completed report remains available.</p></div>';
+		}
 		// This flag selects a static message and does not change state or enter output.
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		if ( isset( $_GET['amazing_security_vulnerability_error'] ) ) {
@@ -112,6 +123,20 @@ final class AdminPage {
 		// IntegrityReportRenderer escapes all dynamic values.
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		echo ( new IntegrityReportRenderer() )->render( $integrity, $progress );
+		echo '<div class="amsec-file-actionbar"><form action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" method="post">';
+		if ( null === $fileProgress || $fileProgress->finished ) {
+			echo '<input type="hidden" name="action" value="amazing_security_file_scan_start">';
+			wp_nonce_field( 'amazing_security_file_scan_start' );
+			submit_button( 'Run file scan', 'primary', 'submit', false );
+		} else {
+			echo '<input type="hidden" name="action" value="amazing_security_file_scan_resume"><input type="hidden" name="scan_id" value="' . esc_attr( $fileProgress->cursor->scanId ) . '">';
+			wp_nonce_field( 'amazing_security_file_scan_resume' );
+			submit_button( 'Continue file scan', 'primary', 'submit', false );
+		}
+		echo '</form></div>';
+		// FileScanReportRenderer escapes dynamic values, including saved notes.
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo ( new FileScanReportRenderer( admin_url( 'admin-post.php' ), wp_create_nonce( 'amsec_file_scan_note' ), $fileStore->notes() ) )->render( $fileCompleted, $fileProgress, $fileStore->historicalWarnings() );
 		if ( $direct ) {
 			echo '<form action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" method="post"><input type="hidden" name="action" value="amazing_security_vulnerability_scan">';
 			wp_nonce_field( 'amazing_security_vulnerability_scan' );
@@ -153,7 +178,7 @@ final class AdminPage {
 		echo '<div class="amsec-ledger-row"><span class="amsec-ledger-name">' . esc_html( $label ) . '</span><strong>' . esc_html( $state ) . '</strong><span class="amsec-ledger-date">' . esc_html( $checkedAt ?? 'No completed check' ) . '</span><span class="amsec-ledger-coverage">' . esc_html( $coverage ) . '</span><a href="' . esc_url( $href ) . '">Details</a></div>';
 	}
 
-	private function attentionList( array $hardening, array $integrity, array $vulnerabilities ): void {
+	private function attentionList( array $hardening, array $integrity, array $vulnerabilities, array $files = array() ): void {
 		$items = array();
 		foreach ( array(
 			'#amsec-hardening'       => $hardening,
@@ -168,6 +193,15 @@ final class AdminPage {
 						'state'   => $result->state,
 					);
 				}
+			}
+		}
+		foreach ( $files as $finding ) {
+			if ( 'warn' === ( $finding['state'] ?? '' ) ) {
+				$items[] = array(
+					'href'    => '#amsec-file-scan',
+					'summary' => ( 'suspected' === ( $finding['kind'] ?? '' ) ? 'Suspected code' : 'Review file' ) . ': ' . (string) ( $finding['path'] ?? '' ),
+					'state'   => 'warn',
+				);
 			}
 		}
 		echo '<div class="amsec-attention"><h3>Needs attention</h3>';

@@ -14,11 +14,19 @@ The update result depends on the last WordPress update cache refresh. HTTPS chec
 
 ## Release file integrity
 
-An administrator can request a checksum comparison for WordPress core and plugins with a supported WordPress.org checksum manifest. The core package locale comes from the installed package, not the site's selected language. The plugin fetches manifests over HTTPS from `api.wordpress.org` and `downloads.wordpress.org` and hashes local files in bounded chunks. It does not upload file contents.
+An administrator can request a checksum comparison for WordPress core and plugins with a supported WordPress.org checksum manifest. Eligible WordPress.org themes use their exact release ZIP as the reference. A custom or child theme stays unknown for release comparison. The core package locale comes from the installed package, not the site's selected language. The plugin fetches release data over HTTPS from `api.wordpress.org` and `downloads.wordpress.org` and hashes local files in bounded chunks. It does not upload file contents.
 
-A changed file or missing core PHP file is `warn`. A missing plugin file, missing optional core file, unreadable path, or symlink is `inconclusive`. A package without a usable official manifest is `unknown`. An interrupted or capped scan is `partial`. Matching files count toward coverage; the scanner does not inspect unlisted extra files. A checksum match does not mean the site is malware-free.
+A changed file or missing core PHP file is `warn`. A missing plugin file, missing optional core file, unreadable path, or symlink is `inconclusive`. A package without a usable official manifest is `unknown`. An interrupted or capped scan is `partial`. Matching files count toward coverage. This release comparison checks published paths; the separate file scan looks for extras. A checksum match does not mean the site is malware-free.
 
 Each request compares up to 250 files and reads up to 32 MiB within a cooperative five-second budget. The whole scan stops at 5,000 files, 128 MiB, or 30 seconds of accumulated work. At most 250 file findings are stored. The last completed integrity report stays visible if a later run is partial.
+
+## Manual local file scan
+
+The file scan looks for extra files under compared core, plugin, and theme packages. It checks PHP-like files in plugins, themes, and uploads with three bundled rules. Core content checks cover unexpected executable files under `wp-admin` and `wp-includes`. WordPress configuration and user content are not treated as core release extras. A match is suspected code, not a confirmed infection. The rules ship with plugin updates and are not a maintained remote feed.
+
+The scan is read-only and starts only when an administrator clicks **Run file scan**. Each request handles at most 250 files, 32 MiB, and five seconds. A run stops at 5,000 files, 128 MiB, or 30 seconds. An eligible PHP-like file over 2 MiB is unscanned. Symlinks, unreadable files, unsafe paths, stale references, and interrupted runs cannot produce a clean result. The report keeps up to 250 findings and counts omitted findings. A later partial run does not erase the previous completed warning.
+
+An administrator may add a short false-positive review note to a current finding. The note stays on this site and does not suppress future scans. File contents and matched snippets are not stored in the report or sent to AmazingPlugins.
 
 ## Installed software and published vulnerabilities
 

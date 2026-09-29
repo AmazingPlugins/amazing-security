@@ -11,6 +11,7 @@ final class WordPressFileScanStore implements FileScanStore {
 	private const ACTIVE    = 'amazing_security_file_scan_active';
 	private const COMPLETED = 'amazing_security_file_scan_completed';
 	private const HISTORY   = 'amazing_security_file_scan_history';
+	private const NOTES     = 'amazing_security_file_scan_notes';
 
 	public function __construct( private readonly OptionGateway $options ) {}
 
@@ -123,6 +124,38 @@ final class WordPressFileScanStore implements FileScanStore {
 			}
 		}
 		return $reports;
+	}
+
+	public function notes(): array {
+		$value = $this->options->get( self::NOTES );
+		$data  = is_string( $value ) ? json_decode( $value, true ) : null;
+		if ( ! is_array( $data ) || count( $data ) > 250 ) {
+			return array();
+		}
+		$notes = array();
+		foreach ( $data as $id => $note ) {
+			if ( is_string( $id ) && preg_match( '/^[a-f0-9]{32}$/D', $id ) && is_string( $note ) && strlen( $note ) <= 500 ) {
+				$notes[ $id ] = $note;
+			}
+		}
+		return $notes;
+	}
+
+	public function saveNote( string $id, string $note ): bool {
+		if ( ! preg_match( '/^[a-f0-9]{32}$/D', $id ) || '' === trim( $note ) || strlen( $note ) > 500 ) {
+			return false;
+		}
+		$previous     = $this->options->get( self::NOTES );
+		$notes        = $this->notes();
+		$notes[ $id ] = $note;
+		if ( count( $notes ) > 250 ) {
+			array_shift( $notes );
+		}
+		$encoded = $this->encode( $notes );
+		if ( $previous === $encoded ) {
+			return true;
+		}
+		return is_string( $previous ) ? $this->options->replaceIfSame( self::NOTES, $previous, $encoded ) : $this->options->add( self::NOTES, $encoded );
 	}
 
 	private function decode( mixed $value ): ?array {
