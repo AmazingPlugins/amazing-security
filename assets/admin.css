@@ -34,6 +34,35 @@
   line-height: 1.55;
 }
 
+.amazing-security-admin .amsec-schedule-status {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--amsec-line);
+  color: var(--amsec-muted);
+}
+
+.amazing-security-admin .amsec-schedule-status strong {
+  color: var(--amsec-ink);
+}
+
+.amazing-security-admin .amsec-schedule-status small {
+  margin-left: auto;
+  color: var(--amsec-muted);
+}
+
+@media (max-width: 600px) {
+  .amazing-security-admin .amsec-schedule-status {
+    flex-wrap: wrap;
+  }
+
+  .amazing-security-admin .amsec-schedule-status small {
+    width: 100%;
+    margin-left: 0;
+  }
+}
+
 .amazing-security-admin > section {
   margin: 26px 0;
 }

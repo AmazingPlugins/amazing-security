@@ -41,6 +41,7 @@ register_deactivation_hook(
 	static function (): void {
 		wp_clear_scheduled_hook( 'amsec_login_cleanup' );
 		wp_clear_scheduled_hook( 'amsec_fix_cleanup' );
+		( new AmazingPlugins\Security\Schedule\ScheduleHooks() )->clear();
 		( new AmazingPlugins\Security\Login\WordPressRateCounterStore( $GLOBALS['wpdb'] ) )->purge();
 	}
 );
@@ -52,6 +53,13 @@ add_action(
 );
 add_action( 'init', array( AmazingPlugins\Security\Login\WordPressRateCounterStore::class, 'ensureScheduled' ) );
 add_action( 'init', array( AmazingPlugins\Security\Fixes\FixTables::class, 'ensureScheduled' ) );
+add_action( 'init', array( new AmazingPlugins\Security\Schedule\ScheduleHooks(), 'ensure' ) );
+add_action(
+	'amsec_local_daily_scan',
+	static function (): void {
+		( new AmazingPlugins\Security\Schedule\LocalSchedule( new AmazingPlugins\Security\Integrity\WordPressOptions() ) )->tick( time() );
+	}
+);
 add_action(
 	'amsec_fix_cleanup',
 	static function (): void {
