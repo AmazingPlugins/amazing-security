@@ -10,13 +10,17 @@ use Throwable;
 final class SafeFileWalker {
 	private array $listCache = array();
 
+	public function beginStep(): void {
+		$this->listCache = array();
+	}
+
 	/** @param FileScanTarget[] $targets */
 	public function step( array $targets, FileScanCursor $cursor, ScanContext $context ): FileScanStep {
-		$this->listCache = array();
-		$started         = microtime( true );
-		$items           = array();
-		$limit           = min( 250, $context->entryLimit );
-		$count           = 0;
+		$this->beginStep();
+		$started = microtime( true );
+		$items   = array();
+		$limit   = min( 250, $context->entryLimit );
+		$count   = 0;
 		while ( $count < $limit && microtime( true ) < $context->deadline && microtime( true ) - $started < 5 ) {
 			$item = $this->next( $targets, $cursor );
 			if ( null === $item ) {

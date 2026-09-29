@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\FileScan;
 
+use AmazingPlugins\Security\Findings\State;
 use AmazingPlugins\Security\Integrity\WordPressOrgManifestProvider;
 
 final class FileScanCursor {
@@ -29,6 +30,15 @@ final class FileScanCursor {
 			'findings'         => $this->findings,
 			'omitted'          => $this->omitted,
 		);
+	}
+
+	public function state(): string {
+		foreach ( $this->findings as $finding ) {
+			if ( State::WARN === ( $finding['state'] ?? '' ) ) {
+				return State::WARN;
+			}
+		}
+		return $this->partial || $this->unknown > 0 || ! $this->finished ? State::INCONCLUSIVE : State::PASS;
 	}
 
 	public static function fromArray( array $data ): ?self {
