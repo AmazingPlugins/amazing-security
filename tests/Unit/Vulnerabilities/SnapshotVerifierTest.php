@@ -74,6 +74,23 @@ final class SnapshotVerifierTest extends TestCase {
 		self::assertSame( 'unknown', $verifier->verify( str_repeat( 'x', 2 * 1024 * 1024 + 1 ), $this->inventory, null )->state );
 	}
 
+	public function test_rejects_untrusted_license_links_in_signed_records(): void {
+		$verifier = $this->verifier();
+		$record = array(
+			'id' => '11111111-1111-4111-8111-111111111111', 'title' => 'Example',
+			'software' => array( 'type' => 'plugin', 'slug' => 'akismet' ),
+			'affected' => array( array( 'from' => '1.0', 'to' => '2.0', 'from_inclusive' => true, 'to_inclusive' => false ) ),
+			'patched_versions' => array( '2.0' ), 'url' => 'https://www.wordfence.com/threat-intel/vulnerabilities/example',
+			'published_at' => '2026-09-28T00:00:00Z', 'updated_at' => '2026-09-29T00:00:00Z',
+			'copyrights' => array( 'notice' => 'Wordfence', 'license_url' => 'javascript:alert(1)' ),
+		);
+		$payload = $this->payload( $verifier );
+		$payload['records'] = array( $record );
+		self::assertSame( 'unknown', $verifier->verify( $this->envelope( $payload ), $this->inventory, null )->state );
+		$payload['records'][0]['copyrights']['license_url'] = 'https://www.wordfence.com/';
+		self::assertSame( 'accepted', $verifier->verify( $this->envelope( $payload ), $this->inventory, null )->state );
+	}
+
 	private function verifier(): SnapshotVerifier {
 		return new SnapshotVerifier( array( 'fixture' => $this->publicKey ), new DateTimeImmutable( '2026-09-29T03:00:00Z' ) );
 	}

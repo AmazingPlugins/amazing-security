@@ -89,6 +89,12 @@ final class SnapshotVerifier {
 				return false;
 			}
 		}
+		$notice     = $record['copyrights']['notice'] ?? null;
+		$licenseUrl = $record['copyrights']['license_url'] ?? null;
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.parse_url_parse_url -- Signed metadata URL validation.
+		if ( ! is_string( $notice ) || strlen( $notice ) > 500 || ! is_string( $licenseUrl ) || strlen( $licenseUrl ) > 2048 || ! filter_var( $licenseUrl, FILTER_VALIDATE_URL ) || 'https' !== parse_url( $licenseUrl, PHP_URL_SCHEME ) ) {
+			return false;
+		}
 		return true;
 	}
 

@@ -26,6 +26,9 @@ final class WordPressSnapshotStore implements SnapshotStore {
 		// phpcs:ignore WordPress.WP.AlternativeFunctions.json_encode_json_encode -- Pure-PHP storage contract.
 		$value    = json_encode( $result->snapshot->toArray(), JSON_THROW_ON_ERROR );
 		$previous = $this->options->get( self::OPTION );
+		if ( $previous === $value ) {
+			return;
+		}
 		if ( null === $previous ? ! $this->options->add( self::OPTION, $value ) : ! $this->options->set( self::OPTION, $value ) ) {
 			throw new RuntimeException( 'Could not save verified vulnerability snapshot.' );
 		}
