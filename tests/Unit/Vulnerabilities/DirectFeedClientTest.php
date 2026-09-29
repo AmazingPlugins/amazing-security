@@ -29,6 +29,7 @@ final class DirectFeedClientTest extends TestCase {
 		$client = new DirectFeedClient( $http, $cache );
 		self::assertNotNull( $client->lookup( 'plugin', 'akismet', 1790676000 ) );
 		self::assertNotNull( $client->lookup( 'plugin', 'akismet', 1790676200 ) );
+		self::assertNotNull( $client->cached( 'plugin', 'akismet', 1790676200 ) );
 		self::assertSame( array( 'https://www.wpvulnerability.net/plugin/akismet/' ), $http->urls );
 	}
 

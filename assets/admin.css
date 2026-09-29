@@ -1,3 +1,118 @@
+.amazing-security-admin {
+  --amsec-ink: #1d2327;
+  --amsec-line: #dcdcde;
+  --amsec-muted: #50575e;
+  max-width: 1100px;
+  color: var(--amsec-ink);
+}
+
+.amazing-security-admin .amsec-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  padding: 18px 0 8px;
+  border-bottom: 1px solid var(--amsec-line);
+}
+
+.amazing-security-admin .amsec-header form {
+  flex: none;
+}
+
+.amazing-security-admin .amsec-header h1 {
+  margin: 0 0 8px;
+  font-size: 30px;
+  line-height: 1.2;
+  font-weight: 650;
+}
+
+.amazing-security-admin .amsec-header p {
+  max-width: 72ch;
+  margin: 0 0 14px;
+  color: var(--amsec-muted);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.amazing-security-admin > section {
+  margin: 26px 0;
+}
+
+.amazing-security-admin .amsec-overview h2 {
+  margin-bottom: 12px;
+}
+
+.amsec-ledger {
+  background: #fff;
+  border: 1px solid var(--amsec-line);
+}
+
+.amsec-ledger-row {
+  display: grid;
+  grid-template-columns: minmax(140px, 1.3fr) minmax(125px, 1fr) minmax(130px, 1fr) minmax(120px, 1fr) auto;
+  gap: 16px;
+  align-items: center;
+  padding: 15px 18px;
+  border-left: 3px solid #8c8f94;
+}
+
+.amsec-ledger-row + .amsec-ledger-row {
+  border-top: 1px solid var(--amsec-line);
+}
+
+.amsec-ledger-name {
+  font-weight: 600;
+}
+
+.amsec-ledger-date {
+  color: var(--amsec-muted);
+}
+
+.amsec-ledger-coverage {
+  color: var(--amsec-muted);
+}
+
+.amsec-attention {
+  margin-top: 18px;
+  padding: 16px 18px;
+  background: #fff;
+  border: 1px solid var(--amsec-line);
+}
+
+.amsec-attention h3 {
+  margin: 0 0 8px;
+}
+
+.amsec-attention p {
+  margin: 0 0 8px;
+}
+
+.amsec-attention ul {
+  margin: 0 0 0 18px;
+  list-style: disc;
+}
+
+.amsec-attention li {
+  margin-bottom: 6px;
+}
+
+.amsec-consent {
+  margin: 18px 0;
+  padding: 18px 20px;
+  background: #fff;
+  border: 1px solid var(--amsec-line);
+  border-left: 3px solid #2271b1;
+}
+
+.amsec-consent h3 {
+  margin-top: 0;
+}
+
+.amsec-consent p {
+  max-width: 75ch;
+  line-height: 1.55;
+}
+
 .amazing-security-table-scroll {
   max-width: 100%;
   overflow-x: auto;
@@ -10,4 +125,115 @@
 
 .amazing-security-table-scroll .widefat {
   min-width: 640px;
+}
+
+@media (max-width: 782px) {
+  .amazing-security-admin .amsec-header {
+    display: block;
+  }
+
+  .amazing-security-admin .amsec-header h1 {
+    font-size: 26px;
+  }
+
+  .amsec-ledger-row {
+    grid-template-columns: 1fr auto;
+    gap: 7px 12px;
+    padding: 14px;
+  }
+
+  .amsec-ledger-date {
+    grid-column: 1;
+  }
+
+  .amsec-ledger-coverage {
+    grid-column: 1;
+  }
+
+  .amsec-ledger-row > a {
+    grid-column: 2;
+    grid-row: 2 / 4;
+    align-self: center;
+  }
+
+  .amsec-vuln-scroll {
+    overflow-x: visible;
+  }
+
+  .amazing-security-table-scroll .amazing-security-responsive-table {
+    min-width: 0;
+    border: 0;
+    background: transparent;
+  }
+
+  .amazing-security-responsive-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  .amazing-security-responsive-table tbody,
+  .amazing-security-responsive-table td {
+    display: block;
+  }
+
+  .amazing-security-responsive-table tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 5px 12px;
+    margin-bottom: 10px;
+    padding: 12px 14px;
+    background: #fff;
+    border: 1px solid var(--amsec-line);
+  }
+
+  .amazing-security-responsive-table td {
+    border: 0;
+    padding: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .amazing-security-responsive-table td[data-label="Package"] {
+    grid-column: 1;
+    grid-row: 1;
+    font-weight: 600;
+  }
+
+  .amazing-security-responsive-table td[data-label="State"] {
+    grid-column: 2;
+    grid-row: 1;
+    color: #8a4600;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  .amazing-security-responsive-table td[data-label="Finding"] {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    line-height: 1.45;
+  }
+
+  .amazing-security-responsive-table td[data-label="Installed"] {
+    grid-column: 1;
+    grid-row: 3;
+    color: var(--amsec-muted);
+    font-size: 12px;
+  }
+
+  .amazing-security-responsive-table td[data-label="Source"] {
+    grid-column: 2;
+    grid-row: 3;
+    font-size: 12px;
+  }
+
+  .amazing-security-responsive-table td::before {
+    content: none;
+  }
+
+  .amazing-security-responsive-table td[data-label="Installed"]::before {
+    content: 'Installed: ';
+  }
 }
