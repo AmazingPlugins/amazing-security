@@ -1,0 +1,61 @@
+<?php
+
+// Run with: AMSEC_CASE=disabled|enabled|editor|anonymous|optout wp eval-file ... --user=admin.
+use AmazingPlugins\Security\Integrity\WordPressOptions;
+use AmazingPlugins\Security\Mcp\McpPreferences;
+
+$case = getenv( 'AMSEC_CASE' );
+$names = array( 'list-findings', 'get-finding', 'start-scan', 'get-scan' );
+if ( ! function_exists( 'wp_get_ability' ) ) {
+	throw new RuntimeException( 'Abilities API unavailable on supported MCP fixture.' );
+}
+foreach ( $names as $name ) {
+	if ( ! wp_get_ability( 'amazing-security/' . $name ) ) {
+		throw new RuntimeException( 'Missing Amazing Security ability: ' . $name );
+	}
+}
+$list = wp_get_ability( 'amazing-security/list-findings' );
+if ( 'disabled' === $case ) {
+	if ( true === ( $list->get_meta()['mcp']['public'] ?? null ) || ! is_wp_error( $list->execute( array() ) ) ) {
+		throw new RuntimeException( 'Disabled MCP still exposed report.' );
+	}
+} elseif ( 'enabled' === $case ) {
+	if ( true !== ( $list->get_meta()['mcp']['public'] ?? null ) ) {
+		throw new RuntimeException( 'Enabled MCP was not exposed.' );
+	}
+	$page = $list->execute( array( 'limit' => 2 ) );
+	if ( is_wp_error( $page ) || ! isset( $page['findings'], $page['schema_version'] ) || count( $page['findings'] ) > 2 ) {
+		throw new RuntimeException( 'Invalid list result.' );
+	}
+	delete_option( 'amazing_security_mcp_scan_last_' . get_current_user_id() );
+	$scan = wp_get_ability( 'amazing-security/start-scan' )->execute( array( 'type' => 'hardening' ) );
+	if ( is_wp_error( $scan ) || 'complete' !== ( $scan['state'] ?? null ) ) {
+		throw new RuntimeException( 'Hardening scan could not start.' );
+	}
+	$detail = wp_get_ability( 'amazing-security/get-scan' )->execute( array( 'scan_id' => $scan['scan_id'] ) );
+	if ( is_wp_error( $detail ) || 'complete' !== ( $detail['state'] ?? null ) ) {
+		throw new RuntimeException( 'Saved scan could not be read.' );
+	}
+	$page = $list->execute( array( 'limit' => 1 ) );
+	$finding = wp_get_ability( 'amazing-security/get-finding' )->execute( array( 'finding_id' => $page['findings'][0]['id'] ) );
+	if ( is_wp_error( $finding ) || 'found' !== ( $finding['state'] ?? null ) ) {
+		throw new RuntimeException( 'Saved finding could not be read.' );
+	}
+	$again = wp_get_ability( 'amazing-security/start-scan' )->execute( array( 'type' => 'hardening' ) );
+	if ( is_wp_error( $again ) || 'cooldown' !== ( $again['state'] ?? null ) ) {
+		throw new RuntimeException( 'MCP scan cooldown failed.' );
+	}
+} elseif ( 'editor' === $case || 'anonymous' === $case ) {
+	wp_set_current_user( 'editor' === $case ? 2 : 0 );
+	if ( ! is_wp_error( $list->execute( array() ) ) || ! is_wp_error( wp_get_ability( 'amazing-security/start-scan' )->execute( array( 'type' => 'hardening' ) ) ) ) {
+		throw new RuntimeException( 'Low-privilege caller accessed MCP.' );
+	}
+} elseif ( 'optout' === $case ) {
+	( new McpPreferences( new WordPressOptions() ) )->setEnabled( false );
+	if ( ! is_wp_error( $list->execute( array() ) ) ) {
+		throw new RuntimeException( 'Known ability still executed after opt-out.' );
+	}
+} else {
+	throw new RuntimeException( 'Unknown test case.' );
+}
+echo 'MCP ability case passed: ' . $case . PHP_EOL;
