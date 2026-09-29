@@ -36,4 +36,14 @@ final class RateCounterStoreTest extends TestCase {
 		self::assertFalse( $store->recordFailure( str_repeat( 'a', 64 ), 400 )->available );
 		self::assertStringContainsString( 'ON DUPLICATE KEY UPDATE', $db->lastQuery );
 	}
+
+	public function test_summary_reports_unknown_when_counter_table_cannot_be_read(): void {
+		$db = new class {
+			public string $prefix = 'wp_';
+			public string $last_error = 'table missing';
+			public function prepare( string $query, mixed ...$args ): string { return $query; }
+			public function get_row( string $query, string $mode ): ?array { return null; }
+		};
+		self::assertSame( array( 'available' => false, 'observed' => 0, 'blocked' => 0 ), ( new WordPressRateCounterStore( $db ) )->summary( 1000 ) );
+	}
 }

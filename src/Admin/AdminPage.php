@@ -8,6 +8,7 @@ use AmazingPlugins\Security\Findings\FindingsRepository;
 use AmazingPlugins\Security\Integrity\WordPressIntegrityStore;
 use AmazingPlugins\Security\Integrity\WordPressOptions;
 use AmazingPlugins\Security\Login\WordPressLoginSettings;
+use AmazingPlugins\Security\Login\WordPressRateCounterStore;
 use AmazingPlugins\Security\Login\WordPressTotpStore;
 use AmazingPlugins\Security\Vulnerabilities\VulnerabilityPreferences;
 use AmazingPlugins\Security\Vulnerabilities\WordPressVulnerabilityReportStore;
@@ -57,7 +58,8 @@ final class AdminPage {
 			$loginEnrolled = true;
 			echo '<div class="notice notice-error"><p>Administrator verification status could not be read. Use the documented WP-CLI recovery route if sign-in is affected.</p></div>';
 		}
-		$loginView = new LoginView(
+		$rateSummary = ( new WordPressRateCounterStore( $GLOBALS['wpdb'] ) )->summary( time() );
+		$loginView   = new LoginView(
 			admin_url( 'admin-post.php' ),
 			array(
 				'settings'   => wp_create_nonce( 'amsec_login_settings' ),
@@ -70,7 +72,8 @@ final class AdminPage {
 			$loginEnrolled,
 			is_ssl(),
 			wp_get_current_user()->user_login,
-			$loginSettings->eraseOnUninstall()
+			$loginSettings->eraseOnUninstall(),
+			$rateSummary
 		);
 		// LoginProtectionRenderer escapes all dynamic values.
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped

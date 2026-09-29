@@ -73,6 +73,24 @@ final class WordPressRateCounterStore implements RateCounterStore {
 		$this->db->query( $this->db->prepare( "DELETE FROM {$this->table} WHERE updated_at < %d LIMIT 250", $cutoff ) );
 	}
 
+	public function summary( int $now ): array {
+		$cutoff = $now - 86400;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Aggregate counts only; no address keys leave storage.
+		$row = $this->db->get_row( $this->db->prepare( "SELECT COUNT(*) AS observed, COALESCE(SUM(IF(blocked_until > %d, 1, 0)), 0) AS blocked FROM {$this->table} WHERE updated_at >= %d", $now, $cutoff ), 'ARRAY_A' );
+		if ( ! is_array( $row ) || $this->databaseFailed() ) {
+			return array(
+				'available' => false,
+				'observed'  => 0,
+				'blocked'   => 0,
+			);
+		}
+		return array(
+			'available' => true,
+			'observed'  => (int) ( $row['observed'] ?? 0 ),
+			'blocked'   => (int) ( $row['blocked'] ?? 0 ),
+		);
+	}
+
 	private function databaseFailed(): bool {
 		return isset( $this->db->last_error ) && '' !== $this->db->last_error;
 	}

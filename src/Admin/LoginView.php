@@ -13,6 +13,11 @@ final class LoginView {
 		public readonly bool $enrolled,
 		public readonly bool $https,
 		public readonly string $username,
-		public readonly bool $eraseOnUninstall = false
+		public readonly bool $eraseOnUninstall = false,
+		public readonly array $rateSummary = array(
+			'available' => true,
+			'observed'  => 0,
+			'blocked'   => 0,
+		)
 	) {}
 }

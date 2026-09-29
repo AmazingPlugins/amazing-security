@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Amazing Security
  * Plugin URI: https://amazingplugins.com/plugins/amazing-security/
- * Description: Evidence-led, read-only WordPress security checks.
+ * Description: Local WordPress security checks and optional login protection.
  * Version: 0.1.0
  * Requires at least: 6.6
  * Requires PHP: 8.1
@@ -64,6 +64,11 @@ add_action(
 		add_action( 'login_form', array( $fields, 'render' ) );
 		add_action( 'woocommerce_login_form', array( $fields, 'render' ) );
 		add_filter( 'xmlrpc_enabled', array( new AmazingPlugins\Security\Login\XmlRpcPolicy( $settings ), 'enabled' ) );
+		if ( defined( 'WP_CLI' ) && WP_CLI ) {
+			$recovery = new AmazingPlugins\Security\Login\LoginRecoveryCommand();
+			\WP_CLI::add_command( 'amazing-security login disable', array( $recovery, 'disableLogin' ) );
+			\WP_CLI::add_command( 'amazing-security totp disable', array( $recovery, 'disableTotp' ) );
+		}
 	}
 );
 

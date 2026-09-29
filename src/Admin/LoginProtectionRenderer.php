@@ -13,6 +13,11 @@ final class LoginProtectionRenderer {
 		)[ $view->rateMode ] ?? 'Off';
 		$html  = '<section class="amsec-login" aria-labelledby="amsec-login-title"><div class="amsec-login-heading"><div><h2 id="amsec-login-title">Login protection</h2><p>Choose how this site handles repeated sign-in failures and administrator verification.</p></div><strong class="amsec-login-state">' . esc_html( $mode ) . '</strong></div>';
 		$html .= '<div class="amsec-login-grid"><div class="amsec-login-panel"><h3>Login attempts</h3><p>Count failed sign-ins using the server connection address. Shared networks can affect several people. Password reset stays available.</p>';
+		if ( ! $view->rateSummary['available'] ) {
+			$html .= '<p class="notice notice-warning inline">Login counters could not be read. Blocking is unavailable until storage is restored.</p>';
+		} else {
+			$html .= '<p class="amsec-login-metric">' . esc_html( (string) $view->rateSummary['observed'] ) . ' addresses observed in 24 hours · ' . esc_html( (string) $view->rateSummary['blocked'] ) . ' currently blocked</p>';
+		}
 		$html .= '<form method="post" action="' . esc_url( $view->formAction ) . '"><input type="hidden" name="action" value="amsec_login_settings"><input type="hidden" name="_wpnonce" value="' . esc_attr( $view->nonces['settings'] ?? '' ) . '">';
 		$html .= '<label for="amsec-rate-mode">Response to repeated failures</label><select id="amsec-rate-mode" name="rate_mode">';
 		foreach ( array(
