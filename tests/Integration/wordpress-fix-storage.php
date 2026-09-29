@@ -4,8 +4,11 @@
 use AmazingPlugins\Security\Fixes\FixProposal;
 use AmazingPlugins\Security\Fixes\FixTables;
 use AmazingPlugins\Security\Fixes\WordPressFixRepository;
+use AmazingPlugins\Security\Integrity\WordPressOptions;
+use AmazingPlugins\Security\Mcp\McpPreferences;
 
 FixTables::install();
+( new McpPreferences( new WordPressOptions() ) )->setEnabled( true );
 $GLOBALS['wpdb']->query( 'DELETE FROM ' . $GLOBALS['wpdb']->prefix . 'amsec_fix_audit' );
 $GLOBALS['wpdb']->query( 'DELETE FROM ' . $GLOBALS['wpdb']->prefix . 'amsec_fix_proposals' );
 delete_option( 'amsec_login_rate_mode' );
@@ -53,5 +56,12 @@ $repo->create( $tampered );
 $GLOBALS['wpdb']->update( $GLOBALS['wpdb']->prefix . 'amsec_fix_proposals', array( 'fingerprint' => str_repeat( '0', 64 ) ), array( 'id' => $tamperedId ) );
 if ( 'unavailable' !== $repo->apply( $tamperedId, 1, $now + 1 ) || 'off' !== get_option( 'amsec_login_rate_mode' ) ) {
 	throw new RuntimeException( 'Changed proposal fingerprint was accepted.' );
+}
+$optOutId = bin2hex( random_bytes( 16 ) );
+$optOut   = new FixProposal( $optOutId, str_repeat( 'f', 32 ), 'login-rate-observe', 'off', 'observe', 4, $now, $now + 900 );
+$repo->create( $optOut );
+( new McpPreferences( new WordPressOptions() ) )->setEnabled( false );
+if ( 'unavailable' !== $repo->apply( $optOutId, 1, $now + 1 ) || 'off' !== get_option( 'amsec_login_rate_mode' ) || 'pending' !== $repo->get( $optOutId )->status || array() !== $repo->audit( $optOutId ) ) {
+	throw new RuntimeException( 'Approval committed after MCP opt-out.' );
 }
 echo "Fix storage case passed.\n";

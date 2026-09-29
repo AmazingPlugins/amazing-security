@@ -129,6 +129,16 @@ final class WordPressFixRepository implements FixRepository {
 				}
 				return $this->abort( 'expired' );
 			}
+			if ( ! $rollback ) {
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Serialize approval with a concurrent MCP opt-out.
+				$permission = $this->db->get_row( $this->db->prepare( "SELECT option_value FROM {$this->db->options} WHERE option_name = %s FOR UPDATE", 'amazing_security_mcp_enabled' ), ARRAY_A );
+				if ( '' !== $this->db->last_error ) {
+					throw new RuntimeException( 'Could not read MCP permission.' );
+				}
+				if ( ! is_array( $permission ) || '1' !== $permission['option_value'] ) {
+					return $this->abort( 'unavailable' );
+				}
+			}
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Lock the exact option row before compare-and-swap.
 			$option = $this->db->get_row( $this->db->prepare( "SELECT option_value FROM {$this->db->options} WHERE option_name = %s FOR UPDATE", 'amsec_login_rate_mode' ), ARRAY_A );
 			if ( '' !== $this->db->last_error ) {
