@@ -71,4 +71,28 @@ final class RateCounterStoreTest extends TestCase {
 		self::assertCount( 1, array_filter( $db->queries, fn( string $query ): bool => str_contains( $query, 'GET_LOCK' ) ) );
 		self::assertCount( 1, array_filter( $db->queries, fn( string $query ): bool => str_contains( $query, 'RELEASE_LOCK' ) ) );
 	}
+
+	public function test_admission_locks_are_separate_for_databases_with_the_same_table_name(): void {
+		$driver = static function ( string $database ): object {
+			return new class( $database ) {
+				public string $prefix = 'wp_';
+				public string $last_error = '';
+				public string $lock = '';
+				public function __construct( public string $dbname ) {}
+				public function prepare( string $sql, mixed ...$values ): string { return vsprintf( str_replace( array( '%s', '%d' ), array( "'%s'", '%d' ), $sql ), $values ); }
+				public function query( string $sql ): int { return 1; }
+				public function get_var( string $sql ): ?int {
+					if ( str_contains( $sql, 'GET_LOCK' ) ) { $this->lock = $sql; return 1; }
+					return str_contains( $sql, 'COUNT(*)' ) ? 0 : null;
+				}
+				public function get_row( string $sql, string $mode ): ?array { return null; }
+			};
+		};
+		$first = $driver( 'wordpress_one' );
+		$second = $driver( 'wordpress_two' );
+		( new WordPressRateCounterStore( $first ) )->recordFailure( str_repeat( 'a', 64 ), 100000 );
+		( new WordPressRateCounterStore( $second ) )->recordFailure( str_repeat( 'b', 64 ), 100000 );
+		self::assertNotSame( '', $first->lock );
+		self::assertNotSame( $first->lock, $second->lock );
+	}
 }

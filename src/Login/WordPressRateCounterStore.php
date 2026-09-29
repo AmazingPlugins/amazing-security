@@ -56,7 +56,8 @@ final class WordPressRateCounterStore implements RateCounterStore {
 		}
 		$locked = false;
 		if ( 0 === $prior->failures ) {
-			$lockName = 'amsec_rate_' . substr( hash( 'sha256', $this->table ), 0, 32 );
+			$database = (string) ( $this->db->dbname ?? ( defined( 'DB_NAME' ) ? DB_NAME : '' ) );
+			$lockName = 'amsec_rate_' . substr( hash( 'sha256', $database . ':' . $this->table ), 0, 32 );
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Serialize admission of new counter keys at the capacity boundary.
 			$locked = 1 === (int) $this->db->get_var( $this->db->prepare( 'SELECT GET_LOCK(%s, 0)', $lockName ) );
 			if ( ! $locked || $this->databaseFailed() ) {
