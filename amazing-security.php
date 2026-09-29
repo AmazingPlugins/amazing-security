@@ -35,10 +35,12 @@ spl_autoload_register(
 );
 
 register_activation_hook( __FILE__, array( AmazingPlugins\Security\Login\WordPressRateCounterStore::class, 'install' ) );
+register_activation_hook( __FILE__, array( AmazingPlugins\Security\Fixes\FixTables::class, 'install' ) );
 register_deactivation_hook(
 	__FILE__,
 	static function (): void {
 		wp_clear_scheduled_hook( 'amsec_login_cleanup' );
+		wp_clear_scheduled_hook( 'amsec_fix_cleanup' );
 		( new AmazingPlugins\Security\Login\WordPressRateCounterStore( $GLOBALS['wpdb'] ) )->purge();
 	}
 );
@@ -49,11 +51,21 @@ add_action(
 	}
 );
 add_action( 'init', array( AmazingPlugins\Security\Login\WordPressRateCounterStore::class, 'ensureScheduled' ) );
+add_action( 'init', array( AmazingPlugins\Security\Fixes\FixTables::class, 'ensureScheduled' ) );
+add_action(
+	'amsec_fix_cleanup',
+	static function (): void {
+		( new AmazingPlugins\Security\Fixes\WordPressFixRepository( $GLOBALS['wpdb'] ) )->cleanup( time() );
+	}
+);
 add_action(
 	'admin_init',
 	static function (): void {
 		if ( current_user_can( 'manage_options' ) && '1' !== get_option( 'amsec_login_schema_version' ) ) {
 			AmazingPlugins\Security\Login\WordPressRateCounterStore::install();
+		}
+		if ( current_user_can( 'manage_options' ) && '1' !== get_option( 'amsec_fix_schema_version' ) ) {
+			AmazingPlugins\Security\Fixes\FixTables::install();
 		}
 	}
 );

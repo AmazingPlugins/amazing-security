@@ -16,6 +16,7 @@ delete_option( 'amsec_login_rate_mode' );
 delete_option( 'amsec_login_xmlrpc_disabled' );
 delete_option( 'amsec_login_erase_on_uninstall' );
 delete_option( 'amsec_login_schema_version' );
+delete_option( 'amsec_fix_schema_version' );
 
 // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Uninstall removes plugin records once; caching has no value.
 $wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->usermeta} WHERE meta_key IN (%s, %s)", 'amsec_totp_v1', 'amsec_totp_recovery_at' ) );
@@ -28,3 +29,10 @@ $wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->options} WHERE option_name LI
 $amsec_table = $wpdb->prefix . 'amsec_login_rate';
 // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.DirectDatabaseQuery.SchemaChange -- Drop only this plugin's counter table after explicit erase selection.
 $wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %i', $amsec_table ) );
+
+$amsec_fix_proposals = $wpdb->prefix . 'amsec_fix_proposals';
+$amsec_fix_audit     = $wpdb->prefix . 'amsec_fix_audit';
+// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.DirectDatabaseQuery.SchemaChange -- Explicit erase selection removes plugin-owned fix records.
+$wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %i', $amsec_fix_proposals ) );
+// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.DirectDatabaseQuery.SchemaChange -- Explicit erase selection removes plugin-owned audit records.
+$wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %i', $amsec_fix_audit ) );
