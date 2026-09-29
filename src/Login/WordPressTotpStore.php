@@ -88,17 +88,7 @@ final class WordPressTotpStore implements TotpStore {
 	}
 
 	public function disable( int $userId ): bool {
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Emergency disable also removes malformed or duplicated user-meta records.
-		$deleted = $this->db->delete(
-			$this->db->usermeta,
-			array(
-				'user_id'  => $userId,
-				'meta_key' => self::KEY,
-			),
-			array( '%d', '%s' )
-		);
-		wp_cache_delete( $userId, 'user_meta' );
-		return false !== $deleted;
+		return ! $this->isEnrolled( $userId ) || delete_user_meta( $userId, self::KEY );
 	}
 
 	private function change( int $userId, callable $mutation ): bool {
