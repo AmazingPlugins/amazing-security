@@ -11,6 +11,7 @@ use AmazingPlugins\Security\Integrity\WordPressOptions;
 use AmazingPlugins\Security\Login\WordPressLoginSettings;
 use AmazingPlugins\Security\Login\WordPressRateCounterStore;
 use AmazingPlugins\Security\Login\WordPressTotpStore;
+use AmazingPlugins\Security\Mcp\McpPreferences;
 use AmazingPlugins\Security\Vulnerabilities\VulnerabilityPreferences;
 use AmazingPlugins\Security\Vulnerabilities\WordPressVulnerabilityReportStore;
 
@@ -91,6 +92,11 @@ final class AdminPage {
 		// LoginProtectionRenderer escapes all dynamic values.
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		echo ( new LoginProtectionRenderer() )->render( $loginView );
+		$mcpEnabled       = ( new McpPreferences( $options ) )->enabled();
+		$adapterAvailable = function_exists( 'is_plugin_active' ) && is_plugin_active( 'mcp-adapter/mcp-adapter.php' );
+		// McpSettingsRenderer escapes all dynamic values.
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo ( new McpSettingsRenderer() )->render( $mcpEnabled, function_exists( 'wp_register_ability' ), $adapterAvailable, admin_url( 'admin-post.php' ), wp_create_nonce( 'amsec_mcp_settings' ) );
 		// This flag selects a static message and does not change state or enter output.
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		if ( isset( $_GET['amazing_security_error'] ) ) {

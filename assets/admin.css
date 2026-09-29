@@ -286,3 +286,6 @@
 .amsec-factor-form label { display: block; margin-bottom: 10px; }
 .amsec-factor-form input { display: block; max-width: 320px; width: 100%; margin-top: 4px; }
 @media (max-width: 782px) { .amsec-login { padding: 18px; } .amsec-login-grid { grid-template-columns: 1fr; } .amsec-login-heading { display: block; } .amsec-login-state { display: inline-block; margin-bottom: 12px; } }
+.amsec-mcp { margin: 24px 0; padding: 20px 24px; background: #fff; border: 1px solid #d6dbe0; }
+.amsec-mcp h2 { margin-top: 0; }
+.amsec-mcp form { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
