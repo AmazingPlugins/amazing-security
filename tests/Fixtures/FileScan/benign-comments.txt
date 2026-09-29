@@ -1,0 +1,3 @@
+<?php
+// A documentation sample: eval(base64_decode("x"));
+echo 1;
