@@ -69,6 +69,14 @@ final class FileScanReportRendererTest extends TestCase {
 		self::assertStringContainsString( 'Not reported in the last complete scan', $html );
 	}
 
+	public function test_newer_history_never_uses_an_older_complete_scan_as_comparison(): void {
+		$old = new FileScanReport( 'old', 'pass', new DateTimeImmutable( '2026-09-28T00:00:00Z' ), false, 1, 10, 0, 0, 0, 0, 1, 0, array() );
+		$newerWarning = new FileScanReport( 'newer', 'warn', new DateTimeImmutable( '2026-09-29T00:00:00Z' ), false, 1, 10, 0, 0, 0, 0, 1, 0, array( array( 'id' => str_repeat( 'f', 32 ), 'state' => 'warn', 'kind' => 'suspected', 'path' => 'loader.php' ) ) );
+		$html = ( new FileScanReportRenderer() )->render( $old, null, array( $newerWarning ) );
+		self::assertStringContainsString( 'No later complete comparison available', $html );
+		self::assertStringNotContainsString( 'Not reported in the last complete scan', $html );
+	}
+
 	public function test_partial_report_escapes_findings_and_keeps_previous_warning_date(): void {
 		$cursor = new FileScanCursor( 'scan-2' );
 		$cursor->processed = 250;

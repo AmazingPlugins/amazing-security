@@ -25,7 +25,7 @@ final class FileScanPlanBuilder {
 		) as $kind => $rows ) {
 			foreach ( $rows as $row ) {
 				$singleFile = is_string( $row['single_file'] ?? null ) ? $row['single_file'] : null;
-				if ( ! isset( $row['slug'], $row['version'], $row['root'] ) || ( 'unsupported_local_path' === ( $row['update_uri'] ?? '' ) && null === $singleFile ) ) {
+				if ( ! isset( $row['slug'], $row['version'], $row['root'] ) || ( 'unsupported_local_path' === ( $row['update_uri'] ?? '' ) && null === $singleFile && ! (bool) ( $row['local_only'] ?? false ) ) ) {
 					continue;
 				}
 				$identity  = $row['slug'] . ':' . $row['version'];

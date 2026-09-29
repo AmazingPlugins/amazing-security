@@ -130,11 +130,12 @@ final class FileScanAction {
 			$slug = dirname( $file );
 			if ( '.' === $slug || ! preg_match( '/^[a-z0-9]+(?:-[a-z0-9]+)*$/D', $slug ) ) {
 				$plugins[] = array(
-					'slug'        => basename( $file ),
+					'slug'        => '.' === $slug ? basename( $file ) : $slug,
 					'version'     => (string) ( $data['Version'] ?? '' ),
-					'root'        => WP_PLUGIN_DIR,
+					'root'        => '.' === $slug ? WP_PLUGIN_DIR : WP_PLUGIN_DIR . '/' . $slug,
 					'update_uri'  => 'unsupported_local_path',
 					'single_file' => '.' === $slug ? basename( $file ) : null,
+					'local_only'  => true,
 				);
 				continue;
 			}

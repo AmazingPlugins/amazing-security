@@ -24,14 +24,28 @@ if ( 'editor' === $case ) {
 add_filter( 'pre_http_request', static fn() => new WP_Error( 'amsec_fixture_offline', 'Fixture keeps outbound requests offline.' ) );
 
 if ( 'plan' === $case ) {
+	require_once ABSPATH . 'wp-admin/includes/plugin.php';
+	$fixtureDirectory = WP_PLUGIN_DIR . '/amsec_fixture_plugin';
+	if ( ! is_dir( $fixtureDirectory ) ) {
+		mkdir( $fixtureDirectory );
+	}
+	file_put_contents( $fixtureDirectory . '/main.php', '<?php /* Plugin Name: Amazing Security scan fixture */' );
+	wp_clean_plugins_cache();
 	$method = new ReflectionMethod( FileScanAction::class, 'plugins' );
 	$plugins = $method->invoke( new FileScanAction() );
+	unlink( $fixtureDirectory . '/main.php' );
+	rmdir( $fixtureDirectory );
+	wp_clean_plugins_cache();
 	$slugs = array_column( $plugins, 'slug' );
-	if ( ! in_array( 'amazing-security', $slugs, true ) || ! in_array( 'hello.php', array_column( $plugins, 'single_file' ), true ) ) {
-		throw new RuntimeException( 'The file scan omitted its own package or a single-file plugin.' );
+	if ( ! in_array( 'amazing-security', $slugs, true ) || ! in_array( 'hello.php', array_column( $plugins, 'single_file' ), true ) || ! in_array( 'amsec_fixture_plugin', $slugs, true ) ) {
+		throw new RuntimeException( 'The file scan omitted its own package or a local plugin.' );
+	}
+	$folder = $plugins[ array_search( 'amsec_fixture_plugin', $slugs, true ) ];
+	if ( WP_PLUGIN_DIR . '/amsec_fixture_plugin' !== $folder['root'] || ! $folder['local_only'] ) {
+		throw new RuntimeException( 'The nonrepository plugin lacked a bounded local root.' );
 	}
 	$candidates = ( new ReflectionMethod( FileScanAction::class, 'manifestPlugins' ) )->invoke( new FileScanAction(), $plugins );
-	if ( in_array( 'amazing-security', array_column( $candidates, 'slug' ), true ) || in_array( 'hello.php', array_column( $candidates, 'slug' ), true ) ) {
+	if ( in_array( 'amazing-security', array_column( $candidates, 'slug' ), true ) || in_array( 'hello.php', array_column( $candidates, 'slug' ), true ) || in_array( 'amsec_fixture_plugin', array_column( $candidates, 'slug' ), true ) ) {
 		throw new RuntimeException( 'Local-only plugins consumed repository manifest slots.' );
 	}
 	echo 'File action: own and single-file plugins are in the local scan plan.' . PHP_EOL;

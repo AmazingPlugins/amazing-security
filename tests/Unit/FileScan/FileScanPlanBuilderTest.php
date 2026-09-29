@@ -36,4 +36,12 @@ final class FileScanPlanBuilderTest extends TestCase {
 		$targets = ( new FileScanPlanBuilder() )->build( $discovery, array( array( 'slug' => 'demo', 'version' => '1.0', 'root' => '/tmp/demo' ) ), array(), '/tmp/uploads' );
 		self::assertSame( array( 'uploads', 'plugin', 'core' ), array_column( $targets, 'kind' ) );
 	}
+
+	public function test_nonrepository_folder_plugin_still_gets_a_local_content_target(): void {
+		$discovery = new DiscoveryResult( array(), array(), 'signature', true );
+		$targets = ( new FileScanPlanBuilder() )->build( $discovery, array( array( 'slug' => 'my_plugin', 'version' => '1.0', 'root' => '/tmp/plugins/my_plugin', 'update_uri' => 'unsupported_local_path', 'local_only' => true ) ), array(), '/tmp/uploads' );
+		self::assertCount( 2, $targets );
+		self::assertSame( '/tmp/plugins/my_plugin', $targets[1]->root );
+		self::assertNull( $targets[1]->singleFile );
+	}
 }
