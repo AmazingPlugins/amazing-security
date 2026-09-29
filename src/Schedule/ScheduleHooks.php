@@ -14,7 +14,7 @@ final class ScheduleHooks {
 	public function __construct( ?callable $next = null, ?callable $schedule = null, ?callable $clear = null ) {
 		$this->next     = Closure::fromCallable( $next ?? static fn(): bool => false !== wp_next_scheduled( 'amsec_local_daily_scan' ) );
 		$this->schedule = Closure::fromCallable( $schedule ?? static fn( int $when, string $recurrence, string $hook ): bool => wp_schedule_event( $when, $recurrence, $hook ) );
-		$this->clear    = Closure::fromCallable( $clear ?? static fn(): int|false => wp_clear_scheduled_hook( 'amsec_local_daily_scan' ) );
+		$this->clear    = Closure::fromCallable( $clear ?? static fn( string $hook ): int|false => wp_clear_scheduled_hook( $hook ) );
 	}
 
 	public function ensure(): void {
@@ -24,6 +24,8 @@ final class ScheduleHooks {
 	}
 
 	public function clear(): void {
-		( $this->clear )();
+		foreach ( array( 'amsec_local_daily_scan', 'amsec_integrity_tick', 'amsec_file_tick' ) as $hook ) {
+			( $this->clear )( $hook );
+		}
 	}
 }

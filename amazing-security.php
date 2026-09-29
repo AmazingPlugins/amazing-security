@@ -58,8 +58,13 @@ add_action(
 	'amsec_local_daily_scan',
 	static function (): void {
 		( new AmazingPlugins\Security\Schedule\LocalSchedule( new AmazingPlugins\Security\Integrity\WordPressOptions() ) )->tick( time() );
+		if ( ! wp_next_scheduled( 'amsec_integrity_tick' ) ) {
+			wp_schedule_single_event( time() + 60, 'amsec_integrity_tick' );
+		}
 	}
 );
+add_action( 'amsec_integrity_tick', array( new AmazingPlugins\Security\Admin\IntegrityScanAction(), 'scheduled' ) );
+add_action( 'amsec_file_tick', array( new AmazingPlugins\Security\Admin\FileScanAction(), 'scheduled' ) );
 add_action(
 	'amsec_fix_cleanup',
 	static function (): void {

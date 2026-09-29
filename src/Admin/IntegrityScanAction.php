@@ -30,7 +30,7 @@ final class IntegrityScanAction {
 		if ( ! $store->begin( $scanId, $cursor ) ) {
 			$this->redirect( true );
 		}
-		$this->execute( $store, $cursor, true );
+		$this->redirect( $this->execute( $store, $cursor, true ) );
 	}
 
 	public function resume(): void {
@@ -42,7 +42,31 @@ final class IntegrityScanAction {
 		if ( null === $progress || $progress->finished || ! hash_equals( $progress->cursor->scanId, $scanId ) ) {
 			$this->redirect( true );
 		}
-		$this->execute( $store, $progress->cursor, false );
+		$this->redirect( $this->execute( $store, $progress->cursor, false ) );
+	}
+
+	public function scheduled(): void {
+		$store    = new WordPressIntegrityStore( new WordPressOptions() );
+		$progress = $store->latestProgress();
+		if ( null !== $progress && ! $progress->finished ) {
+			$error = $this->execute( $store, $progress->cursor, false );
+		} else {
+			$scanId = wp_generate_uuid4();
+			$cursor = new IntegrityCursor( $scanId, startedAt: new DateTimeImmutable() );
+			if ( ! $store->begin( $scanId, $cursor ) ) {
+				$this->schedule( 300, 'amsec_integrity_tick' );
+				return;
+			}
+			$error = $this->execute( $store, $cursor, true );
+		}
+		$progress = $store->latestProgress();
+		if ( null !== $progress && ! $progress->finished ) {
+			if ( ! $error ) {
+				$this->schedule( 60, 'amsec_integrity_tick' );
+			}
+			return;
+		}
+		$this->schedule( 60, 'amsec_file_tick' );
 	}
 
 	private function authorize( string $nonceAction ): void {
@@ -52,10 +76,10 @@ final class IntegrityScanAction {
 		check_admin_referer( $nonceAction );
 	}
 
-	private function execute( WordPressIntegrityStore $store, IntegrityCursor $cursor, bool $isStart ): void {
+	private function execute( WordPressIntegrityStore $store, IntegrityCursor $cursor, bool $isStart ): bool {
 		$workerLock = new WorkerLock( new WordPressOptions() );
 		if ( ! $workerLock->acquire( $cursor->scanId ) ) {
-			$this->redirect( true );
+			return true;
 		}
 		$error = false;
 		try {
@@ -90,7 +114,13 @@ final class IntegrityScanAction {
 		} finally {
 			$workerLock->release();
 		}
-		$this->redirect( $error );
+		return $error;
+	}
+
+	private function schedule( int $delay, string $hook ): void {
+		if ( ! wp_next_scheduled( $hook ) ) {
+			wp_schedule_single_event( time() + $delay, $hook );
+		}
 	}
 
 	private function coreVersion(): string {

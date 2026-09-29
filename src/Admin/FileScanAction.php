@@ -29,7 +29,7 @@ final class FileScanAction {
 		if ( ! $store->begin( $scanId, $cursor ) ) {
 			$this->redirect( true );
 		}
-		$this->execute( $store, $cursor, true );
+		$this->redirect( $this->execute( $store, $cursor, true ) );
 	}
 
 	public function resume(): void {
@@ -41,7 +41,27 @@ final class FileScanAction {
 		if ( null === $progress || $progress->finished || ! hash_equals( $progress->cursor->scanId, $scanId ) ) {
 			$this->redirect( true );
 		}
-		$this->execute( $store, $progress->cursor, false );
+		$this->redirect( $this->execute( $store, $progress->cursor, false ) );
+	}
+
+	public function scheduled(): void {
+		$store    = new WordPressFileScanStore( new WordPressOptions() );
+		$progress = $store->latestProgress();
+		if ( null !== $progress && ! $progress->finished ) {
+			$error = $this->execute( $store, $progress->cursor, false );
+		} else {
+			$scanId = wp_generate_uuid4();
+			$cursor = new FileScanCursor( $scanId );
+			if ( ! $store->begin( $scanId, $cursor ) ) {
+				$this->scheduleNext();
+				return;
+			}
+			$error = $this->execute( $store, $cursor, true );
+		}
+		$progress = $store->latestProgress();
+		if ( ! $error && null !== $progress && ! $progress->finished ) {
+			$this->scheduleNext();
+		}
 	}
 
 	private function authorize( string $nonceAction ): void {
@@ -51,11 +71,11 @@ final class FileScanAction {
 		check_admin_referer( $nonceAction );
 	}
 
-	private function execute( WordPressFileScanStore $store, FileScanCursor $cursor, bool $isStart ): void {
+	private function execute( WordPressFileScanStore $store, FileScanCursor $cursor, bool $isStart ): bool {
 		$options = new WordPressOptions();
 		$lock    = new WorkerLock( $options, 'amazing_security_file_scan_worker_lock' );
 		if ( ! $lock->acquire( $cursor->scanId ) ) {
-			$this->redirect( true );
+			return true;
 		}
 		$error = false;
 		try {
@@ -108,7 +128,13 @@ final class FileScanAction {
 		} finally {
 			$lock->release();
 		}
-		$this->redirect( $error );
+		return $error;
+	}
+
+	private function scheduleNext(): void {
+		if ( ! wp_next_scheduled( 'amsec_file_tick' ) ) {
+			wp_schedule_single_event( time() + 60, 'amsec_file_tick' );
+		}
 	}
 
 	private function coreVersion(): string {
