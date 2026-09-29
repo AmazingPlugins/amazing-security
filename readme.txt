@@ -12,7 +12,7 @@ WordPress hardening checks, release file checks, opt-in vulnerability lookups, a
 
 == Description ==
 
-Run five local hardening checks from wp-admin. An administrator can also compare WordPress core and eligible WordPress.org plugin files with published checksums. Eligible WordPress.org themes are compared with their exact release ZIP. These checks contact api.wordpress.org and downloads.wordpress.org. They don't send file contents.
+Run six local hardening checks from wp-admin. An administrator can also compare WordPress core and eligible WordPress.org plugin files with published checksums. Eligible WordPress.org themes are compared with their exact release ZIP. These checks contact api.wordpress.org and downloads.wordpress.org. They don't send file contents.
 
 A changed checksum means a file differs from the published release. It doesn't identify malware. Missing or unsupported packages show an unknown or partial result. A custom or child theme stays unknown for release comparison. The integrity scan reads a bounded number of files per request and asks you to continue when more work remains.
 
@@ -30,6 +30,8 @@ The XML-RPC setting blocks methods that require authentication. It does not turn
 
 If you lose admin access, run `wp amazing-security login disable` from the site's WP-CLI environment. To remove one administrator's TOTP requirement, run `wp amazing-security totp disable --user=<id>`. These commands act locally; they do not need an AmazingPlugins account. The plugin keeps login settings and enrollment data on uninstall unless you select **Erase login protection data on uninstall** first.
 
-AI assistant access starts off. On WordPress 6.9 or newer, install the official MCP Adapter separately, then turn on access in Amazing Security. An authenticated administrator can list findings, inspect a finding, run the five local hardening checks, and read that scan. These are the only four Amazing Security MCP abilities in this preview.
+AI assistant access starts off. On WordPress 6.9 or newer, install the official MCP Adapter separately, then turn on access in Amazing Security. An authenticated administrator can list findings, inspect a finding, run the six local hardening checks, and read that scan. Two more abilities can prepare a login-rate change and read its status.
 
-Each call checks the current WordPress user's permission and the site's MCP setting. Scan requests have a concurrency guard and a 60-second cooldown per administrator. They don't start file, integrity, or vulnerability scans. The MCP Adapter handles the connection and authentication; Amazing Security doesn't bundle a server. Turn access off in wp-admin to stop further calls. This preview has no AI fix action, repair action, firewall, or maintained malware signature feed.
+Each call checks the current WordPress user's permission and the site's MCP setting. Scan requests have a concurrency guard and a 60-second cooldown per administrator. They don't start file, integrity, or vulnerability scans. The MCP Adapter handles the connection and authentication; Amazing Security doesn't bundle a server. Turn access off in wp-admin to stop further calls.
+
+An assistant can propose only two staged changes: off to observe, then observe to block. The proposal lasts 15 minutes and changes nothing by itself. Open its wp-admin link to review and approve the exact setting. Approval requires an administrator cookie session and a proposal-specific nonce. Block mode also requires HTTPS and the administrator's current password. A changed setting or a second approval is refused. After approval, the page offers a 24-hour rollback. Turning assistant access off stops pending approvals, but an already applied change can still be rolled back. The plugin does not offer file repair, a general firewall, or a maintained malware signature feed.

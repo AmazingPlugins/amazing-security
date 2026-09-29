@@ -289,3 +289,15 @@
 .amsec-mcp { margin: 24px 0; padding: 20px 24px; background: #fff; border: 1px solid #d6dbe0; }
 .amsec-mcp h2 { margin-top: 0; }
 .amsec-mcp form { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+
+.amsec-fix-review { max-width: 680px; padding: 28px 32px; margin: 24px 0; background: #fff; border: 1px solid #d6dbe0; }
+.amsec-fix-review h1 { margin: 0 0 12px; font-size: 25px; line-height: 1.25; }
+.amsec-fix-review p { line-height: 1.55; }
+.amsec-fix-diff { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 24px 0; border-top: 1px solid #d6dbe0; border-bottom: 1px solid #d6dbe0; }
+.amsec-fix-diff > div { padding: 14px 12px 14px 0; }
+.amsec-fix-diff dt { color: #50575e; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .03em; }
+.amsec-fix-diff dd { margin: 6px 0 0; font-size: 16px; font-weight: 600; }
+.amsec-fix-review form { display: grid; justify-items: start; gap: 10px; margin-top: 24px; }
+.amsec-fix-review input[type="password"] { width: 100%; max-width: 340px; }
+.amsec-fix-review :is(button, input):focus-visible { outline: 2px solid #2271b1; outline-offset: 2px; }
+@media (max-width: 600px) { .amsec-fix-review { padding: 20px; } .amsec-fix-diff { grid-template-columns: 1fr; } .amsec-fix-diff > div { padding: 12px 0; } .amsec-fix-diff > div + div { border-top: 1px solid #e6e8eb; } }
