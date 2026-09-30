@@ -43,3 +43,5 @@ wp_clear_scheduled_hook( 'amsec_activity_cleanup' );
 $wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %i', $wpdb->prefix . 'amsec_activity' ) );
 
 delete_option( 'amsec_required_totp_policy' );
+
+delete_option( 'amsec_custom_baseline_state' );

@@ -217,3 +217,6 @@ add_action( 'admin_post_amsec_totp_policy', array( new AmazingPlugins\Security\L
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
 	\WP_CLI::add_command( 'amazing-security policy disable', array( $amsec_policy, 'recovery' ) );
 }
+
+add_action( 'admin_menu', array( new AmazingPlugins\Security\Baseline\BaselinePage(), 'register' ) );
+add_action( 'admin_post_amsec_baseline', array( new AmazingPlugins\Security\Baseline\BaselineAction(), 'handle' ) );
