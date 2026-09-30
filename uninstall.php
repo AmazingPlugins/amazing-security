@@ -19,7 +19,7 @@ delete_option( 'amsec_login_schema_version' );
 delete_option( 'amsec_fix_schema_version' );
 
 // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Uninstall removes plugin records once; caching has no value.
-$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->usermeta} WHERE meta_key IN (%s, %s, %s)", 'amsec_totp_v1', 'amsec_totp_recovery_at', 'amsec_password_reset_required' ) );
+$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->usermeta} WHERE meta_key IN (%s, %s, %s, %s)", 'amsec_totp_v1', 'amsec_totp_recovery_at', 'amsec_password_reset_required', 'amsec_required_totp_grace' ) );
 
 $amsec_pending_pattern = $wpdb->esc_like( '_transient_amsec_totp_pending_' ) . '%';
 $amsec_timeout_pattern = $wpdb->esc_like( '_transient_timeout_amsec_totp_pending_' ) . '%';
@@ -41,3 +41,5 @@ delete_option( 'amsec_activity_schema_version' );
 wp_clear_scheduled_hook( 'amsec_activity_cleanup' );
 // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Explicit erase preference removes only plugin-owned activity history.
 $wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %i', $wpdb->prefix . 'amsec_activity' ) );
+
+delete_option( 'amsec_required_totp_policy' );

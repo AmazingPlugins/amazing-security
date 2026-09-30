@@ -45,6 +45,9 @@ final class TotpAction {
 
 	public function disable(): void {
 		$userId = $this->authorize( 'amsec_totp_disable' );
+		if ( null !== ( new \AmazingPlugins\Security\Login\RequiredTotpPolicy() )->generation() ) {
+			wp_die( esc_html__( 'Required verification is active. Use an enrolled administrator or host-level recovery to disable the policy first.', 'amazing-security' ), '', array( 'response' => 403 ) );
+		}
 		$this->reauthenticate( $userId );
 		if ( ! $this->enrollment()->disable( $userId, $this->factor() ) ) {
 			$this->refuse();

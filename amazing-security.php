@@ -208,3 +208,12 @@ add_action( 'admin_post_amsec_incident_reset', array( new AmazingPlugins\Securit
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
 	\WP_CLI::add_command( 'amazing-security accounts clear-reset', array( $amsec_reset, 'recovery' ) );
 }
+
+$amsec_policy = new AmazingPlugins\Security\Login\RequiredTotpPolicy();
+add_filter( 'authenticate', array( $amsec_policy, 'authenticate' ), 29, 3 );
+add_action( 'admin_menu', array( new AmazingPlugins\Security\Login\RequiredTotpPage(), 'register' ) );
+add_action( 'admin_notices', array( new AmazingPlugins\Security\Login\RequiredTotpPage(), 'notice' ) );
+add_action( 'admin_post_amsec_totp_policy', array( new AmazingPlugins\Security\Login\RequiredTotpAction(), 'handle' ) );
+if ( defined( 'WP_CLI' ) && WP_CLI ) {
+	\WP_CLI::add_command( 'amazing-security policy disable', array( $amsec_policy, 'recovery' ) );
+}
