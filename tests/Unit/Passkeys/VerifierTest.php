@@ -5,7 +5,7 @@ use AmazingPlugins\Security\Passkeys\{Base64Url,PasskeyContext,PasskeyVerifier};
 final class VerifierTest extends TestCase {
  private string|false $previousRandFile;
  private string $randFile;
- protected function setUp():void { $this->previousRandFile=getenv('RANDFILE');$this->randFile=tempnam(sys_get_temp_dir(),'amsec-rand-');chmod($this->randFile,0600);putenv('RANDFILE='.$this->randFile); }
+ protected function setUp():void { if(!defined('ABSPATH'))define('ABSPATH',dirname(__DIR__,3).'/');$this->previousRandFile=getenv('RANDFILE');$this->randFile=tempnam(sys_get_temp_dir(),'amsec-rand-');chmod($this->randFile,0600);putenv('RANDFILE='.$this->randFile); }
  protected function tearDown():void { putenv($this->previousRandFile===false?'RANDFILE':'RANDFILE='.$this->previousRandFile);if(is_file($this->randFile))unlink($this->randFile); }
  private function material():array {
  $private=openssl_pkey_new(['private_key_type'=>OPENSSL_KEYTYPE_EC,'curve_name'=>'prime256v1']);$public=openssl_pkey_get_details($private);return [$private,$public];

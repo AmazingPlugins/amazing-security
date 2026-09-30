@@ -63,6 +63,7 @@ for pair in 'amsec-next-wp wordpress 66' 'amsec-next-wp69 wordpress69 69'; do
  wp_fixture "$base/tests/Integration/wordpress-network.php" --user=admin > "$evidence/network-result$tag.log"
  wp_fixture "$base/tests/Integration/wordpress-traffic.php" --user=admin > "$evidence/traffic-result$tag.log"
  wp_fixture "$base/tests/Integration/wordpress-proxies.php" --user=admin > "$evidence/proxies-result$tag.log"
+ wp_fixture "$base/tests/Integration/wordpress-passkey-storage.php" --user=admin > "$evidence/passkey-storage-result$tag.log"
  wp_fixture "$base/tests/Integration/wordpress-indirect-detection.php" --user=admin > "$evidence/indirect-result$tag.json"
  wp_fixture "$base/tests/Integration/wordpress-expanded-rule-corpus.php" --user=admin > "$evidence/expanded-corpus$tag.json"
  wp eval-file /var/www/html/wp-content/amsec-activity-test.php --user=admin > "$evidence/activity-result$tag.json"
@@ -81,7 +82,14 @@ assert 'wpcf7-form' in s and 'Amazing Security dummy product' in s and 'add-to-c
 assert 'Fatal error' not in s
 print('Real Apache HTTP page renders Contact Form 7 and WooCommerce product/cart controls.')
 PYTEST
- wp plugin check amazing-security --format=table
+ wp plugin check amazing-security --format=table | tee "$evidence/plugin-check$tag.log"
+ python3 - "$evidence/plugin-check$tag.log" <<'PYCHECK'
+import re,sys
+from pathlib import Path
+result=Path(sys.argv[1]).read_text()
+assert not re.search(r'\t(?:ERROR|WARNING)\t',result), 'Plugin Check reported issues despite a successful process exit'
+assert 'Success: Checks complete. No errors found.' in result, 'Plugin Check success marker missing'
+PYCHECK
  docker exec "$site" sh -c 'find /var/www/html/wp-content/plugins/amazing-security -name "*.php" -exec php -l {} \;' > "$evidence/php-lint$tag.log"
  restore
  trap - EXIT

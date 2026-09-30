@@ -8,7 +8,8 @@
   "transformations": [
     "Replace lbuchs\\WebAuthn namespace with AmazingPlugins\\Security\\Vendor\\WebAuthn",
     "Resolve require_once paths through __DIR__",
-    "Add PHPCS third-party format exclusion comment"
+    "Add PHPCS third-party format exclusion comment",
+    "Add ABSPATH direct-access guard to WebAuthn.php before runtime requires"
   ],
   "files": [
     {
@@ -74,7 +75,7 @@
     {
       "path": "WebAuthn.php",
       "upstream_sha256": "6676f1bbdd8daf0b99a57ebd9855c92d36ddf99494106a4e35e5664e6ceb7c75",
-      "bundled_sha256": "b663c3714fb69c0e877758374caa0407941ae39d14ee452c3537b404d6a7d283"
+      "bundled_sha256": "38e91901749477c641e3d8b3ba9daf687735b80870ae360c1d4d131b117db4e4"
     },
     {
       "path": "WebAuthnException.php",

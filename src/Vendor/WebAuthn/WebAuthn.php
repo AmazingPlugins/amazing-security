@@ -3,6 +3,9 @@
 
 namespace AmazingPlugins\Security\Vendor\WebAuthn;
 use AmazingPlugins\Security\Vendor\WebAuthn\Binary\ByteBuffer;
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
 require_once __DIR__ . '/WebAuthnException.php';
 require_once __DIR__ . '/Binary/ByteBuffer.php';
 require_once __DIR__ . '/Attestation/AttestationObject.php';
