@@ -13,6 +13,7 @@ final class RestRateHook {
 			$state      = ( new RestRatePolicy() )->read( get_option( 'amsec_rest_rate_policy', null ) );
 			$this->gate = $this->gate ?? new RestRateGate( wp_salt( 'auth' ), static fn( string $key, int $window, int $now ): ?int=>( new BotCounterStore( $GLOBALS['wpdb'] ) )->record( $key, $window, $now ) );
 			if ( $this->gate->reject( $request, $state, $request->get_route(), $request->get_method(), is_user_logged_in(), $result, $_SERVER, time() ) ) {
+				\AmazingPlugins\Security\Traffic\TrafficHooks::mark( 'rest-rate-block' );
 				return new \WP_Error( 'amsec_rest_rate', __( 'Too many requests to this endpoint. Retry later or contact the site owner.', 'amazing-security' ), array( 'status' => 429 ) );}
 		} catch ( \Throwable ) {
 			return $result;}

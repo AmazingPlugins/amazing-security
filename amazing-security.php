@@ -282,3 +282,33 @@ add_action( 'admin_menu', array( new AmazingPlugins\Security\Network\NetworkSett
 add_action( 'admin_post_amsec_network_settings', array( new AmazingPlugins\Security\Network\NetworkSettings(), 'handle' ) );
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
 	WP_CLI::add_command( 'amazing-security network disable', array( new AmazingPlugins\Security\Network\NetworkSettings(), 'recovery' ) ); }
+
+register_activation_hook( __FILE__, array( AmazingPlugins\Security\Traffic\TrafficTables::class, 'install' ) );
+register_deactivation_hook(
+	__FILE__,
+	static function (): void {
+		wp_clear_scheduled_hook( 'amsec_traffic_cleanup' );
+	}
+);
+add_action( 'init', array( AmazingPlugins\Security\Traffic\TrafficTables::class, 'ensureScheduled' ) );
+add_action(
+	'admin_init',
+	static function (): void {
+		if ( current_user_can( 'manage_options' ) && '1' !== get_option( 'amsec_traffic_schema_version' ) ) {
+			AmazingPlugins\Security\Traffic\TrafficTables::install(); }
+	}
+);
+add_action(
+	'amsec_traffic_cleanup',
+	static function (): void {
+		try {
+			( new AmazingPlugins\Security\Traffic\TrafficRepository( $GLOBALS['wpdb'] ) )->cleanup( time() );
+		} catch ( \Throwable ) {
+			return; }
+	}
+);
+AmazingPlugins\Security\Traffic\TrafficHooks::register();
+add_action( 'admin_menu', array( new AmazingPlugins\Security\Traffic\TrafficSettings(), 'register' ) );
+add_action( 'admin_post_amsec_traffic_settings', array( new AmazingPlugins\Security\Traffic\TrafficSettings(), 'handle' ) );
+if ( defined( 'WP_CLI' ) && WP_CLI ) {
+	WP_CLI::add_command( 'amazing-security traffic disable', array( new AmazingPlugins\Security\Traffic\TrafficSettings(), 'recovery' ) ); }
