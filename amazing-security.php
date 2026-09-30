@@ -270,3 +270,9 @@ add_action( 'admin_post_amsec_content_scan', array( new AmazingPlugins\Security\
 
 add_action( 'admin_menu', array( new AmazingPlugins\Security\Headers\HeaderPage(), 'register' ) );
 add_action( 'admin_post_amsec_headers_check', array( new AmazingPlugins\Security\Headers\HeaderAction(), 'handle' ) );
+
+add_filter( 'rest_pre_dispatch', array( new AmazingPlugins\Security\Firewall\RestRateHook(), 'filter' ), 6, 3 );
+add_action( 'admin_menu', array( new AmazingPlugins\Security\Firewall\RestRateSettings(), 'register' ) );
+add_action( 'admin_post_amsec_rest_rate_settings', array( new AmazingPlugins\Security\Firewall\RestRateSettings(), 'handle' ) );
+if ( defined( 'WP_CLI' ) && WP_CLI ) {
+	WP_CLI::add_command( 'amazing-security rest-rates disable', array( new AmazingPlugins\Security\Firewall\RestRateSettings(), 'recovery' ) ); }
