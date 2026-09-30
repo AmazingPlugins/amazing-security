@@ -13,7 +13,7 @@ final class NetworkHook {
 		$this->checked = true;
 		$options       = new WordPressOptions();
 		try {
-			$state   = ( new NetworkPolicy() )->read( $options->get( 'amsec_network_policy' ) );
+			$state = ( new NetworkPolicy() )->read( $options->get( 'amsec_network_policy' ) );
 			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized,WordPress.Security.ValidatedSanitizedInput.MissingUnslash -- Strict Cidr::validAddress validation below; preserve host address bytes rather than transform an invalid address into a valid one.
 			$address = is_string( $_SERVER['REMOTE_ADDR'] ?? null ) ? $_SERVER['REMOTE_ADDR'] : '';
 			$method  = is_string( $_SERVER['REQUEST_METHOD'] ?? null ) ? sanitize_key( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) : '';

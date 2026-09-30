@@ -37,8 +37,8 @@ final class NetworkSettings {
 		$user     = wp_get_current_user();
 		if ( '' === $password || ! wp_check_password( $password, $user->user_pass, $user->ID ) ) {
 			wp_die( esc_html__( 'Password confirmation failed.', 'amazing-security' ), '', array( 'response' => 403 ) );}
-		$lines    = preg_split( '/\r?\n/', $rules );
-		$lines    = is_array( $lines ) ? array_values( array_filter( array_map( 'trim', $lines ), static fn( string $line ): bool=>'' !== $line ) ) : array();
+		$lines = preg_split( '/\r?\n/', $rules );
+		$lines = is_array( $lines ) ? array_values( array_filter( array_map( 'trim', $lines ), static fn( string $line ): bool=>'' !== $line ) ) : array();
 		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized,WordPress.Security.ValidatedSanitizedInput.MissingUnslash -- Strict Cidr::validAddress in approval service; preserve exact host address bytes for self-lockout refusal.
 		$operator = is_string( $_SERVER['REMOTE_ADDR'] ?? null ) ? $_SERVER['REMOTE_ADDR'] : '';
 		if ( 'saved' !== $s->apply( $fp, $mode, $lines, $methods, $operator ) ) {
