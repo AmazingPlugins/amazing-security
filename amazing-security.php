@@ -364,3 +364,6 @@ if ( defined( 'WP_CLI' ) && WP_CLI ) {
 	WP_CLI::add_command( 'amazing-security passkeys disable', array( $amsec_passkey_settings, 'recoveryDisable' ) );
 	WP_CLI::add_command( 'amazing-security passkeys revoke', array( $amsec_passkey_settings, 'recoveryRevoke' ) );
 }
+$amsec_passkey_login = new AmazingPlugins\Security\Passkeys\PasskeyLogin( $GLOBALS['wpdb'] );
+add_action( 'admin_post_nopriv_amsec_passkey_login_begin', array( $amsec_passkey_login, 'beginRequest' ) );
+add_action( 'admin_post_nopriv_amsec_passkey_login_finish', array( $amsec_passkey_login, 'finishRequest' ) );
