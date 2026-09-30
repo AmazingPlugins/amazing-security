@@ -6,7 +6,7 @@ namespace AmazingPlugins\Security\FileScan;
 
 final class BundledRulePack {
 	public function version(): string {
-		return '2026.09.30.1';
+		return '2026.09.30.2';
 	}
 
 	public function rules(): array {
@@ -70,6 +70,14 @@ final class BundledRulePack {
 			'AS-PHP-015' => array(
 				'pattern' => '/\x01INLINE_HIDDEN_LINK\x02/',
 				'summary' => 'Inline HTML contains a hidden link to an external site.',
+			),
+			'AS-PHP-016' => array(
+				'pattern' => '/\x01INDIRECT_EVAL\x02/',
+				'summary' => 'Request or cookie data is assigned to a variable immediately evaluated as PHP code.',
+			),
+			'AS-PHP-017' => array(
+				'pattern' => '/\x01REQUEST_CALLBACK\x02/',
+				'summary' => 'Request or cookie data selects a variable callback immediately invoked.',
 			),
 		);
 	}

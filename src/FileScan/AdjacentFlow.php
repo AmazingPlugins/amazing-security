@@ -16,7 +16,7 @@ final class AdjacentFlow {
 		}
 		$markers = array();
 		$count   = count( $items );
-		for ( $i = 1; $i < $count - 11; ++$i ) {
+		for ( $i = 1; $i < $count - 8; ++$i ) {
 			if ( T_VARIABLE !== $items[ $i ][1] || '=' !== $items[ $i + 1 ][2] || ( ! in_array( $items[ $i - 1 ][2], array( ';', '{', '}' ), true ) && T_OPEN_TAG !== $items[ $i - 1 ][1] ) ) {
 				continue;
 			}
@@ -24,6 +24,15 @@ final class AdjacentFlow {
 			$j    = $i + 2;
 			if ( self::request( $items, $j ) && ';' === ( $items[ $j + 4 ][2] ?? '' ) && T_STRING === ( $items[ $j + 5 ][1] ?? null ) && 'wp_redirect' === strtolower( $items[ $j + 5 ][2] ) && '(' === ( $items[ $j + 6 ][2] ?? '' ) && ( $items[ $j + 7 ][2] ?? '' ) === $name && in_array( $items[ $j + 8 ][2] ?? '', array( ')', ',' ), true ) ) {
 				$markers[ $items[ $i ][0] ] = "\x01INDIRECT_REDIRECT\x02";
+			}
+			if ( self::request( $items, $j ) && ';' === ( $items[ $j + 4 ][2] ?? '' ) ) {
+				$call = $j + 5;
+				if ( T_EVAL === ( $items[ $call ][1] ?? null ) && '(' === ( $items[ $call + 1 ][2] ?? '' ) && T_VARIABLE === ( $items[ $call + 2 ][1] ?? null ) && ( $items[ $call + 2 ][2] ?? '' ) === $name && ')' === ( $items[ $call + 3 ][2] ?? '' ) ) {
+					$markers[ $items[ $i ][0] ] = "\x01INDIRECT_EVAL\x02";
+				}
+				if ( T_VARIABLE === ( $items[ $call ][1] ?? null ) && ( $items[ $call ][2] ?? '' ) === $name && '(' === ( $items[ $call + 1 ][2] ?? '' ) && ! ( T_ELLIPSIS === ( $items[ $call + 2 ][1] ?? null ) && ')' === ( $items[ $call + 3 ][2] ?? '' ) ) ) {
+					$markers[ $items[ $i ][0] ] = "\x01REQUEST_CALLBACK\x02";
+				}
 			}
 			$literal = '';
 			$pieces  = 0;

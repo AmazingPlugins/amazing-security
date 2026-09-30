@@ -9,6 +9,10 @@ preview="$(cd "$(dirname "$preview")" && pwd)/$(basename "$preview")"
 for pair in 'amsec-next-wp wordpress 66' 'amsec-next-wp69 wordpress69 69'; do
  read -r site db tag <<< "$pair"
  wp() { docker run --rm --network amsec-next-net --volumes-from "$site" -e WORDPRESS_DB_HOST=amsec-next-db -e WORDPRESS_DB_USER=root -e WORDPRESS_DB_PASSWORD= -e WORDPRESS_DB_NAME="$db" --user 33:33 wordpress:cli wp "$@"; }
+ wp_fixture() {
+  local fixture="$1"; shift
+  docker run --rm --network amsec-next-net --volumes-from "$site" --mount "type=bind,source=$fixture,target=/tmp/amsec-feature-fixture.php,readonly" --mount "type=bind,source=$base/tests/Fixtures/FileScan/corpus.json,target=/tmp/amsec-rule-fixtures.json,readonly" -e WORDPRESS_DB_HOST=amsec-next-db -e WORDPRESS_DB_USER=root -e WORDPRESS_DB_PASSWORD= -e WORDPRESS_DB_NAME="$db" --user 33:33 wordpress:cli wp eval-file /tmp/amsec-feature-fixture.php "$@"
+ }
  backup=$(mktemp /private/tmp/amsec-activity-db.XXXXXX)
  docker exec amsec-next-db mysqldump -uroot "$db" > "$backup"
  # Record dependency directories that this task must remove after restoration.
@@ -16,7 +20,7 @@ for pair in 'amsec-next-wp wordpress 66' 'amsec-next-wp69 wordpress69 69'; do
  for slug in woocommerce contact-form-7 classic-editor; do
   if ! docker exec "$site" test -d "/var/www/html/wp-content/plugins/$slug"; then created+=("$slug"); fi
  done
- restore() { docker exec -i amsec-next-db mysql -uroot "$db" < "$backup"; rm -f "$backup"; for slug in "${created[@]}"; do docker exec "$site" rm -rf "/var/www/html/wp-content/plugins/$slug"; done; docker exec "$site" rm -f /var/www/html/wp-content/amsec-activity-test.php /var/www/html/wp-content/amsec-activity-preview.zip /var/www/html/wp-content/amsec-firstwrites.php /var/www/html/wp-content/amsec-sessions-test.php /var/www/html/wp-content/amsec-common-frontend.php /var/www/html/wp-content/amsec-incident-test.php /var/www/html/wp-content/amsec-permissions-test.php /var/www/html/wp-content/amsec-required-totp-test.php /var/www/html/wp-content/amsec-baseline-test.php /var/www/html/wp-content/amsec-bots-test.php /var/www/html/wp-content/amsec-digest-test.php; }
+ restore() { docker exec -i amsec-next-db mysql -uroot "$db" < "$backup"; rm -f "$backup"; for slug in "${created[@]}"; do docker exec "$site" rm -rf "/var/www/html/wp-content/plugins/$slug"; done; docker exec "$site" rm -f /var/www/html/wp-content/amsec-activity-test.php /var/www/html/wp-content/amsec-activity-preview.zip /var/www/html/wp-content/amsec-firstwrites.php /var/www/html/wp-content/amsec-sessions-test.php /var/www/html/wp-content/amsec-common-frontend.php /var/www/html/wp-content/amsec-incident-test.php /var/www/html/wp-content/amsec-permissions-test.php /var/www/html/wp-content/amsec-required-totp-test.php /var/www/html/wp-content/amsec-baseline-test.php /var/www/html/wp-content/amsec-bots-test.php /var/www/html/wp-content/amsec-digest-test.php /tmp/amsec-rule-fixtures.json /tmp/amsec-indirect-test.php /tmp/amsec-expanded-rule-corpus.php; }
  trap restore EXIT
  docker cp "$preview" "$site:/var/www/html/wp-content/amsec-activity-preview.zip"
  wp plugin install /var/www/html/wp-content/amsec-activity-preview.zip --force --activate
@@ -41,6 +45,8 @@ for pair in 'amsec-next-wp wordpress 66' 'amsec-next-wp69 wordpress69 69'; do
  wp eval-file /var/www/html/wp-content/amsec-bots-test.php --user=admin > "$evidence/bots-result$tag.log"
  docker cp "$base/tests/Integration/wordpress-digest.php" "$site:/var/www/html/wp-content/amsec-digest-test.php"
  wp eval-file /var/www/html/wp-content/amsec-digest-test.php --user=admin > "$evidence/digest-result$tag.log"
+ wp_fixture "$base/tests/Integration/wordpress-indirect-detection.php" --user=admin > "$evidence/indirect-result$tag.json"
+ wp_fixture "$base/tests/Integration/wordpress-expanded-rule-corpus.php" --user=admin > "$evidence/expanded-corpus$tag.json"
  wp eval-file /var/www/html/wp-content/amsec-activity-test.php --user=admin > "$evidence/activity-result$tag.json"
  # Real plugin lifecycle calls run in separate WordPress processes.
  wp plugin deactivate classic-editor

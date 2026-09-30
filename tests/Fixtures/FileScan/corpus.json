@@ -525,15 +525,19 @@
     },
     {
       "name": "indirect-call",
-      "kind": "known-gap",
+      "kind": "suspected",
       "code": "<?php $f=$_POST['callback']; $f();",
-      "expected": []
+      "expected": [
+        "AS-PHP-017"
+      ]
     },
     {
       "name": "indirect-eval",
-      "kind": "known-gap",
+      "kind": "suspected",
       "code": "<?php $x=$_POST['code']; eval($x);",
-      "expected": []
+      "expected": [
+        "AS-PHP-016"
+      ]
     },
     {
       "name": "inline-html-spam",
@@ -802,6 +806,163 @@
       "kind": "benign",
       "code": "<a href=\"https://example.invalid\" style=\"color:red\" title=\"display:none\">x</a>",
       "expected": []
+    },
+    {
+      "name": "cookie-assigned-eval",
+      "kind": "suspected",
+      "code": "<?php $x=$_COOKIE['code']; eval($x);",
+      "expected": [
+        "AS-PHP-016"
+      ],
+      "provenance": "Original inert authored regression for adjacent indirect execution; not a collected malware specimen."
+    },
+    {
+      "name": "get-assigned-callback",
+      "kind": "suspected",
+      "code": "<?php $f=$_GET['callback']; $f('fixture');",
+      "expected": [
+        "AS-PHP-017"
+      ],
+      "provenance": "Original inert authored regression for adjacent indirect execution; not a collected malware specimen."
+    },
+    {
+      "name": "comment-separated-eval",
+      "kind": "suspected",
+      "code": "<?php $x = $_REQUEST['code']; /* fixture only */ eval ( $x );",
+      "expected": [
+        "AS-PHP-016"
+      ],
+      "provenance": "Original inert authored regression for adjacent indirect execution; not a collected malware specimen."
+    },
+    {
+      "name": "comment-separated-callback",
+      "kind": "suspected",
+      "code": "<?php $f = $_COOKIE['callback']; // fixture\n$f();",
+      "expected": [
+        "AS-PHP-017"
+      ],
+      "provenance": "Original inert authored regression for adjacent indirect execution; not a collected malware specimen."
+    },
+    {
+      "name": "validated-eval-gap",
+      "kind": "known-gap",
+      "code": "<?php $x=$_POST['code']; if (allowed($x)) { eval($x); }",
+      "expected": [],
+      "provenance": "Original inert authored regression for adjacent indirect execution; not a collected malware specimen."
+    },
+    {
+      "name": "reassigned-eval",
+      "kind": "benign",
+      "code": "<?php $x=$_POST['code']; $x='echo 1;'; eval($x);",
+      "expected": [],
+      "provenance": "Original inert authored regression for adjacent indirect execution; not a collected malware specimen."
+    },
+    {
+      "name": "reassigned-callback",
+      "kind": "benign",
+      "code": "<?php $f=$_POST['callback']; $f='trim'; $f(' fixture ');",
+      "expected": [],
+      "provenance": "Original inert authored regression for adjacent indirect execution; not a collected malware specimen."
+    },
+    {
+      "name": "allowlisted-callback",
+      "kind": "benign",
+      "code": "<?php $f=$allowed[$_POST['callback']]; $f();",
+      "expected": [],
+      "provenance": "Original inert authored regression for adjacent indirect execution; not a collected malware specimen."
+    },
+    {
+      "name": "different-variable-eval",
+      "kind": "benign",
+      "code": "<?php $x=$_POST['code']; eval($trusted);",
+      "expected": [],
+      "provenance": "Original inert authored regression for adjacent indirect execution; not a collected malware specimen."
+    },
+    {
+      "name": "different-variable-callback",
+      "kind": "benign",
+      "code": "<?php $f=$_POST['callback']; $trusted();",
+      "expected": [],
+      "provenance": "Original inert authored regression for adjacent indirect execution; not a collected malware specimen."
+    },
+    {
+      "name": "object-eval",
+      "kind": "benign",
+      "code": "<?php $x=$_POST['code']; $obj->eval($x);",
+      "expected": [],
+      "provenance": "Original inert authored regression for adjacent indirect execution; not a collected malware specimen."
+    },
+    {
+      "name": "static-eval",
+      "kind": "benign",
+      "code": "<?php $x=$_POST['code']; Safe::eval($x);",
+      "expected": [],
+      "provenance": "Original inert authored regression for adjacent indirect execution; not a collected malware specimen."
+    },
+    {
+      "name": "indirect-in-string",
+      "kind": "benign",
+      "code": "<?php $example = '$x=$_POST[\"code\"]; eval($x);';",
+      "expected": [],
+      "provenance": "Original inert authored regression for adjacent indirect execution; not a collected malware specimen."
+    },
+    {
+      "name": "dynamic-index-eval-gap",
+      "kind": "known-gap",
+      "code": "<?php $x=$_POST[$key]; eval($x);",
+      "expected": [],
+      "provenance": "Original inert authored regression for adjacent indirect execution; not a collected malware specimen."
+    },
+    {
+      "name": "eval-concat-gap",
+      "kind": "known-gap",
+      "code": "<?php $x=$_POST['code']; eval($x.';');",
+      "expected": [],
+      "provenance": "Original inert authored regression for adjacent indirect execution; not a collected malware specimen."
+    },
+    {
+      "name": "nested-assignment-callback-gap",
+      "kind": "known-gap",
+      "code": "<?php $result=($f=$_POST['callback']); $f();",
+      "expected": [],
+      "provenance": "Original inert authored regression for adjacent indirect execution; not a collected malware specimen."
+    },
+    {
+      "name": "literal-data-eval",
+      "kind": "benign",
+      "code": "<?php $x='echo 1;'; eval($x);",
+      "expected": [],
+      "provenance": "Original inert authored regression for adjacent indirect execution; not a collected malware specimen."
+    },
+    {
+      "name": "callback-comment-only",
+      "kind": "benign",
+      "code": "<?php /* $f=$_POST['callback']; $f(); */ echo 'fixture';",
+      "expected": [],
+      "provenance": "Original inert authored regression for adjacent indirect execution; not a collected malware specimen."
+    },
+    {
+      "name": "first-class-callback",
+      "kind": "benign",
+      "code": "<?php $f=$_POST['callback']; $f(...);",
+      "expected": [],
+      "provenance": "Original inert PHP 8.1 first-class callable counterexample from independent review; never execute."
+    },
+    {
+      "name": "comment-first-class-callback",
+      "kind": "benign",
+      "code": "<?php $f=$_POST['callback']; $f(/* acquire only */ ... /* no invocation */);",
+      "expected": [],
+      "provenance": "Original inert PHP 8.1 first-class callable counterexample from independent review; never execute."
+    },
+    {
+      "name": "unpacked-invoked-callback",
+      "kind": "suspected",
+      "code": "<?php $f=$_POST['callback']; $f(...$args);",
+      "expected": [
+        "AS-PHP-017"
+      ],
+      "provenance": "Original inert PHP 8.1 first-class callable counterexample from independent review; never execute."
     }
   ]
 }
