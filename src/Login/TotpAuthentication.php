@@ -23,21 +23,35 @@ final class TotpAuthentication {
 			}
 			// Login forms use WordPress authentication instead of a plugin admin nonce.
 			// phpcs:ignore WordPress.Security.NonceVerification.Missing
-			$factor    = isset( $_POST['amsec_otp'] ) && is_string( $_POST['amsec_otp'] ) ? sanitize_text_field( wp_unslash( $_POST['amsec_otp'] ) ) : '';
-			$encrypted = $this->store->encryptedSecret( $user->ID );
-			$seed      = null === $encrypted ? null : $this->cipher->decrypt( $encrypted );
-			if ( null !== $seed ) {
-				$step = $this->totp->verify( $seed, $factor, time(), $this->store->lastStep( $user->ID ) );
-				if ( null !== $step && $this->store->consumeStep( $user->ID, $step ) ) {
-					return $user;
-				}
-			}
-			if ( $this->store->consumeRecoveryCode( $user->ID, $factor ) ) {
+			$factor = isset( $_POST['amsec_otp'] ) && is_string( $_POST['amsec_otp'] ) ? sanitize_text_field( wp_unslash( $_POST['amsec_otp'] ) ) : '';
+			if ( $this->verifyFactor( $user->ID, $factor, time() ) ) {
 				return $user;
 			}
 		} catch ( RuntimeException ) {
 			return new \WP_Error( 'amsec_verification_failed', __( 'Verification could not be completed.', 'amazing-security' ) );
 		}
 		return new \WP_Error( 'amsec_verification_failed', __( 'Verification could not be completed.', 'amazing-security' ) );
+	}
+	/** Shared one-use verification for password and passkey flows. */
+	public function verifyFactor( int $userId, string $factor, int $now ): bool {
+		if ( $userId < 1 || $now < 0 || strlen( $factor ) > 128 ) {
+			return false;
+		}
+		try {
+			if ( ! $this->store->isEnrolled( $userId ) ) {
+				return false;
+			}
+			$encrypted = $this->store->encryptedSecret( $userId );
+			$seed      = null === $encrypted ? null : $this->cipher->decrypt( $encrypted );
+			if ( null !== $seed ) {
+				$step = $this->totp->verify( $seed, $factor, $now, $this->store->lastStep( $userId ) );
+				if ( null !== $step && $this->store->consumeStep( $userId, $step ) ) {
+					return true;
+				}
+			}
+			return $this->store->consumeRecoveryCode( $userId, $factor );
+		} catch ( RuntimeException ) {
+			return false;
+		}
 	}
 }

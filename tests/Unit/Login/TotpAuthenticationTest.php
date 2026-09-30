@@ -60,16 +60,24 @@ namespace AmazingPlugins\Security\Tests\Unit\Login {
 			self::assertFalse( TotpAuthentication::isApiRequest( false, false, false ) );
 		}
 
+		public function test_shared_factor_verification_preserves_one_use_steps_recovery_and_failures(): void {
+			$seed = random_bytes(20);$cipher = new SecretCipher(str_repeat('s',64));$store = $this->store($cipher->encrypt($seed));$auth = new TotpAuthentication($store,$cipher,new Totp());$now = 1800000000;
+			self::assertFalse($auth->verifyFactor(8,'123456',$now));self::assertFalse($auth->verifyFactor(7,'wrong',$now));$code = (new Totp())->atStep($seed,intdiv($now,30));self::assertTrue($auth->verifyFactor(7,$code,$now));self::assertFalse($auth->verifyFactor(7,$code,$now));
+			$store->recovery = bin2hex(random_bytes(12));$recovery = $store->recovery;self::assertTrue($auth->verifyFactor(7,$recovery,$now));self::assertFalse($auth->verifyFactor(7,$recovery,$now));self::assertFalse($auth->verifyFactor(7,str_repeat('x',129),$now));$store->broken = true;self::assertFalse($auth->verifyFactor(7,$code,$now));
+		}
+
 		private function store( string $encrypted ): TotpStore {
 			return new class( $encrypted ) implements TotpStore {
 				public int $last = -1;
+				public string $recovery = '';
+				public bool $broken = false;
 				public function __construct( private string $encrypted ) {}
 				public function enroll( int $userId, string $encryptedSecret, array $recoveryHashes ): bool { return false; }
-				public function isEnrolled( int $userId ): bool { return 7 === $userId; }
+				public function isEnrolled( int $userId ): bool { if($this->broken)throw new \RuntimeException('Unavailable');return 7 === $userId; }
 				public function encryptedSecret( int $userId ): ?string { return $this->encrypted; }
 				public function lastStep( int $userId ): ?int { return $this->last; }
 				public function consumeStep( int $userId, int $step ): bool { if ( $step <= $this->last ) { return false; } $this->last = $step; return true; }
-				public function consumeRecoveryCode( int $userId, string $code ): bool { return false; }
+				public function consumeRecoveryCode( int $userId, string $code ): bool { if($this->recovery!==''&&$code===$this->recovery){$this->recovery='';return true;}return false; }
 				public function replaceRecoveryCodes( int $userId, array $hashes ): bool { return false; }
 				public function disable( int $userId ): bool { return false; }
 			};
