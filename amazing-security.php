@@ -263,5 +263,7 @@ add_action( 'admin_post_amsec_digest_settings', array( new AmazingPlugins\Securi
 add_action( 'admin_menu', array( new AmazingPlugins\Security\Content\ContentPage(), 'register' ) );
 add_action( 'admin_menu', array( new AmazingPlugins\Security\Rules\RulePage(), 'register' ) );
 add_action( 'admin_menu', array( new AmazingPlugins\Security\Repository\DirectoryPage(), 'register' ) );
+add_action( 'admin_menu', array( new AmazingPlugins\Security\Exposure\ExposurePage(), 'register' ) );
+add_action( 'admin_post_amsec_exposure_inventory', array( new AmazingPlugins\Security\Exposure\ExposureAction(), 'handle' ) );
 add_action( 'admin_post_amsec_repository_lookup', array( new AmazingPlugins\Security\Repository\DirectoryAction(), 'handle' ) );
 add_action( 'admin_post_amsec_content_scan', array( new AmazingPlugins\Security\Content\ContentAction(), 'handle' ) );

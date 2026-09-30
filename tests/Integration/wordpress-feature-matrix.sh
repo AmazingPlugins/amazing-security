@@ -48,6 +48,7 @@ for pair in 'amsec-next-wp wordpress 66' 'amsec-next-wp69 wordpress69 69'; do
  wp_fixture "$base/tests/Integration/wordpress-content.php" --user=admin > "$evidence/content-result$tag.log"
  wp_fixture "$base/tests/Integration/wordpress-rules.php" --user=admin > "$evidence/rules-result$tag.log"
  wp_fixture "$base/tests/Integration/wordpress-repository.php" --user=admin > "$evidence/repository-result$tag.log"
+ wp_fixture "$base/tests/Integration/wordpress-exposure.php" --user=admin > "$evidence/exposure-result$tag.log"
  wp_fixture "$base/tests/Integration/wordpress-indirect-detection.php" --user=admin > "$evidence/indirect-result$tag.json"
  wp_fixture "$base/tests/Integration/wordpress-expanded-rule-corpus.php" --user=admin > "$evidence/expanded-corpus$tag.json"
  wp eval-file /var/www/html/wp-content/amsec-activity-test.php --user=admin > "$evidence/activity-result$tag.json"
