@@ -198,3 +198,13 @@ add_action( 'admin_menu', array( new AmazingPlugins\Security\Activity\ActivityPa
 
 add_action( 'admin_menu', array( new AmazingPlugins\Security\Sessions\SessionPage(), 'register' ) );
 add_action( 'admin_post_amsec_sessions_revoke', array( new AmazingPlugins\Security\Sessions\SessionAction(), 'handle' ) );
+
+$amsec_reset = new AmazingPlugins\Security\Incident\ResetRequirement();
+add_filter( 'authenticate', array( $amsec_reset, 'authenticate' ), 28, 3 );
+add_action( 'after_password_reset', array( $amsec_reset, 'passwordReset' ), 10, 1 );
+add_action( 'profile_update', array( $amsec_reset, 'profileUpdated' ), 10, 2 );
+add_action( 'admin_menu', array( new AmazingPlugins\Security\Incident\IncidentPage(), 'register' ) );
+add_action( 'admin_post_amsec_incident_reset', array( new AmazingPlugins\Security\Incident\IncidentAction(), 'handle' ) );
+if ( defined( 'WP_CLI' ) && WP_CLI ) {
+	\WP_CLI::add_command( 'amazing-security accounts clear-reset', array( $amsec_reset, 'recovery' ) );
+}

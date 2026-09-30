@@ -19,7 +19,7 @@ delete_option( 'amsec_login_schema_version' );
 delete_option( 'amsec_fix_schema_version' );
 
 // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Uninstall removes plugin records once; caching has no value.
-$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->usermeta} WHERE meta_key IN (%s, %s)", 'amsec_totp_v1', 'amsec_totp_recovery_at' ) );
+$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->usermeta} WHERE meta_key IN (%s, %s, %s)", 'amsec_totp_v1', 'amsec_totp_recovery_at', 'amsec_password_reset_required' ) );
 
 $amsec_pending_pattern = $wpdb->esc_like( '_transient_amsec_totp_pending_' ) . '%';
 $amsec_timeout_pattern = $wpdb->esc_like( '_transient_timeout_amsec_totp_pending_' ) . '%';
