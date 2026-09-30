@@ -261,4 +261,5 @@ add_action( 'admin_menu', array( new AmazingPlugins\Security\Digest\DigestSettin
 add_action( 'admin_post_amsec_digest_settings', array( new AmazingPlugins\Security\Digest\DigestSettings(), 'handle' ) );
 
 add_action( 'admin_menu', array( new AmazingPlugins\Security\Content\ContentPage(), 'register' ) );
+add_action( 'admin_menu', array( new AmazingPlugins\Security\Rules\RulePage(), 'register' ) );
 add_action( 'admin_post_amsec_content_scan', array( new AmazingPlugins\Security\Content\ContentAction(), 'handle' ) );

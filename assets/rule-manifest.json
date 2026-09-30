@@ -1,0 +1,57 @@
+{
+    "schema": 1,
+    "packs": {
+        "files": {
+            "version": "2026.09.30.2",
+            "reviewed_at": "2026-09-30",
+            "ids": [
+                "AS-PHP-001",
+                "AS-PHP-002",
+                "AS-PHP-003",
+                "AS-PHP-004",
+                "AS-PHP-005",
+                "AS-PHP-006",
+                "AS-PHP-007",
+                "AS-PHP-008",
+                "AS-PHP-009",
+                "AS-PHP-010",
+                "AS-PHP-011",
+                "AS-PHP-012",
+                "AS-PHP-013",
+                "AS-PHP-014",
+                "AS-PHP-015",
+                "AS-PHP-016",
+                "AS-PHP-017"
+            ],
+            "sha256": {
+                "src/FileScan/BundledRulePack.php": "ceaa78a60a16c9f782cab2797f1fdd43f4c9c7170033a470def9dbb73c395e46",
+                "src/FileScan/RuleMatcher.php": "169aac02508bb55ff868d1fd2a82256c95b0c866ad47b08eb173d01d8cf30b01",
+                "src/FileScan/AdjacentFlow.php": "12308f254a259ee515fd370cc6fd3842350a1ff691b9f49479b2aee4fb2dfa3c"
+            }
+        },
+        "content": {
+            "version": "2026.09.30.1",
+            "reviewed_at": "2026-09-30",
+            "ids": [
+                "AS-HTML-001",
+                "AS-HTML-002",
+                "AS-HTML-003",
+                "AS-JS-001"
+            ],
+            "sha256": {
+                "src/Content/MarkupDetector.php": "e68f991d5ab9b50104734a03a79bc66129776e4dbee1470883b99ee075f336b9"
+            }
+        },
+        "requests": {
+            "version": "2026.09.29.1",
+            "reviewed_at": "2026-09-30",
+            "ids": [
+                "AS-REST-001",
+                "AS-REST-002"
+            ],
+            "sha256": {
+                "src/Firewall/BundledRequestRules.php": "6ab0a7a9c92d5d3c6b9f0c8699518beeb54ad47a99a90e652f75d4d3dac84f6a"
+            }
+        }
+    }
+}

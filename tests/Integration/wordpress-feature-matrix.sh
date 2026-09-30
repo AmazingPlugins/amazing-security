@@ -46,6 +46,7 @@ for pair in 'amsec-next-wp wordpress 66' 'amsec-next-wp69 wordpress69 69'; do
  docker cp "$base/tests/Integration/wordpress-digest.php" "$site:/var/www/html/wp-content/amsec-digest-test.php"
  wp eval-file /var/www/html/wp-content/amsec-digest-test.php --user=admin > "$evidence/digest-result$tag.log"
  wp_fixture "$base/tests/Integration/wordpress-content.php" --user=admin > "$evidence/content-result$tag.log"
+ wp_fixture "$base/tests/Integration/wordpress-rules.php" --user=admin > "$evidence/rules-result$tag.log"
  wp_fixture "$base/tests/Integration/wordpress-indirect-detection.php" --user=admin > "$evidence/indirect-result$tag.json"
  wp_fixture "$base/tests/Integration/wordpress-expanded-rule-corpus.php" --user=admin > "$evidence/expanded-corpus$tag.json"
  wp eval-file /var/www/html/wp-content/amsec-activity-test.php --user=admin > "$evidence/activity-result$tag.json"
