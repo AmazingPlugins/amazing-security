@@ -317,3 +317,50 @@ add_action( 'admin_menu', array( new AmazingPlugins\Security\Proxy\ProxySettings
 add_action( 'admin_post_amsec_proxy_settings', array( new AmazingPlugins\Security\Proxy\ProxySettings(), 'handle' ) );
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
 	WP_CLI::add_command( 'amazing-security proxies disable', array( new AmazingPlugins\Security\Proxy\ProxySettings(), 'recovery' ) ); }
+
+register_activation_hook( __FILE__, array( AmazingPlugins\Security\Passkeys\PasskeyTables::class, 'install' ) );
+add_action(
+	'admin_init',
+	static function (): void {
+		if ( current_user_can( 'manage_options' ) && '1' !== get_option( 'amsec_passkey_schema_version' ) ) {
+			AmazingPlugins\Security\Passkeys\PasskeyTables::install();
+		}
+	}
+);
+add_action(
+	'init',
+	static function (): void {
+		if ( '1' === get_option( 'amsec_passkey_schema_version' ) ) {
+			AmazingPlugins\Security\Passkeys\PasskeyTables::ensureScheduled();
+		}
+	}
+);
+add_action(
+	'amsec_passkey_cleanup',
+	static function (): void {
+		( new AmazingPlugins\Security\Passkeys\PasskeyRepository( $GLOBALS['wpdb'] ) )->cleanup( time() );
+	}
+);
+register_deactivation_hook(
+	__FILE__,
+	static function (): void {
+		wp_clear_scheduled_hook( 'amsec_passkey_cleanup' );
+	}
+);
+add_action(
+	'delete_user',
+	static function ( int $id ): void {
+		( new AmazingPlugins\Security\Passkeys\PasskeyRepository( $GLOBALS['wpdb'] ) )->revokeUser( $id );
+	}
+);
+$amsec_passkey_settings = new AmazingPlugins\Security\Passkeys\PasskeySettings();
+add_action( 'admin_menu', array( $amsec_passkey_settings, 'register' ) );
+add_action( 'admin_post_amsec_passkey_settings', array( $amsec_passkey_settings, 'handle' ) );
+$amsec_passkey_actions = new AmazingPlugins\Security\Passkeys\PasskeyActions( $GLOBALS['wpdb'] );
+add_action( 'admin_post_amsec_passkey_enroll_begin', array( $amsec_passkey_actions, 'beginRequest' ) );
+add_action( 'admin_post_amsec_passkey_enroll_finish', array( $amsec_passkey_actions, 'finishRequest' ) );
+add_action( 'admin_post_amsec_passkey_remove', array( $amsec_passkey_actions, 'removeRequest' ) );
+if ( defined( 'WP_CLI' ) && WP_CLI ) {
+	WP_CLI::add_command( 'amazing-security passkeys disable', array( $amsec_passkey_settings, 'recoveryDisable' ) );
+	WP_CLI::add_command( 'amazing-security passkeys revoke', array( $amsec_passkey_settings, 'recoveryRevoke' ) );
+}

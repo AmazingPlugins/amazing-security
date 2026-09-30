@@ -11,18 +11,23 @@ for pair in 'amsec-next-wp wordpress 66' 'amsec-next-wp69 wordpress69 69'; do
  wp() { docker run --rm --network amsec-next-net --volumes-from "$site" -e WORDPRESS_DB_HOST=amsec-next-db -e WORDPRESS_DB_USER=root -e WORDPRESS_DB_PASSWORD= -e WORDPRESS_DB_NAME="$db" --user 33:33 wordpress:cli wp "$@"; }
  wp_fixture() {
   local fixture="$1"; shift
-  docker run --rm --network amsec-next-net --volumes-from "$site" --mount "type=bind,source=$fixture,target=/tmp/amsec-feature-fixture.php,readonly" --mount "type=bind,source=$base/tests/Fixtures/FileScan/corpus.json,target=/tmp/amsec-rule-fixtures.json,readonly" -e WORDPRESS_DB_HOST=amsec-next-db -e WORDPRESS_DB_USER=root -e WORDPRESS_DB_PASSWORD= -e WORDPRESS_DB_NAME="$db" --user 33:33 wordpress:cli wp eval-file /tmp/amsec-feature-fixture.php "$@"
+  docker run --rm --network amsec-next-net --volumes-from "$site" --mount "type=bind,source=$fixture,target=/tmp/amsec-feature-fixture.php,readonly" --mount "type=bind,source=$base/tests/Fixtures/FileScan/corpus.json,target=/tmp/amsec-rule-fixtures.json,readonly" -e WORDPRESS_DB_HOST=amsec-next-db -e WORDPRESS_DB_USER=root -e WORDPRESS_DB_PASSWORD= -e WORDPRESS_DB_NAME="$db" -e AMSEC_FIXTURE_DB_BACKUP=1 --user 33:33 wordpress:cli wp eval-file /tmp/amsec-feature-fixture.php "$@"
  }
  if docker exec "$site" test -e /var/www/html/wp-content/mu-plugins/amsec-proxy-peer-fixture.php; then echo "Refusing pre-existing proxy peer fixture." >&2; exit 1; fi
+ if [[ "$(wp eval 'echo $GLOBALS["wpdb"]->prefix;')" != wp_ ]]; then echo "Unexpected dummy-site table prefix." >&2; exit 1; fi
  backup=$(mktemp /private/tmp/amsec-activity-db.XXXXXX)
  docker exec amsec-next-db mysqldump -uroot "$db" > "$backup"
+ created_passkey_tables=()
+ for table in wp_amsec_passkey_credentials wp_amsec_passkey_pending; do
+  if [[ "$(docker exec amsec-next-db mysql -uroot "$db" -N -e "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='$db' AND table_name='$table';")" == 0 ]]; then created_passkey_tables+=("$table"); fi
+ done
  # Record dependency directories that this task must remove after restoration.
  remoteip_was_enabled=0
  created=()
  for slug in woocommerce contact-form-7 classic-editor; do
   if ! docker exec "$site" test -d "/var/www/html/wp-content/plugins/$slug"; then created+=("$slug"); fi
  done
- restore() { if [[ "$remoteip_was_enabled" == 1 ]]; then docker exec "$site" a2enconf remoteip >/dev/null; docker exec "$site" apache2ctl graceful; remoteip_was_enabled=0; fi; docker exec -i amsec-next-db mysql -uroot "$db" < "$backup"; rm -f "$backup"; for slug in "${created[@]}"; do docker exec "$site" rm -rf "/var/www/html/wp-content/plugins/$slug"; done; docker exec "$site" rm -f /var/www/html/wp-content/mu-plugins/amsec-proxy-peer-fixture.php /var/www/html/wp-content/amsec-activity-test.php /var/www/html/wp-content/amsec-activity-preview.zip /var/www/html/wp-content/amsec-firstwrites.php /var/www/html/wp-content/amsec-sessions-test.php /var/www/html/wp-content/amsec-common-frontend.php /var/www/html/wp-content/amsec-incident-test.php /var/www/html/wp-content/amsec-permissions-test.php /var/www/html/wp-content/amsec-required-totp-test.php /var/www/html/wp-content/amsec-baseline-test.php /var/www/html/wp-content/amsec-bots-test.php /var/www/html/wp-content/amsec-digest-test.php /tmp/amsec-rule-fixtures.json /tmp/amsec-indirect-test.php /tmp/amsec-expanded-rule-corpus.php; }
+ restore() { if [[ "$remoteip_was_enabled" == 1 ]]; then docker exec "$site" a2enconf remoteip >/dev/null; docker exec "$site" apache2ctl graceful; remoteip_was_enabled=0; fi; docker exec -i amsec-next-db mysql -uroot "$db" < "$backup"; rm -f "$backup"; for table in "${created_passkey_tables[@]}"; do docker exec amsec-next-db mysql -uroot "$db" -e "DROP TABLE IF EXISTS $table;"; done; for slug in "${created[@]}"; do docker exec "$site" rm -rf "/var/www/html/wp-content/plugins/$slug"; done; docker exec "$site" rm -f /var/www/html/wp-content/mu-plugins/amsec-proxy-peer-fixture.php /var/www/html/wp-content/amsec-activity-test.php /var/www/html/wp-content/amsec-activity-preview.zip /var/www/html/wp-content/amsec-firstwrites.php /var/www/html/wp-content/amsec-sessions-test.php /var/www/html/wp-content/amsec-common-frontend.php /var/www/html/wp-content/amsec-incident-test.php /var/www/html/wp-content/amsec-permissions-test.php /var/www/html/wp-content/amsec-required-totp-test.php /var/www/html/wp-content/amsec-baseline-test.php /var/www/html/wp-content/amsec-bots-test.php /var/www/html/wp-content/amsec-digest-test.php /tmp/amsec-rule-fixtures.json /tmp/amsec-indirect-test.php /tmp/amsec-expanded-rule-corpus.php; }
  trap restore EXIT
  # Direct-address acceptance requires Apache not rewriting PHP REMOTE_ADDR from caller-supplied headers.
  if docker exec "$site" test -e /etc/apache2/conf-enabled/remoteip.conf; then
@@ -64,6 +69,9 @@ for pair in 'amsec-next-wp wordpress 66' 'amsec-next-wp69 wordpress69 69'; do
  wp_fixture "$base/tests/Integration/wordpress-traffic.php" --user=admin > "$evidence/traffic-result$tag.log"
  wp_fixture "$base/tests/Integration/wordpress-proxies.php" --user=admin > "$evidence/proxies-result$tag.log"
  wp_fixture "$base/tests/Integration/wordpress-passkey-storage.php" --user=admin > "$evidence/passkey-storage-result$tag.log"
+ wp_fixture "$base/tests/Integration/wordpress-passkey-account.php" --user=admin > "$evidence/passkey-account-result$tag.log"
+ wp_fixture "$base/tests/Integration/wordpress-passkey-actions.php" --user=admin > "$evidence/passkey-actions-result$tag.log"
+ wp_fixture "$base/tests/Integration/wordpress-passkey-settings.php" --user=admin > "$evidence/passkey-settings-result$tag.log"
  wp_fixture "$base/tests/Integration/wordpress-indirect-detection.php" --user=admin > "$evidence/indirect-result$tag.json"
  wp_fixture "$base/tests/Integration/wordpress-expanded-rule-corpus.php" --user=admin > "$evidence/expanded-corpus$tag.json"
  wp eval-file /var/www/html/wp-content/amsec-activity-test.php --user=admin > "$evidence/activity-result$tag.json"
@@ -90,6 +98,7 @@ result=Path(sys.argv[1]).read_text()
 assert not re.search(r'\t(?:ERROR|WARNING)\t',result), 'Plugin Check reported issues despite a successful process exit'
 assert 'Success: Checks complete. No errors found.' in result, 'Plugin Check success marker missing'
 PYCHECK
+ wp_fixture "$base/tests/Integration/wordpress-passkey-lifecycle.php" --user=admin > "$evidence/passkey-lifecycle-result$tag.log"
  docker exec "$site" sh -c 'find /var/www/html/wp-content/plugins/amazing-security -name "*.php" -exec php -l {} \;' > "$evidence/php-lint$tag.log"
  restore
  trap - EXIT

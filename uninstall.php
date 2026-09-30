@@ -79,3 +79,13 @@ wp_clear_scheduled_hook( 'amsec_traffic_cleanup' );
 $wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %i', $wpdb->prefix . 'amsec_traffic' ) );
 
 delete_option( 'amsec_proxy_policy' );
+
+delete_option( 'amsec_passkey_policy' );
+delete_option( 'amsec_passkey_schema_version' );
+wp_clear_scheduled_hook( 'amsec_passkey_cleanup' );
+// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Explicit erase preference removes only feature-owned public keys and pending operations.
+$wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %i', $wpdb->prefix . 'amsec_passkey_credentials' ) );
+// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Explicit erase preference removes only feature-owned pending operations.
+$wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %i', $wpdb->prefix . 'amsec_passkey_pending' ) );
+// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Explicit erase preference removes only opaque feature-owned account handles.
+$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->usermeta} WHERE meta_key=%s", 'amsec_passkey_handle' ) );
