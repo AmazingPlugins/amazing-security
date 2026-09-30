@@ -220,3 +220,35 @@ if ( defined( 'WP_CLI' ) && WP_CLI ) {
 
 add_action( 'admin_menu', array( new AmazingPlugins\Security\Baseline\BaselinePage(), 'register' ) );
 add_action( 'admin_post_amsec_baseline', array( new AmazingPlugins\Security\Baseline\BaselineAction(), 'handle' ) );
+
+register_activation_hook( __FILE__, array( AmazingPlugins\Security\Bots\BotCounterStore::class, 'install' ) );
+register_deactivation_hook(
+	__FILE__,
+	static function (): void {
+		wp_clear_scheduled_hook( 'amsec_bot_cleanup' );
+	}
+);
+add_action( 'init', array( AmazingPlugins\Security\Bots\BotCounterStore::class, 'ensureScheduled' ) );
+add_action(
+	'admin_init',
+	static function (): void {
+		if ( '1' !== get_option( 'amsec_bot_schema_version' ) ) {
+			AmazingPlugins\Security\Bots\BotCounterStore::install(); }
+	}
+);
+add_action(
+	'amsec_bot_cleanup',
+	static function (): void {
+		( new AmazingPlugins\Security\Bots\BotCounterStore( $GLOBALS['wpdb'] ) )->cleanup( time() );
+	}
+);
+$amsec_bots = new AmazingPlugins\Security\Bots\BotHooks();
+add_action( 'comment_form_after_fields', array( $amsec_bots, 'fields' ) );
+add_action( 'register_form', array( $amsec_bots, 'fields' ) );
+add_filter( 'preprocess_comment', array( $amsec_bots, 'comment' ) );
+add_filter( 'registration_errors', array( $amsec_bots, 'registration' ), 20, 1 );
+add_action( 'admin_menu', array( new AmazingPlugins\Security\Bots\BotSettings(), 'register' ) );
+add_action( 'admin_post_amsec_bot_settings', array( new AmazingPlugins\Security\Bots\BotSettings(), 'handle' ) );
+if ( defined( 'WP_CLI' ) && WP_CLI ) {
+	\WP_CLI::add_command( 'amazing-security bots disable', array( new AmazingPlugins\Security\Bots\BotSettings(), 'recovery' ) );
+}

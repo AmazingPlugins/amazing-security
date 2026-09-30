@@ -16,7 +16,7 @@ for pair in 'amsec-next-wp wordpress 66' 'amsec-next-wp69 wordpress69 69'; do
  for slug in woocommerce contact-form-7 classic-editor; do
   if ! docker exec "$site" test -d "/var/www/html/wp-content/plugins/$slug"; then created+=("$slug"); fi
  done
- restore() { docker exec -i amsec-next-db mysql -uroot "$db" < "$backup"; rm -f "$backup"; for slug in "${created[@]}"; do docker exec "$site" rm -rf "/var/www/html/wp-content/plugins/$slug"; done; docker exec "$site" rm -f /var/www/html/wp-content/amsec-activity-test.php /var/www/html/wp-content/amsec-activity-preview.zip /var/www/html/wp-content/amsec-firstwrites.php /var/www/html/wp-content/amsec-sessions-test.php /var/www/html/wp-content/amsec-common-frontend.php /var/www/html/wp-content/amsec-incident-test.php /var/www/html/wp-content/amsec-permissions-test.php /var/www/html/wp-content/amsec-required-totp-test.php /var/www/html/wp-content/amsec-baseline-test.php; }
+ restore() { docker exec -i amsec-next-db mysql -uroot "$db" < "$backup"; rm -f "$backup"; for slug in "${created[@]}"; do docker exec "$site" rm -rf "/var/www/html/wp-content/plugins/$slug"; done; docker exec "$site" rm -f /var/www/html/wp-content/amsec-activity-test.php /var/www/html/wp-content/amsec-activity-preview.zip /var/www/html/wp-content/amsec-firstwrites.php /var/www/html/wp-content/amsec-sessions-test.php /var/www/html/wp-content/amsec-common-frontend.php /var/www/html/wp-content/amsec-incident-test.php /var/www/html/wp-content/amsec-permissions-test.php /var/www/html/wp-content/amsec-required-totp-test.php /var/www/html/wp-content/amsec-baseline-test.php /var/www/html/wp-content/amsec-bots-test.php; }
  trap restore EXIT
  docker cp "$preview" "$site:/var/www/html/wp-content/amsec-activity-preview.zip"
  wp plugin install /var/www/html/wp-content/amsec-activity-preview.zip --force --activate
@@ -37,6 +37,8 @@ for pair in 'amsec-next-wp wordpress 66' 'amsec-next-wp69 wordpress69 69'; do
  wp eval-file /var/www/html/wp-content/amsec-required-totp-test.php --user=admin > "$evidence/required-totp-result$tag.log"
  docker cp "$base/tests/Integration/wordpress-baseline.php" "$site:/var/www/html/wp-content/amsec-baseline-test.php"
  wp eval-file /var/www/html/wp-content/amsec-baseline-test.php --user=admin > "$evidence/baseline-result$tag.log"
+ docker cp "$base/tests/Integration/wordpress-bots.php" "$site:/var/www/html/wp-content/amsec-bots-test.php"
+ wp eval-file /var/www/html/wp-content/amsec-bots-test.php --user=admin > "$evidence/bots-result$tag.log"
  wp eval-file /var/www/html/wp-content/amsec-activity-test.php --user=admin > "$evidence/activity-result$tag.json"
  # Real plugin lifecycle calls run in separate WordPress processes.
  wp plugin deactivate classic-editor
