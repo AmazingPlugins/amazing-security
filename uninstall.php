@@ -56,3 +56,6 @@ delete_option( 'amsec_digest_enabled' );
 delete_option( 'amsec_digest_state' );
 delete_option( 'amsec_digest_lock' );
 wp_clear_scheduled_hook( 'amsec_weekly_digest_tick' );
+
+delete_option( 'amsec_content_state' );
+delete_option( 'amsec_content_lock' );

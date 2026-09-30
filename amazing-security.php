@@ -259,3 +259,6 @@ add_action( 'amsec_weekly_digest_tick', array( $amsec_digest, 'tick' ) );
 register_deactivation_hook( __FILE__, array( $amsec_digest, 'clear' ) );
 add_action( 'admin_menu', array( new AmazingPlugins\Security\Digest\DigestSettings(), 'register' ) );
 add_action( 'admin_post_amsec_digest_settings', array( new AmazingPlugins\Security\Digest\DigestSettings(), 'handle' ) );
+
+add_action( 'admin_menu', array( new AmazingPlugins\Security\Content\ContentPage(), 'register' ) );
+add_action( 'admin_post_amsec_content_scan', array( new AmazingPlugins\Security\Content\ContentAction(), 'handle' ) );
