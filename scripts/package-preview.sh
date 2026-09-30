@@ -3,6 +3,7 @@ set -euo pipefail
 
 plugin_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 php "${plugin_dir}/scripts/rule-manifest.php" --check
+php "${plugin_dir}/scripts/passkey-vendor-manifest.php"
 output_path="${1:-${plugin_dir}/dist/amazing-security-0.1.0-preview.zip}"
 mkdir -p "$(dirname "${output_path}")"
 staging_dir="$(mktemp -d)"

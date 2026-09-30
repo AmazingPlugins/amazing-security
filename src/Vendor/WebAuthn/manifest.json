@@ -1,0 +1,85 @@
+{
+  "package": "lbuchs/WebAuthn",
+  "version": "2.2.0",
+  "commit": "20adb4a240c3997bd8cac7dc4dde38ab0bea0ed1",
+  "source": "https://github.com/lbuchs/WebAuthn",
+  "license": "MIT",
+  "license_sha256": "2b0936c64a2f78bae10ac2f88361cd7e638fe5f3364ea5e9e633f6945bfd5ecc",
+  "transformations": [
+    "Replace lbuchs\\WebAuthn namespace with AmazingPlugins\\Security\\Vendor\\WebAuthn",
+    "Resolve require_once paths through __DIR__",
+    "Add PHPCS third-party format exclusion comment"
+  ],
+  "files": [
+    {
+      "path": "Attestation/AttestationObject.php",
+      "upstream_sha256": "1dd9541e45c5d07cdac8a118b5eed7aec6d3d1d2f4442beae9d8701d5556d1d6",
+      "bundled_sha256": "3d8b2fa78695d0c1c9c36aa9a5936cf290d516335a572de1040f663e979567eb"
+    },
+    {
+      "path": "Attestation/AuthenticatorData.php",
+      "upstream_sha256": "4539fc9eab08ec38835b332c0afbd09832985c57a421043d12d92bc42e66762d",
+      "bundled_sha256": "276bc855d57b6d33e36b228a3cd1a2eb869b7fb28f61be61b99a9da61779d4fe"
+    },
+    {
+      "path": "Attestation/Format/AndroidKey.php",
+      "upstream_sha256": "36b7120a882994914738d7520e2a99d8881c28e5db7ff416395f6dff8d186348",
+      "bundled_sha256": "b8d72b1fd335aff5061a2f7a664dbe805f9cffeba0a391ba2484e867fa0c7e37"
+    },
+    {
+      "path": "Attestation/Format/AndroidSafetyNet.php",
+      "upstream_sha256": "b469688d02a9af095dce47d22d6560fad583742e03cf7c3f639eed745ff51958",
+      "bundled_sha256": "7a38eb7517bed058fe66bcd9b9d3c65399bed6044503db6cbc5bb8b6f04a1d9a"
+    },
+    {
+      "path": "Attestation/Format/Apple.php",
+      "upstream_sha256": "2a3e7a26bf057c0488cbcdf9fa2ae047042a44c0d06eeccd3ebd9eeb32cc44f5",
+      "bundled_sha256": "1faed697012c656e1c647a844ab9f34c98237417099a0c4e68b2418711b878ee"
+    },
+    {
+      "path": "Attestation/Format/FormatBase.php",
+      "upstream_sha256": "426b68c571fbdbc880dc5eea85e61b37738293c6fd49aaa363ed0f1e0f495301",
+      "bundled_sha256": "be2183183fcf2c8f542b10a8bfef2973d154b804b24b29a96653cdfec53a276d"
+    },
+    {
+      "path": "Attestation/Format/None.php",
+      "upstream_sha256": "c1db089954f2450f632b07f95491549ef50112f8cc822d21f72ee49ac1bc4771",
+      "bundled_sha256": "48d54de32e61ae55cb3020a4e8b99f2eecea6e5052eb85979689af5512daa512"
+    },
+    {
+      "path": "Attestation/Format/Packed.php",
+      "upstream_sha256": "42b8740014e9846de50801a476b66c7b65fae4b1844c7e714650ef32e204bb76",
+      "bundled_sha256": "01a8c898ff6a70f08613d39bf6e67ed146d608008670acde1b1ccd26bfc84e58"
+    },
+    {
+      "path": "Attestation/Format/Tpm.php",
+      "upstream_sha256": "3cfeba175dc6c88e6891a33bfbe8bcb5b5e357f3337439c91a51630402245a4a",
+      "bundled_sha256": "7b541e58267ef5d7936b4db1fbea307f8df7391ec80e3f26905ab495d3aa9615"
+    },
+    {
+      "path": "Attestation/Format/U2f.php",
+      "upstream_sha256": "595aec3dd2e8985d6a01226a17cba8952881342ce52f99df486c96ac600a96a6",
+      "bundled_sha256": "399ed1dead944087694490e2af51e9f4260586cd7378c1b64c6559d88f4614cf"
+    },
+    {
+      "path": "Binary/ByteBuffer.php",
+      "upstream_sha256": "ffc0a9efec90b9744cb2c7e91653b3c57c4bda75fee48cd2c3b4a44583eb227a",
+      "bundled_sha256": "801eefad4e71174346579abdb1a84f2228957ae025daa60f1a929e7f6047c214"
+    },
+    {
+      "path": "CBOR/CborDecoder.php",
+      "upstream_sha256": "3c4d302ce63b76c80350318cfa664db3d0b28fabff73a4560f009ec1ad6acb1f",
+      "bundled_sha256": "1ec4f03addee838366f22010c2387afe300339958b9ae46569fadc68abb73ec7"
+    },
+    {
+      "path": "WebAuthn.php",
+      "upstream_sha256": "6676f1bbdd8daf0b99a57ebd9855c92d36ddf99494106a4e35e5664e6ceb7c75",
+      "bundled_sha256": "b663c3714fb69c0e877758374caa0407941ae39d14ee452c3537b404d6a7d283"
+    },
+    {
+      "path": "WebAuthnException.php",
+      "upstream_sha256": "9564ae6ae79a0c201971b7c6f691c76e50a925076d1f4a5a7b0fcf5645bb442c",
+      "bundled_sha256": "1d823067379cb32445aff4adc99273c5b63e80a72f65e140fca0ff2a78654e14"
+    }
+  ]
+}
