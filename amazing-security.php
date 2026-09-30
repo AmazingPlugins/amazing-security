@@ -252,3 +252,10 @@ add_action( 'admin_post_amsec_bot_settings', array( new AmazingPlugins\Security\
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
 	\WP_CLI::add_command( 'amazing-security bots disable', array( new AmazingPlugins\Security\Bots\BotSettings(), 'recovery' ) );
 }
+
+$amsec_digest = new AmazingPlugins\Security\Digest\DigestHooks();
+add_action( 'init', array( $amsec_digest, 'ensure' ) );
+add_action( 'amsec_weekly_digest_tick', array( $amsec_digest, 'tick' ) );
+register_deactivation_hook( __FILE__, array( $amsec_digest, 'clear' ) );
+add_action( 'admin_menu', array( new AmazingPlugins\Security\Digest\DigestSettings(), 'register' ) );
+add_action( 'admin_post_amsec_digest_settings', array( new AmazingPlugins\Security\Digest\DigestSettings(), 'handle' ) );

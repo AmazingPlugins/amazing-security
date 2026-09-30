@@ -24,19 +24,19 @@ final class ActivityRepository {
 			return false;
 		}
 		try {
-			if ( 'login_failed' === $event->event ) {
+			if ( in_array( $event->event, array( 'login_failed', 'login_rate_blocked' ), true ) ) {
 				// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Current failed-login quota cannot be cached.
-				$count = $this->db->get_var( $this->db->prepare( "SELECT COUNT(*) FROM {$this->table} WHERE event = %s AND created_at >= %d", 'login_failed', $event->createdAt - 60 ) );
+				$count = $this->db->get_var( $this->db->prepare( "SELECT COUNT(*) FROM {$this->table} WHERE event IN (%s, %s) AND created_at >= %d", 'login_failed', 'login_rate_blocked', $event->createdAt - 60 ) );
 				$this->checkError();
 				if ( (int) $count >= 100 ) {
 					return false;
 				}
 				// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Reserve history capacity for administrative events.
-				$count = $this->db->get_var( $this->db->prepare( "SELECT COUNT(*) FROM {$this->table} WHERE event = %s", 'login_failed' ) );
+				$count = $this->db->get_var( $this->db->prepare( "SELECT COUNT(*) FROM {$this->table} WHERE event IN (%s, %s)", 'login_failed', 'login_rate_blocked' ) );
 				$this->checkError();
 				if ( (int) $count >= 2000 ) {
 					// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Bounded eviction affects failed-login rows only.
-					$this->db->query( $this->db->prepare( "DELETE FROM {$this->table} WHERE event = %s ORDER BY id ASC LIMIT 100", 'login_failed' ) );
+					$this->db->query( $this->db->prepare( "DELETE FROM {$this->table} WHERE event IN (%s, %s) ORDER BY id ASC LIMIT 100", 'login_failed', 'login_rate_blocked' ) );
 					$this->checkError();
 				}
 			}
@@ -75,6 +75,33 @@ final class ActivityRepository {
 		$rows = $this->db->get_results( $this->db->prepare( "SELECT id, event, actor_id, user_id, target, created_at FROM {$this->table}{$where} ORDER BY id DESC LIMIT 50 OFFSET %d", ( $page - 1 ) * 50 ), ARRAY_A );
 		$this->checkError();
 		return is_array( $rows ) ? $rows : array();
+	}
+
+	public function digestCounts( int $now ): array {
+		try {
+			return $this->quiet(
+				function () use ( $now ): array {
+               // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Aggregate only fixed event types within the 10,000-row activity budget.
+					$rows = $this->db->get_results( $this->db->prepare( "SELECT event,COUNT(*) AS total FROM {$this->table} WHERE created_at >= %d AND created_at <= %d AND event IN ('user_created','user_deleted','user_role_changed','login_rate_blocked') GROUP BY event LIMIT 4", $now - 604800, $now ), 'ARRAY_A' );
+					$this->checkError();
+					if ( ! is_array( $rows ) ) {
+						throw new RuntimeException( 'Activity storage unavailable.' ); }
+					$result = array(
+						'available' => true,
+						'changes'   => 0,
+						'blocked'   => 0,
+					);
+					foreach ( $rows as $row ) {
+						$count = max( 0, min( 10000, (int) ( $row['total'] ?? 0 ) ) );
+						if ( 'login_rate_blocked' === ( $row['event'] ?? '' ) ) {
+							$result['blocked'] += $count; } elseif ( in_array( $row['event'] ?? '', array( 'user_created', 'user_deleted', 'user_role_changed' ), true ) ) {
+							$result['changes'] += $count; }
+					}
+					return $result;
+				}
+			);
+		} catch ( \Throwable ) {
+			return array( 'available' => false ); }
 	}
 
 	public function cleanup( int $now ): void {

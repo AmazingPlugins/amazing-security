@@ -20,9 +20,12 @@ final class ActivityHooks {
 		);
 		add_action(
 			'wp_login_failed',
-			function (): void {
-				$this->record( 'login_failed' );
-			}
+			function ( ...$args ): void {
+				$error = $args[1] ?? null;
+				$this->record( $error instanceof \WP_Error && in_array( 'amsec_rate_limited', $error->get_error_codes(), true ) ? 'login_rate_blocked' : 'login_failed' );
+			},
+			10,
+			2
 		);
 		add_action(
 			'user_register',
@@ -105,7 +108,7 @@ final class ActivityHooks {
 	}
 
 	public function optionChanged( string $name ): void {
-		if ( in_array( $name, array( 'amsec_login_rate_mode', 'amsec_login_xmlrpc_disabled', 'amsec_alerts_enabled', 'amazing_security_mcp_enabled', 'amazing_security_vulnerability_direct_enabled' ), true ) ) {
+		if ( in_array( $name, array( 'amsec_login_rate_mode', 'amsec_login_xmlrpc_disabled', 'amsec_alerts_enabled', 'amsec_digest_enabled', 'amazing_security_mcp_enabled', 'amazing_security_vulnerability_direct_enabled' ), true ) ) {
 			$this->record( 'security_setting_changed', 0, $name );
 		}
 	}
@@ -116,7 +119,7 @@ final class ActivityHooks {
 		}
 		++$this->recorded;
 		try {
-			$this->repository->append( new ActivityEvent( $event, 'login_failed' === $event ? 0 : get_current_user_id(), $user, $target, time() ) );
+			$this->repository->append( new ActivityEvent( $event, in_array( $event, array( 'login_failed', 'login_rate_blocked' ), true ) ? 0 : get_current_user_id(), $user, $target, time() ) );
 		} catch ( \Throwable ) {
 			// Logging failure must not interrupt authentication, checkout or updates.
 			return;
