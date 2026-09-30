@@ -68,3 +68,6 @@ delete_option( 'amsec_headers_state' );
 delete_option( 'amsec_headers_lock' );
 
 delete_option( 'amsec_rest_rate_policy' );
+
+delete_option( 'amsec_network_policy' );
+delete_option( 'amsec_network_observation' );

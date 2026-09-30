@@ -276,3 +276,9 @@ add_action( 'admin_menu', array( new AmazingPlugins\Security\Firewall\RestRateSe
 add_action( 'admin_post_amsec_rest_rate_settings', array( new AmazingPlugins\Security\Firewall\RestRateSettings(), 'handle' ) );
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
 	WP_CLI::add_command( 'amazing-security rest-rates disable', array( new AmazingPlugins\Security\Firewall\RestRateSettings(), 'recovery' ) ); }
+
+add_action( 'init', array( new AmazingPlugins\Security\Network\NetworkHook(), 'handle' ), 5 );
+add_action( 'admin_menu', array( new AmazingPlugins\Security\Network\NetworkSettings(), 'register' ) );
+add_action( 'admin_post_amsec_network_settings', array( new AmazingPlugins\Security\Network\NetworkSettings(), 'handle' ) );
+if ( defined( 'WP_CLI' ) && WP_CLI ) {
+	WP_CLI::add_command( 'amazing-security network disable', array( new AmazingPlugins\Security\Network\NetworkSettings(), 'recovery' ) ); }
