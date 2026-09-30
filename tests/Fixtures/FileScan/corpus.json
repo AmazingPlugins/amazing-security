@@ -537,9 +537,11 @@
     },
     {
       "name": "inline-html-spam",
-      "kind": "known-gap",
+      "kind": "suspected",
       "code": "<a href=\"https://example.invalid\" style=\"display:none\">fixture</a>",
-      "expected": []
+      "expected": [
+        "AS-PHP-015"
+      ]
     },
     {
       "name": "split-url-link",
@@ -549,15 +551,19 @@
     },
     {
       "name": "encoded-function-name",
-      "kind": "known-gap",
+      "kind": "suspected",
       "code": "<?php $fn='sy'.'stem'; $fn($_POST['cmd']);",
-      "expected": []
+      "expected": [
+        "AS-PHP-014"
+      ]
     },
     {
       "name": "indirect-redirect",
-      "kind": "known-gap",
+      "kind": "suspected",
       "code": "<?php $next=$_GET['next']; wp_redirect($next);",
-      "expected": []
+      "expected": [
+        "AS-PHP-013"
+      ]
     },
     {
       "name": "ordinary-location-constant",
@@ -656,6 +662,146 @@
       "expected": [
         "AS-PHP-012"
       ]
+    },
+    {
+      "name": "adjacent-redirect",
+      "kind": "suspected",
+      "code": "<?php $next = $_GET['next']; wp_redirect($next);",
+      "expected": [
+        "AS-PHP-013"
+      ],
+      "provenance": "Original minimal regression; obfuscation cases informed by https://malware.expert/malware/website-backdoors-variable-functions/; hidden links informed by Sucuri research. Not a collected malware specimen."
+    },
+    {
+      "name": "adjacent-other-variable",
+      "kind": "benign",
+      "code": "<?php $next = $_GET['next']; wp_redirect($safe);",
+      "expected": [],
+      "provenance": "Original minimal regression; obfuscation cases informed by https://malware.expert/malware/website-backdoors-variable-functions/; hidden links informed by Sucuri research. Not a collected malware specimen."
+    },
+    {
+      "name": "adjacent-sanitized",
+      "kind": "benign",
+      "code": "<?php $next = esc_url_raw($_GET['next']); wp_redirect($next);",
+      "expected": [],
+      "provenance": "Original minimal regression; obfuscation cases informed by https://malware.expert/malware/website-backdoors-variable-functions/; hidden links informed by Sucuri research. Not a collected malware specimen."
+    },
+    {
+      "name": "adjacent-reassigned",
+      "kind": "benign",
+      "code": "<?php $next = $_GET['next']; $next = '/'; wp_redirect($next);",
+      "expected": [],
+      "provenance": "Original minimal regression; obfuscation cases informed by https://malware.expert/malware/website-backdoors-variable-functions/; hidden links informed by Sucuri research. Not a collected malware specimen."
+    },
+    {
+      "name": "adjacent-safe-redirect",
+      "kind": "benign",
+      "code": "<?php $next = $_GET['next']; wp_safe_redirect($next);",
+      "expected": [],
+      "provenance": "Original minimal regression; obfuscation cases informed by https://malware.expert/malware/website-backdoors-variable-functions/; hidden links informed by Sucuri research. Not a collected malware specimen."
+    },
+    {
+      "name": "adjacent-method",
+      "kind": "benign",
+      "code": "<?php $next = $_GET['next']; $obj->wp_redirect($next);",
+      "expected": [],
+      "provenance": "Original minimal regression; obfuscation cases informed by https://malware.expert/malware/website-backdoors-variable-functions/; hidden links informed by Sucuri research. Not a collected malware specimen."
+    },
+    {
+      "name": "split-command",
+      "kind": "suspected",
+      "code": "<?php $run = 'sys'.'tem'; $run($_POST['cmd']);",
+      "expected": [
+        "AS-PHP-014"
+      ],
+      "provenance": "Original minimal regression; obfuscation cases informed by https://malware.expert/malware/website-backdoors-variable-functions/; hidden links informed by Sucuri research. Not a collected malware specimen."
+    },
+    {
+      "name": "split-benign-call",
+      "kind": "benign",
+      "code": "<?php $run = 'str'.'len'; $run($_POST['cmd']);",
+      "expected": [],
+      "provenance": "Original minimal regression; obfuscation cases informed by https://malware.expert/malware/website-backdoors-variable-functions/; hidden links informed by Sucuri research. Not a collected malware specimen."
+    },
+    {
+      "name": "split-unused-command",
+      "kind": "benign",
+      "code": "<?php $run = 'sys'.'tem'; $other($_POST['cmd']);",
+      "expected": [],
+      "provenance": "Original minimal regression; obfuscation cases informed by https://malware.expert/malware/website-backdoors-variable-functions/; hidden links informed by Sucuri research. Not a collected malware specimen."
+    },
+    {
+      "name": "split-constant-argument",
+      "kind": "benign",
+      "code": "<?php $run = 'sys'.'tem'; $run('fixture');",
+      "expected": [],
+      "provenance": "Original minimal regression; obfuscation cases informed by https://malware.expert/malware/website-backdoors-variable-functions/; hidden links informed by Sucuri research. Not a collected malware specimen."
+    },
+    {
+      "name": "split-escaped-literal",
+      "kind": "benign",
+      "code": "<?php $run = 'sys'.'\\x74em'; $run($_POST['cmd']);",
+      "expected": [],
+      "provenance": "Original minimal regression; obfuscation cases informed by https://malware.expert/malware/website-backdoors-variable-functions/; hidden links informed by Sucuri research. Not a collected malware specimen."
+    },
+    {
+      "name": "inline-hidden-link",
+      "kind": "suspected",
+      "code": "<a href=\"https://example.invalid/\" style=\"display:none\">fixture</a><?php echo \"ok\";",
+      "expected": [
+        "AS-PHP-015"
+      ],
+      "provenance": "Original minimal regression; obfuscation cases informed by https://malware.expert/malware/website-backdoors-variable-functions/; hidden links informed by Sucuri research. Not a collected malware specimen."
+    },
+    {
+      "name": "inline-visible-link",
+      "kind": "benign",
+      "code": "<a href=\"https://example.invalid/\">fixture</a><?php echo \"ok\";",
+      "expected": [],
+      "provenance": "Original minimal regression; obfuscation cases informed by https://malware.expert/malware/website-backdoors-variable-functions/; hidden links informed by Sucuri research. Not a collected malware specimen."
+    },
+    {
+      "name": "inline-local-hidden",
+      "kind": "benign",
+      "code": "<a href=\"/account\" style=\"display:none\">fixture</a><?php echo \"ok\";",
+      "expected": [],
+      "provenance": "Original minimal regression; obfuscation cases informed by https://malware.expert/malware/website-backdoors-variable-functions/; hidden links informed by Sucuri research. Not a collected malware specimen."
+    },
+    {
+      "name": "inline-comment",
+      "kind": "benign",
+      "code": "<!-- <a href=\"https://example.invalid\" style=\"display:none\">x</a> -->",
+      "expected": []
+    },
+    {
+      "name": "inline-script",
+      "kind": "benign",
+      "code": "<script>const example = `<a href=\"https://example.invalid\" style=\"display:none\">x</a>`;</script>",
+      "expected": []
+    },
+    {
+      "name": "inline-textarea",
+      "kind": "benign",
+      "code": "<textarea><a href=\"https://example.invalid\" style=\"display:none\">x</a></textarea>",
+      "expected": []
+    },
+    {
+      "name": "split-trailing-dot",
+      "kind": "benign",
+      "code": "<?php $f='sys'.'tem'.; $f($_POST['cmd']);",
+      "expected": []
+    },
+    {
+      "name": "inline-data-style",
+      "kind": "benign",
+      "code": "<a href=\"https://example.invalid\" data-style=\"display:none\">x</a>",
+      "expected": []
+    },
+    {
+      "name": "inline-title-style",
+      "kind": "benign",
+      "code": "<a href=\"https://example.invalid\" style=\"color:red\" title=\"display:none\">x</a>",
+      "expected": []
     }
   ]
 }

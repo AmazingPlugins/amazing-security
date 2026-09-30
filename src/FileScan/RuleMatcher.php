@@ -30,15 +30,21 @@ final class RuleMatcher {
 		if ( count( $tokens ) > 100000 ) {
 			throw new RuntimeException( 'rule_limit' );
 		}
+		$markers  = AdjacentFlow::markers( $tokens );
 		$code     = '';
 		$previous = null;
-		foreach ( $tokens as $token ) {
+		foreach ( $tokens as $index => $token ) {
+			$code .= $markers[ $index ] ?? '';
 			if ( ! is_array( $token ) ) {
 				$code    .= $token;
 				$previous = $token;
 				continue;
 			}
-			if ( in_array( $token[0], array( T_COMMENT, T_DOC_COMMENT, T_INLINE_HTML, T_ENCAPSED_AND_WHITESPACE, T_START_HEREDOC, T_END_HEREDOC ), true ) ) {
+			$offset = T_INLINE_HTML === $token[0] ? $this->hiddenLinkOffset( $token[1] ) : null;
+			if ( null !== $offset ) {
+				$before = substr_count( substr( $token[1], 0, $offset ), "\n" );
+				$code  .= str_repeat( "\n", $before ) . "\x01INLINE_HIDDEN_LINK\x02" . str_repeat( "\n", substr_count( $token[1], "\n" ) - $before );
+			} elseif ( in_array( $token[0], array( T_COMMENT, T_DOC_COMMENT, T_INLINE_HTML, T_ENCAPSED_AND_WHITESPACE, T_START_HEREDOC, T_END_HEREDOC ), true ) ) {
 				$code .= ' ' . str_repeat( "\n", substr_count( $token[1], "\n" ) );
 			} elseif ( in_array( $token[0], array( T_NAME_QUALIFIED, T_NAME_RELATIVE ), true ) || ( T_NAME_FULLY_QUALIFIED === $token[0] && substr_count( $token[1], '\\' ) > 1 ) || ( T_VARIABLE === $token[0] && ! in_array( $token[1], array( '$_GET', '$_POST', '$_REQUEST', '$_COOKIE' ), true ) ) || ( T_STRING === $token[0] && in_array( $previous, array( T_OBJECT_OPERATOR, T_NULLSAFE_OBJECT_OPERATOR, T_DOUBLE_COLON, T_FUNCTION ), true ) ) ) {
 				$code .= 'NON_GLOBAL_NAME';
@@ -72,15 +78,32 @@ final class RuleMatcher {
 	}
 
 	private function hiddenExternalLink( string $literal ): bool {
+		return null !== $this->hiddenLinkOffset( $literal );
+	}
+
+	private function hiddenLinkOffset( string $literal ): ?int {
 		if ( strlen( $literal ) > 4096 || ! str_contains( strtolower( $literal ), '<a' ) ) {
-			return false;
+			return null;
 		}
-		preg_match_all( '/<a\b[^>]{0,1024}>/i', $literal, $tags );
+		// Remove inert/raw-text contexts without changing byte offsets or line numbers.
+		$markup = preg_replace_callback( '~<!--.*?(?:-->|$)|<(script|style|textarea|title)\b[^>]*>.*?(?:</\1\s*>|$)~is', static fn ( array $m ): string => preg_replace( '/[^\n]/', ' ', $m[0] ), $literal );
+		if ( null === $markup ) {
+			return null;
+		}
+		preg_match_all( '/<a\b(?:"[^"]*"|\'[^\']*\'|[^\'">])*+>/i', $markup, $tags, PREG_OFFSET_CAPTURE );
 		foreach ( $tags[0] as $tag ) {
-			if ( preg_match( '/\bhref\s*=\s*[\'\"]?https?:\/\//i', $tag ) && preg_match( '/\bstyle\s*=\s*[\'\"]?[^>]{0,512}\b(?:display\s*:\s*none|visibility\s*:\s*hidden)/i', $tag ) ) {
-				return true;
+			preg_match_all( '/\s+([a-z_:][a-z0-9_.:-]*)\s*=\s*(?:"([^"]*)"|\'([^\']*)\'|([^\s"\'=<>`]+))/i', $tag[0], $attributes, PREG_SET_ORDER | PREG_UNMATCHED_AS_NULL );
+			$values = array();
+			foreach ( $attributes as $attribute ) {
+				$key = strtolower( $attribute[1] );
+				if ( ! isset( $values[ $key ] ) ) {
+					$values[ $key ] = $attribute[2] ?? $attribute[3] ?? $attribute[4] ?? '';
+				}
+			}
+			if ( preg_match( '~^https?://~i', $values['href'] ?? '' ) && preg_match( '/(?:^|;)\s*(?:display\s*:\s*none|visibility\s*:\s*hidden)\s*(?:!important\s*)?(?:;|$)/i', $values['style'] ?? '' ) ) {
+				return $tag[1];
 			}
 		}
-		return false;
+		return null;
 	}
 }

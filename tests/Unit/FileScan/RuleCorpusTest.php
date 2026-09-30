@@ -8,6 +8,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class RuleCorpusTest extends TestCase {
+    public function test_inline_link_reports_anchor_line(): void {
+        $hits = ( new RuleMatcher( new BundledRulePack() ) )->match( "\n\n\n<a href=\"https://example.invalid\" style=\"display:none\">x</a>", 'fixture.php' );
+        self::assertSame( 4, $hits[0]->line );
+    }
     public static function corpus(): array {
         $data = json_decode( file_get_contents( dirname( __DIR__, 2 ) . '/Fixtures/FileScan/corpus.json' ), true, flags: JSON_THROW_ON_ERROR );
         $cases = array();

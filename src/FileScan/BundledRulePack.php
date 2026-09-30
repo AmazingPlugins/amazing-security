@@ -6,7 +6,7 @@ namespace AmazingPlugins\Security\FileScan;
 
 final class BundledRulePack {
 	public function version(): string {
-		return '2026.09.29.4';
+		return '2026.09.30.1';
 	}
 
 	public function rules(): array {
@@ -58,6 +58,18 @@ final class BundledRulePack {
 			'AS-PHP-012' => array(
 				'pattern' => '/(*LIMIT_MATCH=100000)(*LIMIT_RECURSION=1000)\bwp_redirect\s*\(\s*\$_(?:GET|POST|REQUEST)\s*\[/i',
 				'summary' => 'Request input is passed directly to wp_redirect.',
+			),
+			'AS-PHP-013' => array(
+				'pattern' => '/\x01INDIRECT_REDIRECT\x02/',
+				'summary' => 'Request input is assigned to a variable immediately passed to wp_redirect.',
+			),
+			'AS-PHP-014' => array(
+				'pattern' => '/\x01INDIRECT_COMMAND\x02/',
+				'summary' => 'A literal-selected command function receives request input.',
+			),
+			'AS-PHP-015' => array(
+				'pattern' => '/\x01INLINE_HIDDEN_LINK\x02/',
+				'summary' => 'Inline HTML contains a hidden link to an external site.',
 			),
 		);
 	}
