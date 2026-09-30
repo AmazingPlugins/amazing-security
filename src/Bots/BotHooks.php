@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Bots;
 
-use AmazingPlugins\Security\Login\AddressKey;
-
 final class BotHooks {
 	private bool $checked = false;
 
@@ -49,7 +47,7 @@ final class BotHooks {
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Public native forms have no plugin nonce. Only type/emptiness is inspected; no input contents are stored or echoed.
 		$trap       = isset( $_POST['amsec_contact_hint'] ) ? wp_unslash( $_POST['amsec_contact_hint'] ) : null;
 		$suspicious = BotPolicy::trapSuspicious( $trap );
-		$key        = ( new AddressKey( wp_salt( 'auth' ) . ':bot:' . $kind ) )->fromServer( $_SERVER );
+		$key        = ( new \AmazingPlugins\Security\Proxy\WordPressClientAddress() )->key( wp_salt( 'auth' ) . ':bot:' . $kind )->fromServer( $_SERVER );
 		$count      = null === $key ? null : ( new BotCounterStore( $GLOBALS['wpdb'] ) )->record( $key, $window, time() );
 		return BotPolicy::reject( $mode, $suspicious, $count, $limit );
 	}

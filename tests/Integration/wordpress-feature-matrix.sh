@@ -13,6 +13,7 @@ for pair in 'amsec-next-wp wordpress 66' 'amsec-next-wp69 wordpress69 69'; do
   local fixture="$1"; shift
   docker run --rm --network amsec-next-net --volumes-from "$site" --mount "type=bind,source=$fixture,target=/tmp/amsec-feature-fixture.php,readonly" --mount "type=bind,source=$base/tests/Fixtures/FileScan/corpus.json,target=/tmp/amsec-rule-fixtures.json,readonly" -e WORDPRESS_DB_HOST=amsec-next-db -e WORDPRESS_DB_USER=root -e WORDPRESS_DB_PASSWORD= -e WORDPRESS_DB_NAME="$db" --user 33:33 wordpress:cli wp eval-file /tmp/amsec-feature-fixture.php "$@"
  }
+ if docker exec "$site" test -e /var/www/html/wp-content/mu-plugins/amsec-proxy-peer-fixture.php; then echo "Refusing pre-existing proxy peer fixture." >&2; exit 1; fi
  backup=$(mktemp /private/tmp/amsec-activity-db.XXXXXX)
  docker exec amsec-next-db mysqldump -uroot "$db" > "$backup"
  # Record dependency directories that this task must remove after restoration.
@@ -21,7 +22,7 @@ for pair in 'amsec-next-wp wordpress 66' 'amsec-next-wp69 wordpress69 69'; do
  for slug in woocommerce contact-form-7 classic-editor; do
   if ! docker exec "$site" test -d "/var/www/html/wp-content/plugins/$slug"; then created+=("$slug"); fi
  done
- restore() { if [[ "$remoteip_was_enabled" == 1 ]]; then docker exec "$site" a2enconf remoteip >/dev/null; docker exec "$site" apache2ctl graceful; remoteip_was_enabled=0; fi; docker exec -i amsec-next-db mysql -uroot "$db" < "$backup"; rm -f "$backup"; for slug in "${created[@]}"; do docker exec "$site" rm -rf "/var/www/html/wp-content/plugins/$slug"; done; docker exec "$site" rm -f /var/www/html/wp-content/amsec-activity-test.php /var/www/html/wp-content/amsec-activity-preview.zip /var/www/html/wp-content/amsec-firstwrites.php /var/www/html/wp-content/amsec-sessions-test.php /var/www/html/wp-content/amsec-common-frontend.php /var/www/html/wp-content/amsec-incident-test.php /var/www/html/wp-content/amsec-permissions-test.php /var/www/html/wp-content/amsec-required-totp-test.php /var/www/html/wp-content/amsec-baseline-test.php /var/www/html/wp-content/amsec-bots-test.php /var/www/html/wp-content/amsec-digest-test.php /tmp/amsec-rule-fixtures.json /tmp/amsec-indirect-test.php /tmp/amsec-expanded-rule-corpus.php; }
+ restore() { if [[ "$remoteip_was_enabled" == 1 ]]; then docker exec "$site" a2enconf remoteip >/dev/null; docker exec "$site" apache2ctl graceful; remoteip_was_enabled=0; fi; docker exec -i amsec-next-db mysql -uroot "$db" < "$backup"; rm -f "$backup"; for slug in "${created[@]}"; do docker exec "$site" rm -rf "/var/www/html/wp-content/plugins/$slug"; done; docker exec "$site" rm -f /var/www/html/wp-content/mu-plugins/amsec-proxy-peer-fixture.php /var/www/html/wp-content/amsec-activity-test.php /var/www/html/wp-content/amsec-activity-preview.zip /var/www/html/wp-content/amsec-firstwrites.php /var/www/html/wp-content/amsec-sessions-test.php /var/www/html/wp-content/amsec-common-frontend.php /var/www/html/wp-content/amsec-incident-test.php /var/www/html/wp-content/amsec-permissions-test.php /var/www/html/wp-content/amsec-required-totp-test.php /var/www/html/wp-content/amsec-baseline-test.php /var/www/html/wp-content/amsec-bots-test.php /var/www/html/wp-content/amsec-digest-test.php /tmp/amsec-rule-fixtures.json /tmp/amsec-indirect-test.php /tmp/amsec-expanded-rule-corpus.php; }
  trap restore EXIT
  # Direct-address acceptance requires Apache not rewriting PHP REMOTE_ADDR from caller-supplied headers.
  if docker exec "$site" test -e /etc/apache2/conf-enabled/remoteip.conf; then
@@ -61,6 +62,7 @@ for pair in 'amsec-next-wp wordpress 66' 'amsec-next-wp69 wordpress69 69'; do
  wp_fixture "$base/tests/Integration/wordpress-rest-rates.php" --user=admin > "$evidence/rest-rates-result$tag.log"
  wp_fixture "$base/tests/Integration/wordpress-network.php" --user=admin > "$evidence/network-result$tag.log"
  wp_fixture "$base/tests/Integration/wordpress-traffic.php" --user=admin > "$evidence/traffic-result$tag.log"
+ wp_fixture "$base/tests/Integration/wordpress-proxies.php" --user=admin > "$evidence/proxies-result$tag.log"
  wp_fixture "$base/tests/Integration/wordpress-indirect-detection.php" --user=admin > "$evidence/indirect-result$tag.json"
  wp_fixture "$base/tests/Integration/wordpress-expanded-rule-corpus.php" --user=admin > "$evidence/expanded-corpus$tag.json"
  wp eval-file /var/www/html/wp-content/amsec-activity-test.php --user=admin > "$evidence/activity-result$tag.json"

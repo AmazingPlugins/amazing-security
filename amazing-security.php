@@ -128,7 +128,7 @@ add_action(
 		$settings = new AmazingPlugins\Security\Login\WordPressLoginSettings( new AmazingPlugins\Security\Integrity\WordPressOptions() );
 		$hooks    = new AmazingPlugins\Security\Login\LoginHooks(
 			new AmazingPlugins\Security\Login\RateLimiter( $settings, new AmazingPlugins\Security\Login\WordPressRateCounterStore( $GLOBALS['wpdb'] ) ),
-			new AmazingPlugins\Security\Login\AddressKey( wp_salt( 'auth' ) )
+			( new AmazingPlugins\Security\Proxy\WordPressClientAddress() )->key( wp_salt( 'auth' ) )
 		);
 		add_filter( 'authenticate', array( $hooks, 'authenticate' ), 25, 3 );
 		add_action( 'wp_login_failed', array( $hooks, 'failed' ), 10, 2 );
@@ -312,3 +312,8 @@ add_action( 'admin_menu', array( new AmazingPlugins\Security\Traffic\TrafficSett
 add_action( 'admin_post_amsec_traffic_settings', array( new AmazingPlugins\Security\Traffic\TrafficSettings(), 'handle' ) );
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
 	WP_CLI::add_command( 'amazing-security traffic disable', array( new AmazingPlugins\Security\Traffic\TrafficSettings(), 'recovery' ) ); }
+
+add_action( 'admin_menu', array( new AmazingPlugins\Security\Proxy\ProxySettings(), 'register' ) );
+add_action( 'admin_post_amsec_proxy_settings', array( new AmazingPlugins\Security\Proxy\ProxySettings(), 'handle' ) );
+if ( defined( 'WP_CLI' ) && WP_CLI ) {
+	WP_CLI::add_command( 'amazing-security proxies disable', array( new AmazingPlugins\Security\Proxy\ProxySettings(), 'recovery' ) ); }

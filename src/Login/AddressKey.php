@@ -5,10 +5,15 @@ declare(strict_types=1);
 namespace AmazingPlugins\Security\Login;
 
 final class AddressKey {
-	public function __construct( private string $salt ) {}
+	private readonly ?\Closure $resolver;
+	public function __construct( private string $salt, ?callable $resolver = null ) {
+		$this->resolver = null === $resolver ? null : \Closure::fromCallable( $resolver ); }
 
 	public function fromServer( array $server ): ?string {
-		$address = $server['REMOTE_ADDR'] ?? null;
+		try {
+			$address = null === $this->resolver ? ( $server['REMOTE_ADDR'] ?? null ) : ( $this->resolver )( $server );
+		} catch ( \Throwable ) {
+			return null; }
 		if ( ! is_string( $address ) || false === filter_var( $address, FILTER_VALIDATE_IP ) ) {
 			return null;
 		}

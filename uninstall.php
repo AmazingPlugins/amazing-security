@@ -77,3 +77,5 @@ delete_option( 'amsec_traffic_schema_version' );
 wp_clear_scheduled_hook( 'amsec_traffic_cleanup' );
 // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Explicit erase preference removes only feature-owned traffic history.
 $wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %i', $wpdb->prefix . 'amsec_traffic' ) );
+
+delete_option( 'amsec_proxy_policy' );

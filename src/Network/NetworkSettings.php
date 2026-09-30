@@ -9,7 +9,7 @@ use AmazingPlugins\Security\Sessions\SessionPolicy;
 use AmazingPlugins\Security\Activity\{ActivityHooks, ActivityRepository};
 final class NetworkSettings {
 	private function service(): NetworkSettingsService {
-		return new NetworkSettingsService( new WordPressOptions() );}
+		return new NetworkSettingsService( new \AmazingPlugins\Security\Proxy\FreshSecurityOptions( $GLOBALS['wpdb'], new WordPressOptions() ) );}
 	public function register(): void {
 		$hook = add_submenu_page( 'amazing-security', 'Manual network controls', 'Network controls', 'manage_options', 'amsec-network', array( $this, 'render' ) );
 		add_action(
@@ -37,11 +37,16 @@ final class NetworkSettings {
 		$user     = wp_get_current_user();
 		if ( '' === $password || ! wp_check_password( $password, $user->user_pass, $user->ID ) ) {
 			wp_die( esc_html__( 'Password confirmation failed.', 'amazing-security' ), '', array( 'response' => 403 ) );}
-		$lines = preg_split( '/\r?\n/', $rules );
-		$lines = is_array( $lines ) ? array_values( array_filter( array_map( 'trim', $lines ), static fn( string $line ): bool=>'' !== $line ) ) : array();
-		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized,WordPress.Security.ValidatedSanitizedInput.MissingUnslash -- Strict Cidr::validAddress in approval service; preserve exact host address bytes for self-lockout refusal.
-		$operator = is_string( $_SERVER['REMOTE_ADDR'] ?? null ) ? $_SERVER['REMOTE_ADDR'] : '';
-		if ( 'saved' !== $s->apply( $fp, $mode, $lines, $methods, $operator ) ) {
+		$lines  = preg_split( '/\r?\n/', $rules );
+		$lines  = is_array( $lines ) ? array_values( array_filter( array_map( 'trim', $lines ), static fn( string $line ): bool=>'' !== $line ) ) : array();
+		$result = ( new \AmazingPlugins\Security\Proxy\SecurityApprovalLock( $GLOBALS['wpdb'] ) )->run(
+			function () use ( $s, $fp, $mode, $lines, $methods ): string {
+				$options  = new \AmazingPlugins\Security\Proxy\FreshSecurityOptions( $GLOBALS['wpdb'], new WordPressOptions() );
+				$operator = ( new \AmazingPlugins\Security\Proxy\WordPressClientAddress() )->address( $_SERVER, $options ) ?? '';
+				return $s->apply( $fp, $mode, $lines, $methods, $operator );
+			}
+		);
+		if ( 'saved' !== $result ) {
 			wp_die( esc_html__( 'Policy changed, invalid rules or self-lockout risk. Review the current policy and your host address before approving.', 'amazing-security' ), '', array( 'response' => 409 ) );}
 		( new ActivityHooks( new ActivityRepository( $GLOBALS['wpdb'] ) ) )->record( 'security_setting_changed', 0, 'network-' . $mode );
 		wp_safe_redirect( admin_url( 'admin.php?page=amsec-network' ) );
@@ -54,7 +59,7 @@ final class NetworkSettings {
 		$state  = $s->status();
 		$fp     = $s->fingerprint();
 		$metric = ( new NetworkObservation( new WordPressOptions() ) )->status();
-		echo '<div class="wrap amazing-security-admin"><header class="amsec-header"><div><h1>Manual network controls</h1><p>Approve explicit network rules without changing host infrastructure.</p></div></header><section class="amsec-overview"><h2>PHP requests only</h2><p>Off by default. Observe records an approximate redacted match count without denying traffic. Block denies matching IPv4/IPv6 CIDRs for selected methods on requests reaching WordPress PHP. Static assets, cached pages or CDN responses that bypass PHP are outside this scope. This is not a server firewall or automatic ban service.</p><p>CLI, cron and administrators already identified by WordPress at the check point are exempt. Authentication handled later in an API request may still be denied. Use the host-provided PHP REMOTE_ADDR only; forwarded headers are ignored by the plugin, but the host may already have rewritten the address. Verify proxy trust before enforcing. Shared networks can group legitimate visitors.</p><p>Approval refuses a block policy covering your current host-provided address to reduce self-lockout. A later network change can still lock you out. Recovery: <code>wp amazing-security network disable</code>, or bypass with <code>AMSEC_DISABLE_FIREWALL</code>. Recovery clears this feature’s advisory count.</p><p>Configured CIDRs are stored as explicit policy. Visitor addresses, URLs, content and usernames are not collected by the match counter. Counts can miss concurrent or failed writes and cap at one million; they never decide enforcement.</p></section>';
+		echo '<div class="wrap amazing-security-admin"><header class="amsec-header"><div><h1>Manual network controls</h1><p>Approve explicit network rules without changing host infrastructure.</p></div></header><section class="amsec-overview"><h2>PHP requests only</h2><p>Off by default. Observe records an approximate redacted match count without denying traffic. Block denies matching IPv4/IPv6 CIDRs for selected methods on requests reaching WordPress PHP. Static assets, cached pages or CDN responses that bypass PHP are outside this scope. This is not a server firewall or automatic ban service.</p><p>CLI, cron and administrators already identified by WordPress at the check point are exempt. Authentication handled later in an API request may still be denied. By default use the host-provided PHP REMOTE_ADDR; optional approved trusted-proxy settings can resolve a reported client only with host-confirmed direct peer configuration. The host may already have rewritten the address. Verify proxy trust before enforcing. Shared networks can group legitimate visitors.</p><p>Approval refuses a block policy covering your current resolved address to reduce self-lockout. A later network change can still lock you out. Recovery: <code>wp amazing-security network disable</code>, or bypass with <code>AMSEC_DISABLE_FIREWALL</code>. Recovery clears this feature’s advisory count.</p><p>Configured CIDRs are stored as explicit policy. Visitor addresses, URLs, content and usernames are not collected by the match counter. Counts can miss concurrent or failed writes and cap at one million; they never decide enforcement.</p></section>';
 		if ( ! empty( $state['invalid'] ) ) {
 			echo '<div class="notice notice-error"><p>Network policy is invalid; enforcement is unavailable. Use host recovery to set an explicit off policy.</p></div></div>';
 			return;}
