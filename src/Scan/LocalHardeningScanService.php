@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace AmazingPlugins\Security\Scan;
 
 use AmazingPlugins\Security\Checks\AdminAccountsCheck;
+use AmazingPlugins\Security\Checks\FilesystemPermissionsCheck;
+use AmazingPlugins\Security\Checks\UploadsExecutionCheck;
 use AmazingPlugins\Security\Checks\DebugDisplayCheck;
 use AmazingPlugins\Security\Checks\FileEditorCheck;
 use AmazingPlugins\Security\Checks\HttpsAdminCheck;
@@ -22,8 +24,10 @@ final class LocalHardeningScanService {
 	public function __construct( ?callable $execute = null, ?callable $save = null ) {
 		$this->execute = Closure::fromCallable(
 			$execute ?? static function (): ScanRun {
-				$values = new WordPressValues();
-				$checks = self::checks( $values, static fn(): mixed => get_option( 'amsec_login_rate_mode', null ) );
+				$values   = new WordPressValues();
+				$checks   = self::checks( $values, static fn(): mixed => get_option( 'amsec_login_rate_mode', null ) );
+				$checks[] = new FilesystemPermissionsCheck( FilesystemPermissionsCheck::wordpressPaths() );
+				$checks[] = new UploadsExecutionCheck();
 				return ( new ScanCoordinator() )->run( $checks, new ScanContext() );
 			}
 		);
