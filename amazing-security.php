@@ -267,3 +267,6 @@ add_action( 'admin_menu', array( new AmazingPlugins\Security\Exposure\ExposurePa
 add_action( 'admin_post_amsec_exposure_inventory', array( new AmazingPlugins\Security\Exposure\ExposureAction(), 'handle' ) );
 add_action( 'admin_post_amsec_repository_lookup', array( new AmazingPlugins\Security\Repository\DirectoryAction(), 'handle' ) );
 add_action( 'admin_post_amsec_content_scan', array( new AmazingPlugins\Security\Content\ContentAction(), 'handle' ) );
+
+add_action( 'admin_menu', array( new AmazingPlugins\Security\Headers\HeaderPage(), 'register' ) );
+add_action( 'admin_post_amsec_headers_check', array( new AmazingPlugins\Security\Headers\HeaderAction(), 'handle' ) );

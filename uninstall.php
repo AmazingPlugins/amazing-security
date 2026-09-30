@@ -63,3 +63,6 @@ delete_option( 'amsec_content_state' );
 	delete_option( 'amsec_exposure_lock' );
 	delete_option( 'amsec_repository_lock' );
 delete_option( 'amsec_content_lock' );
+
+delete_option( 'amsec_headers_state' );
+delete_option( 'amsec_headers_lock' );

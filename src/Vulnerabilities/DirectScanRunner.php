@@ -71,7 +71,7 @@ final class DirectScanRunner {
 			$proofAt                               = $eligible && preg_match( '/^([0-9]{10}):/', $proof, $matches ) ? (int) $matches[1] : null;
 			$matchedInventory[]                    = new InstalledSoftware( $item->type, $item->slug, $item->version, $eligible, $proofAt );
 		}
-		$report = $this->matcher->evaluate( $matchedInventory, $responses );
+		$report = $this->matcher->evaluate( $matchedInventory, $responses, $now );
 		if ( count( $inventory ) > $total ) {
 			$report = new VulnerabilityReport( $report->results, true, 'Inventory exceeded direct-check limit.', $report->snapshotGeneratedAt, null );
 		}
