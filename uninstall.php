@@ -36,3 +36,8 @@ $amsec_fix_audit     = $wpdb->prefix . 'amsec_fix_audit';
 $wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %i', $amsec_fix_proposals ) );
 // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.DirectDatabaseQuery.SchemaChange -- Explicit erase selection removes plugin-owned audit records.
 $wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %i', $amsec_fix_audit ) );
+
+delete_option( 'amsec_activity_schema_version' );
+wp_clear_scheduled_hook( 'amsec_activity_cleanup' );
+// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Explicit erase preference removes only plugin-owned activity history.
+$wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %i', $wpdb->prefix . 'amsec_activity' ) );

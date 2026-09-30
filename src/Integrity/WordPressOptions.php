@@ -16,6 +16,9 @@ final class WordPressOptions implements OptionGateway {
 		$added = $wpdb->query( $wpdb->prepare( "INSERT IGNORE INTO {$wpdb->options} (option_name, option_value, autoload) VALUES (%s, %s, 'no')", $key, maybe_serialize( $value ) ) );
 		wp_cache_delete( $key, 'options' );
 		wp_cache_delete( 'notoptions', 'options' );
+		if ( 1 === $added ) {
+			do_action( 'amsec_option_written', $key );
+		}
 		return 1 === $added;
 	}
 
@@ -34,6 +37,9 @@ final class WordPressOptions implements OptionGateway {
 		// A competing writer can invalidate this request's cached value or cached absence.
 		wp_cache_delete( $key, 'options' );
 		wp_cache_delete( 'notoptions', 'options' );
+		if ( 1 === $changed ) {
+			do_action( 'amsec_option_written', $key );
+		}
 		return 1 === $changed;
 	}
 
@@ -44,6 +50,9 @@ final class WordPressOptions implements OptionGateway {
 		// A competing writer can invalidate this request's cached value or cached absence.
 		wp_cache_delete( $key, 'options' );
 		wp_cache_delete( 'notoptions', 'options' );
+		if ( 1 === $changed ) {
+			do_action( 'amsec_option_written', $key );
+		}
 		return 1 === $changed;
 	}
 }

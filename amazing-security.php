@@ -36,11 +36,13 @@ spl_autoload_register(
 
 register_activation_hook( __FILE__, array( AmazingPlugins\Security\Login\WordPressRateCounterStore::class, 'install' ) );
 register_activation_hook( __FILE__, array( AmazingPlugins\Security\Fixes\FixTables::class, 'install' ) );
+register_activation_hook( __FILE__, array( AmazingPlugins\Security\Activity\ActivityTables::class, 'install' ) );
 register_deactivation_hook(
 	__FILE__,
 	static function (): void {
 		wp_clear_scheduled_hook( 'amsec_login_cleanup' );
 		wp_clear_scheduled_hook( 'amsec_fix_cleanup' );
+		wp_clear_scheduled_hook( 'amsec_activity_cleanup' );
 		( new AmazingPlugins\Security\Schedule\ScheduleHooks() )->clear();
 		( new AmazingPlugins\Security\Login\WordPressRateCounterStore( $GLOBALS['wpdb'] ) )->purge();
 	}
@@ -53,6 +55,18 @@ add_action(
 );
 add_action( 'init', array( AmazingPlugins\Security\Login\WordPressRateCounterStore::class, 'ensureScheduled' ) );
 add_action( 'init', array( AmazingPlugins\Security\Fixes\FixTables::class, 'ensureScheduled' ) );
+add_action( 'init', array( AmazingPlugins\Security\Activity\ActivityTables::class, 'ensureScheduled' ) );
+add_action(
+	'amsec_activity_cleanup',
+	static function (): void {
+		try {
+			( new AmazingPlugins\Security\Activity\ActivityRepository( $GLOBALS['wpdb'] ) )->cleanup( time() );
+		} catch ( \RuntimeException ) {
+			// Retry next cleanup.
+			return;
+		}
+	}
+);
 add_action(
 	'init',
 	static function (): void {
@@ -98,6 +112,9 @@ add_action(
 	static function (): void {
 		if ( current_user_can( 'manage_options' ) && '1' !== get_option( 'amsec_login_schema_version' ) ) {
 			AmazingPlugins\Security\Login\WordPressRateCounterStore::install();
+		}
+		if ( current_user_can( 'manage_options' ) && '1' !== get_option( 'amsec_activity_schema_version' ) ) {
+			AmazingPlugins\Security\Activity\ActivityTables::install();
 		}
 		if ( current_user_can( 'manage_options' ) && '1' !== get_option( 'amsec_fix_schema_version' ) ) {
 			AmazingPlugins\Security\Fixes\FixTables::install();
@@ -175,3 +192,9 @@ $amsec_abilities      = new AmazingPlugins\Security\Mcp\AbilityRegistrar(
 );
 add_action( 'wp_abilities_api_categories_init', array( $amsec_abilities, 'registerCategory' ) );
 add_action( 'wp_abilities_api_init', array( $amsec_abilities, 'registerAbilities' ) );
+
+( new AmazingPlugins\Security\Activity\ActivityHooks( new AmazingPlugins\Security\Activity\ActivityRepository( $GLOBALS['wpdb'] ) ) )->register();
+add_action( 'admin_menu', array( new AmazingPlugins\Security\Activity\ActivityPage(), 'register' ) );
+
+add_action( 'admin_menu', array( new AmazingPlugins\Security\Sessions\SessionPage(), 'register' ) );
+add_action( 'admin_post_amsec_sessions_revoke', array( new AmazingPlugins\Security\Sessions\SessionAction(), 'handle' ) );
