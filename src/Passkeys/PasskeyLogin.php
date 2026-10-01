@@ -87,7 +87,7 @@ final class PasskeyLogin {
 			$user  = $gate->finalCheck( $permit, $now );
 			if ( null === $fresh || null === $user || $fresh['context']->fingerprint() !== $pending['context_revision'] || $fresh['policy']['revision'] !== $pending['policy_revision'] || headers_sent() ) {
 				return null; }
-			return $this->grant( $user ) ? array( 'redirect' => $config['context']->origin() . '/wp-admin/' ) : null;
+			return $this->grant( $user ) ? array( 'redirect' => $config['context']->adminUrl() ) : null;
 		} catch ( \Throwable $error ) {
 			return null; }
 	}

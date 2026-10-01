@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace AmazingPlugins\Security\Passkeys;
 
 final class PasskeyContext {
-	private function __construct( private readonly string $rp, private readonly string $siteOrigin ) {}
+	private function __construct( private readonly string $rp, private readonly string $siteOrigin, private readonly string $directory ) {}
 	public static function fromSiteUrl( string $url ): ?self {
 		if ( strlen( $url ) > 2048 || 1 === preg_match( '/[\x00-\x20\x7f\\\\]/', $url ) ) {
 			return null; }
@@ -20,14 +20,31 @@ final class PasskeyContext {
 			if ( 1 !== preg_match( '/^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/D', $label ) ) {
 					return null; }
 		}
-		return new self( $host, 'https://' . $host . ( 443 === $port ? '' : ':' . $port ) );
+		$directory = self::directory( is_string( $p['path'] ?? null ) ? $p['path'] : '' );
+		if ( null === $directory ) {
+			return null; }
+		return new self( $host, 'https://' . $host . ( 443 === $port ? '' : ':' . $port ), $directory );
+	}
+	private static function directory( string $path ): ?string {
+		if ( '' === $path || '/' === $path ) {
+			return ''; }
+		if ( ! str_starts_with( $path, '/' ) || str_contains( $path, '\\' ) || str_contains( $path, '//' ) ) {
+			return null; }
+		$trimmed = rtrim( $path, '/' );
+		foreach ( explode( '/', substr( $trimmed, 1 ) ) as $segment ) {
+			if ( '.' === $segment || '..' === $segment || 1 !== preg_match( '/^[A-Za-z0-9._~-]+$/D', $segment ) ) {
+				return null; }
+		}
+		return $trimmed;
 	}
 	public function rpId(): string {
 		return $this->rp; }
 	public function origin(): string {
 		return $this->siteOrigin; }
+	public function adminUrl(): string {
+		return $this->siteOrigin . $this->directory . '/wp-admin/'; }
 	public function fingerprint(): string {
-		return hash( 'sha256', $this->siteOrigin ); }
+		return hash( 'sha256', $this->siteOrigin . "\n" . $this->directory ); }
 	public function acceptOrigin( mixed $origin ): bool {
 		return is_string( $origin ) && $origin === $this->siteOrigin; }
 }

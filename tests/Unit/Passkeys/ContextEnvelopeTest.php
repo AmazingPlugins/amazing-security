@@ -7,6 +7,20 @@ final class ContextEnvelopeTest extends TestCase {
  $c=PasskeyContext::fromSiteUrl('https://Example.com:8443/wordpress');self::assertSame('example.com',$c->rpId());self::assertSame('https://example.com:8443',$c->origin());self::assertTrue($c->acceptOrigin('https://example.com:8443'));foreach(['https://evilexample.com:8443','https://sub.example.com:8443','https://example.com','http://example.com:8443','https://example.com:8443/','https://example.com:8443.evil',null,[]] as $origin)self::assertFalse($c->acceptOrigin($origin));self::assertSame('https://localhost:18890',PasskeyContext::fromSiteUrl('https://localhost:18890')->origin());self::assertSame('https://example.com',PasskeyContext::fromSiteUrl('https://example.com:443')->origin());
  foreach(['http://example.com','https://user@example.com','https://user:password@example.com','https://127.0.0.1','https://[::1]','https://example.com.','https://éxample.com','https://example.com?query=x','https://example.com#fragment','https://bad_host.com','https://-bad.com','https://example.com:0',"https://example.com\n"] as $url)self::assertNull(PasskeyContext::fromSiteUrl($url));self::assertNotSame($c->fingerprint(),PasskeyContext::fromSiteUrl('https://example.com')->fingerprint());
  }
+ public function testDirectoryIsPartOfTheAdminDestinationAndSiteBindingButNotTheWebAuthnOrigin(): void {
+ $root = PasskeyContext::fromSiteUrl('https://example.com/');
+ $nested = PasskeyContext::fromSiteUrl('https://Example.com/wordpress/');
+ self::assertSame('https://example.com', $root->origin());
+ self::assertSame('https://example.com/wp-admin/', $root->adminUrl());
+ self::assertSame('https://example.com', $nested->origin());
+ self::assertSame('example.com', $nested->rpId());
+ self::assertSame('https://example.com/wordpress/wp-admin/', $nested->adminUrl());
+ self::assertNotSame($root->fingerprint(), $nested->fingerprint());
+ self::assertTrue($nested->acceptOrigin('https://example.com'));
+ foreach (['https://example.com/wordpress/../secret', 'https://example.com//wordpress', 'https://example.com/word press'] as $url) {
+  self::assertNull(PasskeyContext::fromSiteUrl($url));
+ }
+ }
  public function testCanonicalBinaryDecodingRejectsPaddingDiscardedBitsAndOversize():void {
  for($n=0;$n<20;$n++){$bytes=$n===0?'':random_bytes($n);self::assertSame($bytes,Base64Url::decode(Base64Url::encode($bytes),20));}
  foreach(['AA=','AA==','AB','A','+/==','%2f',"AA\n",[],null,str_repeat('A',29)] as $encoded)self::assertNull(Base64Url::decode($encoded,20));self::assertNull(Base64Url::decode('AAAA',2));
