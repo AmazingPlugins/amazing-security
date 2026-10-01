@@ -80,7 +80,7 @@ final class PasskeyLogin {
 			if ( null === $verified ) {
 				return null; }
 			$gate   = ( new WordPressPasskeyAccount( $this->db ) )->gate();
-			$permit = $gate->authorize( $record['user_id'], $post['factor'] ?? '', $now );
+			$permit = $gate->authorize( $record['user_id'], '', $now, false );
 			if ( null === $permit || ! $repo->consumeCredential( $loaded, $verified['counter'], $verified['backed_up'], $config['context'], $pending['policy_revision'], $now ) ) {
 				return null; }
 			$fresh = $this->configuration();

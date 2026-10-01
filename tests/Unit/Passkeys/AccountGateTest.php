@@ -9,6 +9,24 @@ final class AccountGateTest extends TestCase {
  $state=$this->state();$factors=0;$gate=new PasskeyAccountGate(static function()use(&$state){return $state;},static function($id,$factor,$now)use(&$factors){$factors++;return $id===7&&$factor==='valid'&&$now===1000;},static fn()=>false,static fn($user)=>$user);
  self::assertNull($gate->authorize(7,'wrong',1000));$permit=$gate->authorize(7,'valid',1000);self::assertSame(7,$permit['user']->ID);self::assertSame(2,$factors);self::assertSame(7,$gate->finalCheck($permit,1000)->ID);$state['fingerprint']=str_repeat('d',64);self::assertNull($gate->finalCheck($permit,1000));$state['reset_required']=true;self::assertNull($gate->authorize(7,'valid',1000));self::assertSame(2,$factors);
  }
+ public function testPasskeyLoginAcceptsAnEnrolledAdministratorWithoutSpendingTheFactor(): void {
+ $state = $this->state();
+ $factors = 0;
+ $gate = new PasskeyAccountGate(
+  static function () use (&$state) { return $state; },
+  static function () use (&$factors) { $factors++; return false; },
+  static fn() => false,
+  static fn($user) => $user
+ );
+ $permit = $gate->authorize(7, '', 1000, false);
+ self::assertSame(7, $permit['user']->ID);
+ self::assertSame(0, $factors);
+ $state['reset_required'] = true;
+ self::assertNull($gate->authorize(7, '', 1000, false));
+ $state['reset_required'] = false;
+ $state['required'] = 'expired';
+ self::assertNull($gate->authorize(7, '', 1000, false));
+ }
  public function testExpiredUnavailableDeletedReassignedOrChangedAccountsCannotAuthorize():void {
  foreach([['required'=>'expired'],['required'=>'unavailable'],['user'=>null],['user'=>new \WP_User(8)],['reset_required'=>true],['enrolled'=>false],['fingerprint'=>'bad']] as $change){$state=array_replace($this->state(),$change);$gate=new PasskeyAccountGate(static fn()=>$state,static fn()=>true,static fn()=>true,static fn($user)=>$user);self::assertNull($gate->authorize(7,'valid',1000));}
  $state=$this->state();foreach([static fn()=>new \WP_User(8),static fn()=>new \WP_Error('blocked','blocked'),static fn()=>null] as $filter){$gate=new PasskeyAccountGate(static fn()=>$state,static fn()=>true,static fn()=>true,$filter);self::assertNull($gate->authorize(7,'valid',1000));}

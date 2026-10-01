@@ -6,7 +6,7 @@ namespace AmazingPlugins\Security\Passkeys;
 /** Reuses native account/factor policy through fresh state callbacks; never grants cookies itself. */
 final class PasskeyAccountGate {
 	public function __construct( private readonly \Closure $readState, private readonly \Closure $verifyFactor, private readonly \Closure $grantGrace, private readonly \Closure $filterAccount ) {}
-	public function authorize( int $userId, string $factor, int $now ): ?array {
+	public function authorize( int $userId, string $factor, int $now, bool $consumeFactor = true ): ?array {
 		if ( $userId < 1 || $now < 0 || strlen( $factor ) > 128 ) {
 			return null; }
 		try {
@@ -24,7 +24,7 @@ final class PasskeyAccountGate {
 			$user = ( $this->filterAccount )( $state['user'] );
 			if ( ! $user instanceof \WP_User || $user->ID !== $userId ) {
 				return null; }
-			if ( $state['admin'] && $state['enrolled'] && ! ( $this->verifyFactor )( $userId, $factor, $now ) ) {
+			if ( $consumeFactor && $state['admin'] && $state['enrolled'] && ! ( $this->verifyFactor )( $userId, $factor, $now ) ) {
 				return null; }
 			$permit = array(
 				'user_id'     => $userId,
