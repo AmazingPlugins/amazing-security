@@ -41,6 +41,8 @@ final class PasskeyContext {
 		return $this->rp; }
 	public function origin(): string {
 		return $this->siteOrigin; }
+	public function bindingUrl(): string {
+		return $this->siteOrigin . $this->directory; }
 	public function adminUrl(): string {
 		return $this->siteOrigin . $this->directory . '/wp-admin/'; }
 	public function fingerprint(): string {

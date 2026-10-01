@@ -117,7 +117,7 @@ final class PasskeyActions {
 				'credential_id'    => Base64Url::encode( $verified['credential_id'] ),
 				'user_handle'      => Base64Url::encode( $handle ),
 				'public_key'       => $verified['public_key'],
-				'origin'           => $own['context']->origin(),
+				'origin'           => $own['context']->bindingUrl(),
 				'rp_id'            => $own['context']->rpId(),
 				'context_revision' => $own['context']->fingerprint(),
 				'counter'          => $verified['counter'],
