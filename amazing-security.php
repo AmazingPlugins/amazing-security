@@ -367,3 +367,8 @@ if ( defined( 'WP_CLI' ) && WP_CLI ) {
 $amsec_passkey_login = new AmazingPlugins\Security\Passkeys\PasskeyLogin( $GLOBALS['wpdb'] );
 add_action( 'admin_post_nopriv_amsec_passkey_login_begin', array( $amsec_passkey_login, 'beginRequest' ) );
 add_action( 'admin_post_nopriv_amsec_passkey_login_finish', array( $amsec_passkey_login, 'finishRequest' ) );
+$amsec_passkey_ui = new AmazingPlugins\Security\Passkeys\PasskeyUi( $GLOBALS['wpdb'] );
+add_action( 'show_user_profile', array( $amsec_passkey_ui, 'profile' ) );
+add_action( 'login_form', array( $amsec_passkey_ui, 'login' ) );
+add_action( 'admin_enqueue_scripts', array( $amsec_passkey_ui, 'adminAssets' ) );
+add_action( 'login_enqueue_scripts', array( $amsec_passkey_ui, 'loginAssets' ) );
