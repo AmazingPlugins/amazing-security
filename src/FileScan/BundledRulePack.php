@@ -6,7 +6,7 @@ namespace AmazingPlugins\Security\FileScan;
 
 final class BundledRulePack {
 	public function version(): string {
-		return '2026.09.30.2';
+		return '2026.10.03.3';
 	}
 
 	public function rules(): array {
@@ -78,6 +78,50 @@ final class BundledRulePack {
 			'AS-PHP-017' => array(
 				'pattern' => '/\x01REQUEST_CALLBACK\x02/',
 				'summary' => 'Request or cookie data selects a variable callback immediately invoked.',
+			),
+			'AS-PHP-018' => array(
+				'pattern' => '/(*LIMIT_MATCH=100000)(*LIMIT_RECURSION=1000)\bassert\s*\(\s*\$_(?:GET|POST|REQUEST|COOKIE)\s*\[/i',
+				'summary' => 'Request or cookie data is passed directly to assert. A second variable between the request and assert is not matched.',
+			),
+			'AS-PHP-019' => array(
+				'pattern' => '/(*LIMIT_MATCH=100000)(*LIMIT_RECURSION=1000)\beval\s*\(\s*str_rot13\s*\(/i',
+				'summary' => 'Rotated text is evaluated as PHP code. Other encodings are not matched.',
+			),
+			'AS-PHP-020' => array(
+				'pattern' => '/(*LIMIT_MATCH=100000)(*LIMIT_RECURSION=1000)\bfile_put_contents\s*\(\s*\$_(?:GET|POST|REQUEST)\s*\[/i',
+				'summary' => 'Request input directly selects a file to write. A second variable between the request and the write is not matched.',
+			),
+			'AS-PHP-021' => array(
+				'pattern' => '/(*LIMIT_MATCH=100000)(*LIMIT_RECURSION=1000)\bextract\s*\(\s*\$_(?:GET|POST|REQUEST|COOKIE)\s*\[/i',
+				'summary' => 'Request or cookie data is expanded into variables. A second variable between the request and extract is not matched.',
+			),
+			'AS-PHP-022' => array(
+				'pattern' => '/(*LIMIT_MATCH=100000)(*LIMIT_RECURSION=1000)\bparse_str\s*\(\s*\$_(?:GET|POST|REQUEST|COOKIE)\s*\[/i',
+				'summary' => 'Request or cookie data is parsed into variables. A second variable between the request and parse_str is not matched.',
+			),
+			'AS-PHP-023' => array(
+				'pattern' => '/\x01INDIRECT_ASSERT\x02/',
+				'summary' => 'A variable holding assert is called with request data within six assignments. A seventh assignment is not matched.',
+			),
+			'AS-PHP-024' => array(
+				'pattern' => '/\x01INDIRECT_EXTRACT\x02/',
+				'summary' => 'Request data reaches extract through up to six variables. A seventh assignment is not matched.',
+			),
+			'AS-PHP-025' => array(
+				'pattern' => '/\x01INDIRECT_PARSE\x02/',
+				'summary' => 'Request data reaches parse_str through up to six variables. A seventh assignment is not matched.',
+			),
+			'AS-PHP-026' => array(
+				'pattern' => '/\x01INDIRECT_WRITE\x02/',
+				'summary' => 'Request data reaches file_put_contents through up to six variables. A seventh assignment is not matched.',
+			),
+			'AS-PHP-027' => array(
+				'pattern' => '/(*LIMIT_MATCH=100000)(*LIMIT_RECURSION=1000)\bcreate_function\s*\(\s*(?:\$_(?:GET|POST|REQUEST|COOKIE)\s*\[|S\s*,\s*\$_(?:GET|POST|REQUEST|COOKIE)\s*\[)|\x01INDIRECT_CREATE\x02/i',
+				'summary' => 'Request data is passed to create_function directly or through three variables. A fourth copied variable is not matched.',
+			),
+			'AS-PHP-028' => array(
+				'pattern' => '/(*LIMIT_MATCH=100000)(*LIMIT_RECURSION=1000)\bpreg_replace\s*\(\s*\x01PREG_E\x02|\x01INDIRECT_PREG_E\x02/i',
+				'summary' => 'A preg_replace pattern uses the old e modifier, including two variables that hold that pattern. A third copied variable is not matched.',
 			),
 		);
 	}

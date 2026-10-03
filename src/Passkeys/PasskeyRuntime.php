@@ -28,9 +28,10 @@ final class PasskeyRuntime {
 	}
 	public function own( array $post, bool $requireEnabled = true ): ?array {
 		$configuration = $this->configuration( $requireEnabled );
-	 // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Exact origin/method comparison refuses normalization or suffix matching.
-		$server = array(
+		$server        = array(
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Exact method comparison refuses normalization or suffix matching.
 			'REQUEST_METHOD' => isset( $_SERVER['REQUEST_METHOD'] ) ? wp_unslash( $_SERVER['REQUEST_METHOD'] ) : null,
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Exact origin comparison refuses normalization or suffix matching.
 			'HTTP_ORIGIN'    => isset( $_SERVER['HTTP_ORIGIN'] ) ? wp_unslash( $_SERVER['HTTP_ORIGIN'] ) : null,
 		);
 		if ( null === $configuration || ! PasskeyRequestGate::request( $configuration['context'], $server, is_ssl() ) ) {

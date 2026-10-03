@@ -20,6 +20,28 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 define( 'AMAZING_SECURITY_FILE', __FILE__ );
 
+$amsec_file_editor = get_option( 'amsec_disallow_file_edit', '0' );
+if ( '1' === $amsec_file_editor && ! defined( 'DISALLOW_FILE_EDIT' ) ) {
+	define( 'DISALLOW_FILE_EDIT', true ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound -- This is the WordPress core file-editor constant.
+}
+if ( '1' === get_option( 'amsec_hide_debug_display', '0' ) ) {
+	// phpcs:ignore WordPress.PHP.IniSet.display_errors_Disallowed, PluginCheck.CodeAnalysis.PHPErrorReporting.IniDirectiveDisplay_errors, Squiz.PHP.DiscouragedFunctions.Discouraged -- Approved display hide. This does not edit wp-config.php.
+	ini_set( 'display_errors', '0' );
+}
+
+add_filter(
+	'wp_is_application_passwords_available',
+	static function ( mixed $available ): mixed {
+		return '1' === get_option( 'amsec_disable_application_passwords', '0' ) ? false : $available;
+	}
+);
+add_filter(
+	'wp_is_application_passwords_available_for_user',
+	static function ( mixed $available ): mixed {
+		return '1' === get_option( 'amsec_disable_application_passwords', '0' ) ? false : $available;
+	}
+);
+
 spl_autoload_register(
 	static function ( string $class_name ): void {
 		$prefix = 'AmazingPlugins\\Security\\';
@@ -132,6 +154,27 @@ add_action(
 		);
 		add_filter( 'authenticate', array( $hooks, 'authenticate' ), 25, 3 );
 		add_action( 'wp_login_failed', array( $hooks, 'failed' ), 10, 2 );
+		$confirm = new AmazingPlugins\Security\Login\LoginConfirmation( static fn(): bool => '1' === get_option( 'amsec_login_confirm', '0' ) );
+		add_action( 'login_form', array( $confirm, 'render' ) );
+		add_filter( 'authenticate', array( $confirm, 'authenticate' ), 26, 3 );
+		$hints = new AmazingPlugins\Security\Login\LoginHints( static fn(): bool => '1' === get_option( 'amsec_generic_login_errors', '0' ) );
+		add_filter( 'wp_login_errors', array( $hints, 'errors' ) );
+		$exposure = new AmazingPlugins\Security\Login\AccountExposure(
+			static fn(): bool => '1' === get_option( 'amsec_hide_author_archives', '0' ),
+			static fn(): bool => '1' === get_option( 'amsec_hide_rest_users', '0' )
+		);
+		add_action( 'template_redirect', array( $exposure, 'redirect' ) );
+		add_filter( 'rest_pre_dispatch', array( $exposure, 'rest' ), 6, 3 );
+		$meta = new AmazingPlugins\Security\Hardening\PublicMeta(
+			static fn(): bool => '1' === get_option( 'amsec_hide_generator', '0' ),
+			static fn(): bool => '1' === get_option( 'amsec_hide_discovery_links', '0' )
+		);
+		add_filter( 'the_generator', array( $meta, 'generator' ) );
+		add_action( 'init', array( $meta, 'discovery' ) );
+		$passwords = new AmazingPlugins\Security\Login\CommonPasswordHooks( static fn(): bool => '1' === get_option( 'amsec_common_passwords', '0' ) );
+		add_action( 'user_profile_update_errors', array( $passwords, 'profile' ), 10, 3 );
+		add_filter( 'registration_errors', array( $passwords, 'registration' ), 10, 3 );
+		add_action( 'validate_password_reset', array( $passwords, 'reset' ), 10, 2 );
 		$totp = new AmazingPlugins\Security\Login\TotpAuthentication(
 			new AmazingPlugins\Security\Login\WordPressTotpStore( $GLOBALS['wpdb'] ),
 			new AmazingPlugins\Security\Login\SecretCipher( wp_salt( 'auth' ) ),
@@ -155,6 +198,8 @@ add_action(
 add_action( 'admin_menu', array( new AmazingPlugins\Security\Admin\AdminPage(), 'register' ) );
 add_action( 'admin_menu', array( new AmazingPlugins\Security\Admin\FixReviewPage(), 'register' ) );
 add_action( 'admin_menu', array( new AmazingPlugins\Security\Admin\RepairPage(), 'register' ) );
+add_action( 'admin_post_amsec_findings_report', array( new AmazingPlugins\Security\Admin\FindingsReportAction(), 'handle' ) );
+add_action( 'admin_post_amsec_approved_setting', array( new AmazingPlugins\Security\Admin\ApprovedSettingAction(), 'handle' ) );
 add_action( 'admin_post_amsec_fix_approve', array( new AmazingPlugins\Security\Admin\FixApprovalAction(), 'handle' ) );
 add_action( 'admin_post_amsec_fix_rollback', array( new AmazingPlugins\Security\Admin\FixRollbackAction(), 'handle' ) );
 add_action( 'admin_post_amsec_repair_apply', array( new AmazingPlugins\Security\Admin\RepairAction(), 'apply' ) );
@@ -213,6 +258,8 @@ $amsec_policy = new AmazingPlugins\Security\Login\RequiredTotpPolicy();
 add_filter( 'authenticate', array( $amsec_policy, 'authenticate' ), 29, 3 );
 add_action( 'admin_menu', array( new AmazingPlugins\Security\Login\RequiredTotpPage(), 'register' ) );
 add_action( 'admin_notices', array( new AmazingPlugins\Security\Login\RequiredTotpPage(), 'notice' ) );
+add_action( 'show_user_profile', array( new AmazingPlugins\Security\Login\RequiredTotpPage(), 'profile' ) );
+add_action( 'edit_user_profile', array( new AmazingPlugins\Security\Login\RequiredTotpPage(), 'profile' ) );
 add_action( 'admin_post_amsec_totp_policy', array( new AmazingPlugins\Security\Login\RequiredTotpAction(), 'handle' ) );
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
 	\WP_CLI::add_command( 'amazing-security policy disable', array( $amsec_policy, 'recovery' ) );

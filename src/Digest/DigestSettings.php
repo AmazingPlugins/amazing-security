@@ -9,7 +9,7 @@ use AmazingPlugins\Security\Sessions\SessionPolicy;
 
 final class DigestSettings {
 	public function register(): void {
-		add_submenu_page( 'amazing-security', 'Weekly security digest', 'Weekly digest', 'manage_options', 'amsec-digest', array( $this, 'render' ) );
+		add_submenu_page( 'amazing-security', __( 'Weekly security digest', 'amazing-security' ), __( 'Weekly digest', 'amazing-security' ), 'manage_options', 'amsec-digest', array( $this, 'render' ) );
 	}
 
 	public function handle(): void {
@@ -60,7 +60,7 @@ final class DigestSettings {
 		echo '</select></label>';
 		wp_nonce_field( 'amsec_digest_settings' );
 		echo '<p><label>Your password <input type="password" name="password" autocomplete="current-password" required maxlength="1024"></label></p><p><label><input type="checkbox" name="confirm" value="1" required> I understand that this summary is emailed to the current WordPress administrator email and does not establish a clean-site verdict.</label></p>';
-		submit_button( 'Approve digest setting', 'secondary' );
+		submit_button( __( 'Approve digest setting', 'amazing-security' ), 'secondary' );
 		echo '</form></div>';
 	}
 }

@@ -2,8 +2,8 @@
     "schema": 1,
     "packs": {
         "files": {
-            "version": "2026.09.30.2",
-            "reviewed_at": "2026-09-30",
+            "version": "2026.10.03.3",
+            "reviewed_at": "2026-10-03",
             "ids": [
                 "AS-PHP-001",
                 "AS-PHP-002",
@@ -21,36 +21,52 @@
                 "AS-PHP-014",
                 "AS-PHP-015",
                 "AS-PHP-016",
-                "AS-PHP-017"
+                "AS-PHP-017",
+                "AS-PHP-018",
+                "AS-PHP-019",
+                "AS-PHP-020",
+                "AS-PHP-021",
+                "AS-PHP-022",
+                "AS-PHP-023",
+                "AS-PHP-024",
+                "AS-PHP-025",
+                "AS-PHP-026",
+                "AS-PHP-027",
+                "AS-PHP-028"
             ],
             "sha256": {
-                "src/FileScan/BundledRulePack.php": "ceaa78a60a16c9f782cab2797f1fdd43f4c9c7170033a470def9dbb73c395e46",
-                "src/FileScan/RuleMatcher.php": "169aac02508bb55ff868d1fd2a82256c95b0c866ad47b08eb173d01d8cf30b01",
-                "src/FileScan/AdjacentFlow.php": "12308f254a259ee515fd370cc6fd3842350a1ff691b9f49479b2aee4fb2dfa3c"
+                "src/FileScan/BundledRulePack.php": "64c08603fafd551b0ad019b8af6a345bd695e5f1a8a298e643f53f40aa3adebf",
+                "src/FileScan/RuleMatcher.php": "761cf2a81c28f35424f572d376275a48aa39667e53afc0ac604abd8db5a4fdd1",
+                "src/FileScan/AdjacentFlow.php": "b5834b355585c9c11a87829865413cb87546bb648a1f04ae76c6306b45a38571"
             }
         },
         "content": {
-            "version": "2026.09.30.1",
-            "reviewed_at": "2026-09-30",
+            "version": "2026.10.02.1",
+            "reviewed_at": "2026-10-03",
             "ids": [
                 "AS-HTML-001",
                 "AS-HTML-002",
                 "AS-HTML-003",
+                "AS-HTML-004",
                 "AS-JS-001"
             ],
             "sha256": {
-                "src/Content/MarkupDetector.php": "e68f991d5ab9b50104734a03a79bc66129776e4dbee1470883b99ee075f336b9"
+                "src/Content/MarkupDetector.php": "d3acceb2b6efac28e67ba9778e298af3b3e6d764fcf913d2daf86cfa53025fcd"
             }
         },
         "requests": {
-            "version": "2026.09.29.1",
-            "reviewed_at": "2026-09-30",
+            "version": "2026.10.03.3",
+            "reviewed_at": "2026-10-03",
             "ids": [
                 "AS-REST-001",
-                "AS-REST-002"
+                "AS-REST-002",
+                "AS-REST-003",
+                "AS-REST-004",
+                "AS-REST-005",
+                "AS-REST-006"
             ],
             "sha256": {
-                "src/Firewall/BundledRequestRules.php": "6ab0a7a9c92d5d3c6b9f0c8699518beeb54ad47a99a90e652f75d4d3dac84f6a"
+                "src/Firewall/BundledRequestRules.php": "9d4f17ea76d4cc0c69c074c1e461e0f8ec7eb1563f585a59947bb7e67327786c"
             }
         }
     }

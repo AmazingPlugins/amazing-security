@@ -5,7 +5,7 @@ namespace AmazingPlugins\Security\Exposure;
 
 final class ExposurePage {
 	public function register(): void {
-		$hook = add_submenu_page( 'amazing-security', 'Local exposure inventory', 'Local inventory', 'manage_options', 'amsec-exposure', array( $this, 'render' ) );
+		$hook = add_submenu_page( 'amazing-security', __( 'Local exposure inventory', 'amazing-security' ), __( 'Local inventory', 'amazing-security' ), 'manage_options', 'amsec-exposure', array( $this, 'render' ) );
 		add_action(
 			'admin_enqueue_scripts',
 			static function ( string $current ) use ( $hook ): void {
@@ -29,7 +29,7 @@ final class ExposurePage {
 		) as $alias => $label ) {
 			echo '<section class="amsec-file-scan"><div class="amsec-file-heading"><h2>' . esc_html( $label ) . '</h2><form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '"><input type="hidden" name="action" value="amsec_exposure_inventory"><input type="hidden" name="root" value="' . esc_attr( $alias ) . '">';
 			wp_nonce_field( 'amsec_exposure_' . $alias );
-			submit_button( 'Inventory this root', 'secondary', 'submit', false );
+			submit_button( __( 'Inventory this root', 'amazing-security' ), 'secondary', 'submit', false );
 			echo '</form></div>';
 			$report = $state['reports'][ $alias ] ?? null;
 			if ( null === $report ) {

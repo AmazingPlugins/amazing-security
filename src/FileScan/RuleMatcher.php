@@ -49,7 +49,9 @@ final class RuleMatcher {
 			} elseif ( in_array( $token[0], array( T_NAME_QUALIFIED, T_NAME_RELATIVE ), true ) || ( T_NAME_FULLY_QUALIFIED === $token[0] && substr_count( $token[1], '\\' ) > 1 ) || ( T_VARIABLE === $token[0] && ! in_array( $token[1], array( '$_GET', '$_POST', '$_REQUEST', '$_COOKIE' ), true ) ) || ( T_STRING === $token[0] && in_array( $previous, array( T_OBJECT_OPERATOR, T_NULLSAFE_OBJECT_OPERATOR, T_DOUBLE_COLON, T_FUNCTION ), true ) ) ) {
 				$code .= 'NON_GLOBAL_NAME';
 			} elseif ( T_CONSTANT_ENCAPSED_STRING === $token[0] ) {
-				if ( $this->hiddenExternalLink( $token[1] ) ) {
+				if ( $this->evalModifier( $token[1] ) ) {
+					$code .= "\x01PREG_E\x02";
+				} elseif ( $this->hiddenExternalLink( $token[1] ) ) {
 					$code .= "\x01HIDDEN_EXTERNAL_LINK\x02";
 				} elseif ( preg_match( '/^[\'\"]Location:\s*[\'\"]$/i', $token[1] ) ) {
 					$code .= "\x01LOCATION\x02";
@@ -75,6 +77,13 @@ final class RuleMatcher {
 			}
 		}
 		return $hits;
+	}
+
+	private function evalModifier( string $literal ): bool {
+		if ( strlen( $literal ) > 512 || ! preg_match( '/^[\'\"](.*)[\'\"]$/s', $literal, $match ) ) {
+			return false;
+		}
+		return 1 === preg_match( '/^(.)(?:\\\\.|(?!\\1).)*\\1[A-Za-z]*e[A-Za-z]*$/s', $match[1] );
 	}
 
 	private function hiddenExternalLink( string $literal ): bool {

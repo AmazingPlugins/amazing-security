@@ -13,6 +13,10 @@ final class FileEditorCheck extends AbstractCheck {
 
 	public function run( ScanContext $context ): array {
 		$disabled = $this->values->fileEditorDisabled();
-		return $this->result( null === $disabled ? null : ! $disabled, 'DISALLOW_FILE_EDIT is enabled.', 'DISALLOW_FILE_EDIT is not enabled. Other controls may still restrict the editor.' );
+		$fix      = $this->values->fileEditorFix();
+		$warn     = 'config' === $fix
+			? 'People can edit theme and plugin files because wp-config.php turns the editor on. This plugin will not edit that file.'
+			: 'People can edit theme and plugin files in wp-admin. Turn that editor off so a signed-in session cannot change PHP from the browser.';
+		return $this->result( null === $disabled ? null : ! $disabled, 'The theme and plugin editor is turned off.', $warn, array( 'fix' => $fix ) );
 	}
 }

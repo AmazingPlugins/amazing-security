@@ -35,7 +35,7 @@ final class RuleCatalog {
 			'requests' => array(
 				'label'    => 'REST observation patterns',
 				'version'  => ( new BundledRequestRules() )->version(),
-				'ids'      => array( 'AS-REST-001', 'AS-REST-002' ),
+				'ids'      => ( new BundledRequestRules() )->ids(),
 				'files'    => array( 'src/Firewall/BundledRequestRules.php' ),
 				'fixtures' => 'tests/Unit/Firewall/',
 				'scope'    => 'Observe-only patterns with known benign matches; they must not be used as blocking rules.',

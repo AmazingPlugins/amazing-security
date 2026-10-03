@@ -6,7 +6,7 @@ namespace AmazingPlugins\Security\Activity;
 
 final class ActivityPage {
 	public function register(): void {
-		add_submenu_page( 'amazing-security', 'Security activity', 'Activity', 'manage_options', 'amsec-activity', array( $this, 'render' ) );
+		add_submenu_page( 'amazing-security', __( 'Security activity', 'amazing-security' ), __( 'Activity', 'amazing-security' ), 'manage_options', 'amsec-activity', array( $this, 'render' ) );
 	}
 
 	public function render(): void {

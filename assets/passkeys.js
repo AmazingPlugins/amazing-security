@@ -47,9 +47,6 @@
                 field('password').value = '';
                 field('factor').value = '';
                 field('confirm').checked = false;
-            } else {
-                const factor = document.getElementById('amsec-otp');
-                if (factor) factor.value = '';
             }
             buttons.forEach((button, index) => { button.disabled = disabled[index]; });
             busy = false;
@@ -76,7 +73,7 @@
             options.user.id = decode(options.user.id);
             options.excludeCredentials = options.excludeCredentials.map(item => ({...item, id: decode(item.id)}));
             const credential = await navigator.credentials.create({publicKey: options});
-            await request('enroll_finish', {_wpnonce: approved._wpnonce, ticket: begun.ticket, label, payload: envelope(credential, true)});
+            await request('enroll_finish', {_wpnonce: approved._wpnonce, ticket: begun.ticket, label, factor: approved.factor, payload: envelope(credential, true)});
             status.textContent = config.saved;
             window.location.reload();
         }));

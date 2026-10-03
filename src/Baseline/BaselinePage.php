@@ -8,7 +8,7 @@ use AmazingPlugins\Security\Integrity\WordPressOptions;
 
 final class BaselinePage {
 	public function register(): void {
-		add_submenu_page( 'amazing-security', 'Custom-code baselines', 'Code baselines', 'manage_options', 'amsec-baselines', array( $this, 'render' ) );
+		add_submenu_page( 'amazing-security', __( 'Custom-code baselines', 'amazing-security' ), __( 'Code baselines', 'amazing-security' ), 'manage_options', 'amsec-baselines', array( $this, 'render' ) );
 	}
 
 	public function render(): void {
@@ -31,14 +31,14 @@ final class BaselinePage {
 			}
 			echo '</select></label>';
 			wp_nonce_field( 'amsec_baseline_preview' );
-			submit_button( 'Prepare five-minute preview', 'secondary' );
+			submit_button( __( 'Prepare five-minute preview', 'amazing-security' ), 'secondary' );
 			echo '</form>';
 			$preview = $state['previews'][ (string) get_current_user_id() ] ?? null;
 			if ( is_array( $preview ) && $preview['expires'] > time() ) {
 				echo '<h2>Pending reference</h2><p>' . esc_html( $preview['key'] ) . ': ' . esc_html( (string) count( $preview['files'] ) ) . ' covered files. Approval replaces any existing reference for this package after checking that the covered files and target are unchanged.</p><details><summary>Covered relative files and SHA-256 hashes</summary><pre>' . esc_html( wp_json_encode( $preview['files'], JSON_PRETTY_PRINT ) ) . '</pre></details><form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '"><input type="hidden" name="action" value="amsec_baseline"><input type="hidden" name="mode" value="approve"><input type="hidden" name="target" value="' . esc_attr( $preview['key'] ) . '"><input type="hidden" name="token" value="' . esc_attr( $preview['token'] ) . '">';
 				wp_nonce_field( 'amsec_baseline_approve_' . $preview['token'] );
 				echo '<p><label>Your password <input type="password" name="password" autocomplete="current-password" maxlength="1024" required></label></p><p><label><input type="checkbox" name="confirm" value="1" required> I approve this reference and understand it replaces an existing baseline without establishing that the code is clean.</label></p>';
-				submit_button( 'Approve reference', 'secondary' );
+				submit_button( __( 'Approve reference', 'amazing-security' ), 'secondary' );
 				echo '</form>';
 			}
 		} else {
@@ -50,7 +50,7 @@ final class BaselinePage {
 		}
 		echo '</select></label>';
 		wp_nonce_field( 'amsec_baseline_compare', '_wpnonce', false );
-		submit_button( 'Compare covered files', 'secondary' );
+		submit_button( __( 'Compare covered files', 'amazing-security' ), 'secondary' );
 		echo '</form>';
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Verified below before bounded read work.
 		$key = is_string( $_GET['compare'] ?? null ) ? sanitize_text_field( wp_unslash( $_GET['compare'] ) ) : '';

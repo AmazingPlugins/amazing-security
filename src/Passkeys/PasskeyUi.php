@@ -14,8 +14,8 @@ final class PasskeyUi {
 			$this->assets(); }
 	}
 	public function assets(): void {
-		wp_enqueue_script( 'amsec-passkeys', plugins_url( 'assets/passkeys.js', AMAZING_SECURITY_FILE ), array(), '0.1.0', true );
-		wp_enqueue_style( 'amsec-passkeys', plugins_url( 'assets/passkeys.css', AMAZING_SECURITY_FILE ), array(), '0.1.0' );
+		wp_enqueue_script( 'amsec-passkeys', plugins_url( 'assets/passkeys.js', AMAZING_SECURITY_FILE ), array(), '0.1.1', true );
+		wp_enqueue_style( 'amsec-passkeys', plugins_url( 'assets/passkeys.css', AMAZING_SECURITY_FILE ), array(), '0.1.1' );
 		wp_localize_script(
 			'amsec-passkeys',
 			'amsecPasskeys',
@@ -40,8 +40,8 @@ final class PasskeyUi {
 		?>
 		<section id="amsec-passkeys" class="amsec-passkeys" aria-labelledby="amsec-passkeys-title">
 		<h2 id="amsec-passkeys-title"><?php esc_html_e( 'Your passkeys', 'amazing-security' ); ?></h2>
-		<p><?php esc_html_e( 'Sign in with your device’s screen lock or security key. Your existing verification-code and account policies still apply.', 'amazing-security' ); ?></p>
-		<p class="description"><?php esc_html_e( 'This preview supports discoverable passkeys with device verification and ES256. Your device or passkey provider manages the private key; this site stores its public key. Some authenticators are not supported.', 'amazing-security' ); ?></p>
+		<p><?php esc_html_e( 'Sign in with your device’s screen lock or security key. The passkey is the sign-in.', 'amazing-security' ); ?></p>
+		<p class="description"><?php esc_html_e( 'Use your verification code with your password when you add or remove a passkey, and when you sign in with a password. A locked account or a required password reset still blocks a passkey.', 'amazing-security' ); ?></p>
 		<p class="description"><?php esc_html_e( 'Your username and display name are sent to your device so it can label this passkey. That device decides whether the passkey syncs to your other devices.', 'amazing-security' ); ?></p>
 		<?php
 		if ( ! $enabled ) :
@@ -72,7 +72,7 @@ elseif ( array() === $records ) :
 		<p><label><input id="amsec-passkey-confirm" type="checkbox"> <?php esc_html_e( 'I approve adding or removing a passkey on my account.', 'amazing-security' ); ?></label></p>
 		<button type="button" class="button button-primary" id="amsec-passkey-add" <?php disabled( ! $enabled || null === $records || count( $records ) >= 5 ); ?>><?php esc_html_e( 'Add a passkey', 'amazing-security' ); ?></button>
 		<p class="amsec-passkey-status" role="status" aria-live="polite"></p>
-		<p class="description"><?php esc_html_e( 'Keep your password and recovery codes somewhere safe. You can add up to five passkeys. If a device is lost, remove its passkey here; if you cannot sign in, ask your site administrator or host for recovery. Changing the site domain requires new passkeys.', 'amazing-security' ); ?></p>
+		<p class="description"><?php esc_html_e( 'Keep your password and recovery codes somewhere safe. You can add up to five passkeys. If a device is lost, remove its passkey here; if you cannot sign in, ask your site administrator or host for recovery. Changing the site address requires new passkeys.', 'amazing-security' ); ?></p>
 		<noscript><p><?php esc_html_e( 'Passkey controls require JavaScript.', 'amazing-security' ); ?></p></noscript>
 		</section>
 		<?php
@@ -82,7 +82,7 @@ elseif ( array() === $records ) :
 			return; }
 		$this->assets();
 		?>
-		<div class="amsec-passkey-login"><button type="button" class="button button-secondary" id="amsec-passkey-signin"><?php esc_html_e( 'Sign in with a passkey', 'amazing-security' ); ?></button><p class="description"><?php esc_html_e( 'Sign in with a passkey. You only need a verification code when you sign in with your password.', 'amazing-security' ); ?></p><p class="amsec-passkey-status" role="status" aria-live="polite"></p></div>
+		<div class="amsec-passkey-login"><button type="button" class="button button-secondary" id="amsec-passkey-signin"><?php esc_html_e( 'Sign in with a passkey', 'amazing-security' ); ?></button><p class="description"><?php esc_html_e( 'You only need a verification code when you sign in with your password.', 'amazing-security' ); ?></p><p class="amsec-passkey-status" role="status" aria-live="polite"></p></div>
 		<?php
 	}
 }

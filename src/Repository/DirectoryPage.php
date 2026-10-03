@@ -5,7 +5,7 @@ namespace AmazingPlugins\Security\Repository;
 
 final class DirectoryPage {
 	public function register(): void {
-		$hook = add_submenu_page( 'amazing-security', 'Plugin directory status', 'Directory status', 'manage_options', 'amsec-repository', array( $this, 'render' ) );
+		$hook = add_submenu_page( 'amazing-security', __( 'Plugin directory status', 'amazing-security' ), __( 'Directory status', 'amazing-security' ), 'manage_options', 'amsec-repository', array( $this, 'render' ) );
 		add_action(
 			'admin_enqueue_scripts',
 			static function ( string $current ) use ( $hook ): void {
@@ -49,7 +49,7 @@ final class DirectoryPage {
 					echo '<p>Candidate directory slug: ' . esc_html( $item['slug'] ) . '. <a href="' . esc_url( 'https://wordpress.org/plugins/' . rawurlencode( $item['slug'] ) . '/' ) . '" target="_blank" rel="noopener noreferrer">Review the directory record</a></p><form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '"><input type="hidden" name="action" value="amsec_repository_lookup"><input type="hidden" name="target" value="' . esc_attr( $item['key'] ) . '"><input type="hidden" name="fingerprint" value="' . esc_attr( $item['fingerprint'] ) . '">';
 					wp_nonce_field( 'amsec_repository_' . $item['key'] . '_' . $item['fingerprint'] );
 					echo '<p><label><input type="checkbox" name="consent" value="1" required> Send this candidate slug to WordPress.org for a directory-status lookup.</label></p>';
-					submit_button( 'Look up directory status', 'secondary', 'submit', false );
+					submit_button( __( 'Look up directory status', 'amazing-security' ), 'secondary', 'submit', false );
 					echo '</form>';
 				} else {
 					echo '<p>Unsupported package for this lookup. Ask its publisher about maintenance; no absence or abandonment is inferred.</p>';}

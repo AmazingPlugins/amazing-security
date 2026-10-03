@@ -11,7 +11,7 @@ final class PasskeyActions {
 			$own     = $runtime->own( $post );
 			if ( null === $own ) {
 				return null; }
-			$permit = $this->approve( $post, $own['user_id'], $now );
+			$permit = $this->approve( $post, $own['user_id'], $now, false );
 			if ( null === $permit ) {
 				return null; }
 			$repository = new PasskeyRepository( $this->db );
@@ -111,6 +111,11 @@ final class PasskeyActions {
 			$handle = ( new PasskeyHandle( $this->db ) )->get( $own['user_id'] );
 			if ( null === $handle ) {
 				return false; }
+			$factor  = $post['factor'] ?? '';
+			$account = new WordPressPasskeyAccount( $this->db );
+			$state   = $account->state( $own['user_id'], $now );
+			if ( ! is_string( $factor ) || strlen( $factor ) > 128 || null === $state || ( $state['admin'] && $state['enrolled'] && ! $account->factor()->verifyFactor( $own['user_id'], $factor, $now ) ) ) {
+				return false; }
 			$record = array(
 				'version'          => 1,
 				'user_id'          => $own['user_id'],
@@ -155,14 +160,14 @@ final class PasskeyActions {
 		( new \AmazingPlugins\Security\Activity\ActivityHooks( new \AmazingPlugins\Security\Activity\ActivityRepository( $this->db ) ) )->record( 'security_setting_changed', $id, $target );
 	}
 
-	private function approve( array $post, int $id, int $now ): ?array {
+	private function approve( array $post, int $id, int $now, bool $consumeFactor = true ): ?array {
 		if ( '1' !== ( $post['confirm'] ?? null ) || ! is_string( $post['password'] ?? null ) || '' === $post['password'] || strlen( $post['password'] ) > 1024 || ! is_string( $post['factor'] ?? null ) || strlen( $post['factor'] ) > 128 ) {
 			return null; }
 		clean_user_cache( $id );
 		$user = get_userdata( $id );
 		if ( ! $user instanceof \WP_User || ! wp_check_password( $post['password'], $user->user_pass, $id ) ) {
 			return null; }
-		return ( new WordPressPasskeyAccount( $this->db ) )->gate()->authorize( $id, $post['factor'], $now );
+		return ( new WordPressPasskeyAccount( $this->db ) )->gate( $consumeFactor )->authorize( $id, $post['factor'], $now );
 	}
 	private function display( string $text, string $fallback ): string {
 		$text = trim( mb_strcut( wp_strip_all_tags( $text ), 0, 64, 'UTF-8' ) );

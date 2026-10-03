@@ -22,16 +22,45 @@ final class AdjacentFlow {
 			}
 			$name = $items[ $i ][2];
 			$j    = $i + 2;
+			if ( T_CONSTANT_ENCAPSED_STRING === ( $items[ $j ][1] ?? null ) && self::evalModifier( (string) $items[ $j ][2] ) && ';' === ( $items[ $j + 1 ][2] ?? '' ) ) {
+				$pregCopied = self::copiedNames( $items, $name, $j + 1, 1 );
+				$pregCall   = $pregCopied['at'] + 1;
+				if ( T_STRING === ( $items[ $pregCall ][1] ?? null ) && 'preg_replace' === strtolower( (string) $items[ $pregCall ][2] ) && '(' === ( $items[ $pregCall + 1 ][2] ?? '' ) && T_VARIABLE === ( $items[ $pregCall + 2 ][1] ?? null ) && in_array( $items[ $pregCall + 2 ][2] ?? '', $pregCopied['names'], true ) ) {
+					$markers[ $items[ $i ][0] ] = "\x01INDIRECT_PREG_E\x02";
+				}
+			}
 			if ( self::request( $items, $j ) && ';' === ( $items[ $j + 4 ][2] ?? '' ) && T_STRING === ( $items[ $j + 5 ][1] ?? null ) && 'wp_redirect' === strtolower( $items[ $j + 5 ][2] ) && '(' === ( $items[ $j + 6 ][2] ?? '' ) && ( $items[ $j + 7 ][2] ?? '' ) === $name && in_array( $items[ $j + 8 ][2] ?? '', array( ')', ',' ), true ) ) {
 				$markers[ $items[ $i ][0] ] = "\x01INDIRECT_REDIRECT\x02";
 			}
 			if ( self::request( $items, $j ) && ';' === ( $items[ $j + 4 ][2] ?? '' ) ) {
-				$call = $j + 5;
+				$call  = $j + 5;
+				$sinks = array(
+					'extract'           => "\x01INDIRECT_EXTRACT\x02",
+					'parse_str'         => "\x01INDIRECT_PARSE\x02",
+					'file_put_contents' => "\x01INDIRECT_WRITE\x02",
+				);
 				if ( T_EVAL === ( $items[ $call ][1] ?? null ) && '(' === ( $items[ $call + 1 ][2] ?? '' ) && T_VARIABLE === ( $items[ $call + 2 ][1] ?? null ) && ( $items[ $call + 2 ][2] ?? '' ) === $name && ')' === ( $items[ $call + 3 ][2] ?? '' ) ) {
 					$markers[ $items[ $i ][0] ] = "\x01INDIRECT_EVAL\x02";
 				}
+				$copied   = self::copiedNames( $items, $name, $j + 4 );
+				$sinkCall = $copied['at'] + 1;
+				$sinkName = strtolower( (string) ( $items[ $sinkCall ][2] ?? '' ) );
+				$arg      = $items[ $sinkCall + 2 ][2] ?? '';
+				if ( isset( $sinks[ $sinkName ] ) && T_STRING === ( $items[ $sinkCall ][1] ?? null ) && '(' === ( $items[ $sinkCall + 1 ][2] ?? '' ) && T_VARIABLE === ( $items[ $sinkCall + 2 ][1] ?? null ) && in_array( $arg, $copied['names'], true ) && in_array( $items[ $sinkCall + 3 ][2] ?? '', array( ')', ',' ), true ) ) {
+					$markers[ $items[ $i ][0] ] = $sinks[ $sinkName ];
+				}
 				if ( T_VARIABLE === ( $items[ $call ][1] ?? null ) && ( $items[ $call ][2] ?? '' ) === $name && '(' === ( $items[ $call + 1 ][2] ?? '' ) && ! ( T_ELLIPSIS === ( $items[ $call + 2 ][1] ?? null ) && ')' === ( $items[ $call + 3 ][2] ?? '' ) ) ) {
 					$markers[ $items[ $i ][0] ] = "\x01REQUEST_CALLBACK\x02";
+				}
+				$createCopied = self::copiedNames( $items, $name, $j + 4, 2 );
+				$createCall   = $createCopied['at'] + 1;
+				if ( T_STRING === ( $items[ $createCall ][1] ?? null ) && 'create_function' === strtolower( (string) ( $items[ $createCall ][2] ?? '' ) ) && '(' === ( $items[ $createCall + 1 ][2] ?? '' ) ) {
+					$used   = $createCopied['names'];
+					$second = T_CONSTANT_ENCAPSED_STRING === ( $items[ $createCall + 2 ][1] ?? null ) && ',' === ( $items[ $createCall + 3 ][2] ?? '' ) && T_VARIABLE === ( $items[ $createCall + 4 ][1] ?? null ) && in_array( $items[ $createCall + 4 ][2] ?? '', $used, true ) && in_array( $items[ $createCall + 5 ][2] ?? '', array( ')', ',' ), true );
+					$first  = T_VARIABLE === ( $items[ $createCall + 2 ][1] ?? null ) && in_array( $items[ $createCall + 2 ][2] ?? '', $used, true ) && ',' === ( $items[ $createCall + 3 ][2] ?? '' );
+					if ( $second || $first ) {
+						$markers[ $items[ $i ][0] ] = "\x01INDIRECT_CREATE\x02";
+					}
 				}
 			}
 			$literal = '';
@@ -45,11 +74,63 @@ final class AdjacentFlow {
 				}
 				++$j;
 			}
-			if ( T_CONSTANT_ENCAPSED_STRING === ( $items[ $j - 1 ][1] ?? null ) && in_array( strtolower( $literal ), array( 'system', 'exec', 'shell_exec', 'passthru', 'proc_open' ), true ) && ';' === ( $items[ $j ][2] ?? '' ) && ( $items[ $j + 1 ][2] ?? '' ) === $name && '(' === ( $items[ $j + 2 ][2] ?? '' ) && self::request( $items, $j + 3 ) && in_array( $items[ $j + 7 ][2] ?? '', array( ')', ',' ), true ) ) {
-				$markers[ $items[ $i ][0] ] = "\x01INDIRECT_COMMAND\x02";
+			$calls  = array(
+				'system'            => "\x01INDIRECT_COMMAND\x02",
+				'exec'              => "\x01INDIRECT_COMMAND\x02",
+				'shell_exec'        => "\x01INDIRECT_COMMAND\x02",
+				'passthru'          => "\x01INDIRECT_COMMAND\x02",
+				'proc_open'         => "\x01INDIRECT_COMMAND\x02",
+				'assert'            => "\x01INDIRECT_ASSERT\x02",
+				'extract'           => "\x01INDIRECT_EXTRACT\x02",
+				'parse_str'         => "\x01INDIRECT_PARSE\x02",
+				'file_put_contents' => "\x01INDIRECT_WRITE\x02",
+			);
+			$copied = self::copiedNames( $items, $name, $j );
+			$use    = $copied['at'];
+			if ( T_CONSTANT_ENCAPSED_STRING === ( $items[ $j - 1 ][1] ?? null ) && isset( $calls[ strtolower( $literal ) ] ) && ';' === ( $items[ $use ][2] ?? '' ) && ( $items[ $use + 1 ][2] ?? '' ) === $copied['name'] && '(' === ( $items[ $use + 2 ][2] ?? '' ) && self::request( $items, $use + 3 ) && in_array( $items[ $use + 7 ][2] ?? '', array( ')', ',' ), true ) ) {
+				$markers[ $items[ $i ][0] ] = $calls[ strtolower( $literal ) ];
 			}
 		}
 		return $markers;
+	}
+
+	private static function copiedNames( array $items, string $name, int $semicolon, int $limit = 5 ): array {
+		$names = array( $name );
+		$at    = $semicolon;
+		for ( $hop = 0; $hop < $limit; ++$hop ) {
+			$next = self::onceCopied( $items, $names[ count( $names ) - 1 ], $at );
+			if ( $next['at'] === $at ) {
+				break;
+			}
+			$names[] = $next['name'];
+			$at      = $next['at'];
+		}
+		return array(
+			'names' => $names,
+			'name'  => $names[ count( $names ) - 1 ],
+			'at'    => $at,
+		);
+	}
+
+	private static function onceCopied( array $items, string $name, int $semicolon ): array {
+		$next = $semicolon + 1;
+		if ( T_VARIABLE === ( $items[ $next ][1] ?? null ) && '=' === ( $items[ $next + 1 ][2] ?? '' ) && ( $items[ $next + 2 ][2] ?? '' ) === $name && ';' === ( $items[ $next + 3 ][2] ?? '' ) ) {
+			return array(
+				'name' => (string) $items[ $next ][2],
+				'at'   => $next + 3,
+			);
+		}
+		return array(
+			'name' => $name,
+			'at'   => $semicolon,
+		);
+	}
+
+	private static function evalModifier( string $literal ): bool {
+		if ( strlen( $literal ) > 512 || ! preg_match( '/^[\'\"](.*)[\'\"]$/s', $literal, $match ) ) {
+			return false;
+		}
+		return 1 === preg_match( '/^(.)(?:\\\\.|(?!\\1).)*\\1[A-Za-z]*e[A-Za-z]*$/s', $match[1] );
 	}
 
 	private static function request( array $items, int $index ): bool {

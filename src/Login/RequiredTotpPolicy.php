@@ -9,6 +9,10 @@ final class RequiredTotpPolicy {
 	public const META   = 'amsec_required_totp_grace';
 	public const GRACE  = 604800;
 
+	public static function coveredAccount( bool $administrator, array $roles ): bool {
+		return $administrator || in_array( 'editor', $roles, true );
+	}
+
 	public function generation(): ?string {
 		$value = get_option( self::OPTION, '' );
 		if ( '' === $value ) {
@@ -30,7 +34,7 @@ final class RequiredTotpPolicy {
 
 	public function grantGrace( int $id ): void {
 		$generation = $this->generation();
-		if ( null === $generation || $id < 1 || ! user_can( $id, 'manage_options' ) ) {
+		if ( null === $generation || $id < 1 || ! self::accountCovered( $id ) ) {
 			throw new \RuntimeException( 'Account or policy unavailable.' );
 		}
 		$value = array(
@@ -45,7 +49,7 @@ final class RequiredTotpPolicy {
 
 	public function status( int $id ): string {
 		$generation = $this->generation();
-		if ( null === $generation || ! user_can( $id, 'manage_options' ) ) {
+		if ( null === $generation || ! self::accountCovered( $id ) ) {
 			return 'off';
 		}
 		if ( ( new WordPressTotpStore( $GLOBALS['wpdb'] ) )->isEnrolled( $id ) ) {
@@ -55,7 +59,7 @@ final class RequiredTotpPolicy {
 	}
 
 	public function authenticate( mixed $user, string $username, string $password ): mixed {
-		if ( ! $user instanceof \WP_User || ! user_can( $user, 'manage_options' ) || TotpAuthentication::isApiRequest( defined( 'REST_REQUEST' ) && REST_REQUEST, defined( 'WP_CLI' ) && WP_CLI, defined( 'XMLRPC_REQUEST' ) && XMLRPC_REQUEST ) || '' === $password || ! wp_check_password( $password, $user->user_pass, $user->ID ) ) {
+		if ( ! $user instanceof \WP_User || ! self::coveredAccount( user_can( $user, 'manage_options' ), is_array( $user->roles ) ? $user->roles : array() ) || TotpAuthentication::isApiRequest( defined( 'REST_REQUEST' ) && REST_REQUEST, defined( 'WP_CLI' ) && WP_CLI, defined( 'XMLRPC_REQUEST' ) && XMLRPC_REQUEST ) || '' === $password || ! wp_check_password( $password, $user->user_pass, $user->ID ) ) {
 			return $user;
 		}
 		try {
@@ -71,6 +75,11 @@ final class RequiredTotpPolicy {
 			return new \WP_Error( 'amsec_policy_unavailable', __( 'Administrator verification policy is unavailable. Contact the site owner for recovery.', 'amazing-security' ) );
 		}
 		return new \WP_Error( 'amsec_enrollment_required', __( 'Your verification enrollment period has ended. Ask an enrolled administrator to grant a new grace period, or use host-level recovery.', 'amazing-security' ) );
+	}
+
+	private static function accountCovered( int $id ): bool {
+		$user = get_userdata( $id );
+		return $user instanceof \WP_User && self::coveredAccount( user_can( $user, 'manage_options' ), is_array( $user->roles ) ? $user->roles : array() );
 	}
 
 	public function recovery( array $args, array $assoc ): void {

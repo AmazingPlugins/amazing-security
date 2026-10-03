@@ -11,7 +11,7 @@ final class ProxySettings {
 	private function service(): ProxySettingsService {
 		return new ProxySettingsService( new FreshSecurityOptions( $GLOBALS['wpdb'], new WordPressOptions() ) ); }
 	public function register(): void {
-		$hook = add_submenu_page( 'amazing-security', 'Trusted proxy addresses', 'Trusted proxies', 'manage_options', 'amsec-proxies', array( $this, 'render' ) );
+		$hook = add_submenu_page( 'amazing-security', __( 'Trusted proxy addresses', 'amazing-security' ), __( 'Trusted proxies', 'amazing-security' ), 'manage_options', 'amsec-proxies', array( $this, 'render' ) );
 		add_action(
 			'admin_enqueue_scripts',
 			static function ( string $current ) use ( $hook ): void {
@@ -74,7 +74,7 @@ final class ProxySettings {
 			echo '</select></label></p><p><label>Trusted proxy networks (one IP/CIDR per line, up to 50)<br><textarea name="rules" rows="6" class="large-text code" maxlength="4096">' . esc_html( implode( "\n", $state['cidrs'] ) ) . '</textarea></label></p>';
 			wp_nonce_field( 'amsec_proxy_' . $fp );
 			echo '<p><label>Your password <input type="password" name="password" autocomplete="current-password" maxlength="1024" required></label></p><p><label><input type="checkbox" name="confirm" value="1" required> The host verified socket-peer origin, upstream ranges and header behavior. I reviewed shared-network and self-lockout effects and know the recovery command.</label></p>';
-			submit_button( 'Approve current proxy policy', 'secondary' );
+			submit_button( __( 'Approve current proxy policy', 'amazing-security' ), 'secondary' );
 			echo '</form></section></div>';
 	}
 	public function recovery( array $args, array $assoc ): void {

@@ -6,7 +6,7 @@ namespace AmazingPlugins\Security\Headers;
 final class HeaderPage {
 	public function __construct( private readonly ?HeaderService $service = null ) {}
 	public function register(): void {
-		$hook = add_submenu_page( 'amazing-security', 'Security headers', 'Security headers', 'manage_options', 'amsec-headers', array( $this, 'render' ) );
+		$hook = add_submenu_page( 'amazing-security', __( 'Security headers', 'amazing-security' ), __( 'Security headers', 'amazing-security' ), 'manage_options', 'amsec-headers', array( $this, 'render' ) );
 		add_action(
 			'admin_enqueue_scripts',
 			static function ( string $current ) use ( $hook ): void {
@@ -28,7 +28,7 @@ final class HeaderPage {
 		echo '<section class="amsec-file-scan"><h2>Assess the configured homepage</h2><form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '"><input type="hidden" name="action" value="amsec_headers_check"><input type="hidden" name="fingerprint" value="' . esc_attr( $fp ) . '">';
 		wp_nonce_field( 'amsec_headers_' . $fp );
 		echo '<p><label><input type="checkbox" name="consent" value="1" required> I agree to one anonymous request to the configured homepage. The destination sees the server IP and generic user agent. Raw headers and the target URL are not stored.</label></p>';
-		submit_button( 'Assess homepage headers', 'secondary' );
+		submit_button( __( 'Assess homepage headers', 'amazing-security' ), 'secondary' );
 		echo '<p>Checks for the same target have a ten-minute cooldown. No scheduled requests or automatic policy changes.</p></form></section>';
 		foreach ( array(
 			'latest'    => 'Latest attempt',

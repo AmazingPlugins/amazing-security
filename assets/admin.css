@@ -6,6 +6,98 @@
   color: var(--amsec-ink);
 }
 
+.amsec-start {
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.amsec-start-heading {
+  margin: 22px 0 8px;
+}
+
+.amsec-start-item {
+  display: grid;
+  grid-template-columns: 7.5rem minmax(0, 1fr) auto;
+  gap: 8px 14px;
+  align-items: start;
+  margin: 0 0 8px;
+  padding: 12px 14px;
+  background: #fff;
+  border: 1px solid var(--amsec-line);
+  border-left: 3px solid #8c8f94;
+}
+
+.amsec-start-item[data-state="warn"],
+.amsec-start-item[data-state="fail"] {
+  border-left-color: #b65a00;
+}
+
+.amsec-start-item[data-state="pass"] {
+  border-left-color: #1e7a46;
+}
+
+.amsec-start-item[data-state="none"],
+.amsec-start-item[data-state="partial"] {
+  border-left-color: #2271b1;
+}
+
+.amsec-start-badge {
+  color: var(--amsec-muted);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.amsec-start-item[data-state="warn"] .amsec-start-badge,
+.amsec-start-item[data-state="fail"] .amsec-start-badge {
+  color: #8a4600;
+}
+
+.amsec-start-item[data-state="none"] .amsec-start-badge,
+.amsec-start-item[data-state="partial"] .amsec-start-badge {
+  color: #135e96;
+}
+
+.amsec-start-copy strong {
+  display: block;
+  margin-bottom: 2px;
+}
+
+.amsec-start-action {
+  margin: 0;
+  justify-self: end;
+}
+
+.amsec-overview > .amsec-start-action {
+  display: block;
+  margin-top: 16px;
+  justify-self: start;
+}
+
+.amsec-start-done {
+  margin-top: 16px;
+}
+
+.amsec-start-done summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+@media (max-width: 782px) {
+  .amsec-start-item {
+    grid-template-columns: 1fr;
+  }
+
+  .amsec-start-action,
+  .amsec-start-action .button {
+    justify-self: start;
+    width: auto;
+  }
+}
+
 .amazing-security-admin code,
 .amazing-security-admin .widefat td {
   overflow-wrap: anywhere;
@@ -70,6 +162,17 @@
 
 .amazing-security-admin .amsec-header form {
   flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.amsec-header-consent {
+  max-width: 32ch;
+  color: var(--amsec-muted);
+  font-size: 12px;
+  line-height: 1.4;
 }
 
 .amazing-security-admin .amsec-header h1 {

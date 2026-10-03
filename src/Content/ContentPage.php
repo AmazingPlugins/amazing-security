@@ -5,7 +5,7 @@ namespace AmazingPlugins\Security\Content;
 
 final class ContentPage {
 	public function register(): void {
-		$hook = add_submenu_page( 'amazing-security', 'Published content', 'Content scan', 'manage_options', 'amsec-content', array( $this, 'render' ) );
+		$hook = add_submenu_page( 'amazing-security', __( 'Published content', 'amazing-security' ), __( 'Content scan', 'amazing-security' ), 'manage_options', 'amsec-content', array( $this, 'render' ) );
 		add_action(
 			'admin_enqueue_scripts',
 			static function ( string $current ) use ( $hook ): void {
@@ -58,7 +58,7 @@ final class ContentPage {
 	private function form( string $operation, string $id ): void {
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '"><input type="hidden" name="action" value="amsec_content_scan"><input type="hidden" name="operation" value="' . esc_attr( $operation ) . '"><input type="hidden" name="scan_id" value="' . esc_attr( $id ) . '">';
 		wp_nonce_field( 'start' === $operation ? 'amsec_content_start' : 'amsec_content_resume_' . $id );
-		submit_button( 'start' === $operation ? 'Scan published content' : 'Continue scan', 'primary', 'submit', false );
+		submit_button( 'start' === $operation ? __( 'Scan published content', 'amazing-security' ) : __( 'Continue scan', 'amazing-security' ), 'primary', 'submit', false );
 		echo '</form>';
 	}
 	private function report( array $report, int $page, bool $expired ): void {
@@ -102,12 +102,12 @@ final class ContentPage {
 		foreach ( $findings as $finding ) {
 			$url      = $this->reviewUrl( $finding['kind'], $finding['id'] );
 			$guidance = match ( $finding['rule'] ) {
-				'AS-HTML-001' => 'Hidden external link: confirm why the link is present and hidden.', 'AS-HTML-002' => 'External meta refresh: confirm the intended destination.', 'AS-HTML-003' => 'Executable link scheme: review the action and its origin.', 'AS-JS-001' => 'Literal external script redirect: confirm who added it.', default => 'Review selected markup.' };
+				'AS-HTML-001' => 'Hidden external link: confirm why the link is present and hidden.', 'AS-HTML-002' => 'External meta refresh: confirm the intended destination.', 'AS-HTML-003' => 'Executable link scheme: review the action and its origin.', 'AS-HTML-004' => 'Hidden external frame: confirm why the frame is present and hidden. A visible frame is not matched.', 'AS-JS-001' => 'Literal external script redirect: confirm who added it.', default => 'Review selected markup.' };
 			echo '<tr><td data-label="Item">' . esc_html( ucfirst( $finding['kind'] ) . ' #' . $finding['id'] ) . '</td><td data-label="Finding">' . esc_html( $guidance ) . '<br><small>' . esc_html( $finding['rule'] . ' / ' . $finding['version'] ) . '</small></td><td data-label="Line">' . esc_html( (string) $finding['line'] ) . '</td><td data-label="Review">';
 			if ( '' !== $url ) {
 				echo '<a href="' . esc_url( $url ) . '">Open editor</a>';
 			} else {
-					echo 'Item changed or editor access unavailable';
+					esc_html_e( 'Item changed or editor access unavailable', 'amazing-security' );
 			} echo '</td></tr>';
 		}
 		echo '</tbody></table>';

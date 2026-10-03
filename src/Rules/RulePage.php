@@ -5,7 +5,7 @@ namespace AmazingPlugins\Security\Rules;
 
 final class RulePage {
 	public function register(): void {
-		$hook = add_submenu_page( 'amazing-security', 'Rule information', 'Rule information', 'manage_options', 'amsec-rules', array( $this, 'render' ) );
+		$hook = add_submenu_page( 'amazing-security', __( 'Rule information', 'amazing-security' ), __( 'Rule information', 'amazing-security' ), 'manage_options', 'amsec-rules', array( $this, 'render' ) );
 		add_action(
 			'admin_enqueue_scripts',
 			static function ( string $current ) use ( $hook ): void {

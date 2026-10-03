@@ -10,5 +10,5 @@ final class UpdatePostureCheck extends AbstractCheck {
 	public function id(): string {
 		return 'core-updates'; }
 	public function run( ScanContext $context ): array {
-		return $this->result( $this->values->coreUpdateAvailable(), 'No pending core update was reported by the local update cache.', 'A WordPress core update is available. Review it in Dashboard > Updates.' ); }
+		return $this->result( $this->values->coreUpdateAvailable(), 'WordPress does not report a core update waiting.', 'A WordPress update is waiting. Open Dashboard, then Updates, and review it.' ); }
 }

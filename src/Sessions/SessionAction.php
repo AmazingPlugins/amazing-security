@@ -28,6 +28,10 @@ final class SessionAction {
 		if ( ! get_userdata( $id ) ) {
 			wp_die( esc_html__( 'The selected account no longer exists.', 'amazing-security' ), '', array( 'response' => 409 ) );
 		}
+		$operation = isset( $post['operation'] ) && is_string( $post['operation'] ) ? sanitize_key( $post['operation'] ) : '';
+		if ( 'revoke-application-password' === $operation ) {
+			$this->revokeApplicationPassword( $id, $post );
+		}
 		try {
 			$this->revoke( $id, $user->ID, wp_get_session_token() );
 		} catch ( \Throwable ) {
@@ -35,6 +39,18 @@ final class SessionAction {
 		}
 		( new ActivityHooks( new ActivityRepository( $GLOBALS['wpdb'] ) ) )->record( 'sessions_revoked', $id );
 		wp_safe_redirect( admin_url( 'admin.php?page=amsec-sessions&user_id=' . $id . '&revoked=1' ) );
+		exit;
+	}
+
+	private function revokeApplicationPassword( int $id, array $post ): void {
+		$uuid   = isset( $post['uuid'] ) && is_string( $post['uuid'] ) ? strtolower( $post['uuid'] ) : '';
+		$stored = class_exists( \WP_Application_Passwords::class ) ? \WP_Application_Passwords::get_user_application_passwords( $id ) : array();
+		$match  = ApplicationPasswordList::selected( ApplicationPasswordList::rows( is_array( $stored ) ? $stored : array() ), $uuid );
+		if ( '' === $match || ! \WP_Application_Passwords::delete_application_password( $id, $match ) ) {
+			wp_die( esc_html__( 'That application password was not revoked.', 'amazing-security' ), '', array( 'response' => 409 ) );
+		}
+		( new ActivityHooks( new ActivityRepository( $GLOBALS['wpdb'] ) ) )->record( 'security_setting_changed', $id, 'application-password' );
+		wp_safe_redirect( admin_url( 'admin.php?page=amsec-sessions&user_id=' . $id . '&app-revoked=1' ) );
 		exit;
 	}
 

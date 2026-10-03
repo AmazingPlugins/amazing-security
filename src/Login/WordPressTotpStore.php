@@ -55,6 +55,22 @@ final class WordPressTotpStore implements TotpStore {
 		);
 	}
 
+	public function hasRecoveryCode( int $userId, string $code ): bool {
+		if ( ! preg_match( '/\A[a-f0-9]{24}\z/', $code ) ) {
+			return false;
+		}
+		$record = $this->record( $userId );
+		if ( null === $record ) {
+			return false;
+		}
+		foreach ( $record['recovery'] as $hash ) {
+			if ( is_string( $hash ) && password_verify( $code, $hash ) ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public function consumeRecoveryCode( int $userId, string $code ): bool {
 		if ( ! preg_match( '/\A[a-f0-9]{24}\z/', $code ) ) {
 			return false;

@@ -52,4 +52,31 @@ final class ChecksTest extends TestCase {
         self::assertContains($result->state, ['pass', 'warn']);
         self::assertSame('complete', $result->coverage);
     }
+
+    public function test_warnings_name_the_first_change_without_a_php_constant(): void {
+        $values = $this->createMock(Values::class);
+        $values->method('adminUsesHttps')->willReturn(false);
+        $values->method('coreUpdateAvailable')->willReturn(true);
+        $values->method('hasDefaultAdminLogin')->willReturn(true);
+        $values->method('debugDisplayed')->willReturn(true);
+        $values->method('fileEditorDisabled')->willReturn(false);
+        $summaries = array(
+            (new HttpsAdminCheck($values))->run(new ScanContext())[0]->summary,
+            (new UpdatePostureCheck($values))->run(new ScanContext())[0]->summary,
+            (new AdminAccountsCheck($values))->run(new ScanContext())[0]->summary,
+            (new DebugDisplayCheck($values))->run(new ScanContext())[0]->summary,
+            (new FileEditorCheck($values))->run(new ScanContext())[0]->summary,
+        );
+        self::assertSame(
+            array(
+                'The admin address is not using HTTPS. Turn on HTTPS for this site before you change other security settings.',
+                'A WordPress update is waiting. Open Dashboard, then Updates, and review it.',
+                'An administrator uses the login name admin. Add a different administrator, then stop using this login.',
+                'Visitors may see WordPress error details. You can hide them for requests that load this plugin. This plugin will not edit wp-config.php.',
+                'People can edit theme and plugin files in wp-admin. Turn that editor off so a signed-in session cannot change PHP from the browser.',
+            ),
+            $summaries
+        );
+        self::assertStringNotContainsString('DISALLOW_FILE_EDIT', implode(' ', $summaries));
+    }
 }

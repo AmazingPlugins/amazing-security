@@ -6,9 +6,11 @@ namespace AmazingPlugins\Security\Admin;
 
 use AmazingPlugins\Security\Alerts\AlertDelivery;
 use AmazingPlugins\Security\Alerts\AlertSettingsRenderer;
+use AmazingPlugins\Security\Content\WordPressContentService;
 use AmazingPlugins\Security\FileScan\WordPressFileScanStore;
 use AmazingPlugins\Security\Firewall\FirewallStatusRenderer;
 use AmazingPlugins\Security\Firewall\ObservationStore;
+use AmazingPlugins\Security\Findings\CheckResult;
 use AmazingPlugins\Security\Findings\FindingsRepository;
 use AmazingPlugins\Security\Integrity\WordPressIntegrityStore;
 use AmazingPlugins\Security\Integrity\WordPressOptions;
@@ -24,12 +26,12 @@ use AmazingPlugins\Security\Vulnerabilities\WordPressVulnerabilityReportStore;
 
 final class AdminPage {
 	public function register(): void {
-		$hook = add_menu_page( 'Amazing Security', 'Amazing Security', 'manage_options', 'amazing-security', array( $this, 'render' ), 'dashicons-shield-alt', 81 );
+		$hook = add_menu_page( __( 'Amazing Security', 'amazing-security' ), __( 'Amazing Security', 'amazing-security' ), 'manage_options', 'amazing-security', array( $this, 'render' ), 'dashicons-shield-alt', 81 );
 		add_action(
 			'admin_enqueue_scripts',
 			static function ( string $current_hook ) use ( $hook ): void {
 				if ( $hook === $current_hook ) {
-					wp_enqueue_style( 'amazing-security-admin', plugins_url( 'assets/admin.css', AMAZING_SECURITY_FILE ), array(), '0.1.0' );
+					wp_enqueue_style( 'amazing-security-admin', plugins_url( 'assets/admin.css', AMAZING_SECURITY_FILE ), array(), '0.1.8' );
 				}
 			}
 		);
@@ -61,8 +63,27 @@ final class AdminPage {
 		echo '<div class="wrap amazing-security-admin"><header class="amsec-header"><div><h1>Amazing Security</h1><p>See what needs attention and when each check last ran. These reports cover only the checks shown below.</p></div>';
 		echo '<form action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" method="post"><input type="hidden" name="action" value="amazing_security_scan">';
 		wp_nonce_field( 'amazing_security_scan' );
-		submit_button( 'Run local checks', 'primary', 'submit', false );
+		echo '<label class="amsec-header-consent"><input type="checkbox" name="amsec_header_consent" value="1"> ' . esc_html__( "Request this site's homepage and read its response headers.", 'amazing-security' ) . '</label>';
+		submit_button( __( 'Run local checks', 'amazing-security' ), 'primary', 'submit', false );
 		echo '</form></header>';
+		$contentScanId = '';
+		try {
+			$active = ( new WordPressContentService() )->create()->status()['active'] ?? null;
+			if ( is_array( $active ) && empty( $active['finished'] ) && is_string( $active['scan_id'] ?? null ) && 1 === preg_match( '/^[a-f0-9]{32}$/D', $active['scan_id'] ) ) {
+				$contentScanId = $active['scan_id'];
+			}
+		} catch ( \Throwable ) {
+			$contentScanId = '';
+		}
+		$integrityScanId = '';
+		if ( null !== $progress && ! $progress->finished && 1 === preg_match( '/^[a-zA-Z0-9-]{1,80}$/D', $progress->cursor->scanId ) ) {
+			$integrityScanId = $progress->cursor->scanId;
+		}
+		$fileScanId = '';
+		if ( null !== $fileProgress && ! $fileProgress->finished && 1 === preg_match( '/^[a-zA-Z0-9-]{1,80}$/D', $fileProgress->cursor->scanId ) ) {
+			$fileScanId = $fileProgress->cursor->scanId;
+		}
+		$this->startList( $run?->results ?? null, $integrityScanId, $contentScanId, $fileScanId );
 		// ScheduleStatusRenderer escapes dynamic values.
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		echo ( new ScheduleStatusRenderer() )->render( ( new LocalSchedule( $options ) )->status( time() ) );
@@ -145,12 +166,12 @@ final class AdminPage {
 		if ( null === $progress || $progress->finished ) {
 			echo '<form action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" method="post"><input type="hidden" name="action" value="amazing_security_integrity_start">';
 			wp_nonce_field( 'amazing_security_integrity_start' );
-			submit_button( 'Run integrity scan' );
+			submit_button( __( 'Run integrity scan', 'amazing-security' ) );
 			echo '</form>';
 		} else {
 			echo '<form action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" method="post"><input type="hidden" name="action" value="amazing_security_integrity_resume"><input type="hidden" name="scan_id" value="' . esc_attr( $progress->cursor->scanId ) . '">';
 			wp_nonce_field( 'amazing_security_integrity_resume' );
-			submit_button( 'Continue integrity scan' );
+			submit_button( __( 'Continue integrity scan', 'amazing-security' ) );
 			echo '</form>';
 		}
 		// IntegrityReportRenderer escapes all dynamic values.
@@ -160,11 +181,11 @@ final class AdminPage {
 		if ( null === $fileProgress || $fileProgress->finished ) {
 			echo '<input type="hidden" name="action" value="amazing_security_file_scan_start">';
 			wp_nonce_field( 'amazing_security_file_scan_start' );
-			submit_button( 'Run file scan', 'primary', 'submit', false );
+			submit_button( __( 'Run file scan', 'amazing-security' ), 'primary', 'submit', false );
 		} else {
 			echo '<input type="hidden" name="action" value="amazing_security_file_scan_resume"><input type="hidden" name="scan_id" value="' . esc_attr( $fileProgress->cursor->scanId ) . '">';
 			wp_nonce_field( 'amazing_security_file_scan_resume' );
-			submit_button( 'Continue file scan', 'primary', 'submit', false );
+			submit_button( __( 'Continue file scan', 'amazing-security' ), 'primary', 'submit', false );
 		}
 		echo '</form></div>';
 		// FileScanReportRenderer escapes dynamic values, including saved notes.
@@ -173,7 +194,7 @@ final class AdminPage {
 		if ( $direct ) {
 			echo '<form action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" method="post"><input type="hidden" name="action" value="amazing_security_vulnerability_scan">';
 			wp_nonce_field( 'amazing_security_vulnerability_scan' );
-			submit_button( 'Check installed versions' );
+			submit_button( __( 'Check installed versions', 'amazing-security' ) );
 			echo '</form>';
 			$scanProgress = get_transient( 'amsec_vuln_progress' );
 			if ( is_array( $scanProgress ) ) {
@@ -182,23 +203,172 @@ final class AdminPage {
 			}
 			echo '<form action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" method="post"><input type="hidden" name="action" value="amazing_security_vulnerability_disable">';
 			wp_nonce_field( 'amazing_security_vulnerability_disable' );
-			submit_button( 'Turn off vulnerability checks', 'secondary' );
+			submit_button( __( 'Turn off vulnerability checks', 'amazing-security' ), 'secondary' );
 			echo '</form>';
 		} else {
 			echo '<section class="amsec-consent" aria-labelledby="amsec-consent-title"><h3 id="amsec-consent-title">Enable vulnerability checks</h3><p>This WordPress site will contact WPVulnerability directly for its core version and installed plugin and theme slugs. The provider can see this site’s request IP address and requested components. AmazingPlugins receives no inventory. Results are stored on this site. Read the <a href="https://www.wpvulnerability.com/privacy/" target="_blank" rel="noopener noreferrer">provider privacy policy</a> and <a href="https://www.wpvulnerability.com/license/" target="_blank" rel="noopener noreferrer">data license</a>.</p>';
 			echo '<form action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" method="post"><input type="hidden" name="action" value="amazing_security_vulnerability_enable">';
 			wp_nonce_field( 'amazing_security_vulnerability_enable' );
-			submit_button( 'Enable vulnerability checks' );
+			submit_button( __( 'Enable vulnerability checks', 'amazing-security' ) );
 			echo '</form></section>';
 		}
 		echo '<form action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" method="post"><input type="hidden" name="action" value="amazing_security_vulnerability_clear">';
 		wp_nonce_field( 'amazing_security_vulnerability_clear' );
-		submit_button( 'Clear local vulnerability data', 'secondary' );
+		submit_button( __( 'Clear local vulnerability data', 'amazing-security' ), 'secondary' );
 		echo '</form>';
 		// VulnerabilityReportRenderer escapes every dynamic value before constructing markup.
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		echo ( new VulnerabilityReportRenderer() )->render( $vulnCurrent, $vulnStore->historical(), null, $direct );
 		echo '</div>';
+	}
+
+	private function startList( ?array $results, string $integrityScanId = '', string $contentScanId = '', string $fileScanId = '' ): void {
+		echo '<section class="amsec-overview" aria-labelledby="amsec-start-title"><h2 id="amsec-start-title">Start here</h2>';
+		if ( null === $results ) {
+			echo '<p>Run local checks. The first list is HTTPS, WordPress updates, the admin login, debug display, the theme and plugin editor, and login monitoring.</p>';
+			$this->reportDownload();
+			echo '</section>';
+			return;
+		}
+		echo '<p>The first six rows stay in this order. Review means that row needs a look. Not run means that scan has not started. Continue means it started and still has work left. One pass does not mean the site is clean.</p>';
+		$this->startItems( StartHere::rows( $results, StartHere::ORDER ), $integrityScanId, $contentScanId, $fileScanId );
+		$later      = StartHere::rows( $results, StartHere::LATER );
+		$review     = array();
+		$notRun     = array();
+		$unfinished = array();
+		$unread     = array();
+		$passing    = array();
+		foreach ( $later as $result ) {
+			$stored = is_string( $result->evidence['stored'] ?? null ) ? $result->evidence['stored'] : '';
+			if ( 'none' === $stored ) {
+				$notRun[] = $result;
+			} elseif ( in_array( $stored, array( 'partial', 'running' ), true ) ) {
+				$unfinished[] = $result;
+			} elseif ( in_array( $result->state, array( 'warn', 'fail' ), true ) ) {
+				$review[] = $result;
+			} elseif ( 'pass' === $result->state ) {
+				$passing[] = $result;
+			} else {
+				$unread[] = $result;
+			}
+		}
+		echo '<h3 class="amsec-start-heading">Review these</h3>';
+		if ( array() === $review ) {
+			echo '<p>Nothing else in this list needs review.</p>';
+		} else {
+			$this->startItems( $review, $integrityScanId, $contentScanId, $fileScanId );
+		}
+		if ( array() !== $unfinished ) {
+			echo '<h3 class="amsec-start-heading">Not finished</h3>';
+			$this->startItems( $unfinished, $integrityScanId, $contentScanId, $fileScanId );
+		}
+		if ( array() !== $notRun ) {
+			echo '<h3 class="amsec-start-heading">Not run yet</h3>';
+			$this->startItems( $notRun, $integrityScanId, $contentScanId, $fileScanId );
+		}
+		if ( array() !== $unread ) {
+			echo '<h3 class="amsec-start-heading">Could not check</h3>';
+			$this->startItems( $unread, $integrityScanId, $contentScanId, $fileScanId );
+		}
+		if ( array() !== $passing ) {
+			echo '<details class="amsec-start-done"><summary>Already in place (' . esc_html( (string) count( $passing ) ) . ')</summary>';
+			$this->startItems( $passing, $integrityScanId, $contentScanId, $fileScanId );
+			echo '</details>';
+		}
+		$this->reportDownload();
+		echo '</section>';
+	}
+
+	/** @param array<int, mixed> $results */
+	private function startItems( array $results, string $integrityScanId, string $contentScanId, string $fileScanId ): void {
+		echo '<ul class="amsec-start">';
+		foreach ( $results as $result ) {
+			if ( ! $result instanceof CheckResult ) {
+				continue;
+			}
+			$stored = is_string( $result->evidence['stored'] ?? null ) ? $result->evidence['stored'] : '';
+			$tone   = match ( $stored ) {
+				'none' => 'none',
+				'partial', 'running' => 'partial',
+				default => $result->state,
+			};
+			$badge = match ( $tone ) {
+				'none' => 'Not run',
+				'partial' => 'Continue',
+				'warn', 'fail' => 'Review',
+				'pass' => 'In place',
+				default => 'Unknown',
+			};
+			echo '<li class="amsec-start-item" data-state="' . esc_attr( $tone ) . '"><span class="amsec-start-badge">' . esc_html( $badge ) . '</span><span class="amsec-start-copy"><strong>' . esc_html( StartHere::label( $result->checkId ) ) . '</strong> ' . esc_html( $result->summary ) . '</span>';
+			$this->startControl( StartHere::control( $result ), $integrityScanId, $contentScanId, $fileScanId );
+			echo '</li>';
+		}
+		echo '</ul>';
+	}
+
+	private function reportDownload(): void {
+		echo '<form class="amsec-start-action" method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '"><input type="hidden" name="action" value="amsec_findings_report">';
+		wp_nonce_field( 'amsec_findings_report' );
+		echo '<button type="submit" class="button">Download findings</button></form>';
+		echo '<p>The file is a starting list for a host. It is not a compliance report, and it does not start a new check.</p>';
+	}
+
+	/** @param array<string, string>|null $control */
+	private function startControl( ?array $control, string $integrityScanId, string $contentScanId, string $fileScanId = '' ): void {
+		if ( null === $control ) {
+			return;
+		}
+		if ( isset( $control['screen'] ) && 1 === preg_match( '/^[a-z0-9-]+\\.php$/D', $control['screen'] ) ) {
+			echo ' <a class="button" href="' . esc_url( admin_url( $control['screen'] ) ) . '">' . esc_html( $control['label'] ) . '</a>';
+			return;
+		}
+		if ( isset( $control['page'] ) ) {
+			echo ' <a class="button" href="' . esc_url( admin_url( 'admin.php?page=' . $control['page'] ) ) . '">' . esc_html( $control['label'] ) . '</a>';
+			return;
+		}
+		if ( isset( $control['hash'] ) ) {
+			echo ' <a class="button" href="#' . esc_attr( $control['hash'] ) . '">' . esc_html( $control['label'] ) . '</a>';
+			return;
+		}
+		$scan   = $control['scan'] ?? '';
+		$scanId = match ( $scan ) {
+			'integrity' => $integrityScanId,
+			'content' => $contentScanId,
+			'files' => $fileScanId,
+			default => '',
+		};
+		if ( '' !== $scan && '' === $scanId ) {
+			$control = match ( $scan ) {
+				'integrity' => array(
+					'label'  => 'Run integrity scan',
+					'action' => 'amazing_security_integrity_start',
+					'nonce'  => 'amazing_security_integrity_start',
+				),
+				'files' => array(
+					'label'  => 'Run file scan',
+					'action' => 'amazing_security_file_scan_start',
+					'nonce'  => 'amazing_security_file_scan_start',
+				),
+				default => array(
+					'label' => 'Review content scan',
+					'page'  => 'amsec-content',
+				),
+			};
+			$this->startControl( $control, '', '', '' );
+			return;
+		}
+		$nonce = $control['nonce'];
+		if ( 'amsec_content_resume' === $nonce ) {
+			$nonce .= '_' . $scanId;
+		}
+		echo '<form class="amsec-start-action" method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '"><input type="hidden" name="action" value="' . esc_attr( $control['action'] ) . '">';
+		if ( isset( $control['operation'] ) ) {
+			echo '<input type="hidden" name="operation" value="' . esc_attr( $control['operation'] ) . '"><input type="hidden" name="scan_id" value="' . esc_attr( $scanId ) . '">';
+		} elseif ( '' !== $scanId ) {
+			echo '<input type="hidden" name="scan_id" value="' . esc_attr( $scanId ) . '">';
+		}
+		wp_nonce_field( $nonce );
+		echo '<button type="submit" class="button">' . esc_html( $control['label'] ) . '</button></form>';
 	}
 
 	private function ledgerRow( string $label, ?array $results, ?string $checkedAt, string $href ): void {

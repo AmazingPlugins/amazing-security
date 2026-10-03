@@ -11,7 +11,7 @@ use AmazingPlugins\Security\Sessions\SessionPolicy;
 
 final class BotSettings {
 	public function register(): void {
-		add_submenu_page( 'amazing-security', 'Native bot controls', 'Bot controls', 'manage_options', 'amsec-bots', array( $this, 'render' ) );
+		add_submenu_page( 'amazing-security', __( 'Native bot controls', 'amazing-security' ), __( 'Bot controls', 'amazing-security' ), 'manage_options', 'amsec-bots', array( $this, 'render' ) );
 	}
 
 	public function handle(): void {
@@ -56,7 +56,7 @@ final class BotSettings {
 		echo '</select></label>';
 		wp_nonce_field( 'amsec_bot_settings' );
 		echo '<p><label>Your password <input type="password" name="password" autocomplete="current-password" required maxlength="1024"></label></p><p><label><input type="checkbox" name="confirm" value="1" required> I understand that blocking can reject legitimate visitors behind shared addresses or autofilled forms.</label></p>';
-		submit_button( 'Approve mode', 'secondary' );
+		submit_button( __( 'Approve mode', 'amazing-security' ), 'secondary' );
 		echo '</form></div>';
 	}
 

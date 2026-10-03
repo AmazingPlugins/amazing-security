@@ -8,8 +8,8 @@ use RuntimeException;
 
 /** Selected markup review patterns; never renders or evaluates input. */
 final class MarkupDetector {
-	public const VERSION = '2026.09.30.1';
-	public const RULES   = array( 'AS-HTML-001', 'AS-HTML-002', 'AS-HTML-003', 'AS-JS-001' );
+	public const VERSION = '2026.10.02.1';
+	public const RULES   = array( 'AS-HTML-001', 'AS-HTML-002', 'AS-HTML-003', 'AS-HTML-004', 'AS-JS-001' );
 	private const LIMITS = '(*LIMIT_MATCH=100000)(*LIMIT_RECURSION=1000)';
 	public function __construct( private readonly string $siteHost ) {}
 
@@ -59,6 +59,13 @@ final class MarkupDetector {
 				break;
 			}
 			if ( in_array( $name, array( 'script', 'style', 'textarea', 'title', 'xmp', 'iframe', 'noembed', 'noframes' ), true ) ) {
+				if ( 'iframe' === $name && 0 === $templateDepth ) {
+					$frame = $this->attributes( $token[0] );
+					$src   = $frame['src'] ?? '';
+					if ( $this->external( $src ) && preg_match( '/(?:^|;)\s*(?:display\s*:\s*none|visibility\s*:\s*hidden)\s*(?:!important\s*)?(?:;|$)/i', $frame['style'] ?? '' ) ) {
+						$this->hit( $hits, 'AS-HTML-004', $tagOffset, $body );
+					}
+				}
 				$result = preg_match( '~' . self::LIMITS . '</' . $name . '\s*>~i', $body, $closing, PREG_OFFSET_CAPTURE, $offset );
 				if ( false === $result ) {
 					throw new RuntimeException( 'content_rule_limit' );

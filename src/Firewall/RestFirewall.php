@@ -7,11 +7,20 @@ namespace AmazingPlugins\Security\Firewall;
 final class RestFirewall {
 	public function __construct( private readonly RequestInspector $inspector, private readonly ObservationStore $store ) {}
 
-	public function observe( array $query, bool $authenticated, int $now ): array {
-		$result = $this->inspector->inspect( $query, $authenticated );
-		if ( array() !== $result['rules'] ) {
-			$this->store->record( $result['rules'], $now );
+	public function observe( array $query, bool $authenticated, int $now, array $body = array() ): array {
+		$queryResult = $this->inspector->inspect( $query, $authenticated );
+		if ( $authenticated ) {
+			return $queryResult;
 		}
-		return $result;
+		$bodyResult = $this->inspector->inspect( $body, false );
+		$rules      = array_values( array_unique( array_merge( $queryResult['rules'], $bodyResult['rules'] ) ) );
+		$partial    = 'partial' === $queryResult['state'] || 'partial' === $bodyResult['state'];
+		if ( array() !== $rules ) {
+			$this->store->record( $rules, $now );
+		}
+		return array(
+			'state' => $partial ? 'partial' : ( array() === $rules ? 'pass' : 'observe' ),
+			'rules' => $rules,
+		);
 	}
 }

@@ -12,7 +12,7 @@ final class RestRateSettings {
 	private function service(): RestRateSettingsService {
 		return new RestRateSettingsService( new WordPressOptions() );}
 	public function register(): void {
-		$hook = add_submenu_page( 'amazing-security', 'REST rate controls', 'REST rate controls', 'manage_options', 'amsec-rest-rates', array( $this, 'render' ) );
+		$hook = add_submenu_page( 'amazing-security', __( 'REST rate controls', 'amazing-security' ), __( 'REST rate controls', 'amazing-security' ), 'manage_options', 'amsec-rest-rates', array( $this, 'render' ) );
 		add_action(
 			'admin_enqueue_scripts',
 			static function ( string $current ) use ( $hook ): void {
@@ -67,7 +67,7 @@ final class RestRateSettings {
 		}echo '</fieldset>';
 		wp_nonce_field( 'amsec_rest_rates_' . $fp );
 		echo '<p><label>Your password <input type="password" name="password" autocomplete="current-password" maxlength="1024" required></label></p><p><label><input type="checkbox" name="confirm" value="1" required> I understand that blocking may reject legitimate requests behind shared addresses. I have tested observe mode and integration compatibility.</label></p>';
-		submit_button( 'Approve current policy', 'secondary' );
+		submit_button( __( 'Approve current policy', 'amazing-security' ), 'secondary' );
 		echo '</form></section></div>';
 	}
 	public function recovery( array $args, array $assoc ): void {

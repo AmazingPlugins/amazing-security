@@ -8,9 +8,10 @@ final class PasskeyLogin {
 	public function __construct( private readonly object $db ) {}
 	private function configuration(): ?array {
 		$configuration = ( new PasskeyRuntime( $this->db ) )->configuration();
-		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Exact method/origin validation must not normalize hostile input.
-		$server = array(
+		$server        = array(
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Exact method comparison must not normalize hostile input.
 			'REQUEST_METHOD' => isset( $_SERVER['REQUEST_METHOD'] ) ? wp_unslash( $_SERVER['REQUEST_METHOD'] ) : null,
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Exact origin comparison must not normalize hostile input.
 			'HTTP_ORIGIN'    => isset( $_SERVER['HTTP_ORIGIN'] ) ? wp_unslash( $_SERVER['HTTP_ORIGIN'] ) : null,
 		);
 		return 0 === get_current_user_id() && null !== $configuration && PasskeyRequestGate::request( $configuration['context'], $server, is_ssl() ) ? $configuration : null;
@@ -115,7 +116,7 @@ final class PasskeyLogin {
 			if ( ! $allowed || '' === $token ) {
 				return false; }
 			wp_set_current_user( $user->ID );
-			do_action( 'wp_login', $user->user_login, $user );
+			do_action( 'wp_login', $user->user_login, $user ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Core login hook, fired after the auth cookie is set.
 			$success = true;
 			return true;
 		} finally {

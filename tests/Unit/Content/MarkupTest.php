@@ -40,6 +40,9 @@ final class MarkupTest extends TestCase {
  'unclosed textarea'=>['<textarea><a href="https://outside.invalid" style="display:none">x</a>',[]],
  'protocol relative hidden'=>['<a href="//outside.invalid" style="visibility:hidden">x</a>',['AS-HTML-001']],
  'entity hidden host'=>['<a href="https:&#47;&#47;outside.invalid" style="display:none!important">x</a>',['AS-HTML-001']],
+ 'hidden external frame'=>['<iframe src="https://outside.invalid/path" style="display:none"></iframe>',['AS-HTML-004']],
+ 'visible external frame'=>['<iframe src="https://outside.invalid/path"></iframe>',[]],
+ 'hidden same host frame'=>['<iframe src="https://site.test/embed" style="display:none"></iframe>',[]],
  ];}
  #[DataProvider('cases')] public function test_markup(string $body,array $expected):void{$hits=(new MarkupDetector('site.test'))->match($body);self::assertSame($expected,array_column($hits,'rule'));self::assertStringNotContainsString('outside.invalid',json_encode($hits));self::assertStringNotContainsString('private',json_encode($hits));}
  public function test_offsets_and_byte_limit_are_preserved():void{$d=new MarkupDetector('site.test');self::assertSame(4,$d->match("\n\n<!-- fixture -->\n<a href='https://outside.invalid' style='display:none'>x</a>")[0]['line']);$this->expectException(\RuntimeException::class);$d->match(str_repeat('x',131073));}

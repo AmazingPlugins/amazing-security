@@ -17,7 +17,9 @@ final class RestFirewallHook {
 		}
 		try {
 			$firewall = new RestFirewall( new RequestInspector(), new ObservationStore( new WordPressOptions() ) );
-			$firewall->observe( $request->get_query_params(), is_user_logged_in(), time() );
+			$body     = $request->get_body_params();
+			$json     = $request->get_json_params();
+			$firewall->observe( $request->get_query_params(), is_user_logged_in(), time(), array_merge( is_array( $body ) ? $body : array(), is_array( $json ) ? $json : array() ) );
 		} catch ( Throwable ) {
 			// Observation never changes a REST response.
 			return $result;

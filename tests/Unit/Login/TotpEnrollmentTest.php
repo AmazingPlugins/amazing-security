@@ -45,6 +45,7 @@ final class TotpEnrollmentTest extends TestCase {
 			public function lastStep( int $userId ): ?int { return $this->saved['last'] ?? null; }
 			public function consumeStep( int $userId, int $step ): bool { if ( $step <= $this->saved['last'] ) { return false; } $this->saved['last'] = $step; return true; }
 			public function consumeRecoveryCode( int $userId, string $code ): bool { return false; }
+			public function hasRecoveryCode( int $userId, string $code ): bool { return false; }
 			public function replaceRecoveryCodes( int $userId, array $hashes ): bool { return true; }
 			public function disable( int $userId ): bool { $this->saved = array(); return true; }
 		};

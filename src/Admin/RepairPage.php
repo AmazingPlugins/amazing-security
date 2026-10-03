@@ -8,7 +8,7 @@ use AmazingPlugins\Security\Repair\WordPressPluginRepair;
 
 final class RepairPage {
 	public function register(): void {
-		$hook = add_submenu_page( null, 'Review file repair', 'Review file repair', 'manage_options', 'amsec-repair', array( $this, 'render' ) );
+		$hook = add_submenu_page( null, __( 'Review file repair', 'amazing-security' ), __( 'Review file repair', 'amazing-security' ), 'manage_options', 'amsec-repair', array( $this, 'render' ) );
 		add_action(
 			'admin_enqueue_scripts',
 			static function ( string $currentHook ) use ( $hook ): void {

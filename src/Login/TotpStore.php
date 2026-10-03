@@ -11,6 +11,7 @@ interface TotpStore {
 	public function lastStep( int $userId ): ?int;
 	public function consumeStep( int $userId, int $step ): bool;
 	public function consumeRecoveryCode( int $userId, string $code ): bool;
+	public function hasRecoveryCode( int $userId, string $code ): bool;
 	public function replaceRecoveryCodes( int $userId, array $hashes ): bool;
 	public function disable( int $userId ): bool;
 }

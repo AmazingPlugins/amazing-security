@@ -11,7 +11,7 @@ final class PasskeySettings {
 		return new PasskeySettingsService( new FreshSecurityOptions( $GLOBALS['wpdb'], new WordPressOptions() ) );
 	}
 	public function register(): void {
-		$hook = add_submenu_page( 'amazing-security', 'Passkeys', 'Passkeys', 'manage_options', 'amsec-passkeys', array( $this, 'render' ) );
+		$hook = add_submenu_page( 'amazing-security', __( 'Passkeys', 'amazing-security' ), __( 'Passkeys', 'amazing-security' ), 'manage_options', 'amsec-passkeys', array( $this, 'render' ) );
 		add_action(
 			'admin_enqueue_scripts',
 			static function ( string $current ) use ( $hook ): void {
@@ -22,10 +22,11 @@ final class PasskeySettings {
 	}
 	public function handle(): void {
 	 // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Exact-current-policy nonce and matched native session are checked below before mutation.
-		$post = wp_unslash( $_POST );
-	 // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Exact origin/method comparison rejects transformed or suffix matches.
+		$post     = wp_unslash( $_POST );
 		$server   = array(
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Exact method comparison rejects transformed or suffix matches.
 			'REQUEST_METHOD' => isset( $_SERVER['REQUEST_METHOD'] ) ? wp_unslash( $_SERVER['REQUEST_METHOD'] ) : null,
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Exact origin comparison rejects transformed or suffix matches.
 			'HTTP_ORIGIN'    => isset( $_SERVER['HTTP_ORIGIN'] ) ? wp_unslash( $_SERVER['HTTP_ORIGIN'] ) : null,
 		);
 		$context  = ( new PasskeyRuntime( $GLOBALS['wpdb'] ) )->context();
@@ -69,7 +70,7 @@ final class PasskeySettings {
 			wp_die( esc_html__( 'Administrator access required.', 'amazing-security' ), '', array( 'response' => 403 ) );
 			return; }
 		echo '<div class="wrap amazing-security-admin"><header class="amsec-header"><div><h1>' . esc_html__( 'Passkeys', 'amazing-security' ) . '</h1><p>' . esc_html__( 'Let people sign in with a device they already trust.', 'amazing-security' ) . '</p></div></header>';
-		echo '<section class="amsec-overview"><h2>' . esc_html__( 'Your site, your sign-in keys', 'amazing-security' ) . '</h2><p>' . esc_html__( 'Passkeys use the device’s screen lock, fingerprint or face recognition. This site stores public keys; private keys stay with the authenticator or its sync provider. No Amazing Plugins server is involved.', 'amazing-security' ) . '</p><p>' . esc_html__( 'People add up to five passkeys from their own WordPress profile. Administrators who use a verification code still enter that code. Existing account restrictions and password-reset requirements also apply.', 'amazing-security' ) . '</p><p><a class="button button-secondary" href="' . esc_url( get_edit_profile_url( get_current_user_id() ) . '#amsec-passkeys' ) . '">' . esc_html__( 'Manage your passkeys', 'amazing-security' ) . '</a></p></section>';
+		echo '<section class="amsec-overview"><h2>' . esc_html__( 'Your site, your sign-in keys', 'amazing-security' ) . '</h2><p>' . esc_html__( 'Passkeys use the device’s screen lock, fingerprint or face recognition. This site stores public keys; private keys stay with the authenticator or its sync provider. No Amazing Plugins server is involved.', 'amazing-security' ) . '</p><p>' . esc_html__( 'People add up to five passkeys from their own WordPress profile. The passkey is the sign-in. Use the verification code with the password to add or remove a passkey, and to sign in with a password. A locked account or a required password reset still blocks a passkey.', 'amazing-security' ) . '</p><p><a class="button button-secondary" href="' . esc_url( get_edit_profile_url( get_current_user_id() ) . '#amsec-passkeys' ) . '">' . esc_html__( 'Manage your passkeys', 'amazing-security' ) . '</a></p></section>';
 		try {
 			$service = $this->service();
 			$state   = $service->status();
@@ -94,7 +95,7 @@ final class PasskeySettings {
 					}
 							echo '</section>';
 			}
-			echo '<section class="amsec-file-scan"><h2>' . esc_html__( 'If a device is lost', 'amazing-security' ) . '</h2><p>' . esc_html__( 'Use your password and existing verification code, or the WordPress password-reset flow. Remove the lost device from your profile after signing in. Turning this feature off keeps saved keys but stops passkey sign-in and enrollment.', 'amazing-security' ) . '</p><p>' . esc_html__( 'This release supports the native WordPress login page and resident ES256 passkeys with device verification. Changing the site domain or HTTPS port requires new enrollment. Device and sync-provider compatibility still needs testing.', 'amazing-security' ) . '</p><details><summary>' . esc_html__( 'Host recovery commands', 'amazing-security' ) . '</summary><p><code>wp amazing-security passkeys disable</code><br><code>wp amazing-security passkeys revoke USER_ID</code></p><p>' . esc_html__( 'The AMSEC_DISABLE_PASSKEYS constant also pauses sign-in and enrollment. It does not remove existing verification requirements.', 'amazing-security' ) . '</p></details></section></div>';
+			echo '<section class="amsec-file-scan"><h2>' . esc_html__( 'If a device is lost', 'amazing-security' ) . '</h2><p>' . esc_html__( 'Use your password and existing verification code, or the WordPress password-reset flow. Remove the lost device from your profile after signing in. Turning this feature off keeps saved keys but stops passkey sign-in and enrollment.', 'amazing-security' ) . '</p><p>' . esc_html__( 'This release supports the native WordPress login page. Changing the site address requires new passkeys. Device and sync-provider compatibility still needs testing.', 'amazing-security' ) . '</p><details><summary>' . esc_html__( 'Host recovery commands', 'amazing-security' ) . '</summary><p><code>wp amazing-security passkeys disable</code><br><code>wp amazing-security passkeys revoke USER_ID</code></p><p>' . esc_html__( 'The AMSEC_DISABLE_PASSKEYS constant also pauses sign-in and enrollment. It does not remove existing verification requirements.', 'amazing-security' ) . '</p></details></section></div>';
 	}
 	public function recoveryDisable( array $args, array $assoc ): void {
 		if ( array() !== $args || array() !== $assoc ) {

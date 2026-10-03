@@ -28,7 +28,7 @@ final class LoginHooks {
 	public function failed( string $username, \WP_Error $error ): void {
 		// WordPress requires the username argument; never retain it in rate-limit storage.
 		// phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
-		if ( ! $this->interactive() || in_array( 'amsec_rate_limited', $error->get_error_codes(), true ) ) {
+		if ( ! $this->interactive() || in_array( 'amsec_rate_limited', $error->get_error_codes(), true ) || in_array( 'amsec_login_confirm', $error->get_error_codes(), true ) ) {
 			return;
 		}
 		$this->limiter->afterFailure( $this->addresses->fromServer( $_SERVER ), time() );

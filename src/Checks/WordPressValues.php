@@ -31,8 +31,23 @@ final class WordPressValues implements Values {
 		return defined( 'WP_DEBUG' ) && WP_DEBUG ? true : false;
 	}
 
+	public function debugHiddenByPlugin(): bool {
+		return '1' === get_option( 'amsec_hide_debug_display', '0' );
+	}
+
 	public function fileEditorDisabled(): ?bool {
 		return defined( 'DISALLOW_FILE_EDIT' ) ? (bool) DISALLOW_FILE_EDIT : false;
+	}
+
+	public function fileEditorFix(): string {
+		$ours = '1' === get_option( 'amsec_disallow_file_edit', '0' );
+		if ( ! defined( 'DISALLOW_FILE_EDIT' ) ) {
+			return 'plugin';
+		}
+		if ( DISALLOW_FILE_EDIT && $ours ) {
+			return 'plugin-on';
+		}
+		return DISALLOW_FILE_EDIT ? 'config-on' : 'config';
 	}
 
 	public function adminUsesHttps(): ?bool {

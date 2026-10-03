@@ -11,5 +11,5 @@ final class HttpsAdminCheck extends AbstractCheck {
 		return 'https-admin'; }
 	public function run( ScanContext $context ): array {
 		$https = $this->values->adminUsesHttps();
-		return $this->result( null === $https ? null : ! $https, 'The administrator URL uses HTTPS.', 'The administrator URL does not use HTTPS. Configure HTTPS for the site.' ); }
+		return $this->result( null === $https ? null : ! $https, 'The admin address uses HTTPS.', 'The admin address is not using HTTPS. Turn on HTTPS for this site before you change other security settings.' ); }
 }

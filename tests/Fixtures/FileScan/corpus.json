@@ -963,6 +963,251 @@
         "AS-PHP-017"
       ],
       "provenance": "Original inert PHP 8.1 first-class callable counterexample from independent review; never execute."
+    },
+    {
+      "name": "assert-request",
+      "kind": "suspected",
+      "code": "<?php assert($_POST['code']);",
+      "expected": [
+        "AS-PHP-018"
+      ],
+      "provenance": "Original inert authored regression; never execute."
+    },
+    {
+      "name": "assert-comment",
+      "kind": "benign",
+      "code": "<?php /* assert($_GET['code']); */ echo 'fixture';",
+      "expected": [],
+      "provenance": "Original inert authored regression; never execute."
+    },
+    {
+      "name": "renamed-assert",
+      "kind": "suspected",
+      "code": "<?php $fn='assert'; $fn($_POST['code']);",
+      "expected": [
+        "AS-PHP-023"
+      ],
+      "provenance": "Original inert authored regression for one adjacent variable. Never execute."
+    },
+    {
+      "name": "rot13-eval",
+      "kind": "suspected",
+      "code": "<?php eval(str_rot13('fixture'));",
+      "expected": [
+        "AS-PHP-019"
+      ],
+      "provenance": "Original inert authored regression; never execute."
+    },
+    {
+      "name": "rot13-comment",
+      "kind": "benign",
+      "code": "<?php /* eval(str_rot13('fixture')); */ echo 'fixture';",
+      "expected": [],
+      "provenance": "Original inert authored regression; never execute."
+    },
+    {
+      "name": "request-file-write",
+      "kind": "suspected",
+      "code": "<?php file_put_contents($_GET['path'], 'fixture');",
+      "expected": [
+        "AS-PHP-020"
+      ],
+      "provenance": "Original inert authored regression; never execute."
+    },
+    {
+      "name": "local-file-write",
+      "kind": "benign",
+      "code": "<?php file_put_contents($path, $bytes);",
+      "expected": [],
+      "provenance": "Original inert authored regression; never execute."
+    },
+    {
+      "name": "copied-file-write",
+      "kind": "suspected",
+      "code": "<?php $path=$_GET['path']; file_put_contents($path, 'fixture');",
+      "expected": [
+        "AS-PHP-026"
+      ],
+      "provenance": "Original inert authored regression for one adjacent variable. Never execute."
+    },
+    {
+      "name": "extract-request",
+      "kind": "suspected",
+      "code": "<?php extract($_POST['data']);",
+      "expected": [
+        "AS-PHP-021"
+      ],
+      "provenance": "Original inert authored regression; never execute."
+    },
+    {
+      "name": "extract-copied",
+      "kind": "suspected",
+      "code": "<?php $data=$_POST['data']; extract($data);",
+      "expected": [
+        "AS-PHP-024"
+      ],
+      "provenance": "Original inert authored regression for one adjacent variable. Never execute."
+    },
+    {
+      "name": "parse-str-request",
+      "kind": "suspected",
+      "code": "<?php parse_str($_GET['query']);",
+      "expected": [
+        "AS-PHP-022"
+      ],
+      "provenance": "Original inert authored regression; never execute."
+    },
+    {
+      "name": "parse-str-copied",
+      "kind": "suspected",
+      "code": "<?php $query=$_GET['query']; parse_str($query);",
+      "expected": [
+        "AS-PHP-025"
+      ],
+      "provenance": "Original inert authored regression for one adjacent variable. Never execute."
+    },
+    {
+      "name": "second-copy-file-write",
+      "kind": "suspected",
+      "code": "<?php $path=$_GET['path']; $copy=$path; file_put_contents($copy, 'fixture');",
+      "expected": [
+        "AS-PHP-026"
+      ],
+      "provenance": "Original inert authored regression for two adjacent assignments. Never execute."
+    },
+    {
+      "name": "third-copy-file-write",
+      "kind": "suspected",
+      "code": "<?php $path=$_GET['path']; $copy=$path; $again=$copy; file_put_contents($again, 'fixture');",
+      "expected": [
+        "AS-PHP-026"
+      ],
+      "provenance": "Original inert authored regression for three adjacent assignments. Never execute."
+    },
+    {
+      "name": "fourth-copy-file-write",
+      "kind": "suspected",
+      "code": "<?php $path=$_GET['path']; $copy=$path; $again=$copy; $later=$again; file_put_contents($later, 'fixture');",
+      "expected": [
+        "AS-PHP-026"
+      ],
+      "provenance": "Original inert authored regression for four adjacent assignments. Never execute."
+    },
+    {
+      "name": "fifth-copy-file-write",
+      "kind": "suspected",
+      "code": "<?php $path=$_GET['path']; $copy=$path; $again=$copy; $later=$again; $last=$later; file_put_contents($last, 'fixture');",
+      "expected": [
+        "AS-PHP-026"
+      ],
+      "provenance": "Original inert authored regression for five adjacent assignments. Never execute."
+    },
+    {
+      "name": "sixth-copy-file-write",
+      "kind": "suspected",
+      "code": "<?php $path=$_GET['path']; $copy=$path; $again=$copy; $later=$again; $last=$later; $final=$last; file_put_contents($final, 'fixture');",
+      "expected": [
+        "AS-PHP-026"
+      ],
+      "provenance": "Original inert authored regression for six adjacent assignments. Never execute."
+    },
+    {
+      "name": "seventh-copy-file-write",
+      "kind": "benign",
+      "code": "<?php $path=$_GET['path']; $copy=$path; $again=$copy; $later=$again; $last=$later; $final=$last; $more=$final; file_put_contents($more, 'fixture');",
+      "expected": [],
+      "provenance": "Known miss: a seventh assignment is not matched. Never execute."
+    },
+    {
+      "name": "create-function-request",
+      "kind": "suspected",
+      "code": "<?php create_function('', $_GET['code']);",
+      "expected": [
+        "AS-PHP-027"
+      ],
+      "provenance": "Original inert authored regression for create_function with request data. Never execute."
+    },
+    {
+      "name": "create-function-copied",
+      "kind": "suspected",
+      "code": "<?php $code=$_GET['code']; create_function('', $code);",
+      "expected": [
+        "AS-PHP-027"
+      ],
+      "provenance": "Original inert authored regression for one copied variable before create_function. Never execute."
+    },
+    {
+      "name": "create-function-second-copy",
+      "kind": "suspected",
+      "code": "<?php $code=$_GET['code']; $again=$code; create_function('', $again);",
+      "expected": [
+        "AS-PHP-027"
+      ],
+      "provenance": "Original inert authored regression for two copied variables before create_function. Never execute."
+    },
+    {
+      "name": "create-function-third-copy",
+      "kind": "suspected",
+      "code": "<?php $code=$_GET['code']; $again=$code; $later=$again; create_function('', $later);",
+      "expected": [
+        "AS-PHP-027"
+      ],
+      "provenance": "Original inert authored regression for three copied variables before create_function. Never execute."
+    },
+    {
+      "name": "create-function-fourth-copy",
+      "kind": "benign",
+      "code": "<?php $code=$_GET['code']; $again=$code; $later=$again; $last=$later; create_function('', $last);",
+      "expected": [],
+      "provenance": "Known miss: a fourth copied variable before create_function is not matched. Never execute."
+    },
+    {
+      "name": "preg-replace-eval",
+      "kind": "suspected",
+      "code": "<?php preg_replace('/.*/e', $_GET['code'], '');",
+      "expected": [
+        "AS-PHP-028"
+      ],
+      "provenance": "Original inert authored regression for the old preg_replace e modifier. Never execute."
+    },
+    {
+      "name": "preg-replace-eval-variable",
+      "kind": "suspected",
+      "code": "<?php $pattern='/.*/e'; preg_replace($pattern, $_GET['code'], '');",
+      "expected": [
+        "AS-PHP-028"
+      ],
+      "provenance": "Original inert authored regression for one variable holding a preg_replace e pattern. Never execute."
+    },
+    {
+      "name": "preg-replace-eval-second-variable",
+      "kind": "suspected",
+      "code": "<?php $pattern='/.*/e'; $again=$pattern; preg_replace($again, $_GET['code'], '');",
+      "expected": [
+        "AS-PHP-028"
+      ],
+      "provenance": "Original inert authored regression for two variables holding a preg_replace e pattern. Never execute."
+    },
+    {
+      "name": "preg-replace-eval-third-variable",
+      "kind": "benign",
+      "code": "<?php $pattern='/.*/e'; $again=$pattern; $later=$again; preg_replace($later, $_GET['code'], '');",
+      "expected": [],
+      "provenance": "Known miss: a third copied variable holding a preg_replace e pattern is not matched. Never execute."
+    },
+    {
+      "name": "preg-replace-eval-other-variable",
+      "kind": "benign",
+      "code": "<?php $pattern='/.*/e'; preg_replace($other, 'x', 'y');",
+      "expected": [],
+      "provenance": "Original inert authored regression for a different variable than the stored e pattern. Never execute."
+    },
+    {
+      "name": "preg-replace-plain",
+      "kind": "benign",
+      "code": "<?php preg_replace('/.*/', 'x', 'y');",
+      "expected": [],
+      "provenance": "Original inert authored regression for preg_replace without the e modifier. Never execute."
     }
   ]
 }

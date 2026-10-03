@@ -16,9 +16,9 @@ abstract class AbstractCheck implements SecurityCheck {
 
 	public function __construct( protected readonly Values $values ) {}
 
-	protected function result( ?bool $condition, string $pass, string $warn ): array {
+	protected function result( ?bool $condition, string $pass, string $warn, array $evidence = array() ): array {
 		$state   = null === $condition ? State::UNKNOWN : ( $condition ? State::WARN : State::PASS );
 		$summary = null === $condition ? 'Could not inspect this setting.' : ( $condition ? $warn : $pass );
-		return array( new CheckResult( $this->id(), $state, $summary, self::SOURCE, new DateTimeImmutable( 'now', new DateTimeZone( 'UTC' ) ), null === $condition ? 'low' : 'high', null === $condition ? 'unavailable' : 'complete', array() ) );
+		return array( new CheckResult( $this->id(), $state, $summary, self::SOURCE, new DateTimeImmutable( 'now', new DateTimeZone( 'UTC' ) ), null === $condition ? 'low' : 'high', null === $condition ? 'unavailable' : 'complete', $evidence ) );
 	}
 }

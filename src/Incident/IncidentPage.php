@@ -6,7 +6,7 @@ namespace AmazingPlugins\Security\Incident;
 
 final class IncidentPage {
 	public function register(): void {
-		add_submenu_page( 'amazing-security', 'Incident response', 'Incident response', 'manage_options', 'amsec-incident', array( $this, 'render' ) );
+		add_submenu_page( 'amazing-security', __( 'Incident response', 'amazing-security' ), __( 'Incident response', 'amazing-security' ), 'manage_options', 'amsec-incident', array( $this, 'render' ) );
 	}
 
 	public function render(): void {
@@ -39,7 +39,7 @@ final class IncidentPage {
 			echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '"><input type="hidden" name="action" value="amsec_incident_reset"><input type="hidden" name="user_id" value="' . esc_attr( (string) $id ) . '"><p>Selected user ID: ' . esc_html( (string) $id ) . '</p>';
 			wp_nonce_field( 'amsec_incident_reset_' . $id );
 			echo '<p><label>Your password <input type="password" name="password" autocomplete="current-password" required maxlength="1024"></label></p><p><label><input type="checkbox" name="confirm" value="1" required> I understand that this account must reset its password and its sessions will be revoked.</label></p>';
-			submit_button( 'Require password reset', 'secondary' );
+			submit_button( __( 'Require password reset', 'amazing-security' ), 'secondary' );
 			echo '</form>';
 		}
 		echo '</div>';

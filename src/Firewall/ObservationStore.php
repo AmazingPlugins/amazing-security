@@ -8,7 +8,6 @@ use AmazingPlugins\Security\Integrity\OptionGateway;
 
 final class ObservationStore {
 	private const OPTION = 'amsec_rest_observations';
-	private const RULES  = array( 'AS-REST-001', 'AS-REST-002' );
 
 	public function __construct( private readonly OptionGateway $options ) {}
 
@@ -19,7 +18,7 @@ final class ObservationStore {
 			return array();
 		}
 		$result = array();
-		foreach ( self::RULES as $rule ) {
+		foreach ( ( new BundledRequestRules() )->ids() as $rule ) {
 			$item = $data[ $rule ] ?? null;
 			if ( is_array( $item ) && isset( $item['count'], $item['last_at'] ) && is_int( $item['count'] ) && is_int( $item['last_at'] ) ) {
 				$result[ $rule ] = array(
@@ -32,7 +31,7 @@ final class ObservationStore {
 	}
 
 	public function record( array $rules, int $now ): bool {
-		if ( array() === $rules || $now < 1 || array_diff( $rules, self::RULES ) ) {
+		if ( array() === $rules || $now < 1 || array_diff( $rules, ( new BundledRequestRules() )->ids() ) ) {
 			return false;
 		}
 		for ( $attempt = 0; $attempt < 3; ++$attempt ) {

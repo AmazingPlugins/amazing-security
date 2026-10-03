@@ -12,7 +12,7 @@ use Throwable;
 
 final class FixReviewPage {
 	public function register(): void {
-		$hook = add_submenu_page( 'amazing-security', 'Review security change', 'Review security change', 'manage_options', 'amsec-fix-review', array( $this, 'render' ) );
+		$hook = add_submenu_page( 'amazing-security', __( 'Review security change', 'amazing-security' ), __( 'Review security change', 'amazing-security' ), 'manage_options', 'amsec-fix-review', array( $this, 'render' ) );
 		add_action(
 			'admin_enqueue_scripts',
 			static function ( string $currentHook ) use ( $hook ): void {

@@ -29,5 +29,12 @@ final class RestFirewallTest extends TestCase {
 		self::assertStringNotContainsString( '../private/secret', json_encode( $options->values ) );
 		self::assertSame( 'skip', $firewall->observe( array( 'path' => '../private/secret' ), true, 1001 )['state'] );
 		self::assertSame( 1, $store->summary()['AS-REST-001']['count'] );
+		$body = $firewall->observe( array(), false, 1002, array( 'note' => '%252e%252e%252fsecret' ) );
+		self::assertSame( 'observe', $body['state'] );
+		self::assertSame( 2, $store->summary()['AS-REST-001']['count'] );
+		self::assertSame( array(), $firewall->observe( array(), false, 1003, array( 'password' => '../private/secret' ) )['rules'] );
+		self::assertSame( 2, $store->summary()['AS-REST-001']['count'] );
+		self::assertStringNotContainsString( '../private/secret', json_encode( $options->values ) );
+		self::assertStringNotContainsString( '%252e', json_encode( $options->values ) );
 	}
 }

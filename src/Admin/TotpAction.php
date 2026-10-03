@@ -67,8 +67,10 @@ final class TotpAction {
 	}
 
 	private function authorize( string $action ): int {
-		$id = get_current_user_id();
-		if ( ! self::canManage( $id, $id, current_user_can( 'manage_options' ), is_ssl() ) ) {
+		$id    = get_current_user_id();
+		$user  = wp_get_current_user();
+		$roles = $user instanceof \WP_User && is_array( $user->roles ) ? $user->roles : array();
+		if ( ! self::canManage( $id, $id, \AmazingPlugins\Security\Login\RequiredTotpPolicy::coveredAccount( current_user_can( 'manage_options' ), $roles ), is_ssl() ) ) {
 			wp_die( esc_html__( 'You cannot change this account.', 'amazing-security' ), '', array( 'response' => 403 ) );
 		}
 		check_admin_referer( $action );

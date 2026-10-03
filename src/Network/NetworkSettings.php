@@ -11,7 +11,7 @@ final class NetworkSettings {
 	private function service(): NetworkSettingsService {
 		return new NetworkSettingsService( new \AmazingPlugins\Security\Proxy\FreshSecurityOptions( $GLOBALS['wpdb'], new WordPressOptions() ) );}
 	public function register(): void {
-		$hook = add_submenu_page( 'amazing-security', 'Manual network controls', 'Network controls', 'manage_options', 'amsec-network', array( $this, 'render' ) );
+		$hook = add_submenu_page( 'amazing-security', __( 'Manual network controls', 'amazing-security' ), __( 'Network controls', 'amazing-security' ), 'manage_options', 'amsec-network', array( $this, 'render' ) );
 		add_action(
 			'admin_enqueue_scripts',
 			static function ( string $current ) use ( $hook ): void {
@@ -83,7 +83,7 @@ final class NetworkSettings {
 		}echo '</fieldset>';
 		wp_nonce_field( 'amsec_network_' . $fp );
 		echo '<p><label>Your password <input type="password" name="password" autocomplete="current-password" maxlength="1024" required></label></p><p><label><input type="checkbox" name="confirm" value="1" required> I have reviewed proxy trust, shared-network and API effects, tested observe mode, and know the host recovery command.</label></p>';
-		submit_button( 'Approve current network policy', 'secondary' );
+		submit_button( __( 'Approve current network policy', 'amazing-security' ), 'secondary' );
 		echo '</form></section></div>';
 	}
 	public function recovery( array $args, array $assoc ): void {

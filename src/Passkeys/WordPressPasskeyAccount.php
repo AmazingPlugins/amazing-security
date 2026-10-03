@@ -12,17 +12,17 @@ final class WordPressPasskeyAccount {
 	public function factor(): TotpAuthentication {
 		return new TotpAuthentication( new WordPressTotpStore( $this->db ), new SecretCipher( wp_salt( 'auth' ) ), new Totp() );
 	}
-	public function gate(): PasskeyAccountGate {
+	public function gate( bool $consumeFactor = true ): PasskeyAccountGate {
 		return new PasskeyAccountGate(
 			fn( int $id, int $now ): ?array => $this->state( $id, $now ),
-			fn( int $id, string $factor, int $now ): bool => $this->factor()->verifyFactor( $id, $factor, $now ),
+			fn( int $id, string $factor, int $now ): bool => $consumeFactor ? $this->factor()->verifyFactor( $id, $factor, $now ) : $this->factor()->matchesFactor( $id, $factor, $now ),
 			fn( int $id, string $revision, int $now ): bool => $this->grantGrace( $id, $revision, $now ),
 			static function ( \WP_User $user ): mixed {
 				$id   = $user->ID;
-				$user = apply_filters( 'wp_authenticate_user', $user, '' );
+				$user = apply_filters( 'wp_authenticate_user', $user, '' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Re-run the core account filter before a passkey is accepted.
 				if ( ! $user instanceof \WP_User || $user->ID !== $id ) {
 					return null; }
-				return apply_filters( 'authenticate', $user, '', '' );
+				return apply_filters( 'authenticate', $user, '', '' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Re-run the core authentication filter before a passkey is accepted.
 			}
 		);
 	}

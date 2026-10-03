@@ -41,10 +41,10 @@ final class LoginRateModeCheck implements SecurityCheck {
 			default => State::UNKNOWN,
 		};
 		$summary = match ( $mode ) {
-			'off' => 'Amazing Security login attempt monitoring is off. You can enable observe mode before choosing to block repeated failures.',
-			'observe' => 'Amazing Security records repeated login failures but does not block them. Review the observed traffic before enabling blocking.',
-			'block' => 'Amazing Security limits repeated login failures. Shared addresses can still affect legitimate sign-ins.',
-			default => 'The login attempt setting could not be read.',
+			'off' => 'Login monitoring is off. Turn on observe mode so repeated failures are recorded before anyone is blocked.',
+			'observe' => 'Repeated login failures are recorded and not blocked yet. Read that record before you turn blocking on.',
+			'block' => 'Repeated login failures are limited. A shared network can still block a real sign-in.',
+			default => 'The login monitoring setting could not be read.',
 		};
 		return array(
 			new CheckResult(

@@ -53,6 +53,21 @@ namespace AmazingPlugins\Security\Tests\Unit\Login {
 			$_POST = array();
 		}
 
+		public function test_matching_a_factor_does_not_spend_it(): void {
+			$seed = random_bytes( 20 );
+			$cipher = new SecretCipher( str_repeat( 's', 64 ) );
+			$store = $this->store( $cipher->encrypt( $seed ) );
+			$auth = new TotpAuthentication( $store, $cipher, new Totp() );
+			$now = 1800000000;
+			$code = ( new Totp() )->atStep( $seed, intdiv( $now, 30 ) );
+			self::assertTrue( $auth->matchesFactor( 7, $code, $now ) );
+			self::assertSame( -1, $store->last );
+			self::assertTrue( $auth->verifyFactor( 7, $code, $now ) );
+			$store->recovery = bin2hex( random_bytes( 12 ) );
+			self::assertTrue( $auth->matchesFactor( 7, $store->recovery, $now ) );
+			self::assertNotSame( '', $store->recovery );
+		}
+
 		public function test_api_scope_excludes_rest_cli_and_xml_rpc(): void {
 			self::assertTrue( TotpAuthentication::isApiRequest( true, false, false ) );
 			self::assertTrue( TotpAuthentication::isApiRequest( false, true, false ) );
@@ -78,6 +93,7 @@ namespace AmazingPlugins\Security\Tests\Unit\Login {
 				public function lastStep( int $userId ): ?int { return $this->last; }
 				public function consumeStep( int $userId, int $step ): bool { if ( $step <= $this->last ) { return false; } $this->last = $step; return true; }
 				public function consumeRecoveryCode( int $userId, string $code ): bool { if($this->recovery!==''&&$code===$this->recovery){$this->recovery='';return true;}return false; }
+				public function hasRecoveryCode( int $userId, string $code ): bool { return $this->recovery !== '' && $code === $this->recovery; }
 				public function replaceRecoveryCodes( int $userId, array $hashes ): bool { return false; }
 				public function disable( int $userId ): bool { return false; }
 			};

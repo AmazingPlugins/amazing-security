@@ -11,7 +11,7 @@ final class TrafficSettings {
 	private function service(): TrafficSettingsService {
 		return new TrafficSettingsService( new WordPressOptions() ); }
 	public function register(): void {
-		$hook = add_submenu_page( 'amazing-security', 'PHP traffic history', 'Traffic history', 'manage_options', 'amsec-traffic', array( $this, 'render' ) );
+		$hook = add_submenu_page( 'amazing-security', __( 'PHP traffic history', 'amazing-security' ), __( 'Traffic history', 'amazing-security' ), 'manage_options', 'amsec-traffic', array( $this, 'render' ) );
 		add_action(
 			'admin_enqueue_scripts',
 			static function ( string $current ) use ( $hook ): void {
@@ -56,7 +56,7 @@ final class TrafficSettings {
 				echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '"><input type="hidden" name="action" value="amsec_traffic_settings"><input type="hidden" name="fingerprint" value="' . esc_attr( $fp ) . '"><p><label>Collection <select name="enabled"><option value="0"' . selected( $state['enabled'], false, false ) . '>Off</option><option value="1"' . selected( $state['enabled'], true, false ) . '>On</option></select></label></p>';
 				wp_nonce_field( 'amsec_traffic_' . $fp );
 				echo '<p><label>Your password <input type="password" name="password" autocomplete="current-password" maxlength="1024" required></label></p><p><label><input type="checkbox" name="confirm" value="1" required> I have reviewed the stored fields, retention and incomplete coverage.</label></p>';
-				submit_button( 'Approve traffic collection', 'secondary' );
+				submit_button( __( 'Approve traffic collection', 'amazing-security' ), 'secondary' );
 				echo '</form>';
 			} else {
 				echo '<p>Use HTTPS to approve collection changes.</p>'; }
@@ -76,7 +76,7 @@ final class TrafficSettings {
 		foreach ( TrafficEvent::CATEGORIES as $label ) {
 			echo '<option value="' . esc_attr( $label ) . '"' . selected( $category, $label, false ) . '>' . esc_html( $label ) . '</option>'; }
 		echo '</select></label> ';
-		submit_button( 'Filter history', 'secondary', '', false );
+		submit_button( __( 'Filter history', 'amazing-security' ), 'secondary', '', false );
 		echo '</form>';
 		try {
 			$rows = ( new TrafficRepository( $GLOBALS['wpdb'] ) )->page( $page, $category ); } catch ( \Throwable ) {
