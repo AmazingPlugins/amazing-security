@@ -6,11 +6,11 @@ namespace AmazingPlugins\Security\Firewall;
 
 final class BundledRequestRules {
 	public function version(): string {
-		return '2026.10.07.3';
+		return '2026.10.09.1';
 	}
 
 	public function ids(): array {
-		return array( 'AS-REST-001', 'AS-REST-002', 'AS-REST-003', 'AS-REST-004', 'AS-REST-005', 'AS-REST-006' );
+		return array( 'AS-REST-001', 'AS-REST-002', 'AS-REST-003', 'AS-REST-004', 'AS-REST-005', 'AS-REST-006', 'AS-REST-007' );
 	}
 
 	public function match( string $value ): array {
@@ -44,6 +44,9 @@ final class BundledRequestRules {
 		}
 		if ( preg_match( '/\bon(?:error|load)\s*=/i', $value ) ) {
 			$rules[] = 'AS-REST-006';
+		}
+		if ( preg_match( '/\bdata:\/\//i', $value ) ) {
+			$rules[] = 'AS-REST-007';
 		}
 		return $rules;
 	}

@@ -3,7 +3,7 @@
     "packs": {
         "files": {
             "version": "2026.10.08.1",
-            "reviewed_at": "2026-10-08",
+            "reviewed_at": "2026-10-09",
             "ids": [
                 "AS-PHP-001",
                 "AS-PHP-002",
@@ -53,7 +53,7 @@
         },
         "content": {
             "version": "2026.10.02.1",
-            "reviewed_at": "2026-10-08",
+            "reviewed_at": "2026-10-09",
             "ids": [
                 "AS-HTML-001",
                 "AS-HTML-002",
@@ -66,18 +66,19 @@
             }
         },
         "requests": {
-            "version": "2026.10.07.3",
-            "reviewed_at": "2026-10-08",
+            "version": "2026.10.09.1",
+            "reviewed_at": "2026-10-09",
             "ids": [
                 "AS-REST-001",
                 "AS-REST-002",
                 "AS-REST-003",
                 "AS-REST-004",
                 "AS-REST-005",
-                "AS-REST-006"
+                "AS-REST-006",
+                "AS-REST-007"
             ],
             "sha256": {
-                "src/Firewall/BundledRequestRules.php": "5b3bc555e92b31b96c4dc20f670412ce294ac5934200e2d8ef4ad8453326523e"
+                "src/Firewall/BundledRequestRules.php": "93336844f3c30f367aaaf7f976a92a91455f7ebe5affe1cf3ee85752bbc0e6fb"
             }
         }
     }

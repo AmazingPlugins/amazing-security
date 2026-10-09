@@ -20,6 +20,8 @@ final class RequestInspectorTest extends TestCase {
 		self::assertSame( array(), $inspector->inspect( array( 'q' => 'A normal search' ), false )['rules'] );
 		self::assertSame( array(), $inspector->inspect( array( 'q' => 'script notes' ), false )['rules'] );
 		self::assertSame( array( 'AS-REST-006' ), $inspector->inspect( array( 'q' => 'onerror=alert' ), false )['rules'] );
+		self::assertSame( array( 'AS-REST-007' ), $inspector->inspect( array( 'q' => 'data://text/plain,hello' ), false )['rules'] );
+		self::assertSame( array(), $inspector->inspect( array( 'q' => 'dataset example' ), false )['rules'] );
 		self::assertSame( array(), $inspector->inspect( array( 'q' => 'onload handler' ), false )['rules'] );
 		self::assertSame( array(), $inspector->inspect( array( 'q' => '&#60;script&#62;' ), false )['rules'] );
 		self::assertSame( array( 'AS-REST-005' ), $inspector->inspect( array( 'q' => "%00" ), false )['rules'] );

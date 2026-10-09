@@ -14,10 +14,10 @@ final class RestWatchCheckTest extends TestCase {
 		$result = ( new RestWatchCheck( static fn (): bool => false ) )->run( new ScanContext() )[0];
 		self::assertSame( State::PASS, $result->state );
 		self::assertSame( 'observe', $result->evidence['status'] );
-		self::assertSame( 6, $result->evidence['rule_count'] );
-		self::assertSame( '2026.10.07.3', $result->evidence['pack'] );
+		self::assertSame( 7, $result->evidence['rule_count'] );
+		self::assertSame( '2026.10.09.1', $result->evidence['pack'] );
 		self::assertStringContainsString( 'observe only', $result->summary );
-		self::assertStringContainsString( '6 public REST rules', $result->summary );
+		self::assertStringContainsString( '7 public REST rules', $result->summary );
 	}
 
 	public function test_disabled_constant_is_warning(): void {
@@ -25,6 +25,6 @@ final class RestWatchCheckTest extends TestCase {
 		self::assertSame( State::WARN, $result->state );
 		self::assertSame( 'disabled', $result->evidence['status'] );
 		self::assertStringContainsString( 'AMSEC_DISABLE_FIREWALL', $result->summary );
-		self::assertStringContainsString( '6 observe rules', $result->summary );
+		self::assertStringContainsString( '7 observe rules', $result->summary );
 	}
 }
