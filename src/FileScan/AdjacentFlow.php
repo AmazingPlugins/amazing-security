@@ -43,6 +43,12 @@ final class AdjacentFlow {
 						$hop    = $copied['at'] + 1;
 						if ( 2 === count( $copied['names'] ) && T_EVAL === ( $items[ $hop ][1] ?? null ) && '(' === ( $items[ $hop + 1 ][2] ?? '' ) && T_VARIABLE === ( $items[ $hop + 2 ][1] ?? null ) && in_array( $items[ $hop + 2 ][2] ?? '', $copied['names'], true ) && ')' === ( $items[ $hop + 3 ][2] ?? '' ) ) {
 							$markers[ $items[ $i ][0] ] = "\x01INDIRECT_HTTP_BODY_EVAL_COPY\x02";
+						} else {
+							$copied = self::copiedNames( $items, $name, $close + 1, 2 );
+							$hop    = $copied['at'] + 1;
+							if ( 3 === count( $copied['names'] ) && T_EVAL === ( $items[ $hop ][1] ?? null ) && '(' === ( $items[ $hop + 1 ][2] ?? '' ) && T_VARIABLE === ( $items[ $hop + 2 ][1] ?? null ) && in_array( $items[ $hop + 2 ][2] ?? '', $copied['names'], true ) && ')' === ( $items[ $hop + 3 ][2] ?? '' ) ) {
+								$markers[ $items[ $i ][0] ] = "\x01INDIRECT_HTTP_BODY_EVAL_COPY2\x02";
+							}
 						}
 					}
 				}
@@ -67,6 +73,18 @@ final class AdjacentFlow {
 						$tail = $open ? ( $items[ $hop + 3 ][2] ?? '' ) : ( $items[ $hop + 2 ][2] ?? '' );
 						if ( T_VARIABLE === ( $open ? ( $items[ $hop + 2 ][1] ?? null ) : ( $items[ $hop + 1 ][1] ?? null ) ) && in_array( $var, $copied['names'], true ) && ( $open ? ')' === $tail : ';' === $tail ) ) {
 							$markers[ $items[ $i ][0] ] = "\x01INDIRECT_DATA_URI_COPY\x02";
+						}
+					} else {
+						$copied = self::copiedNames( $items, $name, $j + 1, 2 );
+						$hop    = $copied['at'] + 1;
+						$kind   = $items[ $hop ][1] ?? null;
+						if ( 3 === count( $copied['names'] ) && in_array( $kind, array( T_INCLUDE, T_REQUIRE, T_INCLUDE_ONCE, T_REQUIRE_ONCE ), true ) ) {
+							$open = ( $items[ $hop + 1 ][2] ?? '' ) === '(';
+							$var  = $open ? ( $items[ $hop + 2 ][2] ?? '' ) : ( $items[ $hop + 1 ][2] ?? '' );
+							$tail = $open ? ( $items[ $hop + 3 ][2] ?? '' ) : ( $items[ $hop + 2 ][2] ?? '' );
+							if ( T_VARIABLE === ( $open ? ( $items[ $hop + 2 ][1] ?? null ) : ( $items[ $hop + 1 ][1] ?? null ) ) && in_array( $var, $copied['names'], true ) && ( $open ? ')' === $tail : ';' === $tail ) ) {
+								$markers[ $items[ $i ][0] ] = "\x01INDIRECT_DATA_URI_COPY2\x02";
+							}
 						}
 					}
 				}

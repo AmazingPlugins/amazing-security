@@ -6,7 +6,7 @@ namespace AmazingPlugins\Security\FileScan;
 
 final class BundledRulePack {
 	public function version(): string {
-		return '2026.10.09.1';
+		return '2026.10.09.2';
 	}
 
 	public function rules(): array {
@@ -153,27 +153,35 @@ final class BundledRulePack {
 			),
 			'AS-PHP-036' => array(
 				'pattern' => '/(*LIMIT_MATCH=100000)(*LIMIT_RECURSION=1000)\beval\s*\(\s*wp_remote_retrieve_body\s*\(/i',
-				'summary' => 'eval runs the body of an HTTP response in the same statement. One assignment then eval is AS-PHP-038. One copy then eval is AS-PHP-040.',
+				'summary' => 'eval runs the body of an HTTP response in the same statement. One assignment then eval is AS-PHP-038. One copy then eval is AS-PHP-040. Two copies then eval is AS-PHP-042.',
 			),
 			'AS-PHP-037' => array(
 				'pattern' => '/(*LIMIT_MATCH=100000)(*LIMIT_RECURSION=1000)\b(?:include|require)(?:_once)?\s*\(?\s*\x01DATA_URI\x02/i',
-				'summary' => 'include or require loads a data:// stream in the same statement. One assignment then include is AS-PHP-039. One copy then include is AS-PHP-041. A string that is only echoed is not matched.',
+				'summary' => 'include or require loads a data:// stream in the same statement. One assignment then include is AS-PHP-039. One copy then include is AS-PHP-041. Two copies then include is AS-PHP-043. A string that is only echoed is not matched.',
 			),
 			'AS-PHP-038' => array(
 				'pattern' => '/\x01INDIRECT_HTTP_BODY_EVAL\x02/',
-				'summary' => 'An HTTP response body is stored in one variable and then evaluated. One copied variable then eval is AS-PHP-040. A third hop is not matched.',
+				'summary' => 'An HTTP response body is stored in one variable and then evaluated. One copied variable then eval is AS-PHP-040. Two copies then eval is AS-PHP-042. A fourth hop is not matched.',
 			),
 			'AS-PHP-039' => array(
 				'pattern' => '/\x01INDIRECT_DATA_URI\x02/',
-				'summary' => 'A data:// string is stored in one variable and then loaded with include or require. One copied variable then include is AS-PHP-041. A third hop is not matched.',
+				'summary' => 'A data:// string is stored in one variable and then loaded with include or require. One copied variable then include is AS-PHP-041. Two copies then include is AS-PHP-043. A fourth hop is not matched.',
 			),
 			'AS-PHP-040' => array(
 				'pattern' => '/\x01INDIRECT_HTTP_BODY_EVAL_COPY\x02/',
-				'summary' => 'An HTTP response body is copied once and then evaluated. A third hop is not matched.',
+				'summary' => 'An HTTP response body is copied once and then evaluated. Two copies then eval is AS-PHP-042. A fourth hop is not matched.',
 			),
 			'AS-PHP-041' => array(
 				'pattern' => '/\x01INDIRECT_DATA_URI_COPY\x02/',
-				'summary' => 'A data:// string is copied once and then loaded with include or require. A third hop is not matched.',
+				'summary' => 'A data:// string is copied once and then loaded with include or require. Two copies then include is AS-PHP-043. A fourth hop is not matched.',
+			),
+			'AS-PHP-042' => array(
+				'pattern' => '/\x01INDIRECT_HTTP_BODY_EVAL_COPY2\x02/',
+				'summary' => 'An HTTP response body is copied twice and then evaluated. A fourth hop is not matched.',
+			),
+			'AS-PHP-043' => array(
+				'pattern' => '/\x01INDIRECT_DATA_URI_COPY2\x02/',
+				'summary' => 'A data:// string is copied twice and then loaded with include or require. A fourth hop is not matched.',
 			),
 		);
 	}
