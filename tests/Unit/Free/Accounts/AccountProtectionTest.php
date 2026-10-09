@@ -97,7 +97,7 @@ final class AccountProtectionTest extends TestCase {
 	}
 
 	public function test_challenge_rejects_a_wrong_sum_and_a_filled_honeypot(): void {
-		$token = '0123456789abcdef0123456789abcdef';
+		$token = str_repeat( 'a', 32 );
 		self::assertSame( 'reject', LoginChallenge::decision( true, false, false, $token, '11', '4', '' ) );
 		self::assertSame( 'reject', LoginChallenge::decision( true, false, false, $token, '11', '11', 'filled' ) );
 		self::assertSame( 'reject', LoginChallenge::decision( true, false, false, '', '11', '11', '' ) );
