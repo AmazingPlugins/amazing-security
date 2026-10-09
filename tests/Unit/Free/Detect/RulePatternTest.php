@@ -36,12 +36,14 @@ final class RulePatternTest extends TestCase {
 			array( '<?php eval(wp_remote_retrieve_body($response));', array( 'AS-PHP-036' ) ),
 			array( '<?php $body = wp_remote_retrieve_body($response); echo $body;', array() ),
 			array( '<?php $body = wp_remote_retrieve_body($response); eval($body);', array( 'AS-PHP-038' ) ),
-			array( '<?php $body = wp_remote_retrieve_body($response); $copy = $body; eval($copy);', array() ),
+			array( '<?php $body = wp_remote_retrieve_body($response); $copy = $body; eval($copy);', array( 'AS-PHP-040' ) ),
+			array( '<?php $body = wp_remote_retrieve_body($response); $copy = $body; $again = $copy; eval($again);', array() ),
 			array( "<?php include 'data://text/plain,<?php phpinfo();';", array( 'AS-PHP-037' ) ),
 			array( "<?php \$stream = 'data://text/plain,hello'; echo \$stream;", array() ),
 			array( "<?php \$stream = 'data://text/plain,hello'; include \$stream;", array( 'AS-PHP-039' ) ),
 			array( "<?php \$stream = 'data://text/plain,hello'; include(\$stream);", array( 'AS-PHP-039' ) ),
-			array( "<?php \$stream = 'data://text/plain,hello'; \$copy = \$stream; include \$copy;", array() ),
+			array( "<?php \$stream = 'data://text/plain,hello'; \$copy = \$stream; include \$copy;", array( 'AS-PHP-041' ) ),
+			array( "<?php \$stream = 'data://text/plain,hello'; \$copy = \$stream; \$again = \$copy; include \$again;", array() ),
 		);
 		$matcher = new RuleMatcher( new BundledRulePack() );
 		foreach ( $cases as $case ) {

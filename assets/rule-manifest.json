@@ -2,7 +2,7 @@
     "schema": 1,
     "packs": {
         "files": {
-            "version": "2026.10.08.1",
+            "version": "2026.10.09.1",
             "reviewed_at": "2026-10-09",
             "ids": [
                 "AS-PHP-001",
@@ -43,12 +43,14 @@
                 "AS-PHP-036",
                 "AS-PHP-037",
                 "AS-PHP-038",
-                "AS-PHP-039"
+                "AS-PHP-039",
+                "AS-PHP-040",
+                "AS-PHP-041"
             ],
             "sha256": {
-                "src/FileScan/BundledRulePack.php": "b7e9ebdaa60616cdfaad80b62c6f78a31ad7c8d69e898fdab09bdb303dcf11f9",
+                "src/FileScan/BundledRulePack.php": "92cfe380b011a4ba6edbfd310db5515725fbf8920792ad8bd11a4b6487e483c1",
                 "src/FileScan/RuleMatcher.php": "787ee60e12cfdda288045c3a66d1734ca5fcde1c26d66e739214eda04ca7df86",
-                "src/FileScan/AdjacentFlow.php": "e6a19e8eea8f4e611da5cccdc737446e62e597a1fc807251ab1991e272f83bb3"
+                "src/FileScan/AdjacentFlow.php": "6a2cfe028952fd3cba17b61d0ab299968614635f0489ca09c08103623879cfcc"
             }
         },
         "content": {
