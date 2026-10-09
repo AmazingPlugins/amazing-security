@@ -11,10 +11,12 @@ use Throwable;
 final class AtomicPluginRepair {
 	private readonly ?Closure $afterReplace;
 	private readonly ?Closure $beforeReplace;
+	private readonly ?Closure $afterFinalCheck;
 
-	public function __construct( private readonly string $root, private readonly string $backupRoot, ?callable $afterReplace = null, ?callable $beforeReplace = null ) {
-		$this->afterReplace  = null === $afterReplace ? null : Closure::fromCallable( $afterReplace );
-		$this->beforeReplace = null === $beforeReplace ? null : Closure::fromCallable( $beforeReplace );
+	public function __construct( private readonly string $root, private readonly string $backupRoot, ?callable $afterReplace = null, ?callable $beforeReplace = null, ?callable $afterFinalCheck = null ) {
+		$this->afterReplace    = null === $afterReplace ? null : Closure::fromCallable( $afterReplace );
+		$this->beforeReplace   = null === $beforeReplace ? null : Closure::fromCallable( $beforeReplace );
+		$this->afterFinalCheck = null === $afterFinalCheck ? null : Closure::fromCallable( $afterFinalCheck );
 	}
 
 	public function currentSha256( string $relativePath ): ?string {
@@ -98,7 +100,13 @@ final class AtomicPluginRepair {
 			if ( $target !== $this->safeTarget( $relativePath ) || $beforeSha256 !== hash_file( 'sha256', $target ) ) {
 				return null;
 			}
-			// phpcs:ignore WordPress.WP.AlternativeFunctions.rename_rename -- Atomic same-directory replacement after hash, inode, and symlink checks.
+			if ( null !== $this->afterFinalCheck ) {
+				( $this->afterFinalCheck )();
+			}
+			if ( ! $this->lockedBytesMatch( $handle, $target, $beforeSha256 ) ) {
+				return null;
+			}
+			// phpcs:ignore WordPress.WP.AlternativeFunctions.rename_rename -- Atomic same-directory replacement after the locked-inode re-read.
 			if ( ! rename( $temp, $target ) ) {
 				return null;
 			}
@@ -184,7 +192,13 @@ final class AtomicPluginRepair {
 			if ( null === $temp || $target !== $this->safeTarget( $receipt->relativePath ) || $expectedCurrentSha256 !== hash_file( 'sha256', $target ) ) {
 				return false;
 			}
-			// phpcs:ignore WordPress.WP.AlternativeFunctions.rename_rename -- Atomic rollback to the backed-up bytes.
+			if ( null !== $this->afterFinalCheck ) {
+				( $this->afterFinalCheck )();
+			}
+			if ( ! $this->lockedBytesMatch( $handle, $target, $expectedCurrentSha256 ) ) {
+				return false;
+			}
+			// phpcs:ignore WordPress.WP.AlternativeFunctions.rename_rename -- Atomic rollback after the locked-inode re-read.
 			if ( ! rename( $temp, $target ) ) {
 				return false;
 			}
@@ -253,6 +267,18 @@ final class AtomicPluginRepair {
 			return null;
 		}
 		return $temp;
+	}
+
+	/** @param resource $handle */
+	private function lockedBytesMatch( $handle, string $target, string $expected ): bool {
+		$stat     = fstat( $handle );
+		$pathStat = stat( $target );
+		// phpcs:ignore WordPress.PHP.YodaConditions.NotYoda -- Dynamic inode and size comparisons.
+		if ( false === $pathStat || ! is_array( $stat ) || $stat['ino'] !== $pathStat['ino'] || $stat['dev'] !== $pathStat['dev'] || $stat['size'] > 2097152 || $stat['size'] < 0 || ! rewind( $handle ) ) {
+			return false;
+		}
+		$contents = stream_get_contents( $handle, 2097153 );
+		return false !== $contents && strlen( $contents ) === $stat['size'] && hash_equals( $expected, hash( 'sha256', $contents ) );
 	}
 
 	private function hashShape( string $hash ): bool {

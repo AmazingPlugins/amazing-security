@@ -171,7 +171,7 @@ final class SiteWatchCheck implements SecurityCheck {
 
 	/** @return array{status: string} */
 	public static function securityActivity(): array {
-		return array( 'status' => self::activity( get_option( 'amsec_activity_schema_version', null ) ) );
+		return array( 'status' => self::activity( get_option( 'amsec_activity_enabled', '0' ) ) );
 	}
 
 	/** @return array{status: string} */
@@ -235,10 +235,10 @@ final class SiteWatchCheck implements SecurityCheck {
 	}
 
 	public static function emails( mixed $raw ): string {
-		if ( '0' === $raw || 0 === $raw ) {
-			return 'off';
+		if ( '1' === $raw || 1 === $raw || true === $raw ) {
+			return 'on';
 		}
-		return null === $raw || false === $raw || '' === $raw || '1' === $raw || 1 === $raw || true === $raw ? 'on' : 'unknown';
+		return null === $raw || false === $raw || '' === $raw || '0' === $raw || 0 === $raw ? 'off' : 'unknown';
 	}
 
 	public static function digest( mixed $raw ): string {

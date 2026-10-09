@@ -4,7 +4,7 @@ use AmazingPlugins\Security\Incident\ResetRequirement;
 use AmazingPlugins\Security\Incident\IncidentAction;
 ResetRequirement::KEY;
 add_filter('pre_wp_mail',static fn()=>true);
-wp_set_current_user(1);$password=bin2hex(random_bytes(20));$targetPassword=bin2hex(random_bytes(20));
+update_option('amsec_activity_enabled','1',false);wp_set_current_user(1);$password=bin2hex(random_bytes(20));$targetPassword=bin2hex(random_bytes(20));
 $actor=wp_insert_user(['user_login'=>'amsec-incident-admin-'.bin2hex(random_bytes(4)),'user_pass'=>$password,'role'=>'administrator']);
 $target=wp_insert_user(['user_login'=>'amsec-incident-target-'.bin2hex(random_bytes(4)),'user_pass'=>$targetPassword,'role'=>'subscriber']);
 if(is_wp_error($actor)||is_wp_error($target)){throw new RuntimeException('Fixture creation failed.');}

@@ -27,6 +27,17 @@ final class RuleGuidance {
 			'AS-PHP-026' => 'Request data selects a file through up to six variables. Ask the developer to use a fixed path. A seventh assignment is not matched.',
 			'AS-PHP-027' => 'Request data is passed to create_function directly or through three variables. Ask the developer to remove that call. A fourth copied variable is not matched.',
 			'AS-PHP-028' => 'A preg_replace pattern uses the old e modifier, which runs its replacement as code. Ask the developer to remove that modifier. A pattern stored in two variables is matched. A third copied variable is not matched.',
+			'AS-PHP-029' => 'move_uploaded_file builds its destination from two strings around a name in the same call. Ask the developer which directory receives it and which extensions are allowed. A single destination string is not matched.',
+			'AS-PHP-030' => 'file_put_contents writes $_POST or $_REQUEST to a string path in the same statement. Ask the developer to write only to a fixed path. $_GET, and a request value used only in another statement, are not matched.',
+			'AS-PHP-031' => 'shell_exec or passthru joins a string in front of a request value in the same statement. Ask the developer to remove that command path. A request value passed alone is a different rule, and exec is not matched.',
+			'AS-PHP-032' => 'copy reads a request value into a string path in the same call. Ask the developer which directory receives that file. A variable destination, a joined path, and a cookie value are not matched.',
+			'AS-PHP-033' => 'fopen is called with a request value in the same statement. Ask the developer to open a fixed local path. A variable path and a cookie value are not matched.',
+			'AS-PHP-034' => 'A Refresh header sends the browser to a request value. Ask the developer to allow only known local addresses. A fixed URL and a variable destination are not matched.',
+			'AS-PHP-035' => 'readfile is called with a request value in the same statement. Ask the developer to read a fixed local path. A variable path and a cookie value are not matched.',
+			'AS-PHP-036' => 'eval runs the body of an HTTP response in the same statement. Ask the developer to remove that path. One assignment then eval is covered by AS-PHP-038.',
+			'AS-PHP-037' => 'include or require loads a data:// stream in the same statement. Ask the developer to include a fixed local file. One assignment then include is covered by AS-PHP-039.',
+			'AS-PHP-038' => 'An HTTP response body is stored in one variable and then evaluated. Ask the developer to remove that path. A second copied variable is not matched.',
+			'AS-PHP-039' => 'A data:// string is stored in one variable and then loaded with include or require. Ask the developer to include a fixed local file. A second copied variable is not matched.',
 			default => 'Compare this file with its trusted release and ask its developer to explain the flagged behavior.',
 		};
 	}

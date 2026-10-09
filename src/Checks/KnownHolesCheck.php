@@ -87,7 +87,7 @@ final class KnownHolesCheck implements SecurityCheck {
 		}
 		$found = 0;
 		foreach ( $report->results as $result ) {
-			if ( in_array( $result->state, array( State::WARN, State::FAIL ), true ) ) {
+			if ( in_array( $result->state, array( State::WARN, State::CRITICAL, State::FAIL ), true ) ) {
 				++$found;
 			}
 		}

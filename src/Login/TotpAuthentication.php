@@ -25,6 +25,16 @@ final class TotpAuthentication {
 			// Login forms use WordPress authentication instead of a plugin admin nonce.
 			// phpcs:ignore WordPress.Security.NonceVerification.Missing
 			$factor = isset( $_POST['amsec_otp'] ) && is_string( $_POST['amsec_otp'] ) ? sanitize_text_field( wp_unslash( $_POST['amsec_otp'] ) ) : '';
+			if ( '' === $factor ) {
+				$redirect = '';
+				if ( function_exists( 'wp_validate_redirect' ) && isset( $_POST['redirect_to'] ) && is_string( $_POST['redirect_to'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+					$redirect = wp_validate_redirect( sanitize_text_field( wp_unslash( $_POST['redirect_to'] ) ), '' ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+				}
+				if ( ( new LoginSecondStep() )->park( $user->ID, $redirect ) ) {
+					return new \WP_Error( LoginSecondStep::ERROR, __( 'Enter the code from your authenticator.', 'amazing-security' ) );
+				}
+				return new \WP_Error( 'amsec_verification_failed', __( 'Verification could not be completed.', 'amazing-security' ) );
+			}
 			if ( $this->verifyFactor( $user->ID, $factor, time() ) ) {
 				return $user;
 			}

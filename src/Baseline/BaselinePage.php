@@ -15,7 +15,7 @@ final class BaselinePage {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_die( esc_html__( 'Administrator access required.', 'amazing-security' ), '', array( 'response' => 403 ) );
 		}
-		echo '<div class="wrap"><h1>Owner-approved code baselines</h1><p>A baseline is your reference for later changes. It does not prove that code is clean, authentic or malware-free. Official checksum checks remain separate. Only declared source assets in the selected package are covered; mu-plugins and standalone plugins cover the selected entry file only.</p><p>Coverage: PHP, PHTML, INC, JS, CSS, HTML, HTM, SVG, JSON and Twig. Limit: 300 files, 1,500 traversed entries, 2 MiB per source file, 16 MiB source bytes (read twice for verification) and five seconds per collection. Linked, unreadable or oversized entries make collection incomplete. Collection rechecks file hashes, metadata and directory listings, but cannot freeze the filesystem. At most ten baselines and ten pending previews share a 512 KiB storage budget.</p>';
+		echo '<div class="wrap amazing-security-admin"><h1>Watch a plugin or theme</h1><p>Pick an installed package, preview the file list, then approve it with your password. Later you can compare that reference with the files on disk. A reference is not proof the code was clean. WordPress.org checksums stay a separate check.</p><details><summary>What the reference covers</summary><p>PHP, PHTML, INC, JS, CSS, HTML, HTM, SVG, JSON and Twig. Up to 300 files. A mu-plugin or a plugin with one file covers that entry file. Linked, unreadable, or oversized files make the collection incomplete.</p></details>';
 		$repository = new BaselineRepository( new WordPressOptions() );
 		try {
 			list( , $state ) = $repository->snapshot();
@@ -44,14 +44,19 @@ final class BaselinePage {
 		} else {
 			echo '<p>Use HTTPS to prepare and approve a baseline.</p>';
 		}
-		echo '<h2>Compare an approved package</h2><form method="get"><input type="hidden" name="page" value="amsec-baselines"><label>Reference <select name="compare">';
-		foreach ( $state['baselines'] as $key => $baseline ) {
-			echo '<option value="' . esc_attr( $key ) . '">' . esc_html( $key ) . '</option>';
+		echo '<h2>Compare an approved package</h2>';
+		if ( array() === $state['baselines'] ) {
+			echo '<p>There is no approved reference yet. Prepare one over HTTPS, then compare it here.</p>';
+		} else {
+			echo '<form method="get"><input type="hidden" name="page" value="amsec-baselines"><label>Reference <select name="compare">';
+			foreach ( $state['baselines'] as $key => $baseline ) {
+				echo '<option value="' . esc_attr( $key ) . '">' . esc_html( $key ) . '</option>';
+			}
+			echo '</select></label>';
+			wp_nonce_field( 'amsec_baseline_compare', '_wpnonce', false );
+			submit_button( __( 'Compare covered files', 'amazing-security' ), 'secondary' );
+			echo '</form>';
 		}
-		echo '</select></label>';
-		wp_nonce_field( 'amsec_baseline_compare', '_wpnonce', false );
-		submit_button( __( 'Compare covered files', 'amazing-security' ), 'secondary' );
-		echo '</form>';
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Verified below before bounded read work.
 		$key = is_string( $_GET['compare'] ?? null ) ? sanitize_text_field( wp_unslash( $_GET['compare'] ) ) : '';
 		if ( '' !== $key ) {

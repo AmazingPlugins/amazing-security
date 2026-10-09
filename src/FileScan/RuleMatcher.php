@@ -55,6 +55,10 @@ final class RuleMatcher {
 					$code .= "\x01HIDDEN_EXTERNAL_LINK\x02";
 				} elseif ( preg_match( '/^[\'\"]Location:\s*[\'\"]$/i', $token[1] ) ) {
 					$code .= "\x01LOCATION\x02";
+				} elseif ( preg_match( '/^[\'\"]Refresh:\s*0\s*;\s*url\s*=\s*[\'\"]$/i', $token[1] ) ) {
+					$code .= "\x01REFRESH\x02";
+				} elseif ( preg_match( '/^[\'\"]data:\/\//i', $token[1] ) ) {
+					$code .= "\x01DATA_URI\x02";
 				} else {
 					$code .= preg_match( '/^[\'\"]https?:\/\//i', $token[1] ) ? "\x01URL\x02" : 'S';
 				}

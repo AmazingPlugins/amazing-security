@@ -44,7 +44,7 @@ final class FileScanReviewAction {
 		if ( ! self::canNote( true, true, $current ) || ! self::validInput( $id, $note ) || ! $store->saveNote( $id, $note ) ) {
 			wp_die( esc_html__( 'The finding or note is no longer valid.', 'amazing-security' ), '', array( 'response' => 400 ) );
 		}
-		wp_safe_redirect( admin_url( 'admin.php?page=amazing-security#amsec-file-scan' ) );
+		wp_safe_redirect( admin_url( 'admin.php?page=amsec-file-checks#amsec-file-scan' ) );
 		exit;
 	}
 }

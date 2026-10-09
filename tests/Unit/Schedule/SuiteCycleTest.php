@@ -25,6 +25,16 @@ final class SuiteCycleTest extends TestCase {
 		self::assertSame( 'complete', $cycle->status( 1004 )['state'] );
 	}
 
+	public function test_a_coverage_gap_keeps_the_file_stage_and_ends_partial(): void {
+		$cycle = new SuiteCycle( $this->options() );
+		self::assertTrue( $cycle->start( 1000 ) );
+		self::assertTrue( $cycle->advance( 'integrity', 'files', 1001 ) );
+		self::assertTrue( $cycle->markCoverageGap( 1002 ) );
+		self::assertTrue( $cycle->complete( 1003 ) );
+		self::assertSame( 'partial', $cycle->status( 1003 )['state'] );
+		self::assertSame( 'files', $cycle->status( 1003 )['stage'] );
+	}
+
 	public function test_retry_is_bounded_and_stale_cycle_is_partial(): void {
 		$cycle = new SuiteCycle( $this->options() );
 		self::assertTrue( $cycle->start( 1000 ) );

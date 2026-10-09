@@ -8,6 +8,7 @@ global $wpdb;
 $r=new ActivityRepository($wpdb);
 $table=$wpdb->prefix.'amsec_activity';
 $wpdb->query("DELETE FROM {$table}");
+update_option('amsec_activity_enabled','1',false);
 wp_set_current_user(1);
 $id=wp_insert_user(['user_login'=>'amsec-activity-fixture-'.bin2hex(random_bytes(4)),'user_pass'=>bin2hex(random_bytes(16)),'role'=>'subscriber']);
 if(is_wp_error($id)){throw new RuntimeException('Fixture user creation failed.');}

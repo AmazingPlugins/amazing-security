@@ -76,6 +76,7 @@ for pair in 'amsec-next-wp wordpress 66' 'amsec-next-wp69 wordpress69 69'; do
  wp_fixture "$base/tests/Integration/wordpress-expanded-rule-corpus.php" --user=admin > "$evidence/expanded-corpus$tag.json"
  wp eval-file /var/www/html/wp-content/amsec-activity-test.php --user=admin > "$evidence/activity-result$tag.json"
  # Real plugin lifecycle calls run in separate WordPress processes.
+ wp option update amsec_activity_enabled 1
  wp plugin deactivate classic-editor
  wp plugin activate classic-editor
  wp eval ' $r=new AmazingPlugins\Security\Activity\ActivityRepository($GLOBALS["wpdb"]);foreach(["plugin_activated","plugin_deactivated"] as $event){if(!$r->page(1,$event)){throw new RuntimeException("Plugin lifecycle event absent.");}} echo "Real plugin activation/deactivation recorded.\n";'

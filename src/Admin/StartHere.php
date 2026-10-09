@@ -10,7 +10,7 @@ use AmazingPlugins\Security\Findings\State;
 /** Fixed first suggestions from a completed local scan. */
 final class StartHere {
 	public const ORDER = array( 'https-admin', 'core-updates', 'default-admin-login', 'debug-display', 'file-editor', 'login-rate-mode' );
-	public const LATER = array( 'uploads-php-execution', 'uploads-php-files', 'file-modes', 'pingbacks', 'xmlrpc-auth', 'captcha-login', 'compromised-passwords', 'login-hints', 'author-archives', 'rest-user-list', 'version-tag', 'discovery-links', 'readme-file', 'license-file', 'debug-log', 'sample-config', 'error-log', 'config-backup', 'php-version', 'background-updates', 'plugin-updates', 'theme-updates', 'inactive-plugins', 'inactive-themes', 'root-exposure', 'bot-controls', 'rest-rates', 'finding-emails', 'weekly-digest', 'traffic-history', 'network-controls', 'trusted-proxies', 'security-activity', 'account-sessions', 'code-baselines', 'daily-checks', 'daily-file-checks', 'rule-review', 'ai-readers', 'ai-readiness', 'known-holes', 'release-files', 'closed-plugins', 'public-content', 'local-code', 'suspicious-files', 'local-inventory', 'security-headers' );
+	public const LATER = array( 'uploads-php-execution', 'uploads-php-files', 'file-modes', 'pingbacks', 'xmlrpc-auth', 'captcha-login', 'compromised-passwords', 'login-hints', 'author-archives', 'rest-user-list', 'version-tag', 'discovery-links', 'readme-file', 'license-file', 'debug-log', 'sample-config', 'error-log', 'config-backup', 'php-version', 'background-updates', 'plugin-updates', 'theme-updates', 'inactive-plugins', 'inactive-themes', 'root-exposure', 'bot-controls', 'rest-rates', 'rest-request-watch', 'finding-emails', 'weekly-digest', 'traffic-history', 'network-controls', 'trusted-proxies', 'security-activity', 'account-sessions', 'code-baselines', 'daily-checks', 'daily-file-checks', 'rule-review', 'ai-readers', 'ai-readiness', 'known-holes', 'release-files', 'closed-plugins', 'public-content', 'local-code', 'suspicious-files', 'local-inventory', 'security-headers' );
 
 	public static function label( string $checkId ): string {
 		return match ( $checkId ) {
@@ -23,6 +23,7 @@ final class StartHere {
 			'uploads-php-execution' => 'PHP in uploads',
 			'uploads-php-files' => 'PHP files in uploads',
 			'file-modes' => 'File modes',
+			'filesystem-permissions' => 'File permissions',
 			'pingbacks' => 'Pingbacks',
 			'xmlrpc-auth' => 'XML-RPC sign-in',
 			'captcha-login' => 'Login CAPTCHA',
@@ -47,6 +48,7 @@ final class StartHere {
 			'root-exposure' => 'Root files',
 			'bot-controls' => 'Bot controls',
 			'rest-rates' => 'REST limits',
+			'rest-request-watch' => 'REST request watch',
 			'finding-emails' => 'Finding emails',
 			'weekly-digest' => 'Weekly digest',
 			'traffic-history' => 'Traffic history',
@@ -102,7 +104,11 @@ final class StartHere {
 				'label'  => 'Review themes',
 				'screen' => 'themes.php',
 			) : null,
-			'core-updates', 'plugin-updates', 'theme-updates' => State::WARN === $result->state ? array(
+			'https-admin' => State::PASS === $result->state ? null : array(
+				'label'  => 'Open Site Health',
+				'screen' => 'site-health.php',
+			),
+			'core-updates', 'plugin-updates', 'theme-updates' => in_array( $result->state, array( State::WARN, State::UNKNOWN ), true ) ? array(
 				'label'  => 'Review updates',
 				'screen' => 'update-core.php',
 			) : null,
@@ -110,10 +116,21 @@ final class StartHere {
 				'label'  => 'Review administrators',
 				'screen' => 'users.php',
 			) : null,
-			'login-rate-mode' => State::WARN === $result->state ? array(
+			'login-rate-mode' => State::PASS === $result->state ? null : array(
 				'label' => 'Open login protection',
-				'hash'  => 'amsec-login-title',
-			) : null,
+				'page'  => 'amsec-accounts',
+				'hash'  => 'sign-in',
+			),
+			'authenticator-app' => State::PASS === $result->state ? null : array(
+				'label' => 'Open authenticator status',
+				'page'  => 'amsec-accounts',
+				'hash'  => 'verification',
+			),
+			'passkeys-status' => State::PASS === $result->state ? null : array(
+				'label' => 'Open passkey status',
+				'page'  => 'amsec-accounts',
+				'hash'  => 'passkeys',
+			),
 			'pingbacks' => 'open' === ( $result->evidence['status'] ?? '' ) ? array(
 				'label'     => 'Turn off pingbacks',
 				'action'    => 'amsec_approved_setting',
@@ -133,7 +150,10 @@ final class StartHere {
 					'nonce'     => 'amsec_approved_setting',
 					'operation' => 'restore-debug-display',
 				),
-				default => null,
+				default => State::PASS === $result->state ? null : array(
+					'label'  => 'Open Site Health',
+					'screen' => 'site-health.php',
+				),
 			},
 			'file-editor' => match ( $result->evidence['fix'] ?? '' ) {
 				'plugin' => State::WARN === $result->state ? array(
@@ -148,7 +168,10 @@ final class StartHere {
 					'nonce'     => 'amsec_approved_setting',
 					'operation' => 'restore-file-editor',
 				),
-				default => null,
+				default => State::PASS === $result->state ? null : array(
+					'label' => 'Review the file editor',
+					'page'  => 'amsec-recovery',
+				),
 			},
 			'captcha-login' => match ( $result->evidence['status'] ?? '' ) {
 				'off' => array(
@@ -255,13 +278,44 @@ final class StartHere {
 				),
 				default => null,
 			},
-			'xmlrpc-auth' => 'open' === ( $result->evidence['auth'] ?? '' ) ? array(
+			'xmlrpc-auth' => 'open' === ( $result->evidence['auth'] ?? '' ) || State::PASS !== $result->state ? array(
 				'label' => 'Open login protection',
-				'hash'  => 'amsec-login-title',
+				'page'  => 'amsec-accounts',
+				'hash'  => 'sign-in',
 			) : null,
+			'uploads-php-execution' => array(
+				'label' => 'Review PHP in uploads',
+				'page'  => 'amsec-uploads',
+			),
+			'uploads-php-files' => State::PASS === $result->state ? null : array(
+				'label'  => 'Review uploads',
+				'screen' => 'upload.php',
+			),
+			'readme-file', 'license-file', 'debug-log', 'sample-config', 'error-log', 'config-backup', 'root-exposure', 'filesystem-permissions' => State::PASS === $result->state ? null : array(
+				'label' => 'Review this finding',
+				'page'  => 'amsec-exposure',
+			),
+			'php-version' => State::PASS === $result->state ? null : array(
+				'label'  => 'Open Site Health',
+				'screen' => 'site-health.php',
+			),
+			'background-updates' => State::PASS === $result->state ? null : array(
+				'label'  => 'Review updates',
+				'screen' => 'update-core.php',
+			),
+			'daily-checks', 'daily-file-checks' => State::PASS === $result->state ? null : array(
+				'label' => 'Review the schedule',
+				'page'  => 'amsec-schedule',
+				'hash'  => 'amsec-schedule',
+			),
+			'local-code' => State::PASS === $result->state ? null : array(
+				'label' => 'Review the file scan',
+				'page'  => 'amsec-file-checks',
+				'hash'  => 'amsec-file-scan',
+			),
 			'file-modes' => in_array( $result->state, array( State::WARN, State::UNKNOWN ), true ) ? array(
 				'label' => 'Review file modes',
-				'hash'  => 'amsec-hardening',
+				'page'  => 'amsec-recovery',
 			) : null,
 			'bot-controls' => in_array( $result->evidence['mode'] ?? '', array( 'off', 'observe' ), true ) ? array(
 				'label' => 'Review bot controls',
@@ -271,8 +325,13 @@ final class StartHere {
 				'label' => 'Review REST limits',
 				'page'  => 'amsec-rest-rates',
 			) : null,
+			'rest-request-watch' => 'disabled' === ( $result->evidence['status'] ?? '' ) ? array(
+				'label' => 'Open Traffic',
+				'page'  => 'amsec-traffic',
+			) : null,
 			'finding-emails' => 'off' === ( $result->evidence['status'] ?? '' ) ? array(
-				'label' => 'Review finding emails',
+				'label' => 'Open notification settings',
+				'page'  => 'amsec-settings',
 				'hash'  => 'amsec-alerts',
 			) : null,
 			'weekly-digest' => 'off' === ( $result->evidence['status'] ?? '' ) ? array(
@@ -314,6 +373,7 @@ final class StartHere {
 			'ai-readiness' => match ( true ) {
 				'on' === ( $result->evidence['assistant'] ?? '' ) => array(
 					'label' => 'Review AI assistant access',
+					'page'  => 'amsec-assistant',
 					'hash'  => 'amsec-mcp',
 				),
 				'open' === ( $result->evidence['app_passwords'] ?? '' ) => array(
@@ -343,6 +403,7 @@ final class StartHere {
 				),
 				'found' === $stored => array(
 					'label' => 'Review vulnerability checks',
+					'page'  => 'amsec-vulnerabilities',
 					'hash'  => 'amsec-vulnerabilities',
 				),
 				default => null,
@@ -361,6 +422,7 @@ final class StartHere {
 				),
 				'found' => array(
 					'label' => 'Review integrity scan',
+					'page'  => 'amsec-file-checks',
 					'hash'  => 'amsec-integrity',
 				),
 				default => null,
@@ -399,6 +461,7 @@ final class StartHere {
 				),
 				'found' => array(
 					'label' => 'Review suspicious files',
+					'page'  => 'amsec-file-checks',
 					'hash'  => 'amsec-file-scan',
 				),
 				default => null,

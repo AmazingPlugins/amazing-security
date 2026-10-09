@@ -1,0 +1,99 @@
+<?php
+
+declare(strict_types=1);
+
+namespace AmazingPlugins\Security\Admin;
+
+/** Scan stays first. Recommendations, Log In & Register, Traffic, Files, and Records stay beside it. */
+final class Submenu {
+	public const PARENT = 'amazing-security';
+
+	/**
+	 * Side-menu slugs after Scan.
+	 *
+	 * @return list<string>
+	 */
+	public static function visible(): array {
+		return array(
+			'amsec-recommendations',
+			'amsec-accounts',
+			'amsec-traffic-guard',
+			'amsec-files',
+			'amsec-records',
+			'amsec-settings',
+			'amsec-assistant',
+		);
+	}
+
+	/**
+	 * @param list<string> $registered Menu slugs currently under the parent.
+	 * @return list<string>
+	 */
+	public static function hidden( array $registered ): array {
+		$keep = array_fill_keys( array_merge( array( self::PARENT ), self::visible() ), true );
+		$hide = array();
+		foreach ( $registered as $slug ) {
+			if ( ! isset( $keep[ $slug ] ) ) {
+				$hide[] = $slug;
+			}
+		}
+		return $hide;
+	}
+
+	public static function trim(): void {
+		global $submenu;
+		$items = $submenu[ self::PARENT ] ?? null;
+		if ( ! is_array( $items ) ) {
+			return;
+		}
+		$by_slug = array();
+		foreach ( $items as $item ) {
+			if ( ! is_array( $item ) || ! isset( $item[2] ) || ! is_string( $item[2] ) || isset( $by_slug[ $item[2] ] ) ) {
+				continue;
+			}
+			$by_slug[ $item[2] ] = $item;
+		}
+		$ordered = array();
+		if ( isset( $by_slug[ self::PARENT ] ) ) {
+			$scan      = $by_slug[ self::PARENT ];
+			$scan[0]   = __( 'Scan', 'amazing-security' );
+			$ordered[] = $scan;
+		}
+		$shown = array_fill_keys( self::visible(), true );
+		foreach ( self::visible() as $slug ) {
+			if ( ! isset( $by_slug[ $slug ] ) ) {
+				continue;
+			}
+			$item   = $by_slug[ $slug ];
+			$labels = array(
+				'amsec-recommendations' => __( 'Recommendations', 'amazing-security' ),
+				'amsec-accounts'        => __( 'Log In & Register', 'amazing-security' ),
+				'amsec-traffic-guard'   => __( 'Traffic', 'amazing-security' ),
+				'amsec-files'           => __( 'Files', 'amazing-security' ),
+				'amsec-records'         => __( 'Records', 'amazing-security' ),
+				'amsec-settings'        => __( 'Settings', 'amazing-security' ),
+				'amsec-assistant'       => __( 'AI & MCP', 'amazing-security' ),
+			);
+			if ( isset( $labels[ $slug ] ) ) {
+				$item[0] = $labels[ $slug ];
+			}
+			$ordered[] = $item;
+		}
+		foreach ( $by_slug as $slug => $item ) {
+			if ( self::PARENT === $slug || isset( $shown[ $slug ] ) ) {
+				continue;
+			}
+			$item[4]   = 'amsec-menu-hidden';
+			$ordered[] = $item;
+		}
+		if ( array() !== $ordered ) {
+			// Scan stays first so the Amazing Security menu opens it. Hidden rows stay registered.
+			$submenu[ self::PARENT ] = $ordered; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+		}
+		add_action( 'admin_head', array( self::class, 'hide' ) );
+	}
+
+	public static function hide(): void {
+		echo '<style>#adminmenu .amsec-menu-hidden{display:none}</style>';
+	}
+}

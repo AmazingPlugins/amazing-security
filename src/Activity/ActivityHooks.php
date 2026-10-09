@@ -113,8 +113,14 @@ final class ActivityHooks {
 		}
 	}
 
+	public static function recording( int $recorded, string $enabled, string $schema ): bool {
+		return $recorded < 20 && '1' === $enabled && '1' === $schema;
+	}
+
 	public function record( string $event, int $user = 0, string $target = '' ): void {
-		if ( $this->recorded >= 20 || '1' !== get_option( 'amsec_activity_schema_version' ) ) {
+		$enabled = function_exists( 'get_option' ) ? (string) get_option( 'amsec_activity_enabled', '0' ) : '0';
+		$schema  = function_exists( 'get_option' ) ? (string) get_option( 'amsec_activity_schema_version', '0' ) : '0';
+		if ( ! self::recording( $this->recorded, $enabled, $schema ) ) {
 			return;
 		}
 		++$this->recorded;

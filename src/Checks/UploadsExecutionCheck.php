@@ -11,7 +11,10 @@ use AmazingPlugins\Security\Scan\SecurityCheck;
 use Closure;
 use DateTimeImmutable;
 
-/** Reports a visible local rule without proving that uploads cannot run PHP. */
+/**
+ * Reports a visible local uploads rule without proving PHP cannot run there.
+ * Soft F24: rule present → Recommended; absent → Warning. No runtime probe file.
+ */
 final class UploadsExecutionCheck implements SecurityCheck {
 	private readonly ?Closure $readRule;
 
@@ -24,22 +27,31 @@ final class UploadsExecutionCheck implements SecurityCheck {
 	}
 
 	public function run( ScanContext $context ): array {
-		$rule    = $this->readRule instanceof Closure ? ( $this->readRule )() : self::visibleRule();
-		$label   = is_string( $rule ) && in_array( $rule, array( 'engine-off', 'filesmatch-deny' ), true ) ? $rule : '';
-		$summary = '' !== $label
-			? 'A local uploads rule (' . $label . ') was found. That does not prove PHP is blocked. Ask your host how this server runs PHP. No test file was written.'
-			: 'PHP in the uploads folder has not been checked on this server. Ask your host whether that folder can run PHP. No test file was written.';
+		unset( $context );
+		$rule  = $this->readRule instanceof Closure ? ( $this->readRule )() : self::visibleRule();
+		$label = is_string( $rule ) && in_array( $rule, array( 'engine-off', 'user-ini-engine-off', 'filesmatch-deny' ), true ) ? $rule : '';
+		if ( '' !== $label ) {
+			$state    = State::UNKNOWN;
+			$summary  = 'A local uploads rule (' . $label . ') was found. That does not prove PHP is blocked. Ask your host how this server runs PHP. No test file was written.';
+			$coverage = 'partial';
+			$method   = 'local_rule';
+		} else {
+			$state    = State::WARN;
+			$summary  = 'No local uploads rule that disables PHP was found. Ask your host whether that folder can run PHP, or add an approved rule. No test file was written.';
+			$coverage = 'complete';
+			$method   = 'no_runtime_probe';
+		}
 		return array(
 			new CheckResult(
 				$this->id(),
-				State::UNKNOWN,
+				$state,
 				$summary,
 				'https://developer.wordpress.org/advanced-administration/security/hardening/',
 				new DateTimeImmutable(),
-				'low',
-				'unavailable',
+				'medium',
+				$coverage,
 				array(
-					'method' => '' !== $label ? 'local_rule' : 'no_runtime_probe',
+					'method' => $method,
 					'rule'   => '' !== $label ? $label : 'none',
 				),
 			),
@@ -49,6 +61,9 @@ final class UploadsExecutionCheck implements SecurityCheck {
 	public static function classify( string $text ): string {
 		if ( preg_match( '/php_(?:admin_)?flag\s+engine\s+off/i', $text ) ) {
 			return 'engine-off';
+		}
+		if ( preg_match( '/(?:^|\n)\s*engine\s*=\s*Off\b/i', $text ) || preg_match( '/php_admin_value\s*\[\s*engine\s*\]\s*=\s*Off\b/i', $text ) ) {
+			return 'user-ini-engine-off';
 		}
 		if ( preg_match( '/<FilesMatch\b[^>]*php/i', $text ) && preg_match( '/Require\s+all\s+denied|Deny\s+from\s+all/i', $text ) ) {
 			return 'filesmatch-deny';
@@ -63,9 +78,13 @@ final class UploadsExecutionCheck implements SecurityCheck {
 		$upload     = wp_upload_dir( null, false );
 		$candidates = array();
 		if ( is_array( $upload ) && empty( $upload['error'] ) && is_string( $upload['basedir'] ?? null ) ) {
-			$candidates[] = rtrim( $upload['basedir'], '/' ) . '/.htaccess';
+			$base         = rtrim( $upload['basedir'], '/' );
+			$candidates[] = $base . '/.htaccess';
+			$candidates[] = $base . '/.user.ini';
 		}
-		$candidates[] = rtrim( WP_CONTENT_DIR, '/' ) . '/.htaccess';
+		$content      = rtrim( WP_CONTENT_DIR, '/' );
+		$candidates[] = $content . '/.htaccess';
+		$candidates[] = $content . '/.user.ini';
 		foreach ( $candidates as $path ) {
 			$label = self::ruleIn( $path );
 			if ( '' !== $label ) {
@@ -88,7 +107,7 @@ final class UploadsExecutionCheck implements SecurityCheck {
 		if ( ! is_int( $size ) || $size < 1 || $size > 65536 ) {
 			return '';
 		}
-		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Bounded local .htaccess read. No probe file is written.
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Bounded local rule-file read. No probe file is written.
 		$text = file_get_contents( $real );
 		return is_string( $text ) ? self::classify( $text ) : '';
 	}

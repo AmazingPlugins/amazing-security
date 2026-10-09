@@ -24,7 +24,7 @@ final class AlertDelivery {
 	}
 
 	public function sendNew( array $ids, int $now, string $source = 'general', bool $complete = true ): string {
-		if ( '0' === $this->options->get( 'amsec_alerts_enabled' ) ) {
+		if ( ! $this->enabled() ) {
 			return 'off';
 		}
 		$ids  = array_values( array_unique( array_filter( $ids, static fn( mixed $id ): bool => is_string( $id ) && (bool) preg_match( '/^[a-zA-Z0-9-]{1,80}$/D', $id ) ) ) );
@@ -52,7 +52,7 @@ final class AlertDelivery {
 	}
 
 	public function retry( int $now ): string {
-		if ( '0' === $this->options->get( 'amsec_alerts_enabled' ) ) {
+		if ( ! $this->enabled() ) {
 			return 'off';
 		}
 		$lock = new WorkerLock( $this->options, 'amsec_alert_lock' );
@@ -64,6 +64,10 @@ final class AlertDelivery {
 		} finally {
 			$lock->release();
 		}
+	}
+
+	private function enabled(): bool {
+		return '1' === $this->options->get( 'amsec_alerts_enabled' );
 	}
 
 	private function deliver( array $state, int $now ): string {

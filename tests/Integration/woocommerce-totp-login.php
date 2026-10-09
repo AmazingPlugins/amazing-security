@@ -7,7 +7,7 @@ if ( ! class_exists( 'WooCommerce' ) ) {
 ob_start();
 do_action( 'woocommerce_login_form' );
 $html = ob_get_clean();
-if ( ! str_contains( $html, 'name="amsec_otp"' ) ) {
-	throw new RuntimeException( 'WooCommerce login field is missing.' );
+if ( str_contains( $html, 'name="amsec_otp"' ) ) {
+	throw new RuntimeException( 'WooCommerce login form still asks for a code.' );
 }
 echo "WooCommerce TOTP hook integration passed.\n";

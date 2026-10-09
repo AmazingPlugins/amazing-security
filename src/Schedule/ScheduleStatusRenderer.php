@@ -17,7 +17,7 @@ final class ScheduleStatusRenderer {
 		$label  = $labels[ $state ] ?? 'Unknown';
 		$when   = isset( $status['attempted_at'] ) ? gmdate( 'Y-m-d H:i', (int) $status['attempted_at'] ) . ' UTC' : 'No attempt recorded';
 		$late   = ! empty( $status['overdue'] ) && 'missed' !== $state ? ' Next run overdue.' : '';
-		return '<div class="amsec-schedule-status" role="status"><span>Daily local hardening</span><strong>' . esc_html( $label ) . '</strong><small>' . esc_html( $when . $late ) . '</small></div>';
+		return '<div id="amsec-schedule" class="amsec-schedule-status" role="status"><span>Daily local hardening</span><strong>' . esc_html( $label ) . '</strong><small>' . esc_html( $when . $late ) . '</small></div>';
 	}
 
 	public function renderSuite( array $status ): string {

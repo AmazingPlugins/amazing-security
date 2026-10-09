@@ -7,6 +7,8 @@ namespace AmazingPlugins\Security\Activity;
 use RuntimeException;
 
 final class ActivityRepository {
+	public const PAGE_SIZE = 10;
+
 	private readonly string $table;
 
 	public function __construct( private readonly object $db ) {
@@ -62,8 +64,40 @@ final class ActivityRepository {
 		return $this->quiet( fn(): array => $this->pageQuiet( $page, $event ) );
 	}
 
+	public function count( string $event = '' ): int {
+		return $this->quiet( fn(): int => $this->countQuiet( $event ) );
+	}
+
 	private function pageQuiet( int $page, string $event ): array {
-		$page = max( 1, min( 200, $page ) );
+		$page  = self::pageNumber( $page );
+		$where = $this->where( $event );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Administrator timeline is one short page of the 30-day list.
+		$rows = $this->db->get_results( $this->db->prepare( "SELECT id, event, actor_id, user_id, target, created_at FROM {$this->table}{$where} ORDER BY id DESC LIMIT %d OFFSET %d", self::PAGE_SIZE, ( $page - 1 ) * self::PAGE_SIZE ), ARRAY_A );
+		$this->checkError();
+		return is_array( $rows ) ? $rows : array();
+	}
+
+	private function countQuiet( string $event ): int {
+		$where = $this->where( $event );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Page count uses the same 30-day filter as the list.
+		$total = $this->db->get_var( "SELECT COUNT(*) FROM {$this->table}{$where}" );
+		$this->checkError();
+		return max( 0, (int) $total );
+	}
+
+	public static function pageNumber( int $page ): int {
+		return max( 1, min( self::maxPage(), $page ) );
+	}
+
+	public static function pageCount( int $total ): int {
+		return max( 1, min( self::maxPage(), (int) ceil( max( 0, $total ) / self::PAGE_SIZE ) ) );
+	}
+
+	private static function maxPage(): int {
+		return (int) ceil( 10000 / self::PAGE_SIZE );
+	}
+
+	private function where( string $event ): string {
 		if ( '' !== $event && ! in_array( $event, ActivityEvent::TYPES, true ) ) {
 			throw new \InvalidArgumentException( 'Unsupported event filter.' );
 		}
@@ -71,10 +105,7 @@ final class ActivityRepository {
 		if ( '' !== $event ) {
 			$where .= $this->db->prepare( ' AND event = %s', $event );
 		}
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Administrator timeline is fresh and limited to 50 rows.
-		$rows = $this->db->get_results( $this->db->prepare( "SELECT id, event, actor_id, user_id, target, created_at FROM {$this->table}{$where} ORDER BY id DESC LIMIT 50 OFFSET %d", ( $page - 1 ) * 50 ), ARRAY_A );
-		$this->checkError();
-		return is_array( $rows ) ? $rows : array();
+		return $where;
 	}
 
 	public function digestCounts( int $now ): array {

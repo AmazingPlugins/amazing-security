@@ -24,11 +24,11 @@ use PHPUnit\Framework\TestCase;
 final class StartSuggestionsTest extends TestCase {
 	public function test_start_here_keeps_the_fixed_order_and_leaves_later_suggestions_after(): void {
 		$results = array();
-		foreach ( array( 'security-headers', 'local-inventory', 'local-code', 'suspicious-files', 'public-content', 'closed-plugins', 'release-files', 'known-holes', 'ai-readiness', 'ai-readers', 'rule-review', 'daily-file-checks', 'daily-checks', 'code-baselines', 'account-sessions', 'security-activity', 'trusted-proxies', 'network-controls', 'traffic-history', 'weekly-digest', 'finding-emails', 'rest-rates', 'bot-controls', 'uploads-php-files', 'inactive-themes', 'root-exposure', 'inactive-plugins', 'theme-updates', 'plugin-updates', 'background-updates', 'php-version', 'config-backup', 'error-log', 'sample-config', 'debug-log', 'license-file', 'readme-file', 'discovery-links', 'version-tag', 'rest-user-list', 'author-archives', 'login-hints', 'compromised-passwords', 'captcha-login', 'xmlrpc-auth', 'pingbacks', 'file-modes', 'login-rate-mode', 'https-admin', 'uploads-php-execution', 'file-editor' ) as $id ) {
+		foreach ( array( 'security-headers', 'local-inventory', 'local-code', 'suspicious-files', 'public-content', 'closed-plugins', 'release-files', 'known-holes', 'ai-readiness', 'ai-readers', 'rule-review', 'daily-file-checks', 'daily-checks', 'code-baselines', 'account-sessions', 'security-activity', 'trusted-proxies', 'network-controls', 'traffic-history', 'weekly-digest', 'finding-emails', 'rest-request-watch', 'rest-rates', 'bot-controls', 'uploads-php-files', 'inactive-themes', 'root-exposure', 'inactive-plugins', 'theme-updates', 'plugin-updates', 'background-updates', 'php-version', 'config-backup', 'error-log', 'sample-config', 'debug-log', 'license-file', 'readme-file', 'discovery-links', 'version-tag', 'rest-user-list', 'author-archives', 'login-hints', 'compromised-passwords', 'captcha-login', 'xmlrpc-auth', 'pingbacks', 'file-modes', 'login-rate-mode', 'https-admin', 'uploads-php-execution', 'file-editor' ) as $id ) {
 			$results[] = new CheckResult( $id, 'warn', $id . ' next step', 'https://developer.wordpress.org/advanced-administration/security/hardening/', new DateTimeImmutable( '2026-10-01T00:00:00Z' ), 'low', 'complete', array() );
 		}
 		self::assertSame( array( 'https-admin', 'file-editor', 'login-rate-mode' ), array_map( static fn( CheckResult $row ): string => $row->checkId, StartHere::rows( $results, StartHere::ORDER ) ) );
-		self::assertSame( array( 'uploads-php-execution', 'uploads-php-files', 'file-modes', 'pingbacks', 'xmlrpc-auth', 'captcha-login', 'compromised-passwords', 'login-hints', 'author-archives', 'rest-user-list', 'version-tag', 'discovery-links', 'readme-file', 'license-file', 'debug-log', 'sample-config', 'error-log', 'config-backup', 'php-version', 'background-updates', 'plugin-updates', 'theme-updates', 'inactive-plugins', 'inactive-themes', 'root-exposure', 'bot-controls', 'rest-rates', 'finding-emails', 'weekly-digest', 'traffic-history', 'network-controls', 'trusted-proxies', 'security-activity', 'account-sessions', 'code-baselines', 'daily-checks', 'daily-file-checks', 'rule-review', 'ai-readers', 'ai-readiness', 'known-holes', 'release-files', 'closed-plugins', 'public-content', 'local-code', 'suspicious-files', 'local-inventory', 'security-headers' ), array_map( static fn( CheckResult $row ): string => $row->checkId, StartHere::rows( $results, StartHere::LATER ) ) );
+		self::assertSame( array( 'uploads-php-execution', 'uploads-php-files', 'file-modes', 'pingbacks', 'xmlrpc-auth', 'captcha-login', 'compromised-passwords', 'login-hints', 'author-archives', 'rest-user-list', 'version-tag', 'discovery-links', 'readme-file', 'license-file', 'debug-log', 'sample-config', 'error-log', 'config-backup', 'php-version', 'background-updates', 'plugin-updates', 'theme-updates', 'inactive-plugins', 'inactive-themes', 'root-exposure', 'bot-controls', 'rest-rates', 'rest-request-watch', 'finding-emails', 'weekly-digest', 'traffic-history', 'network-controls', 'trusted-proxies', 'security-activity', 'account-sessions', 'code-baselines', 'daily-checks', 'daily-file-checks', 'rule-review', 'ai-readers', 'ai-readiness', 'known-holes', 'release-files', 'closed-plugins', 'public-content', 'local-code', 'suspicious-files', 'local-inventory', 'security-headers' ), array_map( static fn( CheckResult $row ): string => $row->checkId, StartHere::rows( $results, StartHere::LATER ) ) );
 	}
 
 	public function test_pingbacks_warn_only_when_open_and_do_not_describe_a_change(): void {
@@ -52,7 +52,8 @@ final class StartSuggestionsTest extends TestCase {
 		self::assertStringContainsString( 'still allowed', $open->summary );
 		self::assertStringContainsString( 'does not turn that off', $open->summary );
 		self::assertStringNotContainsString( 'safe', $open->summary );
-		self::assertSame( 'amsec-login-title', StartHere::control( $open )['hash'] );
+		self::assertSame( 'amsec-accounts', StartHere::control( $open )['page'] );
+		self::assertSame( 'sign-in', StartHere::control( $open )['hash'] );
 
 		self::assertSame( 'pass', $closed->state );
 		self::assertStringContainsString( 'turned off', $closed->summary );
@@ -63,18 +64,22 @@ final class StartSuggestionsTest extends TestCase {
 		self::assertStringContainsString( 'could not be read', $unread->summary );
 	}
 
-	public function test_uploads_rule_stays_unknown_and_names_the_rule_without_a_probe(): void {
+	public function test_uploads_rule_names_the_rule_without_a_probe(): void {
 		$seen   = ( new UploadsExecutionCheck( static fn(): string => 'engine-off' ) )->run( new ScanContext() )[0];
 		$absent = ( new UploadsExecutionCheck( static fn(): string => '' ) )->run( new ScanContext() )[0];
 		self::assertSame( 'unknown', $seen->state );
-		self::assertSame( 'unavailable', $seen->coverage );
+		self::assertSame( 'partial', $seen->coverage );
 		self::assertSame( 'local_rule', $seen->evidence['method'] );
 		self::assertStringContainsString( 'engine-off', $seen->summary );
 		self::assertStringContainsString( 'No test file was written.', $seen->summary );
+		self::assertSame( 'warn', $absent->state );
 		self::assertSame( 'no_runtime_probe', $absent->evidence['method'] );
 		self::assertSame( 'engine-off', UploadsExecutionCheck::classify( "php_flag engine off\n" ) );
+		self::assertSame( 'user-ini-engine-off', UploadsExecutionCheck::classify( "engine = Off\n" ) );
+		self::assertSame( 'user-ini-engine-off', UploadsExecutionCheck::classify( "php_admin_value[engine] = Off\n" ) );
 		self::assertSame( 'filesmatch-deny', UploadsExecutionCheck::classify( "<FilesMatch \\.php>\nRequire all denied\n</FilesMatch>" ) );
 		self::assertSame( '', UploadsExecutionCheck::classify( 'Options -Indexes' ) );
+		self::assertSame( '', UploadsExecutionCheck::classify( "engine = On\n" ) );
 	}
 
 	public function test_ai_readers_warn_for_open_bots_and_only_describe_crawler_rules(): void {
@@ -191,6 +196,7 @@ final class StartSuggestionsTest extends TestCase {
 		self::assertSame( 'warn', $on->state );
 		self::assertStringContainsString( 'AI assistant access is on', $on->summary );
 		self::assertStringContainsString( 'llms.txt guide is published', $on->summary );
+		self::assertSame( 'amsec-assistant', StartHere::control( $on )['page'] );
 		self::assertSame( 'amsec-mcp', StartHere::control( $on )['hash'] );
 		self::assertSame( 'amsec-mcp', StartHere::control( $both )['hash'] );
 
@@ -382,13 +388,15 @@ final class StartSuggestionsTest extends TestCase {
 		$ping       = ( new PingbackCheck( static fn(): string => 'open' ) )->run( new ScanContext() )[0];
 		self::assertSame( 'update-core.php', StartHere::control( $update )['screen'] );
 		self::assertNull( StartHere::control( $updateDone ) );
-		self::assertSame( 'amsec-login-title', StartHere::control( $login )['hash'] );
+		self::assertSame( 'amsec-accounts', StartHere::control( $login )['page'] );
+		self::assertSame( 'sign-in', StartHere::control( $login )['hash'] );
 		self::assertSame( 'close-pingbacks', StartHere::control( $ping )['operation'] );
 		self::assertArrayNotHasKey( 'screen', StartHere::control( $ping ) );
 		$editor = new CheckResult( 'file-editor', 'warn', 'People can edit theme and plugin files in wp-admin.', 'https://developer.wordpress.org/advanced-administration/security/hardening/', new DateTimeImmutable( '2026-10-01T00:00:00Z' ), 'high', 'complete', array( 'fix' => 'plugin' ) );
 		$config = new CheckResult( 'file-editor', 'warn', 'People can edit theme and plugin files because wp-config.php turns the editor on.', 'https://developer.wordpress.org/advanced-administration/security/hardening/', new DateTimeImmutable( '2026-10-01T00:00:00Z' ), 'high', 'complete', array( 'fix' => 'config' ) );
 		self::assertSame( 'disable-file-editor', StartHere::control( $editor )['operation'] );
-		self::assertNull( StartHere::control( $config ) );
+		self::assertSame( 'amsec-recovery', StartHere::control( $config )['page'] );
+		self::assertArrayNotHasKey( 'action', StartHere::control( $config ) );
 		$inventory = ( new FollowUpCheck(
 			'local-inventory',
 			static fn(): array => array(
@@ -428,7 +436,7 @@ final class StartSuggestionsTest extends TestCase {
 		self::assertStringNotContainsString( 'safe', $quiet->summary );
 		self::assertNull( StartHere::control( $quiet ) );
 		self::assertSame( 'warn', $open->state );
-		self::assertSame( 'amsec-hardening', StartHere::control( $open )['hash'] );
+		self::assertSame( 'amsec-recovery', StartHere::control( $open )['page'] );
 		self::assertStringNotContainsString( $file, $open->summary );
 
 		$bots   = ( new BotModeCheck( static fn(): string => 'off' ) )->run( new ScanContext() )[0];
@@ -472,6 +480,7 @@ final class StartSuggestionsTest extends TestCase {
 		$forwarded = ( new SiteWatchCheck( 'trusted-proxies', static fn(): array => array( 'status' => 'xff' ) ) )->run( new ScanContext() )[0];
 
 		self::assertSame( 'warn', $emails->state );
+		self::assertSame( 'amsec-settings', StartHere::control( $emails )['page'] );
 		self::assertSame( 'amsec-alerts', StartHere::control( $emails )['hash'] );
 		self::assertSame( 'amsec-digest', StartHere::control( $digest )['page'] );
 		self::assertSame( 'amsec-traffic', StartHere::control( $traffic )['page'] );
@@ -489,7 +498,9 @@ final class StartSuggestionsTest extends TestCase {
 			self::assertStringNotContainsString( 'safe', $row->summary );
 		}
 
-		self::assertSame( 'on', SiteWatchCheck::emails( false ) );
+		self::assertSame( 'off', SiteWatchCheck::emails( false ) );
+		self::assertSame( 'off', SiteWatchCheck::emails( null ) );
+		self::assertSame( 'on', SiteWatchCheck::emails( '1' ) );
 		self::assertSame( 'off', SiteWatchCheck::emails( '0' ) );
 		self::assertSame( 'off', SiteWatchCheck::digest( null ) );
 		self::assertSame( 'on', SiteWatchCheck::digest( '1' ) );
@@ -541,7 +552,8 @@ final class StartSuggestionsTest extends TestCase {
 		self::assertSame( 'warn', $daily->state );
 		self::assertStringContainsString( 'does not start one', $daily->summary );
 		self::assertStringNotContainsString( 'safe', $daily->summary );
-		self::assertNull( StartHere::control( $daily ) );
+		self::assertSame( 'amsec-schedule', StartHere::control( $daily )['hash'] );
+		self::assertArrayNotHasKey( 'action', StartHere::control( $daily ) );
 		self::assertSame( 'pass', $done->state );
 
 		$files = ( new SiteWatchCheck( 'daily-file-checks', static fn(): array => array( 'status' => 'never' ) ) )->run( new ScanContext() )[0];
@@ -550,7 +562,8 @@ final class StartSuggestionsTest extends TestCase {
 		$rulesOk = ( new SiteWatchCheck( 'rule-review', static fn(): array => array( 'status' => 'recent' ) ) )->run( new ScanContext() )[0];
 		self::assertSame( 'warn', $files->state );
 		self::assertStringContainsString( 'does not start one', $files->summary );
-		self::assertNull( StartHere::control( $files ) );
+		self::assertSame( 'amsec-schedule', StartHere::control( $files )['hash'] );
+		self::assertArrayNotHasKey( 'action', StartHere::control( $files ) );
 		self::assertSame( 'pass', $filesDone->state );
 		self::assertSame( 'warn', $rules->state );
 		self::assertStringContainsString( 'does not download new rules', $rules->summary );

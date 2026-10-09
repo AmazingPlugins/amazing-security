@@ -1208,6 +1208,54 @@
       "code": "<?php preg_replace('/.*/', 'x', 'y');",
       "expected": [],
       "provenance": "Original inert authored regression for preg_replace without the e modifier. Never execute."
+    },
+    {
+      "name": "upload-php-two-literals",
+      "kind": "suspected",
+      "code": "<?php move_uploaded_file($tmp, 'wp-content/uploads/' . $name . '.php');",
+      "expected": [
+        "AS-PHP-029"
+      ],
+      "provenance": "Original inert authored regression for move_uploaded_file with two string literals in one destination. Never execute."
+    },
+    {
+      "name": "upload-php-one-literal",
+      "kind": "benign",
+      "code": "<?php move_uploaded_file($tmp, 'wp-content/uploads/shell.php');",
+      "expected": [],
+      "provenance": "Known miss: directory and file name inside one string literal are not separate tokens. Never execute."
+    },
+    {
+      "name": "write-php-from-request",
+      "kind": "suspected",
+      "code": "<?php file_put_contents('wp-content/uploads/drop.php', $_POST['body']);",
+      "expected": [
+        "AS-PHP-030"
+      ],
+      "provenance": "Original inert authored regression for file_put_contents of a string path with $_POST in the same statement. Never execute."
+    },
+    {
+      "name": "write-php-from-get",
+      "kind": "benign",
+      "code": "<?php file_put_contents('wp-content/uploads/drop.php', $_GET['body']);",
+      "expected": [],
+      "provenance": "Known miss: $_GET in the written data is not matched by the $_POST or $_REQUEST write rule. Never execute."
+    },
+    {
+      "name": "shell-concat-request",
+      "kind": "suspected",
+      "code": "<?php shell_exec('id ' . $_POST['cmd']);",
+      "expected": [
+        "AS-PHP-031"
+      ],
+      "provenance": "Original inert authored regression for shell_exec concatenating a string in front of a request variable. Never execute."
+    },
+    {
+      "name": "shell-concat-local",
+      "kind": "benign",
+      "code": "<?php shell_exec('id ' . $cmd);",
+      "expected": [],
+      "provenance": "Known miss: concatenation with a local variable is not a request variable in the same statement. Never execute."
     }
   ]
 }

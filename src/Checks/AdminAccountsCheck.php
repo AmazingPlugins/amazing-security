@@ -10,5 +10,5 @@ final class AdminAccountsCheck extends AbstractCheck {
 	public function id(): string {
 		return 'default-admin-login'; }
 	public function run( ScanContext $context ): array {
-		return $this->result( $this->values->hasDefaultAdminLogin(), 'None of the checked administrators use the login name admin.', 'An administrator uses the login name admin. Add a different administrator, then stop using this login.' ); }
+		return $this->result( $this->values->hasDefaultAdminLogin(), 'No checked administrator uses admin as a login or as the name shown on the site.', 'An administrator uses admin as a login or as the name shown on the site. Open Users and change it.' ); }
 }

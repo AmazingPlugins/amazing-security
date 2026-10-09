@@ -12,6 +12,9 @@ final class RequestInspectorTest extends TestCase {
 		$inspector = new RequestInspector();
 		self::assertSame( array( 'AS-REST-001' ), $inspector->inspect( array( 'file' => '../private/config.php' ), false )['rules'] );
 		self::assertSame( array( 'AS-REST-002' ), $inspector->inspect( array( 'q' => '1 UNION ALL SELECT 2' ), false )['rules'] );
+		self::assertSame( array(), $inspector->inspect( array( 'q' => 'how does UNION SELECT work' ), false )['rules'] );
+		self::assertSame( array(), $inspector->inspect( array( 'q' => 'people write ../ to mean the parent' ), false )['rules'] );
+		self::assertSame( array( 'AS-REST-001', 'AS-REST-002' ), $inspector->inspect( array( 'q' => '../docs UNION SELECT' ), false )['rules'] );
 		self::assertSame( array( 'AS-REST-003' ), $inspector->inspect( array( 'q' => '%3Cscript%3E' ), false )['rules'] );
 		self::assertSame( array( 'AS-REST-004' ), $inspector->inspect( array( 'q' => 'php://filter' ), false )['rules'] );
 		self::assertSame( array(), $inspector->inspect( array( 'q' => 'A normal search' ), false )['rules'] );

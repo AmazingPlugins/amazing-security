@@ -16,6 +16,9 @@ final class LoginProtectionRendererTest extends TestCase {
 		self::assertStringContainsString( '&lt;script&gt;', $html );
 		self::assertStringNotContainsString( '<script>', $html );
 		self::assertStringContainsString( 'XML-RPC', $html );
-		self::assertStringContainsString( 'Set up verification codes', $html );
+		self::assertStringContainsString( 'does not enroll', $html );
+		self::assertStringContainsString( 'Two Factor', $html );
+		self::assertStringNotContainsString( 'Set up verification codes', $html );
+		self::assertStringContainsString( 'amsec-accounts', $html );
 	}
 }

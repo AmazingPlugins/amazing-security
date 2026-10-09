@@ -71,7 +71,7 @@ final class ChecksTest extends TestCase {
             array(
                 'The admin address is not using HTTPS. Turn on HTTPS for this site before you change other security settings.',
                 'A WordPress update is waiting. Open Dashboard, then Updates, and review it.',
-                'An administrator uses the login name admin. Add a different administrator, then stop using this login.',
+				'An administrator uses admin as a login or as the name shown on the site. Open Users and change it.',
                 'Visitors may see WordPress error details. You can hide them for requests that load this plugin. This plugin will not edit wp-config.php.',
                 'People can edit theme and plugin files in wp-admin. Turn that editor off so a signed-in session cannot change PHP from the browser.',
             ),

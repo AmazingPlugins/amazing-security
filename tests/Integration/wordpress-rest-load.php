@@ -53,7 +53,7 @@ try {
         $results[$label] = array( 'http' => $response['status'], 'observations' => $delta );
     }
     $inspector = new RequestInspector();
-    foreach ( array( array( 'x' => array( '../' ) ), array( 'x' => str_repeat( 'a', 2049 ) ), array_fill( 0, 51, '../' ), array( 'a' => str_repeat( 'a', 2048 ), 'b' => str_repeat( 'a', 2048 ), 'c' => str_repeat( 'a', 2048 ), 'd' => str_repeat( 'a', 2048 ), 'e' => '../' ) ) as $query ) {
+    foreach ( array( array( 'note' => array( 'path' => array( 'inner' => array( 'deeper' => array( 'last' => array( 'stop' => array( 'end' => '../private' ) ) ) ) ) ) ), array( 'x' => str_repeat( 'a', 2049 ) ), array_fill( 0, 51, '../docs' ), array( 'a' => str_repeat( 'a', 2048 ), 'b' => str_repeat( 'a', 2048 ), 'c' => str_repeat( 'a', 2048 ), 'd' => str_repeat( 'a', 2048 ), 'e' => '../docs' ) ) as $query ) {
         $assert( 'partial' === $inspector->inspect( $query, false )['state'], 'A bounded input was labeled complete.' );
     }
     $assert( 'skip' === $inspector->inspect( array( 'probe' => '../' ), true )['state'], 'Authenticated exemption failed.' );

@@ -31,7 +31,7 @@ final class McpSettingsAction {
 		} catch ( Throwable ) {
 			wp_die( esc_html__( 'MCP setting could not be saved.', 'amazing-security' ), '', array( 'response' => 400 ) );
 		}
-		wp_safe_redirect( admin_url( 'admin.php?page=amazing-security#amsec-mcp' ) );
+		wp_safe_redirect( admin_url( 'admin.php?page=amsec-assistant#amsec-mcp' ) );
 		exit;
 	}
 }

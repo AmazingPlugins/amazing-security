@@ -17,7 +17,7 @@ if ( ! $found ) {
 ob_start();
 do_action( 'login_form' );
 $html = ob_get_clean();
-if ( ! str_contains( $html, 'name="amsec_otp"' ) ) {
-	throw new RuntimeException( 'Native login field is missing.' );
+if ( str_contains( $html, 'name="amsec_otp"' ) ) {
+	throw new RuntimeException( 'Native login form still asks for a code.' );
 }
 echo "Native TOTP hook integration passed.\n";

@@ -39,7 +39,7 @@ final class LoginSettingsAction {
 		} catch ( \Throwable ) {
 			wp_die( esc_html__( 'Login settings could not be saved.', 'amazing-security' ), '', array( 'response' => 400 ) );
 		}
-		wp_safe_redirect( admin_url( 'admin.php?page=amazing-security#amsec-login-title' ) );
+		wp_safe_redirect( admin_url( 'admin.php?page=amsec-accounts#sign-in' ) );
 		exit;
 	}
 }

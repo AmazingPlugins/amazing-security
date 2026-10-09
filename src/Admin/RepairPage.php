@@ -8,7 +8,7 @@ use AmazingPlugins\Security\Repair\WordPressPluginRepair;
 
 final class RepairPage {
 	public function register(): void {
-		$hook = add_submenu_page( null, __( 'Review file repair', 'amazing-security' ), __( 'Review file repair', 'amazing-security' ), 'manage_options', 'amsec-repair', array( $this, 'render' ) );
+		$hook = add_submenu_page( 'amazing-security', __( 'Review file repair', 'amazing-security' ), __( 'Review file repair', 'amazing-security' ), 'manage_options', 'amsec-repair', array( $this, 'render' ) );
 		add_action(
 			'admin_enqueue_scripts',
 			static function ( string $currentHook ) use ( $hook ): void {
@@ -26,11 +26,14 @@ final class RepairPage {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only preview; POST actions carry their own nonces.
 		$id = isset( $_GET['finding'] ) && is_string( $_GET['finding'] ) ? sanitize_text_field( wp_unslash( $_GET['finding'] ) ) : '';
 		if ( ! preg_match( '/^[a-f0-9]{32}$/D', $id ) ) {
-			wp_die( esc_html__( 'Finding unavailable.', 'amazing-security' ), '', array( 'response' => 404 ) );
+			echo '<div class="wrap amazing-security-admin"><h1>' . esc_html__( 'Review file repair', 'amazing-security' ) . '</h1>';
+			echo '<p>' . esc_html__( 'There is no file waiting on this screen. A repair opens from one changed release file after an integrity scan.', 'amazing-security' ) . '</p>';
+			echo '<p><a class="button" href="' . esc_url( admin_url( 'admin.php?page=amsec-file-checks#amsec-integrity' ) ) . '">' . esc_html__( 'Open integrity and file scan', 'amazing-security' ) . '</a></p></div>';
+			return;
 		}
 		$repair  = new WordPressPluginRepair();
 		$receipt = $repair->receipt( $id );
-		echo '<div class="wrap amazing-security-admin"><h1>Review plugin file repair</h1><p><a href="' . esc_url( admin_url( 'admin.php?page=amazing-security#amsec-integrity' ) ) . '">Back to Amazing Security</a></p>';
+		echo '<div class="wrap amazing-security-admin"><h1>Review plugin file repair</h1><p><a href="' . esc_url( admin_url( 'admin.php?page=amsec-file-checks#amsec-integrity' ) ) . '">Back to integrity and file scan</a></p>';
 		if ( null !== $receipt ) {
 			if ( in_array( $receipt['status'], array( 'prepared', 'needs_recovery' ), true ) ) {
 				echo '<div class="notice notice-error"><p>Replacement verification did not finish. The installed file may have changed. The private backup was retained. Inspect the current file and its SHA-256, then use WP-CLI recovery with that exact hash. Do not repeat the repair.</p><p><code>' . esc_html( 'wp amazing-security repair recover ' . $id . ' --current-sha256=<hash> --confirm' ) . '</code></p></div></div>';

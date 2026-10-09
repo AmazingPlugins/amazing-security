@@ -89,11 +89,11 @@ final class IntegrityScanAction {
 			}
 			return;
 		}
-		if ( $progress->cursor->partial ) {
-			$cycle->fail( 'integrity', time() );
-			return;
-		}
+		$coverage_gap = $progress->cursor->partial;
 		if ( $cycle->advance( 'integrity', 'files', time() ) ) {
+			if ( $coverage_gap ) {
+				$cycle->markCoverageGap( time() );
+			}
 			$this->schedule( 60, 'amsec_file_tick' );
 		}
 	}
@@ -213,7 +213,7 @@ final class IntegrityScanAction {
 	}
 
 	private function redirect( bool $error ): never {
-		wp_safe_redirect( admin_url( 'admin.php?page=amazing-security' . ( $error ? '&amazing_security_integrity_error=1' : '' ) ) );
+		wp_safe_redirect( admin_url( 'admin.php?page=amsec-file-checks' . ( $error ? '&amazing_security_integrity_error=1' : '' ) . '#amsec-integrity' ) );
 		exit;
 	}
 }

@@ -44,20 +44,55 @@ final class BotSettings {
 		}
 		$mode      = ( new BotHooks() )->mode();
 		$available = ( new BotCounterStore( $GLOBALS['wpdb'] ) )->available();
-		echo '<div class="wrap"><h1>Native comment and registration controls</h1><p>Off by default. Observe records request counters without rejecting submissions. Block rejects filled/malformed hidden fields or excess unauthenticated native requests: twenty comments per five minutes and five registrations per fifteen minutes. Missing trap fields remain accepted for legacy forms.</p><p>These controls apply to native wp-comments-post.php and wp-login.php registration. Logged-in users, WooCommerce registration/checkout, Contact Form 7 and custom/API forms are outside this scope. The host-provided PHP REMOTE_ADDR is salted into an opaque key. Forwarded headers are ignored by default. Optional approved trusted-proxy settings require a host-confirmed direct peer; Apache or a proxy may already have rewritten the address. Verify host proxy trust before relying on rate accuracy. Proxies and shared networks can group visitors, so test observe mode before blocking.</p><p>Counters have a 10,000-key admission budget. Hourly cleanup deletes up to 1,000 records older than one day. Missing/full storage or invalid addresses skip rate enforcement; the hidden-field check remains independent. No raw addresses, usernames or submission contents are stored. Host recovery: <code>wp amazing-security bots disable</code>.</p><p>Mode: ' . esc_html( $mode ) . '. Rate storage/admission: ' . ( $available ? 'available' : 'unavailable' ) . '.</p>';
+		$label     = match ( $mode ) {
+			'observe' => __( 'Observe', 'amazing-security' ),
+			'block' => __( 'Limit', 'amazing-security' ),
+			default => __( 'Off', 'amazing-security' ),
+		};
+		echo '<div class="wrap amazing-security-admin amsec-brief">';
+		echo '<h1>' . esc_html__( 'Comments and registration', 'amazing-security' ) . '</h1>';
+		echo '<p class="amsec-brief-status"><span class="amsec-pill' . ( 'off' === $mode ? ' is-off' : ' is-on' ) . '">' . esc_html( $label ) . '</span>';
+		echo esc_html__( 'Guest comments and new accounts.', 'amazing-security' ) . ' ';
+		self::tip( __( 'Off leaves them alone. Observe counts them. Limit refuses a filled hidden field, or more than the numbers below.', 'amazing-security' ) );
+		echo '</p><ul class="amsec-facts">';
+		echo '<li><strong>20</strong> ' . esc_html__( 'guest comments in 5 minutes', 'amazing-security' ) . ' ';
+		self::tip( __( 'Counts comments from people who are not signed in, on the WordPress comment form.', 'amazing-security' ) );
+		echo '</li><li><strong>5</strong> ' . esc_html__( 'registrations in 15 minutes', 'amazing-security' ) . ' ';
+		self::tip( __( 'Counts new accounts on the WordPress registration form.', 'amazing-security' ) );
+		echo '</li><li><strong>' . esc_html( $available ? __( 'Ready', 'amazing-security' ) : __( 'Unavailable', 'amazing-security' ) ) . '</strong> ';
+		echo esc_html__( 'rate storage', 'amazing-security' ) . ' ';
+		self::tip( __( 'Ready means a count can be stored. Unavailable means the count is skipped and the hidden-field check still runs.', 'amazing-security' ) );
+		echo '</li></ul>';
+		echo '<details class="amsec-more"><summary>' . esc_html__( 'See more', 'amazing-security' ) . '</summary>';
+		echo '<p>' . esc_html__( 'This covers the WordPress comment form and registration on wp-login.php. People who are already signed in are left alone. WooCommerce, Contact Form 7, and custom forms are outside this.', 'amazing-security' ) . '</p>';
+		echo '<p>' . esc_html__( 'The site stores a salted key for the address, not the address, the name, or the comment. Forwarded headers are ignored unless trusted proxies are on. A shared network can group visitors. Storage holds 10,000 keys, and old rows are removed after a day.', 'amazing-security' ) . '</p>';
+		echo '<p>' . esc_html__( 'Recovery command: wp amazing-security bots disable', 'amazing-security' ) . '</p></details>';
 		if ( ! is_ssl() ) {
-			echo '<p>Use HTTPS to approve a setting change.</p></div>';
+			echo '<p class="amsec-brief-note">' . esc_html__( 'Use HTTPS to change this mode.', 'amazing-security' ) . '</p></div>';
 			return;
 		}
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '"><input type="hidden" name="action" value="amsec_bot_settings"><label>Mode <select name="mode">';
-		foreach ( array( 'off', 'observe', 'block' ) as $value ) {
-			echo '<option value="' . esc_attr( $value ) . '"' . selected( $mode, $value, false ) . '>' . esc_html( ucfirst( $value ) ) . '</option>';
+		$choices = array(
+			'off'     => __( 'Off', 'amazing-security' ),
+			'observe' => __( 'Observe', 'amazing-security' ),
+			'block'   => __( 'Limit', 'amazing-security' ),
+		);
+		foreach ( $choices as $value => $choice ) {
+			echo '<option value="' . esc_attr( $value ) . '"' . selected( $mode, $value, false ) . '>' . esc_html( $choice ) . '</option>';
 		}
 		echo '</select></label>';
 		wp_nonce_field( 'amsec_bot_settings' );
-		echo '<p><label>Your password <input type="password" name="password" autocomplete="current-password" required maxlength="1024"></label></p><p><label><input type="checkbox" name="confirm" value="1" required> I understand that blocking can reject legitimate visitors behind shared addresses or autofilled forms.</label></p>';
+		echo '<p><label>' . esc_html__( 'Your password', 'amazing-security' ) . ' <input type="password" name="password" autocomplete="current-password" required maxlength="1024"></label></p><p><label><input type="checkbox" name="confirm" value="1" required> ' . esc_html__( 'I understand Limit can refuse a real visitor who shares an address, or a browser that fills the hidden field.', 'amazing-security' ) . '</label></p>';
 		submit_button( __( 'Approve mode', 'amazing-security' ), 'secondary' );
 		echo '</form></div>';
+	}
+
+	private static function tip( string $text ): void {
+		static $n = 0;
+		++$n;
+		$id = 'amsec-bot-tip-' . $n;
+		echo '<span class="amsec-tip"><button type="button" class="amsec-tip-button" aria-describedby="' . esc_attr( $id ) . '">' . esc_html__( 'Details', 'amazing-security' ) . '</button>';
+		echo '<span class="amsec-tip-bubble" id="' . esc_attr( $id ) . '" role="tooltip">' . esc_html( $text ) . '</span></span>';
 	}
 
 	public function recovery( array $args, array $assoc ): void {

@@ -231,7 +231,7 @@ final class FileScanAction {
 	}
 
 	private function redirect( bool $error ): never {
-		wp_safe_redirect( admin_url( 'admin.php?page=amazing-security' . ( $error ? '&amazing_security_file_scan_error=1' : '' ) . '#amsec-file-scan' ) );
+		wp_safe_redirect( admin_url( 'admin.php?page=amsec-file-checks' . ( $error ? '&amazing_security_file_scan_error=1' : '' ) . '#amsec-file-scan' ) );
 		exit;
 	}
 }

@@ -6,7 +6,7 @@ namespace AmazingPlugins\Security\FileScan;
 
 final class BundledRulePack {
 	public function version(): string {
-		return '2026.10.03.3';
+		return '2026.10.08.1';
 	}
 
 	public function rules(): array {
@@ -122,6 +122,50 @@ final class BundledRulePack {
 			'AS-PHP-028' => array(
 				'pattern' => '/(*LIMIT_MATCH=100000)(*LIMIT_RECURSION=1000)\bpreg_replace\s*\(\s*\x01PREG_E\x02|\x01INDIRECT_PREG_E\x02/i',
 				'summary' => 'A preg_replace pattern uses the old e modifier, including two variables that hold that pattern. A third copied variable is not matched.',
+			),
+			'AS-PHP-029' => array(
+				'pattern' => '/(*LIMIT_MATCH=100000)(*LIMIT_RECURSION=1000)\bmove_uploaded_file\s*\([^;]{0,240}S\s*\.\s*NON_GLOBAL_NAME\s*\.\s*S\s*\)/i',
+				'summary' => 'move_uploaded_file builds its destination from two string literals around a name in the same call. A single destination string is not matched.',
+			),
+			'AS-PHP-030' => array(
+				'pattern' => '/(*LIMIT_MATCH=100000)(*LIMIT_RECURSION=1000)\bfile_put_contents\s*\(\s*(?:NON_GLOBAL_NAME\s*\.\s*)?S\s*,\s*\$_(?:POST|REQUEST)\s*\[/i',
+				'summary' => 'file_put_contents writes a string path using $_POST or $_REQUEST in the same statement. $_GET, and a request value used only in another statement, are not matched.',
+			),
+			'AS-PHP-031' => array(
+				'pattern' => '/(*LIMIT_MATCH=100000)(*LIMIT_RECURSION=1000)\b(?:shell_exec|passthru)\s*\(\s*S(?:\s*\.\s*S)*\s*\.\s*\$_(?:GET|POST|REQUEST)\s*\[/i',
+				'summary' => 'shell_exec or passthru concatenates a string literal in front of a request variable in the same statement. A request variable passed alone is a different rule, and exec is not matched.',
+			),
+			'AS-PHP-032' => array(
+				'pattern' => '/(*LIMIT_MATCH=100000)(*LIMIT_RECURSION=1000)\bcopy\s*\(\s*\$_(?:GET|POST|REQUEST)\s*\[\s*S\s*\]\s*,\s*S/i',
+				'summary' => 'copy reads a request value and writes a string path in the same call. A variable destination, a joined path, and $_COOKIE are not matched.',
+			),
+			'AS-PHP-033' => array(
+				'pattern' => '/(*LIMIT_MATCH=100000)(*LIMIT_RECURSION=1000)\bfopen\s*\(\s*\$_(?:GET|POST|REQUEST)\s*\[/i',
+				'summary' => 'fopen is called with a request value in the same statement. A variable path and $_COOKIE are not matched.',
+			),
+			'AS-PHP-034' => array(
+				'pattern' => '/(*LIMIT_MATCH=100000)(*LIMIT_RECURSION=1000)\bheader\s*\(\s*\x01REFRESH\x02\s*\.\s*\$_(?:GET|POST|REQUEST)\s*\[/i',
+				'summary' => 'A Refresh header sends the browser to a request value in the same statement. A fixed URL and a variable destination are not matched.',
+			),
+			'AS-PHP-035' => array(
+				'pattern' => '/(*LIMIT_MATCH=100000)(*LIMIT_RECURSION=1000)\breadfile\s*\(\s*\$_(?:GET|POST|REQUEST)\s*\[/i',
+				'summary' => 'readfile is called with a request value in the same statement. A variable path and $_COOKIE are not matched.',
+			),
+			'AS-PHP-036' => array(
+				'pattern' => '/(*LIMIT_MATCH=100000)(*LIMIT_RECURSION=1000)\beval\s*\(\s*wp_remote_retrieve_body\s*\(/i',
+				'summary' => 'eval runs the body of an HTTP response in the same statement. One assignment then eval is AS-PHP-038. A second copied variable is not matched.',
+			),
+			'AS-PHP-037' => array(
+				'pattern' => '/(*LIMIT_MATCH=100000)(*LIMIT_RECURSION=1000)\b(?:include|require)(?:_once)?\s*\(?\s*\x01DATA_URI\x02/i',
+				'summary' => 'include or require loads a data:// stream in the same statement. One assignment then include is AS-PHP-039. A string that is only echoed is not matched.',
+			),
+			'AS-PHP-038' => array(
+				'pattern' => '/\x01INDIRECT_HTTP_BODY_EVAL\x02/',
+				'summary' => 'An HTTP response body is stored in one variable and then evaluated. A second copied variable is not matched.',
+			),
+			'AS-PHP-039' => array(
+				'pattern' => '/\x01INDIRECT_DATA_URI\x02/',
+				'summary' => 'A data:// string is stored in one variable and then loaded with include or require. A second copied variable is not matched.',
 			),
 		);
 	}

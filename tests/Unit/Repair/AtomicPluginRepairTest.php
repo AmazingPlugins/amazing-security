@@ -36,6 +36,50 @@ final class AtomicPluginRepairTest extends TestCase {
 		self::assertSame( array(), glob( $this->backup . '/*' ) );
 	}
 
+	public function test_backup_on_another_filesystem_can_roll_back(): void {
+		if ( ! is_dir( '/dev/shm' ) ) {
+			self::markTestSkipped( 'This machine has no tmpfs for a second filesystem.' );
+		}
+		$backup = '/dev/shm/amsec-repair-' . bin2hex( random_bytes( 4 ) );
+		if ( ! mkdir( $backup, 0700 ) ) {
+			self::markTestSkipped( 'The tmpfs backup directory could not be created.' );
+		}
+		$site_dev = stat( $this->site );
+		$bak_dev  = stat( $backup );
+		if ( ! is_array( $site_dev ) || ! is_array( $bak_dev ) || $site_dev['dev'] === $bak_dev['dev'] ) {
+			rmdir( $backup );
+			self::markTestSkipped( 'The backup directory is on the same filesystem as the site.' );
+		}
+		try {
+			$repair = new AtomicPluginRepair( $this->site, $backup );
+			$clean  = new RepairBytes( 'clean', hash( 'sha256', 'clean' ), 'https://downloads.wordpress.org/plugin/example.zip' );
+			$receipt = $repair->apply( 'hello.php', hash( 'sha256', 'changed' ), $clean->sha256, $clean );
+			self::assertNotNull( $receipt );
+			self::assertSame( 'clean', file_get_contents( $this->site . '/hello.php' ) );
+			self::assertTrue( $repair->rollback( $receipt ) );
+			self::assertSame( 'changed', file_get_contents( $this->site . '/hello.php' ) );
+		} finally {
+			foreach ( glob( $backup . '/*' ) ?: array() as $path ) {
+				unlink( $path );
+			}
+			rmdir( $backup );
+		}
+	}
+
+	public function test_same_inode_write_after_the_last_path_check_refuses_replacement(): void {
+		$repair = new AtomicPluginRepair(
+			$this->site,
+			$this->backup,
+			afterFinalCheck: function (): void {
+				file_put_contents( $this->site . '/hello.php', 'raced' );
+			}
+		);
+		$clean = new RepairBytes( 'clean', hash( 'sha256', 'clean' ), 'https://downloads.wordpress.org/plugin/example.zip' );
+		self::assertNull( $repair->apply( 'hello.php', hash( 'sha256', 'changed' ), $clean->sha256, $clean ) );
+		self::assertSame( 'raced', file_get_contents( $this->site . '/hello.php' ) );
+		self::assertSame( array(), glob( $this->backup . '/*' ) );
+	}
+
 	public function test_exception_after_rename_keeps_backup_for_recovery(): void {
 		$repair = new AtomicPluginRepair( $this->site, $this->backup, static function (): never { throw new \RuntimeException( 'Interrupted after rename.' ); } );
 		$clean = new RepairBytes( 'clean', hash( 'sha256', 'clean' ), 'https://downloads.wordpress.org/plugin/example.zip' );

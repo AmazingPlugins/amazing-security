@@ -1,9 +1,15 @@
 .amazing-security-admin {
-  --amsec-ink: #1d2327;
-  --amsec-line: #dcdcde;
-  --amsec-muted: #50575e;
-  max-width: 1100px;
+  --amsec-ink: #1a1410;
+  --amsec-line: rgba(26, 20, 16, 0.12);
+  --amsec-muted: #6b5c4f;
+  --amsec-coral: #f26b3a;
+  --amsec-coral-deep: #d94b26;
+  --amsec-cream: #faf5ec;
+  --amsec-amber: #f4a93c;
+  box-sizing: border-box;
+  max-width: none;
   color: var(--amsec-ink);
+  font-family: Inter, system-ui, sans-serif;
 }
 
 .amsec-start {
@@ -18,14 +24,19 @@
 
 .amsec-start-item {
   display: grid;
-  grid-template-columns: 7.5rem minmax(0, 1fr) auto;
+  grid-template-columns: 7.5rem minmax(0, 1fr) 13.5rem;
   gap: 8px 14px;
-  align-items: start;
+  align-items: center;
   margin: 0 0 8px;
   padding: 12px 14px;
   background: #fff;
   border: 1px solid var(--amsec-line);
-  border-left: 3px solid #8c8f94;
+  border-left: 3px solid var(--amsec-coral);
+  border-radius: 14px;
+}
+
+.amsec-start-item[data-state="critical"] {
+  border-left-color: #9b1c1c;
 }
 
 .amsec-start-item[data-state="warn"],
@@ -37,9 +48,13 @@
   border-left-color: #1e7a46;
 }
 
+.amsec-start-item.is-quiet {
+  grid-template-columns: 7.5rem minmax(0, 1fr);
+}
+
 .amsec-start-item[data-state="none"],
 .amsec-start-item[data-state="partial"] {
-  border-left-color: #2271b1;
+  border-left-color: var(--amsec-amber);
 }
 
 .amsec-start-badge {
@@ -51,14 +66,22 @@
   white-space: nowrap;
 }
 
+.amsec-start-item[data-state="critical"] .amsec-start-badge {
+  color: #9b1c1c;
+}
+
 .amsec-start-item[data-state="warn"] .amsec-start-badge,
 .amsec-start-item[data-state="fail"] .amsec-start-badge {
   color: #8a4600;
 }
 
+.amsec-start-item[data-state="pass"] .amsec-start-badge {
+  color: #1e7a46;
+}
+
 .amsec-start-item[data-state="none"] .amsec-start-badge,
 .amsec-start-item[data-state="partial"] .amsec-start-badge {
-  color: #135e96;
+  color: #a63617;
 }
 
 .amsec-start-copy strong {
@@ -66,15 +89,30 @@
   margin-bottom: 2px;
 }
 
+.amsec-start-item > .button,
+.amsec-start-item > .amsec-start-action,
+.amsec-start-item > .amsec-start-action .button {
+  width: 100%;
+  margin: 0;
+  text-align: center;
+}
+
 .amsec-start-action {
   margin: 0;
-  justify-self: end;
+  justify-self: stretch;
+}
+
+.amsec-overview > .amsec-start-action,
+.amsec-overview > .amsec-start-action + p {
+  display: block;
+  margin-right: auto;
+  margin-left: auto;
+  text-align: center;
 }
 
 .amsec-overview > .amsec-start-action {
-  display: block;
+  width: max-content;
   margin-top: 16px;
-  justify-self: start;
 }
 
 .amsec-start-done {
@@ -160,26 +198,337 @@
   border-bottom: 1px solid var(--amsec-line);
 }
 
-.amazing-security-admin .amsec-header form {
-  flex: none;
+.amsec-stage {
+  display: flex;
+  justify-content: center;
+  padding: 36px 16px 12px;
+}
+
+.amsec-scan-first .amsec-stage {
+  flex-direction: column;
+  align-items: center;
+}
+
+.amsec-scan-empty {
+  margin: 0 0 8px;
+  color: #6b5c4f;
+}
+
+.amsec-scan-form {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: center;
+  gap: 18px;
+  width: min(100%, 520px);
+  text-align: center;
+}
+
+.amsec-scan-button {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 220px;
+  height: 220px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #f26b3a;
+  color: #fff;
+  cursor: pointer;
+  font-family: Fraunces, "Times New Roman", serif;
+  font-size: 32px;
+  font-weight: 650;
+  line-height: 1;
+  box-shadow: 0 0 0 12px rgba(242, 107, 58, 0.16), 0 18px 40px rgba(242, 107, 58, 0.28);
+}
+
+.amsec-scan-button:hover,
+.amsec-scan-button:focus {
+  background: #d94b26;
+  color: #fff;
+}
+
+.amsec-scan-button:focus-visible {
+  outline: 3px solid #1d2327;
+  outline-offset: 4px;
+}
+
+.amsec-scan-first {
+  min-height: 62vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.amsec-scan-first .amsec-scan-button {
+  width: 240px;
+  height: 240px;
+  border: 6px solid #f4a93c;
+  font-size: 36px;
+  box-shadow: 0 18px 40px rgba(242, 107, 58, 0.28);
+  animation: amsec-scan-blink 1.05s steps(2, jump-none) infinite;
+}
+
+@keyframes amsec-scan-blink {
+  50% {
+    border-color: rgba(244, 169, 60, 0.15);
+  }
+}
+
+.amsec-scan-progress {
+  width: min(420px, 86vw);
+  text-align: center;
+}
+
+.amsec-scan-status {
+  margin: 0 0 16px;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.amsec-scan-track {
+  height: 14px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #dcdcde;
+}
+
+.amsec-scan-fill {
+  display: block;
+  width: 42%;
+  height: 100%;
+  border-radius: 999px;
+  background: #f26b3a;
+  animation: amsec-scan-slide 1.1s ease-in-out infinite;
+}
+
+.amsec-scan-fill.is-done {
+  width: 100%;
+  animation: none;
+  transform: none;
+}
+
+@keyframes amsec-scan-slide {
+  0% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(280%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .amsec-scan-fill {
+    width: 100%;
+    animation: none;
+    opacity: 0.7;
+  }
+
+  .amsec-scan-first .amsec-scan-button {
+    animation: none;
+    border-color: #f4a93c;
+  }
+}
+
+.amsec-scan-form.amsec-rescan-bar {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.amsec-rescan-bar {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+  width: 100%;
+  margin: 0 0 16px;
+  padding: 14px 18px;
+  border: 1px solid rgba(26, 20, 16, 0.12);
+  border-radius: 16px;
+  background: #fff;
+  text-align: left;
+}
+
+.amsec-page-bar {
+  box-sizing: border-box;
+  width: auto;
+  margin: 10px 20px 16px;
+}
+
+.amsec-page-bar h1 {
+  margin: 0;
+  font-family: Fraunces, "Times New Roman", serif;
+  font-size: 28px;
+  font-weight: 650;
+  line-height: 1.1;
+  color: #1a1410;
+}
+
+body.amsec-app #wpbody-content > .wrap.amazing-security-admin:not(.amsec-scan) > h1,
+body.amsec-app #wpbody-content > .wrap.amazing-security-admin:not(.amsec-scan) > .amsec-header h1 {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.amsec-rescan-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 18px;
+  min-width: 0;
+}
+
+.amsec-scan-summary {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 8px 22px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.amsec-scan-summary li {
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-start;
+  gap: 6px;
+  color: #3a2e26;
+  font-weight: 650;
+}
+
+.amsec-scan-summary strong {
+  font-family: Fraunces, "Times New Roman", serif;
+  font-size: 28px;
+  font-weight: 650;
+  line-height: 1;
+}
+
+.amsec-scan-summary a {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.amsec-scan-summary .is-success strong {
+  color: #1e7a46;
+}
+
+.amsec-scan-summary .is-error strong {
+  color: #d94b26;
+}
+
+.amsec-scan-summary .is-critical strong {
+  color: #9b1c1c;
+}
+
+.amsec-scan-summary .is-warn strong {
+  color: #8a5a10;
+}
+
+.amsec-scan-summary .is-recommended strong {
+  color: #5b3a6b;
+}
+
+.amsec-rescan-bar .amsec-scan-button {
+  width: auto;
+  height: auto;
+  min-height: 44px;
+  justify-self: end;
+  padding: 10px 22px;
+  border-radius: 999px;
+  font-family: Inter, sans-serif;
+  font-size: 16px;
+  font-weight: 650;
+  box-shadow: none;
+}
+
+.amsec-rescan-bar .amsec-header-consent {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
   gap: 8px;
+  max-width: none;
+  margin: 0;
+  text-align: right;
+}
+
+.amsec-rescan-row .amsec-scan-progress {
+  grid-column: 2;
+  grid-row: 1;
+  width: 180px;
+  justify-self: end;
+}
+
+.amsec-rescan-bar .amsec-scan-status {
+  margin: 0 0 8px;
+  font-size: 16px;
 }
 
 .amsec-header-consent {
-  max-width: 32ch;
+  max-width: 36ch;
   color: var(--amsec-muted);
-  font-size: 12px;
-  line-height: 1.4;
+  font-size: 13px;
+  line-height: 1.45;
+  text-align: center;
+}
+
+.amazing-security-admin .amsec-overview {
+  margin: 12px auto 28px;
+  padding: 22px 22px 8px;
+  background: #fff;
+  border: 1px solid rgba(26, 20, 16, 0.12);
+  border-radius: 20px;
+}
+
+@media (max-width: 782px) {
+  .amsec-stage {
+    padding-top: 24px;
+  }
+
+  .amsec-scan-button:not(.amsec-rescan-button),
+  .amsec-scan-first .amsec-scan-button {
+    width: 180px;
+    height: 180px;
+    font-size: 28px;
+    box-shadow: 0 12px 28px rgba(242, 107, 58, 0.24);
+  }
+
+  .amsec-rescan-row .amsec-scan-button,
+  .amsec-rescan-row .amsec-scan-progress {
+    justify-self: end;
+    width: auto;
+  }
+
+  .amsec-rescan-bar .amsec-header-consent {
+    justify-content: flex-end;
+  }
+
+  .amazing-security-admin .amsec-overview {
+    padding: 16px 14px 4px;
+    border-radius: 16px;
+  }
 }
 
 .amazing-security-admin .amsec-header h1 {
   margin: 0 0 8px;
+  font-family: Fraunces, "Times New Roman", serif;
   font-size: 30px;
   line-height: 1.2;
   font-weight: 650;
+  color: #1a1410;
 }
 
 .amazing-security-admin .amsec-header p {
@@ -261,8 +610,270 @@
   gap: 5px;
 }
 
-.amazing-security-admin .amsec-overview h2 {
+.amsec-setting-group {
+  margin: 0 0 22px;
+}
+
+.amsec-setting-group h2 {
+  margin: 0 0 8px;
+  font-family: Fraunces, "Times New Roman", serif;
+  font-size: 22px;
+  font-weight: 650;
+}
+
+.amsec-settings {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  background: #f7f1ea;
+  border: 1px solid rgba(26, 20, 16, 0.1);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.amsec-settings a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 0;
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(26, 20, 16, 0.08);
+  background: #f7f1ea;
+  color: #1a1410;
+  text-decoration: none;
+}
+
+.amsec-settings li:last-child a {
+  border-bottom: 0;
+}
+
+.amsec-settings-copy {
+  display: grid;
+  gap: 2px;
+}
+
+.amsec-settings-copy span {
+  color: #6b5c4f;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+.amsec-settings-go {
+  flex: none;
+  color: #1a1410;
+  font-weight: 650;
+}
+
+.amsec-settings a:hover .amsec-settings-go,
+.amsec-settings a:focus .amsec-settings-go {
+  color: #a63617;
+}
+
+.amazing-security-admin .amsec-overview h2,
+.amazing-security-admin .amsec-group h2 {
   margin-bottom: 12px;
+  font-family: Fraunces, "Times New Roman", serif;
+  font-weight: 650;
+}
+
+body.amsec-app .amazing-security-admin:not(.amsec-scan) {
+  box-sizing: border-box;
+  padding: 22px 22px 16px;
+  background: #fff;
+  border: 1px solid rgba(26, 20, 16, 0.12);
+  border-radius: 20px;
+}
+
+body.amsec-app .amazing-security-admin:not(.amsec-scan):has(.amsec-screen-tabs) {
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+}
+
+body.amsec-app .amazing-security-admin:not(.amsec-scan) > h1,
+body.amsec-app .amazing-security-admin:not(.amsec-scan) .amsec-header h1 {
+  margin-top: 0;
+  font-family: Fraunces, "Times New Roman", serif;
+  font-size: 30px;
+  font-weight: 650;
+  color: #1a1410;
+}
+
+body.amsec-app .amazing-security-admin:not(.amsec-scan) :is(.amsec-overview, .amsec-login, .amsec-mcp, .amsec-file-scan, .amsec-fix-review, .amsec-consent) {
+  margin: 12px 0 0;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.amsec-auth fieldset,
+.amsec-auth-group {
+  margin: 22px 0 0;
+  padding: 0;
+  border: 0;
+}
+
+.amsec-auth legend,
+.amsec-auth-group h2 {
+  margin: 0 0 12px;
+  padding: 0;
+  font-family: Fraunces, "Times New Roman", serif;
+  font-size: 22px;
+  font-weight: 650;
+  color: #1a1410;
+}
+
+.amsec-field {
+  display: grid;
+  grid-template-columns: minmax(160px, 240px) minmax(180px, 260px);
+  gap: 6px 16px;
+  align-items: center;
+  margin: 0 0 16px;
+}
+
+.amsec-field label {
+  font-weight: 650;
+}
+
+.amsec-field select {
+  width: 100%;
+  margin: 0;
+}
+
+.amsec-field p,
+.amsec-auth-group > p {
+  max-width: 68ch;
+  margin: 0 0 8px;
+  color: #3a2e26;
+}
+
+.amsec-field p {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
+.amsec-auth .amsec-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 0 0 12px;
+}
+
+.amsec-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.amsec-links a {
+  display: inline-block;
+  padding: 8px 14px;
+  background: #faf5ec;
+  border: 1px solid rgba(26, 20, 16, 0.12);
+  border-radius: 999px;
+  color: #1a1410;
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.amsec-links a:hover,
+.amsec-links a:focus {
+  background: #fff;
+  color: #1a1410;
+}
+
+.amsec-example-actions {
+  margin: 4px 0 8px;
+}
+
+.amsec-example-note {
+  margin: 0 0 12px;
+  color: #3a2e26;
+}
+
+.amazing-security-admin textarea {
+  width: 100%;
+  max-width: 640px;
+  border-radius: 12px;
+  border-color: rgba(26, 20, 16, 0.2);
+}
+
+@media (max-width: 782px) {
+  .amsec-field {
+    grid-template-columns: 1fr;
+  }
+}
+
+.amsec-start-home {
+  margin: 0 0 16px;
+  padding: 16px 16px 4px;
+  background: #fff;
+  border: 1px solid rgba(26, 20, 16, 0.12);
+  border-radius: 16px;
+}
+
+.amsec-start-home ol {
+  margin: 0 0 12px 1.2em;
+}
+
+.amsec-start-home li {
+  margin: 0 0 6px;
+}
+
+.amsec-jumps {
+  display: grid;
+  gap: 8px;
+  margin: 0 0 18px;
+  padding: 0;
+  list-style: none;
+  border: 0;
+}
+
+.amsec-jumps a {
+  display: grid;
+  gap: 2px;
+  align-items: start;
+  justify-items: start;
+  margin: 0;
+  padding: 12px 14px;
+  background: #fff;
+  border: 1px solid rgba(26, 20, 16, 0.12);
+  border-left: 3px solid #f26b3a;
+  border-radius: 14px;
+  color: #1a1410;
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.amsec-jumps a span {
+  color: #6b5c4f;
+  font-weight: 400;
+  line-height: 1.45;
+}
+
+.amsec-jumps a:hover,
+.amsec-jumps a:focus {
+  background: #fff;
+  border-color: rgba(26, 20, 16, 0.2);
+  color: #a63617;
+}
+
+.amazing-security-admin :is(select, textarea, input[type="text"], input[type="number"]) {
+  border-radius: 12px;
+  border-color: rgba(26, 20, 16, 0.2);
+}
+
+@media (max-width: 782px) {
+  .amsec-jumps {
+    gap: 2px;
+  }
 }
 
 .amsec-ledger {
@@ -276,7 +887,7 @@
   gap: 16px;
   align-items: center;
   padding: 15px 18px;
-  border-left: 3px solid #8c8f94;
+  border-left: 3px solid var(--amsec-coral);
 }
 
 .amsec-ledger-row + .amsec-ledger-row {
@@ -522,5 +1133,686 @@
 .amsec-fix-diff dd { margin: 6px 0 0; font-size: 16px; font-weight: 600; }
 .amsec-fix-review form { display: grid; justify-items: start; gap: 10px; margin-top: 24px; }
 .amsec-fix-review input[type="password"] { width: 100%; max-width: 340px; }
-.amsec-fix-review :is(button, input):focus-visible { outline: 2px solid #2271b1; outline-offset: 2px; }
+.amsec-fix-review :is(button, input):focus-visible { outline: 2px solid #f26b3a; outline-offset: 2px; }
+
+body.amsec-app #wpcontent {
+  background: #faf5ec;
+}
+
+body.amsec-app #wpbody-content .wrap,
+body.amsec-app .amazing-security-admin {
+  box-sizing: border-box;
+  max-width: none;
+  margin-right: 20px;
+  margin-left: 20px;
+  color: #1a1410;
+  font-family: Inter, system-ui, sans-serif;
+}
+
+body.amsec-app #wpbody-content .wrap > h1,
+body.amsec-app .amazing-security-admin h1,
+body.amsec-app .amsec-brand-name {
+  font-family: Fraunces, "Times New Roman", serif;
+  color: #1a1410;
+}
+
+body.amsec-app .button-primary {
+  background: #f26b3a;
+  border-color: #d94b26;
+  border-radius: 999px;
+  color: #fff;
+}
+
+body.amsec-app .button-primary:hover,
+body.amsec-app .button-primary:focus {
+  background: #d94b26;
+  border-color: #d94b26;
+  color: #fff;
+}
+
+body.amsec-app .button:not(.button-primary),
+body.amsec-app .button-secondary {
+  border-radius: 999px;
+  border-color: #d94b26;
+  background: #fff;
+  color: #a63617;
+}
+
+body.amsec-app .button:not(.button-primary):hover,
+body.amsec-app .button:not(.button-primary):focus,
+body.amsec-app .button-secondary:hover,
+body.amsec-app .button-secondary:focus {
+  border-color: #d94b26;
+  background: #faf5ec;
+  color: #d94b26;
+}
+
+body.amsec-app #wpbody-content > :is(.notice, .update-nag, .updated, .error) {
+  margin: 16px 20px 0;
+  border-radius: 14px;
+}
+
+.amsec-brand {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 16px 20px 0;
+  padding: 14px 18px;
+  background: #fff;
+  border: 1px solid rgba(26, 20, 16, 0.12);
+  border-radius: 18px;
+}
+
+.amsec-brand-mark {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.amsec-brand-mark img {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+.amsec-brand-title {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  min-width: 0;
+}
+
+.amsec-brand-name {
+  margin: 0;
+  font-size: 28px;
+  line-height: 1.1;
+  font-weight: 650;
+}
+
+.amsec-brand-version {
+  margin: 0;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #faf5ec;
+  color: #a63617;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.amsec-brand-links {
+  display: flex;
+  gap: 16px;
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.amsec-brand-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #a63617;
+  text-decoration: none;
+}
+
+.amsec-brand-links img {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+}
+
+.amsec-brand-links a:hover,
+.amsec-brand-links a:focus {
+  color: #d94b26;
+}
+
+.amsec-screen-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 4px;
+  margin: 12px 0 0;
+  border-bottom: 1px solid rgba(26, 20, 16, 0.12);
+}
+
+.amsec-screen-tabs button {
+  appearance: none;
+  margin: 0 0 -1px;
+  padding: 11px 16px 12px;
+  border: 1px solid transparent;
+  border-bottom: 0;
+  border-radius: 12px 12px 0 0;
+  background: transparent;
+  color: #6b5c4f;
+  font: inherit;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.amsec-screen-tabs button.is-current {
+  border-color: rgba(26, 20, 16, 0.12);
+  background: #fff;
+  color: #1a1410;
+}
+
+body.amsec-app .amsec-screen-tabs ~ .amsec-tab-panel {
+  margin: 0 0 28px;
+  padding: 22px 22px 8px;
+  background: #fff;
+  border: 1px solid rgba(26, 20, 16, 0.12);
+  border-top: 0;
+  border-radius: 0 0 20px 20px;
+}
+
+body.amsec-app #wpbody-content .amsec-tab-panel .amazing-security-admin,
+body.amsec-app #wpbody-content .amsec-tab-panel .wrap {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.amsec-tab-panel .amsec-header h1,
+.amsec-tab-panel .wrap > h1 {
+  font-size: 22px;
+}
+
+.amsec-tab-panel .amsec-header a {
+  display: none;
+}
+
+.amazing-security-admin h2,
+.amsec-tab-panel h2 {
+  font-family: Fraunces, "Times New Roman", serif;
+  font-weight: 650;
+  color: #1a1410;
+}
+
+body.amsec-app .amazing-security-admin .widefat,
+.amsec-tab-panel .widefat {
+  border: 1px solid rgba(26, 20, 16, 0.12);
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: none;
+}
+
+body.amsec-app .amazing-security-admin .widefat thead th,
+.amsec-tab-panel .widefat thead th {
+  background: #faf5ec;
+  color: #1a1410;
+  font-weight: 650;
+}
+
+body.amsec-app .amazing-security-admin code,
+.amsec-tab-panel code {
+  padding: 1px 5px;
+  background: #faf5ec;
+  border-radius: 6px;
+}
+
+.amsec-cats {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: flex-start;
+  gap: 4px;
+  margin: 0;
+  border-bottom: 1px solid rgba(26, 20, 16, 0.12);
+}
+
+.amsec-cats a {
+  position: relative;
+  margin: 0 0 -1px;
+  padding: 11px 16px 12px;
+  border: 1px solid transparent;
+  border-bottom: 0;
+  border-radius: 12px 12px 0 0;
+  background: transparent;
+  color: #6b5c4f;
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.amsec-cats a.is-current {
+  border-color: rgba(26, 20, 16, 0.12);
+  background: #fff;
+  color: #1a1410;
+}
+
+.amsec-cats + .amsec-overview,
+.amsec-tab-panel {
+  margin-top: 0;
+  margin-bottom: 28px;
+  padding: 22px 22px 8px;
+  background: #fff;
+  border: 1px solid rgba(26, 20, 16, 0.12);
+  border-top: 0;
+  border-radius: 0 0 20px 20px;
+}
+
+.amsec-tab-panel :is(.amsec-overview, .amsec-file-scan, .amsec-login, .amsec-mcp, .amsec-consent) {
+  margin: 16px 0;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.amsec-tab-panel h2,
+.amsec-cats + .amsec-overview h2 {
+  color: #1a1410;
+}
+
+.amsec-pager {
+  display: grid;
+  grid-template-columns: 8.5rem minmax(8rem, auto) 8.5rem;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 16px auto 8px;
+}
+
+.amsec-pager-nav {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 8px 14px;
+  border: 1px solid rgba(26, 20, 16, 0.12);
+  border-radius: 999px;
+  background: #fff;
+  color: #1a1410;
+  font-weight: 650;
+  text-align: center;
+  text-decoration: none;
+}
+
+.amsec-pager-nav.is-spacer {
+  visibility: hidden;
+}
+
+.amsec-pager-label {
+  color: #6b5c4f;
+  font-weight: 650;
+  text-align: center;
+}
+
+@media (max-width: 782px) {
+  body.amsec-app #wpbody-content > :is(.notice, .update-nag, .updated, .error) {
+    margin-right: 12px;
+    margin-left: 12px;
+  }
+
+  .amsec-brand,
+  .amsec-page-bar,
+  body.amsec-app #wpbody-content .wrap {
+    margin-right: 12px;
+    margin-left: 12px;
+  }
+
+  .amsec-brand {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .amsec-brand-name {
+    font-size: 22px;
+  }
+
+  .amsec-brand-links {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 600px) {
+  body.amsec-app {
+    padding-top: 46px;
+  }
+
+  body.amsec-app #wpadminbar {
+    position: fixed;
+    top: 0;
+  }
+}
 @media (max-width: 600px) { .amsec-fix-review { padding: 20px; } .amsec-fix-diff { grid-template-columns: 1fr; } .amsec-fix-diff > div { padding: 12px 0; } .amsec-fix-diff > div + div { border-top: 1px solid #e6e8eb; } }
+
+.amsec-activity-switch {
+  margin: 0 0 18px;
+  padding: 14px 16px;
+  background: #f7f1ea;
+  border: 1px solid rgba(26, 20, 16, 0.1);
+  border-radius: 12px;
+}
+
+.amsec-activity-switch p {
+  margin: 0 0 10px;
+}
+
+.amsec-activity-switch .button {
+  margin: 0;
+}
+
+.amsec-activity-filter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 4px 0 18px;
+}
+
+.amsec-activity-filter select {
+  min-width: 14rem;
+}
+
+.amsec-log-day {
+  margin: 0 0 18px;
+}
+
+.amsec-log-day h2 {
+  margin: 0 0 8px;
+  font-family: Fraunces, "Times New Roman", serif;
+  font-size: 18px;
+  font-weight: 650;
+}
+
+.amsec-log {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  background: #f7f1ea;
+  border: 1px solid rgba(26, 20, 16, 0.1);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.amsec-log li {
+  display: grid;
+  grid-template-columns: 3.6rem minmax(11rem, 15rem) minmax(0, 1fr);
+  gap: 8px 16px;
+  align-items: center;
+  margin: 0;
+  padding: 11px 14px;
+  border-bottom: 1px solid rgba(26, 20, 16, 0.08);
+}
+
+.amsec-log li:last-child {
+  border-bottom: 0;
+}
+
+.amsec-log time {
+  color: #6b5c4f;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.amsec-log p {
+  display: contents;
+  margin: 0;
+}
+
+.amsec-log strong {
+  font-weight: 650;
+}
+
+.amsec-log span {
+  color: #6b5c4f;
+  line-height: 1.4;
+}
+
+.amsec-log-empty {
+  margin: 0 0 8px;
+  color: #6b5c4f;
+}
+
+@media (max-width: 782px) {
+  .amsec-log li {
+    grid-template-columns: 3.6rem minmax(0, 1fr);
+  }
+
+  .amsec-log p {
+    display: block;
+  }
+
+  .amsec-log span {
+    display: block;
+  }
+}
+
+.amsec-session-lines {
+  margin: 12px 0 18px;
+  padding: 0;
+  list-style: none;
+}
+
+.amsec-session-lines li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 7px 2px;
+  border-bottom: 1px solid rgba(26, 20, 16, 0.08);
+}
+
+.amsec-session-lines .dashicons {
+  flex: 0 0 auto;
+  width: 20px;
+  height: 20px;
+  font-size: 20px;
+  line-height: 20px;
+  color: #1a1410;
+}
+
+.amsec-session-lines li.is-current .dashicons {
+  color: #1e7a46;
+}
+
+.amsec-session-summary {
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.amsec-session-lines a {
+  flex: 0 0 auto;
+  color: #1a1410;
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.amsec-session-lines a:hover,
+.amsec-session-lines a:focus {
+  text-decoration: underline;
+}
+
+.amsec-session-back {
+  margin: 0 0 12px;
+}
+
+.amsec-session {
+  margin: 0;
+  padding: 14px 16px;
+  background: #f7f1ea;
+  border: 1px solid rgba(26, 20, 16, 0.1);
+  border-radius: 12px;
+}
+
+.amsec-session.is-current {
+  border-color: #1e7a46;
+}
+
+.amsec-session-kicker {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 4px;
+  color: #1e7a46;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.amsec-session-kicker .dashicons {
+  width: 18px;
+  height: 18px;
+  font-size: 18px;
+  line-height: 18px;
+}
+
+.amsec-session h1 {
+  margin: 0 0 10px;
+  font-family: Fraunces, "Times New Roman", serif;
+  font-size: 18px;
+  font-weight: 650;
+}
+
+.amsec-session dl {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: 10px 16px;
+  margin: 0;
+}
+
+.amsec-session dt {
+  color: #6b5c4f;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.amsec-session dd {
+  margin: 2px 0 0;
+}
+
+.amsec-session details {
+  margin-top: 12px;
+}
+
+.amsec-session-agent {
+  margin: 8px 0 0;
+  color: #6b5c4f;
+  overflow-wrap: anywhere;
+}
+
+.amsec-brief-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0 12px;
+}
+
+.amsec-pill {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: #fff4e8;
+  color: #8a5a10;
+  font-weight: 700;
+}
+
+.amsec-pill.is-on {
+  background: #e5f6ec;
+  color: #1e7a46;
+}
+
+.amsec-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+}
+
+.amsec-facts li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: #faf5ec;
+  border-radius: 10px;
+  font-weight: 650;
+}
+
+.amsec-facts strong {
+  color: #d94b26;
+}
+
+.amsec-check {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.amsec-tip {
+  position: relative;
+  display: inline-flex;
+}
+
+.amsec-tip-button {
+  margin: 0;
+  padding: 0 6px;
+  border: 0;
+  border-radius: 999px;
+  background: #f7f1ea;
+  color: #6b5c4f;
+  font-size: 11px;
+  line-height: 18px;
+  cursor: help;
+}
+
+.amsec-tip-bubble {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 6px);
+  left: 0;
+  width: 240px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: #1a1410;
+  color: #faf5ec;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.4;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.amsec-tip:hover .amsec-tip-bubble,
+.amsec-tip:focus-within .amsec-tip-bubble {
+  opacity: 1;
+}
+
+.amsec-more {
+  margin: 8px 0 0;
+}
+
+.amsec-more summary {
+  width: fit-content;
+  color: #d94b26;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.amsec-more p,
+.amsec-brief-note {
+  max-width: 68ch;
+  color: #6b5c4f;
+}
+
+body.amsec-app #wpbody-content .amsec-tab-panel .amsec-brief + .amsec-brief {
+  margin-top: 18px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(26, 20, 16, 0.12);
+}

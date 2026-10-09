@@ -9,6 +9,20 @@ if ( ! function_exists( 'esc_html' ) ) {
 	function esc_attr( string $value ): string { return htmlspecialchars( $value, ENT_QUOTES, 'UTF-8' ); }
 	function esc_url( string $value ): string { return htmlspecialchars( $value, ENT_QUOTES, 'UTF-8' ); }
 }
+if ( ! function_exists( 'admin_url' ) ) {
+	function admin_url( string $path = '' ): string {
+		return 'http://example.test/wp-admin/' . ltrim( $path, '/' );
+	}
+	function add_query_arg( $args, string $url = '' ): string {
+		return $url . '?' . http_build_query( is_array( $args ) ? $args : array() );
+	}
+}
+if ( ! function_exists( 'wp_strip_all_tags' ) ) {
+	function wp_strip_all_tags( string $text, bool $remove_breaks = false ): string {
+		$clean = trim( strip_tags( $text ) );
+		return $remove_breaks ? str_replace( array( "\r", "\n" ), '', $clean ) : $clean;
+	}
+}
 if ( ! function_exists( '__' ) ) {
 	function __( string $text, string $domain = 'default' ): string { return $text; }
 	function esc_html__( string $text, string $domain = 'default' ): string { return htmlspecialchars( $text, ENT_QUOTES, 'UTF-8' ); }

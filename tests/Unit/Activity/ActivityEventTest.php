@@ -3,6 +3,7 @@
 declare(strict_types=1);
 namespace AmazingPlugins\Security\Tests\Unit\Activity;
 use AmazingPlugins\Security\Activity\ActivityEvent;
+use AmazingPlugins\Security\Activity\ActivityHooks;
 use PHPUnit\Framework\TestCase;
 final class ActivityEventTest extends TestCase {
     public function test_fixed_schema_rejects_unknown_event_and_secret_metadata(): void {
@@ -17,4 +18,11 @@ final class ActivityEventTest extends TestCase {
         $event=new ActivityEvent('user_role_changed',1,2,'administrator',100);
         self::assertSame(['event'=>'user_role_changed','actor_id'=>1,'user_id'=>2,'target'=>'administrator','created_at'=>100],$event->row());
     }
+
+	public function test_recording_stays_off_until_it_is_turned_on(): void {
+		self::assertFalse( ActivityHooks::recording( 0, '0', '1' ) );
+		self::assertFalse( ActivityHooks::recording( 0, '1', '0' ) );
+		self::assertTrue( ActivityHooks::recording( 0, '1', '1' ) );
+		self::assertFalse( ActivityHooks::recording( 20, '1', '1' ) );
+	}
 }

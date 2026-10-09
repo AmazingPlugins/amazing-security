@@ -175,15 +175,7 @@ add_action(
 		add_action( 'user_profile_update_errors', array( $passwords, 'profile' ), 10, 3 );
 		add_filter( 'registration_errors', array( $passwords, 'registration' ), 10, 3 );
 		add_action( 'validate_password_reset', array( $passwords, 'reset' ), 10, 2 );
-		$totp = new AmazingPlugins\Security\Login\TotpAuthentication(
-			new AmazingPlugins\Security\Login\WordPressTotpStore( $GLOBALS['wpdb'] ),
-			new AmazingPlugins\Security\Login\SecretCipher( wp_salt( 'auth' ) ),
-			new AmazingPlugins\Security\Login\Totp()
-		);
-		add_filter( 'authenticate', array( $totp, 'authenticate' ), 30, 3 );
-		$fields = new AmazingPlugins\Security\Login\LoginFormFields();
-		add_action( 'login_form', array( $fields, 'render' ) );
-		add_action( 'woocommerce_login_form', array( $fields, 'render' ) );
+		// Own TOTP second-step login is retired; detect-only status lives on Log In & Register.
 		add_filter( 'xmlrpc_enabled', array( new AmazingPlugins\Security\Login\XmlRpcPolicy( $settings ), 'enabled' ) );
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {
 			$recovery = new AmazingPlugins\Security\Login\LoginRecoveryCommand();
@@ -195,6 +187,7 @@ add_action(
 	}
 );
 
+add_action( 'plugins_loaded', array( AmazingPlugins\Security\Free\FreeSuite::class, 'boot' ), 20 );
 add_action( 'admin_menu', array( new AmazingPlugins\Security\Admin\AdminPage(), 'register' ) );
 add_action( 'admin_menu', array( new AmazingPlugins\Security\Admin\FixReviewPage(), 'register' ) );
 add_action( 'admin_menu', array( new AmazingPlugins\Security\Admin\RepairPage(), 'register' ) );
@@ -218,6 +211,8 @@ add_action( 'admin_post_amazing_security_vulnerability_clear', array( new Amazin
 add_action( 'admin_post_amsec_login_settings', array( new AmazingPlugins\Security\Admin\LoginSettingsAction(), 'save' ) );
 add_action( 'admin_post_amsec_mcp_settings', array( new AmazingPlugins\Security\Admin\McpSettingsAction(), 'save' ) );
 add_action( 'admin_post_amsec_alert_settings', array( new AmazingPlugins\Security\Admin\AlertSettingsAction(), 'save' ) );
+add_action( 'admin_post_amsec_notification_test', array( new AmazingPlugins\Security\Admin\NotificationTestAction(), 'handle' ) );
+add_action( 'admin_menu', array( new AmazingPlugins\Security\Admin\NotificationSettingsPage(), 'register' ), 20 );
 add_action( 'admin_post_amsec_totp_begin', array( new AmazingPlugins\Security\Admin\TotpAction(), 'begin' ) );
 add_action( 'admin_post_amsec_totp_confirm', array( new AmazingPlugins\Security\Admin\TotpAction(), 'confirm' ) );
 add_action( 'admin_post_amsec_totp_disable', array( new AmazingPlugins\Security\Admin\TotpAction(), 'disable' ) );
@@ -255,11 +250,7 @@ if ( defined( 'WP_CLI' ) && WP_CLI ) {
 }
 
 $amsec_policy = new AmazingPlugins\Security\Login\RequiredTotpPolicy();
-add_filter( 'authenticate', array( $amsec_policy, 'authenticate' ), 29, 3 );
-add_action( 'admin_menu', array( new AmazingPlugins\Security\Login\RequiredTotpPage(), 'register' ) );
-add_action( 'admin_notices', array( new AmazingPlugins\Security\Login\RequiredTotpPage(), 'notice' ) );
-add_action( 'show_user_profile', array( new AmazingPlugins\Security\Login\RequiredTotpPage(), 'profile' ) );
-add_action( 'edit_user_profile', array( new AmazingPlugins\Security\Login\RequiredTotpPage(), 'profile' ) );
+// Required TOTP policy login gate retired; WP-CLI cleanup remains.
 add_action( 'admin_post_amsec_totp_policy', array( new AmazingPlugins\Security\Login\RequiredTotpAction(), 'handle' ) );
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
 	\WP_CLI::add_command( 'amazing-security policy disable', array( $amsec_policy, 'recovery' ) );
@@ -403,19 +394,38 @@ add_action(
 $amsec_passkey_settings = new AmazingPlugins\Security\Passkeys\PasskeySettings();
 add_action( 'admin_menu', array( $amsec_passkey_settings, 'register' ) );
 add_action( 'admin_post_amsec_passkey_settings', array( $amsec_passkey_settings, 'handle' ) );
-$amsec_passkey_actions = new AmazingPlugins\Security\Passkeys\PasskeyActions( $GLOBALS['wpdb'] );
-add_action( 'admin_post_amsec_passkey_enroll_begin', array( $amsec_passkey_actions, 'beginRequest' ) );
-add_action( 'admin_post_amsec_passkey_enroll_finish', array( $amsec_passkey_actions, 'finishRequest' ) );
-add_action( 'admin_post_amsec_passkey_remove', array( $amsec_passkey_actions, 'removeRequest' ) );
+// Own passkey enroll/login UI retired; status card is on Log In & Register. Cleanup CLI remains.
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
 	WP_CLI::add_command( 'amazing-security passkeys disable', array( $amsec_passkey_settings, 'recoveryDisable' ) );
 	WP_CLI::add_command( 'amazing-security passkeys revoke', array( $amsec_passkey_settings, 'recoveryRevoke' ) );
 }
-$amsec_passkey_login = new AmazingPlugins\Security\Passkeys\PasskeyLogin( $GLOBALS['wpdb'] );
-add_action( 'admin_post_nopriv_amsec_passkey_login_begin', array( $amsec_passkey_login, 'beginRequest' ) );
-add_action( 'admin_post_nopriv_amsec_passkey_login_finish', array( $amsec_passkey_login, 'finishRequest' ) );
-$amsec_passkey_ui = new AmazingPlugins\Security\Passkeys\PasskeyUi( $GLOBALS['wpdb'] );
-add_action( 'show_user_profile', array( $amsec_passkey_ui, 'profile' ) );
-add_action( 'login_form', array( $amsec_passkey_ui, 'login' ) );
-add_action( 'admin_enqueue_scripts', array( $amsec_passkey_ui, 'adminAssets' ) );
-add_action( 'login_enqueue_scripts', array( $amsec_passkey_ui, 'loginAssets' ) );
+add_action(
+	'admin_post_amsec_passkey_enroll_begin',
+	static function (): void {
+		wp_die( esc_html__( 'Amazing Security no longer enrolls passkeys.', 'amazing-security' ), '', array( 'response' => 410 ) );
+	}
+);
+add_action(
+	'admin_post_amsec_passkey_enroll_finish',
+	static function (): void {
+		wp_die( esc_html__( 'Amazing Security no longer enrolls passkeys.', 'amazing-security' ), '', array( 'response' => 410 ) );
+	}
+);
+add_action(
+	'admin_post_amsec_passkey_remove',
+	static function (): void {
+		wp_die( esc_html__( 'Amazing Security no longer manages passkeys.', 'amazing-security' ), '', array( 'response' => 410 ) );
+	}
+);
+add_action(
+	'admin_post_nopriv_amsec_passkey_login_begin',
+	static function (): void {
+		wp_die( esc_html__( 'Amazing Security no longer provides passkey sign-in.', 'amazing-security' ), '', array( 'response' => 410 ) );
+	}
+);
+add_action(
+	'admin_post_nopriv_amsec_passkey_login_finish',
+	static function (): void {
+		wp_die( esc_html__( 'Amazing Security no longer provides passkey sign-in.', 'amazing-security' ), '', array( 'response' => 410 ) );
+	}
+);

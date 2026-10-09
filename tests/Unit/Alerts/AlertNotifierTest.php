@@ -18,6 +18,7 @@ use AmazingPlugins\Security\Vulnerabilities\VulnerabilityReport;
 final class AlertNotifierTest extends TestCase {
 	public function test_confirmed_serious_vulnerability_alerts_survive_partial_scans_without_repeats(): void {
 		$options = $this->options();
+		$options->values['amsec_alerts_enabled'] = '1';
 		$messages = array();
 		$notifier = new AlertNotifier( new AlertPolicy(), new AlertDelivery( $options, static function ( $to, $subject, $body ) use ( &$messages ): bool { $messages[] = $body; return true; }, 'owner@example.test', 'https://example.test/report' ) );
 		$finding = static fn ( string $id, string $severity, string $coverage = 'complete' ): CheckResult => new CheckResult( 'vulnerability', 'warn', 'Untrusted issue title', 'https://www.wpvulnerability.com/', new DateTimeImmutable(), 'medium', $coverage, array( 'severity' => $severity ), $id );

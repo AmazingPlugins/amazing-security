@@ -35,8 +35,10 @@ final class FindingsReport {
 
 	private static function state( string $state ): string {
 		return match ( $state ) {
+			'critical' => 'Critical',
+			'fail' => 'Needs a change',
 			'warn' => 'Needs attention',
-			'pass' => 'No issue recorded',
+			'pass' => 'Configured',
 			'unknown' => 'Could not check',
 			default => 'Could not check',
 		};

@@ -15,9 +15,9 @@ $cursor = new FileScanCursor( 'attention-fixture' );
 $cursor->findings[] = array( 'id' => str_repeat( 'a', 32 ), 'state' => 'warn', 'kind' => 'suspected', 'package' => 'fixture', 'path' => 'demo/loader.php', 'rule_id' => 'AS-PHP-001', 'version' => '2026.09.29.1', 'line' => 1, 'summary' => 'Decoded input is evaluated as PHP code.', 'reason' => '', 'tested_at' => gmdate( 'c' ) );
 update_option( $key, wp_json_encode( array( 'scan_id' => 'attention-fixture', 'expires' => time() + 600, 'cursor' => $cursor->toArray(), 'finished' => false ) ), false );
 ob_start();
-( new AdminPage() )->render();
+( new AdminPage() )->renderSection( 'files' );
 $html = ob_get_clean();
-if ( ! str_contains( $html, 'href="#amsec-file-scan">Suspected code: demo/loader.php' ) ) {
+if ( ! str_contains( $html, 'id="amsec-file-scan"' ) || ! str_contains( $html, 'demo/loader.php' ) ) {
 	throw new RuntimeException( 'File finding was absent from the security overview.' );
 }
 $cursor->findings = array();
@@ -26,9 +26,9 @@ update_option( $key, wp_json_encode( array( 'scan_id' => 'attention-fixture', 'e
 $prior = new FileScanReport( 'prior-fixture', 'warn', new DateTimeImmutable( '2026-09-28T00:00:00Z' ), false, 1, 10, 0, 0, 0, 0, 1, 0, array( array( 'id' => str_repeat( 'b', 32 ), 'state' => 'warn', 'kind' => 'suspected', 'path' => 'prior/loader.php', 'summary' => 'Prior finding.' ) ) );
 update_option( $completedKey, wp_json_encode( $prior->toArray() ), false );
 ob_start();
-( new AdminPage() )->render();
+( new AdminPage() )->renderSection( 'files' );
 $html = ob_get_clean();
-$preserved = str_contains( $html, 'href="#amsec-file-scan">Suspected code: prior/loader.php' ) && str_contains( $html, '<strong>Partial coverage</strong>' );
+$preserved = str_contains( $html, 'prior/loader.php' ) && str_contains( $html, '<strong>Partial coverage</strong>' );
 if ( null === $previous ) {
 	delete_option( $key );
 } else {
@@ -49,9 +49,9 @@ delete_option( $key );
 update_option( $completedKey, wp_json_encode( $partial->toArray() ), false );
 update_option( $historyKey, wp_json_encode( array( $prior->toArray() ) ), false );
 ob_start();
-( new AdminPage() )->render();
+( new AdminPage() )->renderSection( 'files' );
 $html = ob_get_clean();
-$preserved = str_contains( $html, 'href="#amsec-file-scan">Suspected code: prior/loader.php' ) && str_contains( $html, '<strong>Partial coverage</strong>' );
+$preserved = str_contains( $html, 'prior/loader.php' ) && str_contains( $html, '<strong>Partial coverage</strong>' );
 if ( null === $previous ) {
 	delete_option( $key );
 } else {

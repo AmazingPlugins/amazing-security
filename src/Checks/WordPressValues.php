@@ -60,7 +60,7 @@ final class WordPressValues implements Values {
 		$users = get_users(
 			array(
 				'role'   => 'administrator',
-				'fields' => array( 'user_login' ),
+				'fields' => array( 'user_login', 'display_name' ),
 				'number' => 501,
 			)
 		);
@@ -74,7 +74,9 @@ final class WordPressValues implements Values {
 			if ( ! is_object( $user ) || ! isset( $user->user_login ) ) {
 				return null;
 			}
-			if ( 'admin' === strtolower( (string) $user->user_login ) ) {
+			$login   = strtolower( trim( (string) $user->user_login ) );
+			$display = strtolower( trim( (string) ( $user->display_name ?? '' ) ) );
+			if ( 'admin' === $login || 'admin' === $display ) {
 				return true;
 			}
 		}

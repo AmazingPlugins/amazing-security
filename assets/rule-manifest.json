@@ -2,8 +2,8 @@
     "schema": 1,
     "packs": {
         "files": {
-            "version": "2026.10.03.3",
-            "reviewed_at": "2026-10-03",
+            "version": "2026.10.08.1",
+            "reviewed_at": "2026-10-08",
             "ids": [
                 "AS-PHP-001",
                 "AS-PHP-002",
@@ -32,17 +32,28 @@
                 "AS-PHP-025",
                 "AS-PHP-026",
                 "AS-PHP-027",
-                "AS-PHP-028"
+                "AS-PHP-028",
+                "AS-PHP-029",
+                "AS-PHP-030",
+                "AS-PHP-031",
+                "AS-PHP-032",
+                "AS-PHP-033",
+                "AS-PHP-034",
+                "AS-PHP-035",
+                "AS-PHP-036",
+                "AS-PHP-037",
+                "AS-PHP-038",
+                "AS-PHP-039"
             ],
             "sha256": {
-                "src/FileScan/BundledRulePack.php": "64c08603fafd551b0ad019b8af6a345bd695e5f1a8a298e643f53f40aa3adebf",
-                "src/FileScan/RuleMatcher.php": "761cf2a81c28f35424f572d376275a48aa39667e53afc0ac604abd8db5a4fdd1",
-                "src/FileScan/AdjacentFlow.php": "b5834b355585c9c11a87829865413cb87546bb648a1f04ae76c6306b45a38571"
+                "src/FileScan/BundledRulePack.php": "b7e9ebdaa60616cdfaad80b62c6f78a31ad7c8d69e898fdab09bdb303dcf11f9",
+                "src/FileScan/RuleMatcher.php": "787ee60e12cfdda288045c3a66d1734ca5fcde1c26d66e739214eda04ca7df86",
+                "src/FileScan/AdjacentFlow.php": "e6a19e8eea8f4e611da5cccdc737446e62e597a1fc807251ab1991e272f83bb3"
             }
         },
         "content": {
             "version": "2026.10.02.1",
-            "reviewed_at": "2026-10-03",
+            "reviewed_at": "2026-10-08",
             "ids": [
                 "AS-HTML-001",
                 "AS-HTML-002",
@@ -55,8 +66,8 @@
             }
         },
         "requests": {
-            "version": "2026.10.03.3",
-            "reviewed_at": "2026-10-03",
+            "version": "2026.10.07.3",
+            "reviewed_at": "2026-10-08",
             "ids": [
                 "AS-REST-001",
                 "AS-REST-002",
@@ -66,7 +77,7 @@
                 "AS-REST-006"
             ],
             "sha256": {
-                "src/Firewall/BundledRequestRules.php": "9d4f17ea76d4cc0c69c074c1e461e0f8ec7eb1563f585a59947bb7e67327786c"
+                "src/Firewall/BundledRequestRules.php": "5b3bc555e92b31b96c4dc20f670412ce294ac5934200e2d8ef4ad8453326523e"
             }
         }
     }

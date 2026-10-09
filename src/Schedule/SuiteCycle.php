@@ -137,7 +137,24 @@ final class SuiteCycle {
 				if ( 'running' !== $state['state'] || 'files' !== $state['stage'] ) {
 					return null;
 				}
-				$state['state']      = 'complete';
+				$state['state']      = 'partial' === ( $state['coverage'] ?? '' ) ? 'partial' : 'complete';
+				$state['updated_at'] = $now;
+				return $state;
+			}
+		);
+	}
+
+	public function markCoverageGap( int $now ): bool {
+		if ( ! $this->allows( 'files', $now ) ) {
+			return false;
+		}
+		return $this->update(
+			$now,
+			static function ( array $state ) use ( $now ): ?array {
+				if ( 'running' !== $state['state'] || 'files' !== $state['stage'] ) {
+					return null;
+				}
+				$state['coverage']   = 'partial';
 				$state['updated_at'] = $now;
 				return $state;
 			}

@@ -3,6 +3,8 @@
 declare(strict_types=1);
 namespace AmazingPlugins\Security\Passkeys;
 
+use AmazingPlugins\Security\Access;
+
 final class PasskeyUi {
 	public function __construct( private readonly object $db ) {}
 	public function adminAssets( string $hook ): void {
@@ -30,7 +32,7 @@ final class PasskeyUi {
 		);
 	}
 	public function profile( \WP_User $user ): void {
-		if ( get_current_user_id() !== $user->ID || ! current_user_can( 'read' ) ) {
+		if ( ! Access::ownSecret( get_current_user_id(), (int) $user->ID ) || ! current_user_can( 'read' ) ) {
 			return; }
 		$this->assets();
 		$runtime    = new PasskeyRuntime( $this->db );

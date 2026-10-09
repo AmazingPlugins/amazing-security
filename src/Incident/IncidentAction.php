@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Incident;
 
+use AmazingPlugins\Security\Access;
 use AmazingPlugins\Security\Sessions\SessionPolicy;
 use AmazingPlugins\Security\Sessions\SessionAction;
 
@@ -15,11 +16,13 @@ final class IncidentAction {
 	public function handle(): void {
 		// Nonce is verified before any mutation.
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing
-		$post   = wp_unslash( $_POST );
-		$method = is_string( $_SERVER['REQUEST_METHOD'] ?? null ) ? sanitize_key( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) : '';
-		$auth   = wp_parse_auth_cookie( '', is_ssl() ? 'secure_auth' : 'auth' );
-		$id     = is_scalar( $post['user_id'] ?? null ) ? absint( $post['user_id'] ) : 0;
-		if ( ! SessionPolicy::allowed( 'post' === $method, current_user_can( 'manage_options' ), 0 < $id && get_current_user_id() !== $id && current_user_can( 'edit_user', $id ), FixApprovalAction::cookieAuthenticated() && SessionPolicy::matchingTokens( is_array( $auth ) ? (string) $auth['token'] : '', wp_get_session_token() ), is_ssl(), '1' === ( $post['confirm'] ?? null ) ) ) {
+		$post    = wp_unslash( $_POST );
+		$method  = is_string( $_SERVER['REQUEST_METHOD'] ?? null ) ? sanitize_key( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) : '';
+		$auth    = wp_parse_auth_cookie( '', is_ssl() ? 'secure_auth' : 'auth' );
+		$id      = is_scalar( $post['user_id'] ?? null ) ? absint( $post['user_id'] ) : 0;
+		$viewer  = get_current_user_id();
+		$allowed = Access::otherAccount( current_user_can( 'manage_options' ), $viewer, $id ) && current_user_can( 'edit_user', $id );
+		if ( ! SessionPolicy::allowed( 'post' === $method, current_user_can( 'manage_options' ), $allowed, FixApprovalAction::cookieAuthenticated() && SessionPolicy::matchingTokens( is_array( $auth ) ? (string) $auth['token'] : '', wp_get_session_token() ), is_ssl(), '1' === ( $post['confirm'] ?? null ) ) ) {
 			wp_die( esc_html__( 'A secure administrator session and explicit confirmation are required.', 'amazing-security' ), '', array( 'response' => 403 ) );
 		}
 		check_admin_referer( 'amsec_incident_reset_' . $id );

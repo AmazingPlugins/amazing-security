@@ -12,15 +12,7 @@ use Throwable;
 
 final class FixReviewPage {
 	public function register(): void {
-		$hook = add_submenu_page( 'amazing-security', __( 'Review security change', 'amazing-security' ), __( 'Review security change', 'amazing-security' ), 'manage_options', 'amsec-fix-review', array( $this, 'render' ) );
-		add_action(
-			'admin_enqueue_scripts',
-			static function ( string $currentHook ) use ( $hook ): void {
-				if ( $currentHook === $hook ) {
-					wp_enqueue_style( 'amazing-security-admin', plugins_url( 'assets/admin.css', AMAZING_SECURITY_FILE ), array(), '0.1.0' );
-				}
-			}
-		);
+		add_submenu_page( 'amazing-security', __( 'Review security change', 'amazing-security' ), __( 'Review security change', 'amazing-security' ), 'manage_options', 'amsec-fix-review', array( $this, 'render' ) );
 	}
 
 	public function render(): void {
@@ -31,7 +23,7 @@ final class FixReviewPage {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$id = isset( $_GET['proposal'] ) && is_string( $_GET['proposal'] ) ? sanitize_text_field( wp_unslash( $_GET['proposal'] ) ) : '';
 		if ( ! preg_match( '/^[a-f0-9]{32}$/D', $id ) ) {
-			echo '<div class="wrap amazing-security-admin"><h1>Review security change</h1><p>Proposal not found.</p></div>';
+			echo '<div class="wrap amazing-security-admin"><h1>Review security change</h1><p>There is no saved proposal on this screen. One appears here after a scan offers a single setting change.</p><p><a class="button" href="' . esc_url( admin_url( 'admin.php?page=amsec-recommendations' ) ) . '">Open recommendations</a></p></div>';
 			return;
 		}
 		try {

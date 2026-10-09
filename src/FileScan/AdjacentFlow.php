@@ -16,7 +16,7 @@ final class AdjacentFlow {
 		}
 		$markers = array();
 		$count   = count( $items );
-		for ( $i = 1; $i < $count - 8; ++$i ) {
+		for ( $i = 1; $i < $count - 3; ++$i ) {
 			if ( T_VARIABLE !== $items[ $i ][1] || '=' !== $items[ $i + 1 ][2] || ( ! in_array( $items[ $i - 1 ][2], array( ';', '{', '}' ), true ) && T_OPEN_TAG !== $items[ $i - 1 ][1] ) ) {
 				continue;
 			}
@@ -31,6 +31,27 @@ final class AdjacentFlow {
 			}
 			if ( self::request( $items, $j ) && ';' === ( $items[ $j + 4 ][2] ?? '' ) && T_STRING === ( $items[ $j + 5 ][1] ?? null ) && 'wp_redirect' === strtolower( $items[ $j + 5 ][2] ) && '(' === ( $items[ $j + 6 ][2] ?? '' ) && ( $items[ $j + 7 ][2] ?? '' ) === $name && in_array( $items[ $j + 8 ][2] ?? '', array( ')', ',' ), true ) ) {
 				$markers[ $items[ $i ][0] ] = "\x01INDIRECT_REDIRECT\x02";
+			}
+			if ( T_STRING === ( $items[ $j ][1] ?? null ) && 'wp_remote_retrieve_body' === strtolower( (string) $items[ $j ][2] ) && '(' === ( $items[ $j + 1 ][2] ?? '' ) ) {
+				$close = self::balancedClose( $items, $j + 1 );
+				if ( $close > $j && ';' === ( $items[ $close + 1 ][2] ?? '' ) ) {
+					$call = $close + 2;
+					if ( T_EVAL === ( $items[ $call ][1] ?? null ) && '(' === ( $items[ $call + 1 ][2] ?? '' ) && T_VARIABLE === ( $items[ $call + 2 ][1] ?? null ) && ( $items[ $call + 2 ][2] ?? '' ) === $name && ')' === ( $items[ $call + 3 ][2] ?? '' ) ) {
+						$markers[ $items[ $i ][0] ] = "\x01INDIRECT_HTTP_BODY_EVAL\x02";
+					}
+				}
+			}
+			if ( T_CONSTANT_ENCAPSED_STRING === ( $items[ $j ][1] ?? null ) && preg_match( '/^[\'\"]data:\/\//i', (string) $items[ $j ][2] ) && ';' === ( $items[ $j + 1 ][2] ?? '' ) ) {
+				$inc  = $j + 2;
+				$kind = $items[ $inc ][1] ?? null;
+				if ( in_array( $kind, array( T_INCLUDE, T_REQUIRE, T_INCLUDE_ONCE, T_REQUIRE_ONCE ), true ) ) {
+					$open = ( $items[ $inc + 1 ][2] ?? '' ) === '(';
+					$var  = $open ? ( $items[ $inc + 2 ][2] ?? '' ) : ( $items[ $inc + 1 ][2] ?? '' );
+					$tail = $open ? ( $items[ $inc + 3 ][2] ?? '' ) : ( $items[ $inc + 2 ][2] ?? '' );
+					if ( T_VARIABLE === ( $open ? ( $items[ $inc + 2 ][1] ?? null ) : ( $items[ $inc + 1 ][1] ?? null ) ) && $var === $name && ( $open ? ')' === $tail : ';' === $tail ) ) {
+						$markers[ $items[ $i ][0] ] = "\x01INDIRECT_DATA_URI\x02";
+					}
+				}
 			}
 			if ( self::request( $items, $j ) && ';' === ( $items[ $j + 4 ][2] ?? '' ) ) {
 				$call  = $j + 5;
@@ -135,5 +156,23 @@ final class AdjacentFlow {
 
 	private static function request( array $items, int $index ): bool {
 		return T_VARIABLE === ( $items[ $index ][1] ?? null ) && in_array( $items[ $index ][2], array( '$_GET', '$_POST', '$_REQUEST', '$_COOKIE' ), true ) && '[' === ( $items[ $index + 1 ][2] ?? '' ) && T_CONSTANT_ENCAPSED_STRING === ( $items[ $index + 2 ][1] ?? null ) && ']' === ( $items[ $index + 3 ][2] ?? '' );
+	}
+
+	/** Index of the matching ')' for an opening '(' token, or -1. */
+	private static function balancedClose( array $items, int $open ): int {
+		$depth = 0;
+		$count = count( $items );
+		for ( $k = $open; $k < $count; ++$k ) {
+			$piece = $items[ $k ][2] ?? '';
+			if ( '(' === $piece ) {
+				++$depth;
+			} elseif ( ')' === $piece ) {
+				--$depth;
+				if ( 0 === $depth ) {
+					return $k;
+				}
+			}
+		}
+		return -1;
 	}
 }

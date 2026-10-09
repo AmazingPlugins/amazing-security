@@ -29,14 +29,14 @@ final class DigestSummary {
 					++$rowUnknown;
 					continue;
 				}
-				if ( ! in_array( $row['state'] ?? '', array( 'pass', 'warn', 'fail' ), true ) ) {
+				if ( ! in_array( $row['state'] ?? '', array( 'pass', 'warn', 'critical', 'fail' ), true ) ) {
 					++$rowUnknown;
 					$partial = true;
 				}
 				if ( 'complete' !== ( $row['coverage'] ?? 'complete' ) ) {
 					$partial = true;
 				}
-				if ( in_array( $row['state'] ?? '', array( 'warn', 'fail' ), true ) ) {
+				if ( in_array( $row['state'] ?? '', array( 'warn', 'critical', 'fail' ), true ) ) {
 					$id = $row['id'] ?? null;
 					if ( ! is_string( $id ) || '' === $id || strlen( $id ) > 1024 ) {
 						$partial = true;

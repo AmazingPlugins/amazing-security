@@ -56,8 +56,10 @@ final class PublicSurfaceTest extends TestCase {
 		self::assertSame( 'warn', $present->state );
 		self::assertStringContainsString( 'does not delete', $present->summary );
 		self::assertStringNotContainsString( 'safe', $present->summary );
-		self::assertNull( StartHere::control( $present ) );
+		self::assertSame( 'amsec-exposure', StartHere::control( $present )['page'] );
+		self::assertArrayNotHasKey( 'action', StartHere::control( $present ) );
 		self::assertSame( 'pass', $absent->state );
+		self::assertNull( StartHere::control( $absent ) );
 	}
 
 	public function test_license_warns_when_present_and_does_not_delete_it(): void {
@@ -66,7 +68,8 @@ final class PublicSurfaceTest extends TestCase {
 		self::assertStringContainsString( 'license.txt', $present->summary );
 		self::assertStringContainsString( 'does not delete', $present->summary );
 		self::assertStringNotContainsString( 'safe', $present->summary );
-		self::assertNull( StartHere::control( $present ) );
+		self::assertSame( 'amsec-exposure', StartHere::control( $present )['page'] );
+		self::assertArrayNotHasKey( 'action', StartHere::control( $present ) );
 	}
 
 	public function test_debug_log_warns_when_present_and_does_not_read_it(): void {
@@ -77,8 +80,10 @@ final class PublicSurfaceTest extends TestCase {
 		self::assertStringContainsString( 'does not read or delete', $present->summary );
 		self::assertStringContainsString( 'custom log path is not checked', $present->summary );
 		self::assertStringNotContainsString( 'safe', $present->summary );
-		self::assertNull( StartHere::control( $present ) );
+		self::assertSame( 'amsec-exposure', StartHere::control( $present )['page'] );
+		self::assertArrayNotHasKey( 'action', StartHere::control( $present ) );
 		self::assertSame( 'pass', $absent->state );
+		self::assertNull( StartHere::control( $absent ) );
 	}
 
 	public function test_root_and_runtime_warnings_do_not_change_the_site(): void {
@@ -93,10 +98,17 @@ final class PublicSurfaceTest extends TestCase {
 		self::assertStringContainsString( 'does not read or delete', $backup->summary );
 		self::assertStringContainsString( 'does not contact', $php->summary );
 		self::assertStringContainsString( 'does not turn them on', $updates->summary );
-		foreach ( array( $sample, $error, $backup, $php, $updates ) as $row ) {
+		foreach ( array( $sample, $error, $backup ) as $row ) {
 			self::assertStringNotContainsString( 'safe', $row->summary );
-			self::assertNull( StartHere::control( $row ) );
+			self::assertSame( 'amsec-exposure', StartHere::control( $row )['page'] );
+			self::assertArrayNotHasKey( 'action', StartHere::control( $row ) );
 		}
+		self::assertStringNotContainsString( 'safe', $php->summary );
+		self::assertSame( 'site-health.php', StartHere::control( $php )['screen'] );
+		self::assertArrayNotHasKey( 'action', StartHere::control( $php ) );
+		self::assertStringNotContainsString( 'safe', $updates->summary );
+		self::assertSame( 'update-core.php', StartHere::control( $updates )['screen'] );
+		self::assertArrayNotHasKey( 'action', StartHere::control( $updates ) );
 		self::assertSame( 'pass', BackgroundUpdatesCheck::decide( 'on' ) );
 		self::assertSame( 'pass', PhpVersionCheck::decide( 'current' ) );
 	}
@@ -129,7 +141,8 @@ final class PublicSurfaceTest extends TestCase {
 		self::assertNull( StartHere::control( $active ) );
 		self::assertSame( 'warn', $env->state );
 		self::assertStringContainsString( 'does not read or delete', $env->summary );
-		self::assertNull( StartHere::control( $env ) );
+		self::assertSame( 'amsec-exposure', StartHere::control( $env )['page'] );
+		self::assertArrayNotHasKey( 'action', StartHere::control( $env ) );
 		self::assertSame( 'pass', $clear->state );
 		self::assertSame( 'pass', RootExposureCheck::decide( 'absent' ) );
 		self::assertSame( 'warn', RootExposureCheck::decide( 'both' ) );
@@ -143,7 +156,8 @@ final class PublicSurfaceTest extends TestCase {
 		self::assertSame( 'themes.php', StartHere::control( $themes )['screen'] );
 		self::assertSame( 'warn', $php->state );
 		self::assertStringContainsString( 'does not open, run, or delete', $php->summary );
-		self::assertNull( StartHere::control( $php ) );
+		self::assertSame( 'upload.php', StartHere::control( $php )['screen'] );
+		self::assertArrayNotHasKey( 'action', StartHere::control( $php ) );
 		self::assertSame( 'pass', $clear->state );
 		self::assertSame( 'unknown', UploadsPhpFilesCheck::decide( 'partial' ) );
 		$running = ( new LocalCodeCheck( static fn(): array => array( 'stored' => 'running', 'found' => 0 ) ) )->run( new ScanContext() )[0];
