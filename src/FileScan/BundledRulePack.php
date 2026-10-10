@@ -6,13 +6,13 @@ namespace AmazingPlugins\Security\FileScan;
 
 final class BundledRulePack {
 	public function version(): string {
-		return '2026.10.09.2';
+		return '2026.10.10.1';
 	}
 
 	public function rules(): array {
 		return array(
 			'AS-PHP-001' => array(
-				'pattern' => '/(*LIMIT_MATCH=100000)(*LIMIT_RECURSION=1000)\beval\s*\(\s*base64_decode\s*\(/i',
+				'pattern' => '/(*LIMIT_MATCH=100000)(*LIMIT_RECURSION=1000)\beval\s*\(\s*\\\\?base64_decode\s*\(/i',
 				'summary' => 'Decoded input is evaluated as PHP code.',
 			),
 			'AS-PHP-002' => array(
@@ -92,8 +92,8 @@ final class BundledRulePack {
 				'summary' => 'Request input directly selects a file to write. A second variable between the request and the write is not matched.',
 			),
 			'AS-PHP-021' => array(
-				'pattern' => '/(*LIMIT_MATCH=100000)(*LIMIT_RECURSION=1000)\bextract\s*\(\s*\$_(?:GET|POST|REQUEST|COOKIE)\s*\[/i',
-				'summary' => 'Request or cookie data is expanded into variables. A second variable between the request and extract is not matched.',
+				'pattern' => '/(*LIMIT_MATCH=100000)(*LIMIT_RECURSION=1000)\bextract\s*\(\s*\$_(?:GET|POST|REQUEST|COOKIE)\s*[\[\),]/i',
+				'summary' => 'Request or cookie data is expanded into variables, either one element or the whole array. A second variable between the request and extract is not matched.',
 			),
 			'AS-PHP-022' => array(
 				'pattern' => '/(*LIMIT_MATCH=100000)(*LIMIT_RECURSION=1000)\bparse_str\s*\(\s*\$_(?:GET|POST|REQUEST|COOKIE)\s*\[/i',
@@ -182,6 +182,18 @@ final class BundledRulePack {
 			'AS-PHP-043' => array(
 				'pattern' => '/\x01INDIRECT_DATA_URI_COPY2\x02/',
 				'summary' => 'A data:// string is copied twice and then loaded with include or require. A fourth hop is not matched.',
+			),
+			'AS-PHP-044' => array(
+				'pattern' => '/(*LIMIT_MATCH=100000)(*LIMIT_RECURSION=1000)\beval\s*\(\s*(?!\\\\?(?:base64_decode|gzinflate|str_rot13)\b)(?:\\\\?[a-z_][a-z0-9_]*\s*\(\s*){1,2}\$_(?:GET|POST|REQUEST|COOKIE)\s*\[/i',
+				'summary' => 'Request or cookie data is passed through one or two functions and then evaluated as PHP code. Decode chains that start with base64_decode, gzinflate or str_rot13 are reported by their own rules. Server-header data and a function name built from string pieces are not matched.',
+			),
+			'AS-PHP-045' => array(
+				'pattern' => '/(*LIMIT_MATCH=100000)(*LIMIT_RECURSION=1000)\beval\s*\(\s*\\\\?(?:gzuncompress|gzdecode|file_get_contents)\s*\(/i',
+				'summary' => 'Uncompressed data or the contents of a file or stream are evaluated as PHP code.',
+			),
+			'AS-PHP-046' => array(
+				'pattern' => '/(*LIMIT_MATCH=100000)(*LIMIT_RECURSION=1000)`[^`\n]{0,200}\$_(?:GET|POST|REQUEST|COOKIE)\b[^`\n]{0,200}`/i',
+				'summary' => 'A backtick shell command contains request or cookie data. A local variable between the request and the command is not matched.',
 			),
 		);
 	}
