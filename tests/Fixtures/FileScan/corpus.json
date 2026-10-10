@@ -1256,6 +1256,136 @@
       "code": "<?php shell_exec('id ' . $cmd);",
       "expected": [],
       "provenance": "Known miss: concatenation with a local variable is not a request variable in the same statement. Never execute."
+    },
+    {
+      "name": "eval-leading-backslash-decode",
+      "kind": "suspected",
+      "code": "<?php eval(\\base64_decode('fixture'));",
+      "expected": [
+        "AS-PHP-001"
+      ],
+      "provenance": "Original inert authored regression for pack 2026.10.10.1. Never execute."
+    },
+    {
+      "name": "extract-whole-get",
+      "kind": "suspected",
+      "code": "<?php extract($_GET);",
+      "expected": [
+        "AS-PHP-021"
+      ],
+      "provenance": "Original inert authored regression for pack 2026.10.10.1. Never execute."
+    },
+    {
+      "name": "extract-whole-post-flags",
+      "kind": "suspected",
+      "code": "<?php extract($_POST, EXTR_OVERWRITE);",
+      "expected": [
+        "AS-PHP-021"
+      ],
+      "provenance": "Original inert authored regression for pack 2026.10.10.1. Never execute."
+    },
+    {
+      "name": "extract-local-array",
+      "kind": "benign",
+      "code": "<?php extract($args);",
+      "expected": [],
+      "provenance": "Original inert near-miss: extract of a local array is not request data. Never execute."
+    },
+    {
+      "name": "eval-wrapped-request",
+      "kind": "suspected",
+      "code": "<?php eval(stripslashes($_POST['c']));",
+      "expected": [
+        "AS-PHP-044"
+      ],
+      "provenance": "Original inert authored regression for pack 2026.10.10.1. Never execute."
+    },
+    {
+      "name": "eval-double-wrapped-request",
+      "kind": "suspected",
+      "code": "<?php eval(trim(urldecode($_GET['c'])));",
+      "expected": [
+        "AS-PHP-044"
+      ],
+      "provenance": "Original inert authored regression for pack 2026.10.10.1. Never execute."
+    },
+    {
+      "name": "eval-decode-server-header",
+      "kind": "suspected",
+      "code": "<?php eval(base64_decode($_SERVER['HTTP_X_C']));",
+      "expected": [
+        "AS-PHP-001"
+      ],
+      "provenance": "Original inert authored regression for pack 2026.10.10.1. Never execute."
+    },
+    {
+      "name": "eval-local-wrapped",
+      "kind": "benign",
+      "code": "<?php eval(trim($code));",
+      "expected": [],
+      "provenance": "Original inert near-miss: no request data in the same statement. Never execute."
+    },
+    {
+      "name": "eval-gzuncompress",
+      "kind": "suspected",
+      "code": "<?php eval(gzuncompress($blob));",
+      "expected": [
+        "AS-PHP-045"
+      ],
+      "provenance": "Original inert authored regression for pack 2026.10.10.1. Never execute."
+    },
+    {
+      "name": "eval-file-contents",
+      "kind": "suspected",
+      "code": "<?php eval(file_get_contents('php://input'));",
+      "expected": [
+        "AS-PHP-045"
+      ],
+      "provenance": "Original inert authored regression for pack 2026.10.10.1. Never execute."
+    },
+    {
+      "name": "file-contents-no-eval",
+      "kind": "benign",
+      "code": "<?php $body = file_get_contents('php://input'); echo strlen($body);",
+      "expected": [],
+      "provenance": "Original inert near-miss: reading the request body without eval. Never execute."
+    },
+    {
+      "name": "backtick-request",
+      "kind": "suspected",
+      "code": "<?php echo `ls $_GET[c]`;",
+      "expected": [
+        "AS-PHP-046"
+      ],
+      "provenance": "Original inert authored regression for pack 2026.10.10.1. Never execute."
+    },
+    {
+      "name": "backtick-local",
+      "kind": "benign",
+      "code": "<?php echo `ls $dir`;",
+      "expected": [],
+      "provenance": "Original inert near-miss: backtick command with a local variable only. Never execute."
+    },
+    {
+      "name": "backtick-in-string",
+      "kind": "benign",
+      "code": "<?php echo 'use `$_GET[c]` in docs';",
+      "expected": [],
+      "provenance": "Original inert near-miss: backticks inside a string literal. Never execute."
+    },
+    {
+      "name": "split-function-name",
+      "kind": "known-gap",
+      "code": "<?php $f='ev'.'al'; $f($_GET['c']);",
+      "expected": [],
+      "provenance": "Known miss: a function name assembled from string pieces is not matched. Never execute."
+    },
+    {
+      "name": "eval-wrapped-server-header",
+      "kind": "known-gap",
+      "code": "<?php eval(trim($_SERVER['HTTP_X_C']));",
+      "expected": [],
+      "provenance": "Known miss: $_SERVER is not kept by the shared token normalizer, so server-header data is not matched. Never execute."
     }
   ]
 }
