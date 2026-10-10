@@ -35,7 +35,7 @@ final class PhpVersionCheck implements SecurityCheck {
 
 	public static function wordpressKind(): string {
 		global $required_php_version;
-		if ( ! is_string( $required_php_version ) || 1 !== preg_match( '/^\d+\.\d+\.\d+$/', $required_php_version ) ) {
+		if ( ! is_string( $required_php_version ) || 1 !== preg_match( '/^\d+\.\d+(?:\.\d+)?$/', $required_php_version ) ) {
 			return 'unknown';
 		}
 		return version_compare( PHP_VERSION, $required_php_version, '<' ) ? 'older' : 'current';

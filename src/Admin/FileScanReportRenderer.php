@@ -17,7 +17,7 @@ final class FileScanReportRenderer {
 		$version  = ( new BundledRulePack() )->version();
 		$released = DateTimeImmutable::createFromFormat( '!Y.m.d', substr( $version, 0, 10 ) );
 		$age      = false === $released ? 0 : max( 0, (int) floor( ( time() - $released->getTimestamp() ) / 86400 ) );
-		$html     = '<section class="amsec-file-scan" aria-labelledby="amsec-file-scan"><div class="amsec-file-heading"><div><h2 id="amsec-file-scan">Suspicious files</h2><p>Checks unfamiliar PHP files on this site. A match needs review; no match does not prove the site is clean.</p></div><span class="amsec-file-rule-age">Bundled rules ' . esc_html( $version ) . ' (' . esc_html( (string) $age ) . ' days old)</span></div>';
+		$html     = '<section class="amsec-file-scan" aria-labelledby="amsec-file-scan"><div class="amsec-file-heading"><div><h2 id="amsec-file-scan">Suspicious files</h2><p>Checks unfamiliar PHP files on this site. A match needs review; no match does not prove the site is clean.</p></div><span class="amsec-file-rule-age">Bundled rules ' . esc_html( $version ) . ' (' . esc_html( (string) $age ) . ( 1 === (int) $age ? ' day old' : ' days old' ) . ')</span></div>';
 		if ( null === $completed && null === $progress ) {
 			return $html . '<p class="amsec-file-empty">No file scan has run. Start one to check for extra files and the bundled suspicious-code patterns.</p></section>';
 		}

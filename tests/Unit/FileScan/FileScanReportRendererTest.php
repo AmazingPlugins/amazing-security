@@ -26,7 +26,7 @@ final class FileScanReportRendererTest extends TestCase {
 	public function test_empty_state_invites_manual_scan_without_all_clear(): void {
 		$html = ( new FileScanReportRenderer() )->render( null, null, array() );
 		self::assertStringContainsString( 'No file scan has run', $html );
-		self::assertStringContainsString( 'days old', $html );
+		self::assertMatchesRegularExpression( '/\d+ days? old/', $html );
 		self::assertStringNotContainsString( 'malware-free', $html );
 	}
 

@@ -89,7 +89,7 @@ final class RuleCatalog {
 				'age_days'    => $ok ? (int) floor( ( $now - $date ) / 86400 ) : null,
 				'origin'      => 'AmazingPlugins authored local review patterns',
 				'license'     => 'GPL-2.0-or-later',
-				'owner'       => 'AmazingPlugins rule maintainer (staffing required before public release)',
+				'owner'       => 'AmazingPlugins',
 			);
 		}
 		return $status;

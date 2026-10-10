@@ -30,7 +30,7 @@ final class WordPressSoftwareInventory implements SoftwareInventory {
 				if ( ! is_array( $record ) ) {
 					continue;
 				}
-				$rawSlug  = 'plugin' === $type ? dirname( (string) ( $record['file'] ?? '' ) ) : (string) ( $record['slug'] ?? '' );
+				$rawSlug  = 'plugin' === $type ? $this->pluginSlug( (string) ( $record['file'] ?? '' ) ) : (string) ( $record['slug'] ?? '' );
 				$slug     = $this->validSlug( $rawSlug ) ? $rawSlug : 'unsupported-' . count( $items );
 				$version  = (string) ( $record['version'] ?? '' );
 				$trusted  = (string) ( $record['repository_slug'] ?? '' );
@@ -93,5 +93,11 @@ final class WordPressSoftwareInventory implements SoftwareInventory {
 	private function officialPackage( string $url ): bool {
 		// phpcs:ignore WordPress.WP.AlternativeFunctions.parse_url_parse_url -- Pure metadata validation.
 		return 'https' === parse_url( $url, PHP_URL_SCHEME ) && 'downloads.wordpress.org' === parse_url( $url, PHP_URL_HOST );
+	}
+
+	/** A plugin in a folder uses the folder name; a single-file plugin such as hello.php uses the file name. */
+	private function pluginSlug( string $file ): string {
+		$dir = dirname( $file );
+		return '.' === $dir ? basename( $file, '.php' ) : $dir;
 	}
 }

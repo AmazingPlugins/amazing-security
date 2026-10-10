@@ -1,0 +1,106 @@
+name: Quality and release
+
+on:
+  push:
+    branches: [main]
+    tags: ['*']
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: PHP ${{ matrix.php }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['8.1', '8.3']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+      - run: composer validate --strict
+      - run: composer install --no-interaction --prefer-dist --no-progress
+      - run: composer test
+      - run: composer cs
+      - run: php scripts/rule-manifest.php --check
+
+  package:
+    name: Build release package
+    needs: quality
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+      - name: Build ZIP
+        run: scripts/package-preview.sh "$RUNNER_TEMP/amazing-security.zip"
+      - name: Inspect ZIP
+        run: |
+          unzip -tq "$RUNNER_TEMP/amazing-security.zip"
+          if unzip -Z1 "$RUNNER_TEMP/amazing-security.zip" | grep -E '(^|/)(tests|dist|vendor|docs|scripts|\.wordpress-org|\.github)/|(^|/)(composer\.(json|lock)|phpunit.*|phpcs.*|\.env.*)$'; then
+            echo "Release ZIP contains development files."
+            exit 1
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: amazing-security-zip
+          path: ${{ runner.temp }}/amazing-security.zip
+          retention-days: 14
+
+  deploy:
+    name: Publish to WordPress.org
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: package
+    runs-on: ubuntu-latest
+    env:
+      SLUG: ${{ vars.WPORG_SLUG || 'amazing-security' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Require the tag to match the plugin version
+        run: |
+          tag="${GITHUB_REF#refs/tags/}"
+          tag="${tag#v}"
+          header=$(sed -n 's/^ \* Version: *//p' amazing-security.php | head -n 1 | tr -d '[:space:]')
+          stable=$(sed -n 's/^Stable tag: *//p' readme.txt | head -n 1 | tr -d '[:space:]')
+          case "$tag" in
+            [0-9]*.[0-9]*.[0-9]*) ;;
+            *) echo "Tag $tag must look like 1.2.3."; exit 1 ;;
+          esac
+          if [ "$tag" != "$header" ] || [ "$tag" != "$stable" ]; then
+            echo "Tag $tag does not match header '$header' and readme stable tag '$stable'."
+            exit 1
+          fi
+
+      - name: Require an approved WordPress.org plugin
+        run: |
+          if ! svn info "https://plugins.svn.wordpress.org/${SLUG}" >/dev/null 2>&1; then
+            echo "No WordPress.org SVN repository for '${SLUG}'. The first submission needs WordPress.org review; set repo variable WPORG_SLUG if the assigned slug differs."
+            exit 1
+          fi
+
+      - name: Download the tested ZIP
+        uses: actions/download-artifact@v4
+        with:
+          name: amazing-security-zip
+          path: ${{ runner.temp }}/zip
+
+      - name: Extract the release folder
+        run: |
+          unzip -q "$RUNNER_TEMP/zip/amazing-security.zip" -d "$RUNNER_TEMP/build"
+          echo "BUILD_DIR=$RUNNER_TEMP/build/amazing-security" >> "$GITHUB_ENV"
+
+      - name: Deploy to WordPress.org
+        uses: 10up/action-wordpress-plugin-deploy@54bd289b8525fd23a5c365ec369185f2966529c2 # 2.3.0
+        env:
+          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+          SLUG: ${{ env.SLUG }}
+          BUILD_DIR: ${{ env.BUILD_DIR }}

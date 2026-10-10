@@ -64,6 +64,7 @@ final class BoundedContentReader {
 				}
 				$bytes .= $chunk;
 			}
+			clearstatcache( true, $current );
 			$after = lstat( $current );
 			if ( false === $after || is_link( $current ) || $after['dev'] !== $opened['dev'] || $after['ino'] !== $opened['ino'] || $after['size'] !== $opened['size'] || $after['mtime'] !== $opened['mtime'] || realpath( $current ) !== $resolved ) {
 				return new ContentReadResult( 'unsafe' );
