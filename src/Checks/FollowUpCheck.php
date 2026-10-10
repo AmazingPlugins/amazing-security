@@ -375,18 +375,25 @@ final class FollowUpCheck implements SecurityCheck {
 				'found'  => 0,
 			);
 		}
-		$found = count( $report->findings );
+		// Files the scan could not read are coverage gaps, not rule matches.
+		$found   = count(
+			array_filter(
+				$report->findings,
+				static fn( $finding ): bool => ! is_array( $finding ) || 'unscanned' !== ( $finding['kind'] ?? '' )
+			)
+		);
+		$skipped = count( $report->findings ) > $found;
 		if ( $found > 250 ) {
 			$found = 250;
 		}
-		if ( $found > 0 || 'warn' === $report->state ) {
+		if ( $found > 0 ) {
 			return array(
 				'stored' => 'found',
 				'found'  => $found,
 			);
 		}
 		return array(
-			'stored' => $report->partial || 'inconclusive' === $report->state ? 'partial' : 'clean',
+			'stored' => $skipped || $report->partial || 'inconclusive' === $report->state ? 'partial' : 'clean',
 			'found'  => 0,
 		);
 	}

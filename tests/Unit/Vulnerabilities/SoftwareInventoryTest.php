@@ -31,6 +31,19 @@ final class SoftwareInventoryTest extends TestCase {
 		self::assertSame( 'plugin', $items[2]->type );
 	}
 
+	public function test_single_file_plugins_use_the_file_name_as_slug(): void {
+		$inventory = new WordPressSoftwareInventory(
+			static fn (): array => array(
+				'core' => array( 'version' => '6.9.4' ),
+				'plugins' => array( array( 'file' => 'hello.php', 'version' => '1.7.2', 'update_uri' => '', 'repository_slug' => '' ) ),
+				'themes' => array(),
+			)
+		);
+		$items = $inventory->collect();
+		self::assertSame( 'hello', $items[1]->slug );
+		self::assertFalse( $items[1]->eligible );
+	}
+
 	public function test_missing_or_malformed_versions_are_unknown_and_inventory_is_bounded(): void {
 		$plugins = array();
 		for ( $i = 0; $i < 1100; ++$i ) {

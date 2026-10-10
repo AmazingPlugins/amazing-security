@@ -29,7 +29,6 @@ final class AdminPage {
 		add_action( 'admin_menu', array( StartPanel::class, 'register' ), 20 );
 		add_action( 'admin_menu', array( new ReviewPage(), 'register' ), 20 );
 		add_action( 'admin_menu', array( new UploadsRulePage(), 'register' ), 20 );
-		add_action( 'admin_post_amsec_uploads_rule', array( new UploadsRulePage(), 'save' ) );
 		add_action( 'admin_menu', array( Submenu::class, 'trim' ), 999 );
 		Brand::boot();
 	}
