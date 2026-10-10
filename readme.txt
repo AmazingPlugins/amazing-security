@@ -8,7 +8,7 @@ Stable tag: 0.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-WordPress hardening checks, release file checks, opt-in vulnerability lookups, and local login protection. Private preview.
+WordPress hardening checks, release file checks, opt-in vulnerability lookups, and local login protection.
 
 == Description ==
 
@@ -67,4 +67,4 @@ Login blocking, the sign-in confirmation, the common-password list, required ver
 == Changelog ==
 
 = 0.1.0 =
-* Private preview. Local starting-list checks, optional WordPress.org file comparison, and opt-in vulnerability lookups.
+* Initial release. Local starting-list checks, optional WordPress.org file comparison, and opt-in vulnerability lookups.
