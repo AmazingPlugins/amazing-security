@@ -82,6 +82,30 @@ final class UnexpectedFileTest extends TestCase {
 		self::assertSame( 'extra', (string) file_get_contents( (string) $saved[0] ) );
 	}
 
+	public function test_refuses_any_file_inside_this_plugins_own_folder(): void {
+		$this->makeInstall();
+		mkdir( $this->root . '/wp-content/plugins/amazing-security/src', 0755, true );
+		file_put_contents( $this->root . '/wp-content/plugins/amazing-security/amazing-security.php', 'main' );
+		$inner = $this->root . '/wp-content/plugins/amazing-security/src/Admin.php';
+		file_put_contents( $inner, 'inner' );
+
+		$result = $this->files()->remove( 'wp-content/plugins/amazing-security/src/Admin.php', 'DELETE', $this->approval() );
+
+		self::assertFalse( $result->ok );
+		self::assertFileExists( $inner );
+	}
+
+	public function test_success_message_names_where_the_backup_went(): void {
+		$this->makeInstall();
+		$upload = $this->root . '/wp-content/uploads/extra.txt';
+		file_put_contents( $upload, 'extra' );
+
+		$result = $this->files()->remove( 'wp-content/uploads/extra.txt', 'DELETE', $this->approval() );
+
+		self::assertTrue( $result->ok );
+		self::assertStringContainsString( $this->backup, $result->message );
+	}
+
 	private function files(): UnexpectedFile {
 		return new UnexpectedFile( $this->root, $this->root . '/wp-content/plugins/amazing-security/amazing-security.php', $this->backup );
 	}
