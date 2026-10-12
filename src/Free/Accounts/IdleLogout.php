@@ -45,4 +45,9 @@ final class IdleLogout {
 		}
 		return 'stamp';
 	}
+
+	/** The timestamp only needs minute accuracy, so a busy admin session does not write user meta on every request. */
+	public static function shouldStamp( ?int $lastSeen, int $now ): bool {
+		return null === $lastSeen || $lastSeen < 1 || ( $now - $lastSeen ) >= 60;
+	}
 }

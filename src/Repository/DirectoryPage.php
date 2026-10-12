@@ -10,7 +10,7 @@ final class DirectoryPage {
 			'admin_enqueue_scripts',
 			static function ( string $current ) use ( $hook ): void {
 				if ( $current === $hook ) {
-					wp_enqueue_style( 'amazing-security-admin', plugins_url( 'assets/admin.css', AMAZING_SECURITY_FILE ), array(), '0.1.0' );
+					wp_enqueue_style( 'amazing-security-admin', plugins_url( 'assets/admin.css', AMAZING_SECURITY_FILE ), array(), AMAZING_SECURITY_VERSION );
 				}}
 		);
 	}
@@ -21,7 +21,7 @@ final class DirectoryPage {
 		$now   = time();
 		echo '<div class="wrap amazing-security-admin"><header class="amsec-header"><div><h1>Plugin directory status</h1><p>Optional WordPress.org directory observations for selected installed plugin candidates.</p></div></header><section class="amsec-overview"><h2>Scope and privacy</h2><p>Each consented lookup sends one directory slug to WordPress.org, which sees your server IP. It does not send the installed version, site URL, credentials or contents. No lookup runs automatically. Up to 100 standard plugin entries are listed; custom-update, standalone and symlink packages are unsupported.</p><p>A directory slug match does not authenticate installed code. Closure is a directory observation, not a malware verdict. Missing records and old updates do not prove abandonment or a vulnerability. No plugin is deactivated or changed. Results older than 24 hours, or for a changed installation, are historical. A repeated lookup within ten minutes uses its saved result.</p></section>';
 		if ( ! empty( $state['invalid'] ) ) {
-			echo '<div class="notice notice-error"><p>Stored advisory state is invalid. No current directory status can be established; ask the host administrator to review it.</p></div></div>';
+			echo '<div class="notice inline notice-error"><p>Stored advisory state is invalid. No current directory status can be established; ask the host administrator to review it.</p></div></div>';
 			return;}
 		foreach ( ( new WordPressDirectoryInventory() )->all() as $item ) {
 			$row        = $state['records'][ $item['key'] ] ?? null;

@@ -16,7 +16,7 @@ final class NetworkSettings {
 			'admin_enqueue_scripts',
 			static function ( string $current ) use ( $hook ): void {
 				if ( $current === $hook ) {
-					wp_enqueue_style( 'amazing-security-admin', plugins_url( 'assets/admin.css', AMAZING_SECURITY_FILE ), array(), '0.1.0' );
+					wp_enqueue_style( 'amazing-security-admin', plugins_url( 'assets/admin.css', AMAZING_SECURITY_FILE ), array(), AMAZING_SECURITY_VERSION );
 				}}
 		);}
 	public function handle(): void {
@@ -61,7 +61,7 @@ final class NetworkSettings {
 		$metric = ( new NetworkObservation( new WordPressOptions() ) )->status();
 		echo '<div class="wrap amazing-security-admin"><header class="amsec-header"><div><h1>Manual network controls</h1><p>Approve explicit network rules without changing host infrastructure.</p></div></header><section class="amsec-overview"><h2>PHP requests only</h2><p>Off by default. Observe records an approximate redacted match count without denying traffic. Block denies matching IPv4/IPv6 CIDRs for selected methods on requests reaching WordPress PHP. Static assets, cached pages or CDN responses that bypass PHP are outside this scope. This is not a server firewall or automatic ban service.</p><p>CLI, cron and administrators already identified by WordPress at the check point are exempt. Authentication handled later in an API request may still be denied. By default use the host-provided PHP REMOTE_ADDR; optional approved trusted-proxy settings can resolve a reported client only with host-confirmed direct peer configuration. The host may already have rewritten the address. Verify proxy trust before enforcing. Shared networks can group legitimate visitors.</p><p>Approval refuses a block policy covering your current resolved address to reduce self-lockout. A later network change can still lock you out. Recovery: <code>wp amazing-security network disable</code>, or bypass with <code>AMSEC_DISABLE_FIREWALL</code>. Recovery clears this feature’s advisory count.</p><p>Configured CIDRs are stored as explicit policy. Visitor addresses, URLs, content and usernames are not collected by the match counter. Counts can miss concurrent or failed writes and cap at one million; they never decide enforcement.</p></section>';
 		if ( ! empty( $state['invalid'] ) ) {
-			echo '<div class="notice notice-error"><p>Network policy is invalid; enforcement is unavailable. Use host recovery to set an explicit off policy.</p></div></div>';
+			echo '<div class="notice inline notice-error"><p>Network policy is invalid; enforcement is unavailable. Use host recovery to set an explicit off policy.</p></div></div>';
 			return;}
 		echo '<section class="amsec-file-scan"><h2>Current policy</h2><p>Mode: ' . esc_html( $state['mode'] ) . '.</p>';
 		if ( ! empty( $metric['invalid'] ) ) {

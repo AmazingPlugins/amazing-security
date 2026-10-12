@@ -48,11 +48,11 @@ final class NotificationSettingsPage {
 		echo '<p>' . esc_html__( 'Off by default. Only administrators can change these. Amazing Security does not add its own mail host; it uses whatever WordPress already uses for password resets.', 'amazing-security' ) . '</p>';
 
 		if ( 'accepted' === $notice ) {
-			echo '<div class="notice notice-success"><p>' . esc_html__( 'Test message was accepted by WordPress mail. That does not confirm it arrived in the inbox.', 'amazing-security' ) . '</p></div>';
+			echo '<div class="notice inline notice-success"><p>' . esc_html__( 'Test message was accepted by WordPress mail. That does not confirm it arrived in the inbox.', 'amazing-security' ) . '</p></div>';
 		} elseif ( 'failed' === $notice ) {
-			echo '<div class="notice notice-error"><p>' . esc_html__( 'Test message was not accepted. Check the site mail setup, then try again.', 'amazing-security' ) . '</p></div>';
+			echo '<div class="notice inline notice-error"><p>' . esc_html__( 'Test message was not accepted. Check the site mail setup, then try again.', 'amazing-security' ) . '</p></div>';
 		} elseif ( 'unconfigured' === $notice ) {
-			echo '<div class="notice notice-warning"><p>' . esc_html__( 'WordPress admin email is not configured. Fix it under Settings → General first.', 'amazing-security' ) . '</p></div>';
+			echo '<div class="notice inline notice-warning"><p>' . esc_html__( 'WordPress admin email is not configured. Fix it under Settings → General first.', 'amazing-security' ) . '</p></div>';
 		}
 
 		echo '<div class="amsec-login-panel">';

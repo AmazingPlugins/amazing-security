@@ -48,6 +48,9 @@ final class UnexpectedFile {
 		if ( $this->isPluginMain( $target ) ) {
 			return ChangeResult::failure( __( 'The plugin main file cannot be removed.', 'amazing-security' ) );
 		}
+		if ( $this->isInsideOwnPlugin( $target ) ) {
+			return ChangeResult::failure( __( 'Files that belong to this plugin cannot be removed here.', 'amazing-security' ) );
+		}
 		$moved = ( new PrivateBackup( $this->root, $this->backupDirectory ) )->move( $target );
 		if ( ! $moved['removed'] ) {
 			return ChangeResult::failure( __( 'The private backup could not be written. The file was left in place.', 'amazing-security' ) );
@@ -56,7 +59,13 @@ final class UnexpectedFile {
 		if ( is_file( $target ) || is_link( $target ) ) {
 			return ChangeResult::failure( __( 'The file is still in place.', 'amazing-security' ) );
 		}
-		return ChangeResult::success( __( 'The file was moved out of the site into a private temp backup.', 'amazing-security' ) );
+		$where = isset( $moved['path'] ) && is_string( $moved['path'] ) ? $moved['path'] : '';
+		return ChangeResult::success(
+			'' === $where
+				? __( 'The file was moved out of the site into a private temp backup.', 'amazing-security' )
+				/* translators: %s: server path of the private backup copy. */
+				: sprintf( __( 'The file was moved out of the site to %s. Temp folders can be cleared by the server, so copy it from there if you may need it.', 'amazing-security' ), $where )
+		);
 	}
 
 	private function inTree( string $target ): bool {
@@ -83,6 +92,19 @@ final class UnexpectedFile {
 		}
 		$main = realpath( $this->pluginMainFile );
 		return false !== $main && $main === $target;
+	}
+
+	/** Removing a file from this plugin's own folder could break the security plugin itself. */
+	private function isInsideOwnPlugin( string $target ): bool {
+		if ( '' === $this->pluginMainFile ) {
+			return false;
+		}
+		$main = realpath( $this->pluginMainFile );
+		if ( false === $main ) {
+			return false;
+		}
+		$folder = rtrim( dirname( $main ), '/\\' ) . DIRECTORY_SEPARATOR;
+		return str_starts_with( $target, $folder );
 	}
 
 	private static function trim( string $path ): string {

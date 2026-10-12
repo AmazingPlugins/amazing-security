@@ -26,7 +26,7 @@ final class Page {
 		echo '<div class="wrap amazing-security-admin">';
 		echo '<h1>' . esc_html__( 'Password rules', 'amazing-security' ) . '</h1>';
 		if ( '' !== $notice ) {
-			echo '<div class="notice notice-info"><p>' . esc_html( $notice ) . '</p></div>';
+			echo '<div class="notice inline notice-info"><p>' . esc_html( $notice ) . '</p></div>';
 		}
 		echo '<p>' . esc_html__( 'These rules apply to a new password or a reset password. Off does nothing. Signing in is not checked.', 'amazing-security' ) . '</p>';
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';

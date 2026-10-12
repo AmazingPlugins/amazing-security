@@ -72,6 +72,27 @@ final class RateCounterStoreTest extends TestCase {
 		self::assertCount( 1, array_filter( $db->queries, fn( string $query ): bool => str_contains( $query, 'RELEASE_LOCK' ) ) );
 	}
 
+	public function test_full_table_is_made_room_for_instead_of_switching_the_limiter_off(): void {
+		$db = new class {
+			public string $prefix = 'wp_';
+			public string $last_error = '';
+			public array $queries = array();
+			private int $counts = 0;
+			public function prepare( string $sql, mixed ...$values ): string { return vsprintf( str_replace( array( '%s', '%d' ), array( "'%s'", '%d' ), $sql ), $values ); }
+			public function query( string $sql ): int { $this->queries[] = $sql; return 1; }
+			public function get_var( string $sql ): ?int {
+				$this->queries[] = $sql;
+				if ( str_contains( $sql, 'GET_LOCK' ) || str_contains( $sql, 'RELEASE_LOCK' ) ) { return 1; }
+				if ( str_contains( $sql, 'COUNT(*)' ) ) { return 1 === ++$this->counts ? 10000 : 9000; }
+				return null;
+			}
+			public function get_row( string $sql, string $mode ): ?array { return null; }
+		};
+		$store = new WordPressRateCounterStore( $db );
+		self::assertTrue( $store->recordFailure( str_repeat( 'a', 64 ), 100000 )->available );
+		self::assertNotEmpty( array_filter( $db->queries, fn( string $query ): bool => str_contains( $query, 'DELETE FROM' ) && str_contains( $query, 'blocked_until <=' ) ) );
+	}
+
 	public function test_admission_locks_are_separate_for_databases_with_the_same_table_name(): void {
 		$driver = static function ( string $database ): object {
 			return new class( $database ) {

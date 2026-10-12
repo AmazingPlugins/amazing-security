@@ -16,7 +16,7 @@ final class WordPressDirectFeedHttpClient implements HttpClient {
 				'redirection'         => 0,
 				'sslverify'           => true,
 				'limit_response_size' => $maxBytes + 1,
-				'user-agent'          => 'AmazingSecurity/0.1.0',
+				'user-agent'          => 'AmazingSecurity/' . AMAZING_SECURITY_VERSION,
 				'headers'             => array( 'Accept' => 'application/json' ),
 			)
 		);

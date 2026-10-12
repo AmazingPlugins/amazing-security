@@ -1816,3 +1816,11 @@ body.amsec-app #wpbody-content .amsec-tab-panel .amsec-brief + .amsec-brief {
   padding-top: 8px;
   border-top: 1px solid rgba(26, 20, 16, 0.12);
 }
+
+/* Notices from WordPress and other plugins sit above the Amazing Security bar, not inside it. */
+body.amsec-app #wpbody-content > .notice,
+body.amsec-app #wpbody-content > .update-nag,
+body.amsec-app #wpbody-content > .error,
+body.amsec-app #wpbody-content > .updated {
+  margin: 12px 20px 0;
+}

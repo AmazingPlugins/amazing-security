@@ -16,8 +16,8 @@ final class PasskeyUi {
 			$this->assets(); }
 	}
 	public function assets(): void {
-		wp_enqueue_script( 'amsec-passkeys', plugins_url( 'assets/passkeys.js', AMAZING_SECURITY_FILE ), array(), '0.1.1', true );
-		wp_enqueue_style( 'amsec-passkeys', plugins_url( 'assets/passkeys.css', AMAZING_SECURITY_FILE ), array(), '0.1.1' );
+		wp_enqueue_script( 'amsec-passkeys', plugins_url( 'assets/passkeys.js', AMAZING_SECURITY_FILE ), array(), AMAZING_SECURITY_VERSION, true );
+		wp_enqueue_style( 'amsec-passkeys', plugins_url( 'assets/passkeys.css', AMAZING_SECURITY_FILE ), array(), AMAZING_SECURITY_VERSION );
 		wp_localize_script(
 			'amsec-passkeys',
 			'amsecPasskeys',

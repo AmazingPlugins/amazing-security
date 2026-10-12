@@ -19,6 +19,7 @@ use AmazingPlugins\Security\Integrity\WordPressOrgManifestProvider;
 use AmazingPlugins\Security\Integrity\WordPressOrgThemeManifestProvider;
 use AmazingPlugins\Security\Integrity\ThemeArchiveParser;
 use AmazingPlugins\Security\Scan\ScanContext;
+use AmazingPlugins\Security\Schedule\DailyReleaseCheck;
 use AmazingPlugins\Security\Schedule\SuiteCycle;
 use DateTimeImmutable;
 use Throwable;
@@ -50,6 +51,13 @@ final class IntegrityScanAction {
 	public function scheduled(): void {
 		$options = new WordPressOptions();
 		$cycle   = new SuiteCycle( $options );
+		if ( ! DailyReleaseCheck::enabled() ) {
+			// The owner has not allowed the daily WordPress.org comparison, so skip to the local file scan.
+			if ( $cycle->advance( 'integrity', 'files', time() ) ) {
+				$this->schedule( 60, 'amsec_file_tick' );
+			}
+			return;
+		}
 		if ( ! $cycle->claim( 'integrity', time() ) ) {
 			return;
 		}

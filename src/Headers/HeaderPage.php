@@ -11,7 +11,7 @@ final class HeaderPage {
 			'admin_enqueue_scripts',
 			static function ( string $current ) use ( $hook ): void {
 				if ( $current === $hook ) {
-					wp_enqueue_style( 'amazing-security-admin', plugins_url( 'assets/admin.css', AMAZING_SECURITY_FILE ), array(), '0.1.0' );
+					wp_enqueue_style( 'amazing-security-admin', plugins_url( 'assets/admin.css', AMAZING_SECURITY_FILE ), array(), AMAZING_SECURITY_VERSION );
 				}}
 		);
 	}
@@ -23,7 +23,7 @@ final class HeaderPage {
 		$fp    = $s->fingerprint();
 		echo '<div class="wrap amazing-security-admin"><header class="amsec-header"><div><h1>Security headers</h1><p>Review selected response protections without changing site behavior.</p></div></header><section class="amsec-overview"><h2>Server-side HEAD observation</h2><p>An optional anonymous HEAD request checks the configured homepage from this server. Its route and response may differ from a visitor’s browser GET, CDN, login, checkout or other pages. Header presence does not prove an effective policy, safe CSP, browser enforcement or compliance.</p><p>Public IPv4 and standard HTTP/HTTPS ports only. Requests use a validated pinned address, verified TLS, no cookies, proxy or redirects, and a five-second transfer timeout. DNS can take longer. Private, IPv6-only, unresolved, unsupported and non-HTML/error responses remain unknown. Hosts without cURL are unsupported. No hosted scanning service is used.</p><p>Header enforcement is unchanged. Review any policy rollout with the host administrator and test WooCommerce, forms, embeds and login first.</p></section>';
 		if ( ! empty( $state['invalid'] ) ) {
-			echo '<div class="notice notice-error"><p>Stored assessment is invalid. No response coverage can be established.</p></div></div>';
+			echo '<div class="notice inline notice-error"><p>Stored assessment is invalid. No response coverage can be established.</p></div></div>';
 			return;}
 		echo '<section class="amsec-file-scan"><h2>Assess the configured homepage</h2><form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '"><input type="hidden" name="action" value="amsec_headers_check"><input type="hidden" name="fingerprint" value="' . esc_attr( $fp ) . '">';
 		wp_nonce_field( 'amsec_headers_' . $fp );

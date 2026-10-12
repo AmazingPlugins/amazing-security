@@ -28,7 +28,10 @@ final class SuiteCycle {
 		return $data;
 	}
 
-	public function start( int $now ): bool {
+	public function start( int $now, string $stage = 'integrity' ): bool {
+		if ( ! in_array( $stage, array( 'integrity', 'files' ), true ) ) {
+			return false;
+		}
 		$raw = $this->options->get( self::OPTION );
 		if ( 'running' === $this->status( $now )['state'] ) {
 			return false;
@@ -36,7 +39,7 @@ final class SuiteCycle {
 		$next = $this->encode(
 			array(
 				'state'       => 'running',
-				'stage'       => 'integrity',
+				'stage'       => $stage,
 				'started_at'  => $now,
 				'updated_at'  => $now,
 				'attempts'    => 0,

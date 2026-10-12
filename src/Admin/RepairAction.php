@@ -43,6 +43,7 @@ final class RepairAction {
 	}
 
 	private function authorize( string $action ): string {
+		\AmazingPlugins\Security\Files\FileMods::requireAllowed();
 		if ( ! current_user_can( 'manage_options' ) || ! FixApprovalAction::cookieAuthenticated() ) {
 			wp_die( esc_html__( 'A current administrator session is required.', 'amazing-security' ), '', array( 'response' => 403 ) );
 		}

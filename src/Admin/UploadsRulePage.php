@@ -35,11 +35,11 @@ final class UploadsRulePage {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only result after the confirmed write.
 		$notice = isset( $_GET['amsec_uploads'] ) ? sanitize_key( wp_unslash( $_GET['amsec_uploads'] ) ) : '';
 		if ( 'added' === $notice ) {
-			echo '<div class="notice notice-success"><p>' . esc_html__( 'The Apache rule was added. Ask the host whether this server reads it.', 'amazing-security' ) . '</p></div>';
+			echo '<div class="notice inline notice-success"><p>' . esc_html__( 'The Apache rule was added. Ask the host whether this server reads it.', 'amazing-security' ) . '</p></div>';
 		} elseif ( 'present' === $notice ) {
-			echo '<div class="notice notice-info"><p>' . esc_html__( 'A rule was already present. Nothing was written.', 'amazing-security' ) . '</p></div>';
+			echo '<div class="notice inline notice-info"><p>' . esc_html__( 'A rule was already present. Nothing was written.', 'amazing-security' ) . '</p></div>';
 		} elseif ( 'failed' === $notice ) {
-			echo '<div class="notice notice-error"><p>' . esc_html__( 'The rule could not be written. Ask the host to add it.', 'amazing-security' ) . '</p></div>';
+			echo '<div class="notice inline notice-error"><p>' . esc_html__( 'The rule could not be written. Ask the host to add it.', 'amazing-security' ) . '</p></div>';
 		}
 		echo '<pre>' . esc_html( UploadsRule::snippet() ) . '</pre>';
 		if ( ! is_ssl() ) {
@@ -126,15 +126,6 @@ final class UploadsRulePage {
 	}
 
 	private function write( string $path, string $contents ): bool {
-		if ( strlen( $contents ) > 65536 || is_link( $path ) ) {
-			return false;
-		}
-		$dir = dirname( $path );
-		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_is_writable -- Confirmed write is limited to the uploads directory.
-		if ( is_link( $dir ) || ! is_dir( $dir ) || ! is_writable( $dir ) ) {
-			return false;
-		}
-		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents -- Confirmed Apache rule in the uploads folder only.
-		return false !== file_put_contents( $path, $contents, LOCK_EX );
+		return \AmazingPlugins\Security\Files\AtomicWrite::write( $path, $contents );
 	}
 }

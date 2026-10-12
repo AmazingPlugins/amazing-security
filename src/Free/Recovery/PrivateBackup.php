@@ -60,6 +60,7 @@ final class PrivateBackup {
 			return array(
 				'removed'  => true,
 				'backedUp' => true,
+				'path'     => $path,
 			);
 		}
 		clearstatcache( true, $source );
@@ -106,7 +107,10 @@ final class PrivateBackup {
 			return null;
 		}
 		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen -- Exclusive create for a private backup outside the site.
+		$previousMask = umask( 0077 );
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen -- Exclusive create for a private backup outside the site.
 		$handle = fopen( $path, 'xb' );
+		umask( $previousMask );
 		if ( false === $handle ) {
 			return null;
 		}

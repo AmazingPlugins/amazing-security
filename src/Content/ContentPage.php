@@ -10,7 +10,7 @@ final class ContentPage {
 			'admin_enqueue_scripts',
 			static function ( string $current ) use ( $hook ): void {
 				if ( $current === $hook ) {
-					wp_enqueue_style( 'amazing-security-admin', plugins_url( 'assets/admin.css', AMAZING_SECURITY_FILE ), array(), '0.1.0' );
+					wp_enqueue_style( 'amazing-security-admin', plugins_url( 'assets/admin.css', AMAZING_SECURITY_FILE ), array(), AMAZING_SECURITY_VERSION );
 				} }
 		);
 	}
@@ -31,7 +31,7 @@ final class ContentPage {
 		}
 		echo '</header><section class="amsec-overview"><h2>Coverage</h2><p>Published, non-password-protected posts/pages and approved native comments only. Private/draft content, custom post types, products/reviews, order/customer records and other database tables are excluded. Links are not contacted or checked against a reputation service. A match can be legitimate and needs review.</p><p>Each step processes up to 50 items, with a five-second work target. A run stops at 1,000 items, 16 MiB read or 30 seconds of work. Items over 128 KiB are skipped; at most 250 findings are retained. Slow database responses can take longer. Items added after a scan starts are checked on the next scan. Content can change while scanning, and later edits can be missed. No stored content is rendered here or changed.</p></section>';
 		if ( ! empty( $state['invalid'] ) ) {
-			echo '<div class="notice notice-error"><p>Scan state is unavailable or invalid. No coverage can be established. Ask the host administrator to review the local scan state before restarting.</p></div></div>';
+			echo '<div class="notice inline notice-error"><p>Scan state is unavailable or invalid. No coverage can be established. Ask the host administrator to review the local scan state before restarting.</p></div></div>';
 			return;
 		}
 		if ( ! is_array( $active ) ) {

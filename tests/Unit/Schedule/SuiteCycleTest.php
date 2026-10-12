@@ -25,6 +25,15 @@ final class SuiteCycleTest extends TestCase {
 		self::assertSame( 'complete', $cycle->status( 1004 )['state'] );
 	}
 
+	public function test_cycle_can_start_at_the_file_stage_and_refuses_an_unknown_stage(): void {
+		$cycle = new SuiteCycle( $this->options() );
+		self::assertFalse( $cycle->start( 1000, 'vulnerabilities' ) );
+		self::assertTrue( $cycle->start( 1000, 'files' ) );
+		self::assertSame( 'files', $cycle->status( 1000 )['stage'] );
+		self::assertFalse( $cycle->allows( 'integrity', 1001 ) );
+		self::assertTrue( $cycle->allows( 'files', 1001 ) );
+	}
+
 	public function test_a_coverage_gap_keeps_the_file_stage_and_ends_partial(): void {
 		$cycle = new SuiteCycle( $this->options() );
 		self::assertTrue( $cycle->start( 1000 ) );

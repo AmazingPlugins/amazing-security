@@ -31,7 +31,7 @@ final class LoginProtectionRenderer {
 		$html .= '</select><p class="description">Blocking requires an explicit choice. Turn it off here or with WP-CLI if you are locked out.</p>';
 		$html .= '<label class="amsec-check"><input type="checkbox" name="xmlrpc_disabled" value="1"' . ( $view->xmlRpcDisabled ? ' checked' : '' ) . '> Disable authenticated XML-RPC methods</label>';
 		$html .= '<p class="description">May affect Jetpack or mobile publishing. Pingbacks and other unauthenticated methods remain available.</p>';
-		$html .= '<label class="amsec-check"><input type="checkbox" name="erase_on_uninstall" value="1"' . ( $view->eraseOnUninstall ? ' checked' : '' ) . '> Erase login protection data on uninstall</label>';
+		$html .= '<label class="amsec-check"><input type="checkbox" name="erase_on_uninstall" value="1"' . ( $view->eraseOnUninstall ? ' checked' : '' ) . '> Erase all Amazing Security data on uninstall</label>';
 		$html .= '<p><button class="button button-primary" type="submit">Save login settings</button></p></form></div>';
 		$html .= '<div class="amsec-login-panel"><h3>Authenticator and passkeys</h3><p>Account: <strong>' . esc_html( $view->username ) . '</strong></p>';
 		$html .= '<p>Check status under Log In &amp; Register. Amazing Security does not enroll devices or store backup codes. Use a dedicated plugin such as Two Factor when you want app codes or passkeys.</p>';

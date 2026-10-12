@@ -37,7 +37,16 @@ final class WordPressPluginRepair {
 			return null;
 		}
 		$key = $this->receiptOption( $preview->candidate->findingId );
-		if ( ! ( new WordPressOptions() )->add( $key, wp_json_encode( array( 'status' => 'pending' ) ) ) ) {
+		$this->clearStalePending( $key );
+		if ( ! ( new WordPressOptions() )->add(
+			$key,
+			wp_json_encode(
+				array(
+					'status' => 'pending',
+					'at'     => time(),
+				)
+			)
+		) ) {
 			return null;
 		}
 		$atomic = new AtomicPluginRepair( $preview->root, $backupRoot, beforeReplace: fn( RepairReceipt $receipt ): bool => $this->saveReceipt( $key, $preview, $receipt, 'prepared' ) );
@@ -199,6 +208,19 @@ final class WordPressPluginRepair {
 		}
 		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_is_writable -- Direct filesystem is required for atomic repair.
 		return ! is_link( $path ) && is_dir( $path ) && is_writable( $path ) ? $path : null;
+	}
+
+	/** A request that died before saving its receipt leaves a pending row that would block every later repair of that finding. */
+	private function clearStalePending( string $key ): void {
+		$raw = get_option( $key, null );
+		if ( ! is_string( $raw ) ) {
+			return;
+		}
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.json_encode_json_decode -- Own receipt row.
+		$data = json_decode( $raw, true );
+		if ( is_array( $data ) && 'pending' === ( $data['status'] ?? null ) && time() - (int) ( $data['at'] ?? 0 ) > 600 ) {
+			delete_option( $key );
+		}
 	}
 
 	private function receiptOption( string $findingId ): string {

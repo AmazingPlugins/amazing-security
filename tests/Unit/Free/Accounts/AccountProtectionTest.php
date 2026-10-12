@@ -17,6 +17,12 @@ use PHPUnit\Framework\TestCase;
  * Decision tests. They do not bootstrap WordPress or call the breach-list network.
  */
 final class AccountProtectionTest extends TestCase {
+	public function test_last_seen_is_only_rewritten_after_a_minute(): void {
+		self::assertTrue( IdleLogout::shouldStamp( null, 1_000 ) );
+		self::assertFalse( IdleLogout::shouldStamp( 1_000, 1_059 ) );
+		self::assertTrue( IdleLogout::shouldStamp( 1_000, 1_060 ) );
+	}
+
 	public function test_unknown_sign_in_choices_are_ignored(): void {
 		self::assertSame( 'off', LoginExtras::rate( 'off' ) );
 		self::assertSame( 'observe', LoginExtras::rate( 'observe' ) );
