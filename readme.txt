@@ -37,12 +37,13 @@ The Scan screen sorts every check into Success, Error, Critical, Warning or Reco
 **Reviewing and fixing**
 
 * If a finished check finds a changed WordPress.org plugin file, an administrator can review a repair. The page shows the file path and SHA-256 hashes before approval, and repair stops if anything no longer matches. The previous file is kept so you can roll back in wp-admin or with `wp amazing-security repair rollback <finding-id>`.
-* A Recovery page (administrator, HTTPS, nonce) can set content, uploads, plugin and theme folders to 0755, download the prefixed database tables as SQL, replace one core, admin or theme file when the SHA-256 you enter matches the bytes you upload, and move one unexpected file out of uploads, themes or plugins after you type DELETE. The moved file is copied to a private backup first and the page shows where it went. This plugin's own files can't be removed this way.
+* A Recovery page (administrator, HTTPS, nonce) can download the prefixed database tables as SQL and move one unexpected file out of uploads, themes or plugins after you type DELETE. The file goes to a private backup first and the page shows where. This plugin's own files can't be removed this way.
+* Every action that changes files, including plugin repair and moving a file, refuses to run when your site sets DISALLOW_FILE_MODS.
 * Activity log, session manager, incident panel for administrator accounts, weekly digest and finding emails are available and off until you turn them on.
 
 **Scheduled work**
 
-WP-Cron runs the local hardening checks daily and then queues bounded integrity and file scan steps. This daily cycle contacts WordPress.org to compare release files (see External services). WP-Cron needs site traffic, so a quiet site may run late. The dashboard shows when daily checks were missed or incomplete.
+WP-Cron runs the local hardening checks daily and then queues a bounded file scan. The daily comparison of release files with WordPress.org is off until an administrator ticks "Compare release files with WordPress.org every day" under Daily checks. You can run a release comparison by hand at any time. WP-Cron needs site traffic, so a quiet site may run late. The dashboard shows when daily checks were missed or incomplete.
 
 **The REST request watch** only records matches. It checks public REST query values and five levels of the request body for seven patterns, including six layers of URL encoding. Values aren't stored and nothing is blocked. A seventh encoding layer and a sixth nested level are still missed. Set `AMSEC_DISABLE_FIREWALL` to `true` in `wp-config.php` to stop it.
 
@@ -56,7 +57,7 @@ Run `wp amazing-security login disable` from the site's WP-CLI environment to tu
 
 Amazing Security talks to outside services only in the cases below. Nothing is sent to AmazingPlugins. File contents, page content and passwords are never sent.
 
-* **WordPress.org** (api.wordpress.org and downloads.wordpress.org). Used for the release file comparison, including the daily scheduled cycle and any scan you start, and for plugin repair downloads you approve. Sends the WordPress version, the plugin and theme slugs and versions being checked, and your server's IP address as part of the request. Terms: https://wordpress.org/about/privacy/
+* **WordPress.org** (api.wordpress.org and downloads.wordpress.org). Used for the release file comparison when you start one or turn on the daily comparison, and for plugin repair downloads you approve. Sends the WordPress version, the plugin and theme slugs and versions being checked, and your server's IP address as part of the request. Terms: https://wordpress.org/about/privacy/
 * **WPVulnerability** (www.wpvulnerability.net). Off until an administrator turns on vulnerability checks. Sends the WordPress core version and installed plugin and theme slugs. The provider sees your server's IP address. Privacy: https://www.wpvulnerability.com/privacy/ License: https://www.wpvulnerability.com/license/ Data is credited to WPVulnerability and linked to its original sources.
 * **Plugin directory status** (api.wordpress.org/plugins/info). Off until an administrator consents. Sends the slugs of installed plugins.
 * **Have I Been Pwned** (api.pwnedpasswords.com). Off until an administrator turns on the common-password check. When a password is set or an administrator signs in, only the first five characters of its SHA-1 hash are sent, so the password is never shared. The reply is cached for an hour. Privacy: https://haveibeenpwned.com/Privacy
@@ -82,11 +83,11 @@ No. A pass means that one check didn't find the thing it looks for. Run the chec
 
 = Does this plugin send my pages to someone else? =
 
-No. File contents, pages and passwords are never sent. The release file comparison, including the daily scheduled one, contacts WordPress.org. Vulnerability lookups contact WPVulnerability only after you turn them on. See External services for the full list.
+No. File contents, pages and passwords are never sent. The release file comparison contacts WordPress.org only when you start it or turn on the daily comparison. Vulnerability lookups contact WPVulnerability only after you turn them on. See External services for the full list.
 
 = What stays off after activation? =
 
-Login blocking, the sign-in confirmation, the common-password check, idle logout, registration approval, XML-RPC blocking, bot controls, hotlink protection, live traffic history, vulnerability lookups, assistant access and email alerts all stay off until you turn them on.
+Login blocking, the sign-in confirmation, the common-password check, idle logout, registration approval, XML-RPC blocking, bot controls, hotlink protection, live traffic history, the daily release file comparison, vulnerability lookups, assistant access and email alerts all stay off until you turn them on.
 
 = Does it change the login screen? =
 
