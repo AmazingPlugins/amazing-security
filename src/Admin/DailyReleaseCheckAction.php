@@ -14,7 +14,7 @@ final class DailyReleaseCheckAction {
 		check_admin_referer( 'amsec_daily_release_check' );
 		// Nonce verified above.
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing
-		$value = isset( $_POST['enabled'] ) && is_string( $_POST['enabled'] ) ? wp_unslash( $_POST['enabled'] ) : '';
+		$value = isset( $_POST['enabled'] ) && is_string( $_POST['enabled'] ) ? sanitize_text_field( wp_unslash( $_POST['enabled'] ) ) : '';
 		if ( ! in_array( $value, array( '0', '1' ), true ) ) {
 			wp_die( esc_html__( 'The setting could not be saved.', 'amazing-security' ), '', array( 'response' => 400 ) );
 		}
