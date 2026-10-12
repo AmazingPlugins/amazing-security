@@ -16,7 +16,8 @@ final class CommonPasswordHooks {
 		$this->breached = Closure::fromCallable( $breached ?? array( BreachedPasswords::class, 'listed' ) );
 	}
 
-	public function profile( \WP_Error $errors, bool $update, \WP_User $user ): void {
+	/** WordPress passes a plain object here when it saves a profile, so the user argument is not typed as WP_User. */
+	public function profile( \WP_Error $errors, bool $update, object $user ): void {
 		unset( $update, $user );
 		$this->reject( $errors, $this->posted( 'pass1' ) );
 	}
