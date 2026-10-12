@@ -66,7 +66,7 @@ final class Page {
 		$notice    = $this->notice();
 		echo '<div class="wrap amazing-security-admin">';
 		if ( '' !== $notice ) {
-			echo '<div class="notice notice-info"><p>' . esc_html( $notice ) . '</p></div>';
+			echo '<div class="notice inline notice-info"><p>' . esc_html( $notice ) . '</p></div>';
 		}
 		ScreenTabs::bar(
 			array(

@@ -37,7 +37,7 @@ final class AdminPage {
 		echo '<div class="wrap amazing-security-admin amsec-scan amsec-scan-first"><div class="amsec-stage">';
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only notice after a failed scan redirect.
 		if ( isset( $_GET['amazing_security_error'] ) ) {
-			echo '<div class="notice notice-error" data-amsec-scan-error><p>' . esc_html__( 'Scan could not be saved.', 'amazing-security' ) . '</p></div>';
+			echo '<div class="notice inline notice-error" data-amsec-scan-error><p>' . esc_html__( 'Scan could not be saved.', 'amazing-security' ) . '</p></div>';
 		}
 		echo '<p class="amsec-scan-empty">' . esc_html__( 'No scan has been saved yet.', 'amazing-security' ) . '</p>';
 		$this->scanForm( false, __( 'Scan', 'amazing-security' ) );
@@ -154,7 +154,7 @@ final class AdminPage {
 		// These flags select a static message only.
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		if ( isset( $_GET['amazing_security_error'] ) ) {
-			echo '<div class="notice notice-error"><p>' . esc_html__( 'Scan could not be saved. The previous report is still shown.', 'amazing-security' ) . '</p></div>';
+			echo '<div class="notice inline notice-error"><p>' . esc_html__( 'Scan could not be saved. The previous report is still shown.', 'amazing-security' ) . '</p></div>';
 		}
 		$category = $this->requestedCategory( $run->results );
 		$this->categoryNav( $category );

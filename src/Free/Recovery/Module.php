@@ -27,7 +27,7 @@ final class Module {
 		echo '<p>' . esc_html__( 'These tools write only after you submit a form. A finished repair does not mean the site is clean.', 'amazing-security' ) . '</p>';
 		self::notice();
 		if ( ! $https ) {
-			echo '<div class="notice notice-error"><p>' . esc_html( ( new Approval( false, true, true ) )->denial() ?? '' ) . '</p></div>';
+			echo '<div class="notice inline notice-error"><p>' . esc_html( ( new Approval( false, true, true ) )->denial() ?? '' ) . '</p></div>';
 		}
 		self::renderModes( $https );
 		if ( $https ) {
@@ -151,7 +151,7 @@ final class Module {
 			'delete' => __( 'The file was moved out of the site into a private temp backup.', 'amazing-security' ),
 		);
 		if ( isset( $messages[ $code ] ) ) {
-			echo '<div class="notice notice-success"><p>' . esc_html( $messages[ $code ] ) . '</p></div>';
+			echo '<div class="notice inline notice-success"><p>' . esc_html( $messages[ $code ] ) . '</p></div>';
 		}
 	}
 

@@ -20,7 +20,7 @@ final class ExposurePage {
 		$state = ( new WordPressExposureService() )->create()->status();
 		echo '<div class="wrap amazing-security-admin"><header class="amsec-header"><div><h1>Local exposure inventory</h1><p>Review selected filenames that may need a host access-policy check.</p></div></header><section class="amsec-overview"><h2>Local evidence only</h2><p>This inventory uses filenames and filesystem metadata. Candidate contents are not opened, read, executed or changed. No HTTP request is made to establish public reachability. A log, archive or backup-like filename can be legitimate; it does not prove sensitive contents, public exposure or a vulnerability.</p><p>WordPress and content roots cover top-level entries only. Uploads descends at most three directory levels; plugin/theme/core subtrees and remote storage are outside this slice. Each fresh inventory stops at 1,500 entries, 50 directories, 100 candidates or a five-second work target. Slow filesystem calls may take longer. Limits, depth exclusions and unreadable/changing entries are partial or unknown. Repeating starts fresh; there is no resume cursor. Files and configured roots can change after capture, so stored paths are historical evidence.</p></section>';
 		if ( ! empty( $state['invalid'] ) ) {
-			echo '<div class="notice notice-error"><p>Stored inventory state is invalid. No coverage can be established; ask the host administrator to review it.</p></div></div>';
+			echo '<div class="notice inline notice-error"><p>Stored inventory state is invalid. No coverage can be established; ask the host administrator to review it.</p></div></div>';
 			return;}
 		foreach ( array(
 			'site'    => 'WordPress root: top level',

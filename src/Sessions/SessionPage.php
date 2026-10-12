@@ -48,7 +48,7 @@ final class SessionPage {
 		try {
 			$rows = $this->rows( $id );
 		} catch ( \Throwable ) {
-			echo '<div class="wrap amazing-security-admin"><div class="notice notice-error"><p>Session information is unavailable.</p></div></div>';
+			echo '<div class="wrap amazing-security-admin"><div class="notice inline notice-error"><p>Session information is unavailable.</p></div></div>';
 			return;
 		}
 		if ( $this->wantsDetail() ) {

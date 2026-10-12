@@ -47,7 +47,7 @@ final class FollowUpPages {
 	private function notice( string $flag, string $message ): void {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only notice after a failed redirect.
 		if ( isset( $_GET[ $flag ] ) ) {
-			echo '<div class="notice notice-error"><p>' . esc_html( $message ) . '</p></div>';
+			echo '<div class="notice inline notice-error"><p>' . esc_html( $message ) . '</p></div>';
 		}
 	}
 }
