@@ -40,6 +40,8 @@ final class Module {
 		}
 		if ( 'logout' === $decision ) {
 			self::endSession( $user_id );
+		} elseif ( ! IdleLogout::shouldStamp( $seen, $now ) ) {
+			return;
 		}
 		update_user_meta( $user_id, IdleLogout::META, (string) $now );
 	}
