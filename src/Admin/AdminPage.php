@@ -218,6 +218,8 @@ final class AdminPage {
 			echo ( new ScheduleStatusRenderer() )->render( ( new LocalSchedule( $options ) )->status( time() ) );
 			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			echo ( new ScheduleStatusRenderer() )->renderSuite( ( new SuiteCycle( $options ) )->status( time() ) );
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- ScheduleStatusRenderer escapes dynamic values.
+			echo ( new ScheduleStatusRenderer() )->renderReleaseToggle( \AmazingPlugins\Security\Schedule\DailyReleaseCheck::enabled(), admin_url( 'admin-post.php' ), wp_create_nonce( 'amsec_daily_release_check' ) );
 			return;
 		}
 		if ( 'alerts' === $section ) {

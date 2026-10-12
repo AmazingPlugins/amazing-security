@@ -113,8 +113,9 @@ add_action(
 		$schedule = new AmazingPlugins\Security\Schedule\LocalSchedule( $options );
 		$success  = $schedule->tick( time() );
 		$cycle    = new AmazingPlugins\Security\Schedule\SuiteCycle( $options );
-		if ( $success && 'complete' === $schedule->status( time() )['state'] && $cycle->start( time() ) ) {
-			wp_schedule_single_event( time() + 60, 'amsec_integrity_tick' );
+		$release  = AmazingPlugins\Security\Schedule\DailyReleaseCheck::enabled();
+		if ( $success && 'complete' === $schedule->status( time() )['state'] && $cycle->start( time(), AmazingPlugins\Security\Schedule\DailyReleaseCheck::firstStage( $release ) ) ) {
+			wp_schedule_single_event( time() + 60, AmazingPlugins\Security\Schedule\DailyReleaseCheck::firstHook( $release ) );
 		}
 	}
 );
@@ -194,6 +195,7 @@ add_action( 'plugins_loaded', array( AmazingPlugins\Security\Free\FreeSuite::cla
 add_action( 'admin_menu', array( new AmazingPlugins\Security\Admin\AdminPage(), 'register' ) );
 add_action( 'admin_menu', array( new AmazingPlugins\Security\Admin\FixReviewPage(), 'register' ) );
 add_action( 'admin_menu', array( new AmazingPlugins\Security\Admin\RepairPage(), 'register' ) );
+add_action( 'admin_post_amsec_daily_release_check', array( new AmazingPlugins\Security\Admin\DailyReleaseCheckAction(), 'save' ) );
 add_action( 'admin_post_amsec_findings_report', array( new AmazingPlugins\Security\Admin\FindingsReportAction(), 'handle' ) );
 add_action( 'admin_post_amsec_approved_setting', array( new AmazingPlugins\Security\Admin\ApprovedSettingAction(), 'handle' ) );
 add_action( 'admin_post_amsec_fix_approve', array( new AmazingPlugins\Security\Admin\FixApprovalAction(), 'handle' ) );
