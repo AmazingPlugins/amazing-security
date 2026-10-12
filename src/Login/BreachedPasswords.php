@@ -35,19 +35,29 @@ final class BreachedPasswords {
 		if ( 1 !== preg_match( '/^[A-F0-9]{5}$/D', $prefix ) ) {
 			return false;
 		}
-		$response = wp_remote_get(
-			'https://api.pwnedpasswords.com/range/' . $prefix,
-			array(
-				'timeout'     => 2,
-				'redirection' => 0,
-				'user-agent'  => 'Amazing-Security',
-				'headers'     => array( 'Add-Padding' => 'true' ),
-			)
-		);
-		if ( is_wp_error( $response ) || 200 !== wp_remote_retrieve_response_code( $response ) ) {
-			return false;
+		// Only the 5-character prefix is sent. The same prefix answers many passwords, so keep the reply for an hour.
+		$cacheKey = 'amsec_hibp_' . $prefix;
+		$body     = get_transient( $cacheKey );
+		if ( ! is_string( $body ) ) {
+			$response = wp_remote_get(
+				'https://api.pwnedpasswords.com/range/' . $prefix,
+				array(
+					'timeout'             => 2,
+					'redirection'         => 0,
+					'limit_response_size' => 1048576,
+					'user-agent'          => 'Amazing-Security',
+					'headers'             => array( 'Add-Padding' => 'true' ),
+				)
+			);
+			if ( is_wp_error( $response ) || 200 !== wp_remote_retrieve_response_code( $response ) ) {
+				return false;
+			}
+			$body = wp_remote_retrieve_body( $response );
+			if ( ! is_string( $body ) || strlen( $body ) > 1048576 ) {
+				return false;
+			}
+			set_transient( $cacheKey, $body, HOUR_IN_SECONDS );
 		}
-		$body = wp_remote_retrieve_body( $response );
-		return is_string( $body ) && strlen( $body ) <= 1048576 && self::matchesSuffix( substr( $hash, 5 ), $body );
+		return self::matchesSuffix( substr( $hash, 5 ), $body );
 	}
 }
