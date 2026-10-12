@@ -8,47 +8,71 @@ Stable tag: 0.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-WordPress hardening checks, release file checks, opt-in vulnerability lookups, and local login protection.
+WordPress hardening checks, release file checks, opt-in vulnerability lookups and local login protection. Most protections start off.
 
 == Description ==
 
-The first list is six checks: HTTPS, WordPress updates, the admin login, debug display, the theme and plugin editor, and login monitoring. More checks follow on the same screen. An administrator can also compare WordPress core and eligible WordPress.org plugin files with published checksums. Eligible WordPress.org themes are compared with their exact release ZIP. These checks contact api.wordpress.org and downloads.wordpress.org. They don't send file contents.
+Amazing Security looks at your WordPress site, tells you what it found in plain words, and lets you decide what to change. It reports first. Nothing that changes how visitors or administrators sign in is on after you activate it.
 
-A changed checksum means a file differs from the published release. It doesn't identify malware. Missing or unsupported packages show an unknown or partial result. A custom or child theme stays unknown for release comparison. The integrity scan reads a bounded number of files per request and asks you to continue when more work remains.
+**What you see**
 
-Run local checks also starts three scans that stay on this server. It reads plugin, theme, and uploads PHP with the 43 local patterns. It lists selected public file names. It checks posts and comments for suspicious links, one bounded batch at a time. They don't contact WordPress.org. One click keeps reading until the scan finishes or about 12 seconds pass, and the row says how many files were read. A match lists the file, the line, and the rule. If a scan still has work left, run local checks again. A finished pattern scan with no hits doesn't prove the site is clean. The homepage header check stays off until you tick "Request this site's homepage and read its response headers" on that same form.
+The Scan screen sorts every check into Success, Error, Critical, Warning or Recommended, with the reason and a next step. A pass means one check didn't find the thing it looks for. It doesn't mean the site is clean.
 
-The separate file scan looks for extra files in compared packages. It also reads PHP-like files in plugins, themes, and uploads with 43 local patterns. It can follow six copied assignments, three copies before create_function, and a preg_replace /e pattern held in two variables. A seventh assignment, a fourth create_function copy, and a third variable are still missed. Each finding says why it needs a look and what to open next. It scans only unexpected executable files under core directories. A hit is suspected code. It isn't proof of malware. A scan without hits doesn't prove the site is clean. The rules update with plugin releases. This preview has no maintained malware feed. Files stay on your server. The scan stops after 5,000 files, 128 MiB read, or 30 seconds of work, and may need several steps. Unreadable, oversized, changed, or skipped files show partial coverage. A conservative memory check can leave large or dense PHP files unscanned instead of exhausting the site's memory. You can save a note on a finding. Notes don't hide it from later scans.
+**Checks that read your site**
 
-If a finished integrity check finds a changed WordPress.org plugin file, an administrator can review a repair. The page shows the file path and SHA-256 hashes before approval. Repair stops if the installed version, file, published checksum, or approved replacement no longer matches.
+* Hardening: HTTPS, WordPress updates, the admin login, debug display, the theme and plugin editor, login monitoring, file permissions and more.
+* Release file comparison: WordPress core, eligible WordPress.org plugins and eligible WordPress.org themes are compared with the published release. A changed file differs from the release. It isn't proof of malware. Custom and child themes stay unknown.
+* Suspicious file review: PHP-like files in plugins, themes and uploads are read with 43 local patterns. A match is suspected code, and a scan with no matches doesn't prove the site is clean. There is no maintained malware feed, and the rules update with plugin releases. The scan stops after 5,000 files, 128 MiB read or 30 seconds, and it says when coverage is partial. It can follow six copied assignments, three copies before create_function, and a preg_replace /e pattern held in two variables. A seventh assignment, a fourth create_function copy and a third variable are still missed.
+* Published content review: posts and comments are checked locally for suspicious links and hidden frames.
+* Local inventory of selected public file names, security headers for your homepage (only if you tick the box), and plugin directory status (only after you consent).
 
-The plugin keeps a private backup outside the served site. You can roll back in wp-admin or run `wp amazing-security repair rollback <finding-id>`. Other files remain review-only. This doesn't remove malware or repair a whole plugin.
+**Protections you can turn on**
 
-WP-Cron starts the local hardening checks daily, then queues bounded integrity and file scan steps. You can still run them yourself. WP-Cron needs site traffic, so a quiet site may run them late. The dashboard shows when daily hardening was missed or incomplete and keeps partial scan results visible. Completed integrity and file scans can email the site administrator about changed published files or selected suspicious PHP matches. When vulnerability checks are on, confirmed high and critical findings can also send an alert. Severity comes from a valid provider CVSS score. Missing scores stay unknown. Partial checks keep earlier alert history until a complete check resolves it. The message contains finding IDs and a dashboard link, not file contents. You can turn these emails off in wp-admin. "Accepted for sending" doesn't prove the message reached an inbox.
+* Login limiting: watch failed logins first, then optionally block a server address for 15 minutes after five failures in 15 minutes. The plugin uses the server connection address, not forwarded headers. Shared networks can affect more than one visitor.
+* Sign-in extras: a confirmation checkbox, a two-number question, an email code, idle logout, administrator approval for new registrations, password rules, and a common-password check.
+* XML-RPC: block methods that need a login. This doesn't turn off pingbacks. Check Jetpack or mobile publishing first.
+* Bot controls for the comment form and registration, hotlink protection for uploads, and manual address rules.
+* Two-factor and passkeys: the plugin tells you whether an authenticator or passkey plugin is active and suggests Two Factor. It doesn't enroll codes or passkeys.
 
-The REST request watch only records matches. It checks public REST query values and five levels of the request body for seven patterns, including six layers of URL encoding. Values aren't stored. A seventh encoding layer and a sixth nested level are still missed. It doesn't block requests. Set `AMSEC_DISABLE_FIREWALL` to `true` in `wp-config.php` to stop it.
+**Reviewing and fixing**
 
-Vulnerability checks stay off until an administrator turns them on. When they're on, this site asks the public WPVulnerability API for its WordPress core version and installed plugin and theme slugs. Requests go directly from your server to https://www.wpvulnerability.net/. The provider can see the request IP and the component you asked about. AmazingPlugins doesn't receive your inventory. The plugin stores responses and reports them locally. You can turn off future lookups in wp-admin. Older reports stay until you clear them. See the provider's privacy policy at https://www.wpvulnerability.com/privacy/ and license at https://www.wpvulnerability.com/license/. Data is credited to WPVulnerability and linked to its original sources.
+* If a finished check finds a changed WordPress.org plugin file, an administrator can review a repair. The page shows the file path and SHA-256 hashes before approval, and repair stops if anything no longer matches. The previous file is kept so you can roll back in wp-admin or with `wp amazing-security repair rollback <finding-id>`.
+* A Recovery page (administrator, HTTPS, nonce) can set content, uploads, plugin and theme folders to 0755, download the prefixed database tables as SQL, replace one core, admin or theme file when the SHA-256 you enter matches the bytes you upload, and move one unexpected file out of uploads, themes or plugins after you type DELETE. The moved file is copied to a private backup first and the page shows where it went. This plugin's own files can't be removed this way.
+* Activity log, session manager, incident panel for administrator accounts, weekly digest and finding emails are available and off until you turn them on.
 
-The lookup compares published issues with installed versions. Unknown package identity, unsupported ranges, stale data, and provider errors are marked unknown or possible affected. It doesn't update installed software, and it doesn't claim the site is vulnerability-free.
+**Scheduled work**
 
-Login protection is off when you install the plugin. You can watch failed logins first, then choose to block a server address after five failures in 15 minutes. The block lasts 15 minutes. Shared networks can affect more than one visitor. The plugin uses the server connection address, not forwarded headers, and ignores counter records after 24 hours. Expired records are deleted by WP-Cron or on the next failed login or dashboard view. WP-Cron needs site traffic to run. Turning protection off deletes the counters. If the counter store fails or reaches its 10,000-address limit, login attempts are allowed and the dashboard reports incomplete coverage. Password reset isn't blocked.
+WP-Cron runs the local hardening checks daily and then queues bounded integrity and file scan steps. This daily cycle contacts WordPress.org to compare release files (see External services). WP-Cron needs site traffic, so a quiet site may run late. The dashboard shows when daily checks were missed or incomplete.
 
-Administrators can enroll a TOTP authenticator over HTTPS. WordPress and WooCommerce login forms then ask that administrator for a six-digit code or one of ten single-use recovery codes after a valid password. Save the recovery codes when they appear. The plugin doesn't show them again. TOTP seeds are encrypted with site-specific key material, and recovery codes are stored as hashes. If site keys change, use a recovery code or the local WP-CLI command below. Customer accounts, application passwords, and XML-RPC requests are outside this TOTP rule. Custom interactive login forms that omit the code field deny enrolled administrators rather than skipping the check.
+**The REST request watch** only records matches. It checks public REST query values and five levels of the request body for seven patterns, including six layers of URL encoding. Values aren't stored and nothing is blocked. A seventh encoding layer and a sixth nested level are still missed. Set `AMSEC_DISABLE_FIREWALL` to `true` in `wp-config.php` to stop it.
 
-The XML-RPC setting blocks methods that require authentication. It doesn't turn off pingbacks or the whole XML-RPC endpoint. Check Jetpack or mobile publishing before you turn it on.
+**AI assistant access** starts off. On WordPress 6.9 or newer, install the official MCP Adapter separately, then turn on access in Amazing Security. An authenticated administrator can list findings, inspect one, run the local hardening checks and read that scan. Two more abilities can prepare a login-rate change and read its status. Each call checks the current user's permission. A proposal changes nothing until an administrator approves the exact setting in wp-admin with a cookie session and a nonce. Block mode also needs HTTPS and the administrator's current password. An applied change can be rolled back for 24 hours.
 
-If you lose admin access, run `wp amazing-security login disable` from the site's WP-CLI environment. To remove one administrator's TOTP requirement, run `wp amazing-security totp disable --user=<id>`. These commands act locally. They don't need an AmazingPlugins account. The plugin keeps login settings and enrollment data on uninstall unless you select **Erase login protection data on uninstall** first.
+**If you lose access**
 
-AI assistant access starts off. On WordPress 6.9 or newer, install the official MCP Adapter separately, then turn on access in Amazing Security. An authenticated administrator can list findings, inspect a finding, run the six local hardening checks, and read that scan. Two more abilities can prepare a login-rate change and read its status.
+Run `wp amazing-security login disable` from the site's WP-CLI environment to turn off login blocking and the XML-RPC restriction. If the sign-in question, confirmation, email code or common-password check stops you, turn it off with `wp option update amsec_login_challenge 0`, `amsec_login_confirm`, `amsec_email_factor` or `amsec_common_passwords` in the same way. Other commands turn off bot, network, proxy, traffic and REST-rate rules. These act locally and don't need an AmazingPlugins account.
 
-Each call checks the current WordPress user's permission and the site's MCP setting. Scan requests have a concurrency guard and a 60-second cooldown per administrator. They don't start file, integrity, or vulnerability scans. The MCP Adapter handles the connection and authentication; Amazing Security doesn't bundle a server. Turn access off in wp-admin to stop further calls.
+== External services ==
 
-An assistant can propose only two staged changes: off to observe, then observe to block. The proposal lasts 15 minutes and changes nothing by itself. Open its wp-admin link to review and approve the exact setting. Approval needs an administrator cookie session and a proposal-specific nonce. Block mode also needs HTTPS and the administrator's current password. A changed setting or a second approval is refused. After approval, the page offers a 24-hour rollback. Turning assistant access off stops pending approvals, but an already applied change can still be rolled back. The assistant can't start file repair. The plugin doesn't offer a general firewall or a maintained malware signature feed.
+Amazing Security talks to outside services only in the cases below. Nothing is sent to AmazingPlugins. File contents, page content and passwords are never sent.
+
+* **WordPress.org** (api.wordpress.org and downloads.wordpress.org). Used for the release file comparison, including the daily scheduled cycle and any scan you start, and for plugin repair downloads you approve. Sends the WordPress version, the plugin and theme slugs and versions being checked, and your server's IP address as part of the request. Terms: https://wordpress.org/about/privacy/
+* **WPVulnerability** (www.wpvulnerability.net). Off until an administrator turns on vulnerability checks. Sends the WordPress core version and installed plugin and theme slugs. The provider sees your server's IP address. Privacy: https://www.wpvulnerability.com/privacy/ License: https://www.wpvulnerability.com/license/ Data is credited to WPVulnerability and linked to its original sources.
+* **Plugin directory status** (api.wordpress.org/plugins/info). Off until an administrator consents. Sends the slugs of installed plugins.
+* **Have I Been Pwned** (api.pwnedpasswords.com). Off until an administrator turns on the common-password check. When a password is set or an administrator signs in, only the first five characters of its SHA-1 hash are sent, so the password is never shared. The reply is cached for an hour. Privacy: https://haveibeenpwned.com/Privacy
+* **Your own homepage.** If you tick the box on the local-checks form, the plugin requests your site's homepage once to read its security headers.
+
+== Data and uninstall ==
+
+The plugin stores its settings and scan results in options, and some features keep their own database tables: login counters, the activity log, bot counters, traffic history, repair proposals and audit records, and passkey status. Plugin repair keeps a backup of the replaced file in a private folder outside the served site.
+
+Deactivating stops scheduled work, resets any scan in progress and removes the hotlink rule this plugin may have added to the uploads .htaccess file. Settings and data stay.
+
+Deleting the plugin removes cached lookups and the same hotlink rule and keeps your settings and data unless you select **Erase all Amazing Security data on uninstall** on the Log In and Register screen before you delete it. With that box ticked, every Amazing Security option, user meta row and table is removed.
 
 == Installation ==
 
-Upload the plugin ZIP from Plugins, Add New, Upload Plugin. Activate it, then open Amazing Security. The first six checks stay in that order. Extra checks, emails, vulnerability lookups, and login rules stay off until an administrator turns them on.
+Upload the plugin ZIP from Plugins, Add New, Upload Plugin. Activate it, then open Amazing Security. The first six checks stay in order at the top. Extra checks, emails, vulnerability lookups and login rules stay off until an administrator turns them on.
 
 == Frequently Asked Questions ==
 
@@ -58,11 +82,19 @@ No. A pass means that one check didn't find the thing it looks for. Run the chec
 
 = Does this plugin send my pages to someone else? =
 
-Local checks stay on the server. The separate file and integrity scans contact WordPress.org only when you start them. Vulnerability lookups contact WPVulnerability only after you turn them on. The homepage header check runs only if you tick that box on the local-checks form.
+No. File contents, pages and passwords are never sent. The release file comparison, including the daily scheduled one, contacts WordPress.org. Vulnerability lookups contact WPVulnerability only after you turn them on. See External services for the full list.
 
 = What stays off after activation? =
 
-Login blocking, the sign-in confirmation, the common-password list, required verification, version-tag hiding, discovery-link hiding, and assistant access all stay off until you turn them on.
+Login blocking, the sign-in confirmation, the common-password check, idle logout, registration approval, XML-RPC blocking, bot controls, hotlink protection, live traffic history, vulnerability lookups, assistant access and email alerts all stay off until you turn them on.
+
+= Does it change the login screen? =
+
+Not until you turn something on. With nothing changed, the login, lost-password and registration pages and the login response are identical with or without the plugin.
+
+= Can it lock me out? =
+
+Login blocking is off by default and can be set to observe first. The email code, the sign-in question, the confirmation checkbox and the common-password check can stop a sign-in when they are on. See "If you lose access" above for the WP-CLI commands that turn each one off.
 
 == Changelog ==
 
