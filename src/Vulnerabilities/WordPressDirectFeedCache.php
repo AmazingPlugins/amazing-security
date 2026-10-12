@@ -13,7 +13,17 @@ final class WordPressDirectFeedCache implements DirectFeedCache {
 	}
 
 	public function put( string $key, string $body, int $fetchedAt ): void {
-		$name = $this->name( $key );
+		$name  = $this->name( $key );
+		$index = get_option( self::INDEX, array() );
+		$index = is_array( $index ) ? $index : array();
+		if ( ! in_array( $name, $index, true ) ) {
+			// Past the cap nothing new is cached, so "Clear reports" can always find everything that was stored.
+			if ( count( $index ) >= 250 ) {
+				return;
+			}
+			$index[] = $name;
+			update_option( self::INDEX, $index, false );
+		}
 		set_transient(
 			$name,
 			array(
@@ -22,12 +32,6 @@ final class WordPressDirectFeedCache implements DirectFeedCache {
 			),
 			DAY_IN_SECONDS
 		);
-		$index = get_option( self::INDEX, array() );
-		$index = is_array( $index ) ? $index : array();
-		if ( count( $index ) < 250 && ! in_array( $name, $index, true ) ) {
-			$index[] = $name;
-			update_option( self::INDEX, $index, false );
-		}
 	}
 
 	public function clear(): void {
@@ -38,6 +42,12 @@ final class WordPressDirectFeedCache implements DirectFeedCache {
 			}
 		}
 		delete_option( self::INDEX );
+		// Anything stored before the index existed or after it was lost.
+		global $wpdb;
+		$value   = $wpdb->esc_like( '_transient_amsec_vuln_' ) . '%';
+		$timeout = $wpdb->esc_like( '_transient_timeout_amsec_vuln_' ) . '%';
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Removes only this feature's cached responses.
+		$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->options} WHERE option_name LIKE %s OR option_name LIKE %s", $value, $timeout ) );
 	}
 
 	private function name( string $key ): string {
