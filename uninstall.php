@@ -6,6 +6,15 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) || ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+require_once __DIR__ . '/src/Free/TrafficGuard/HotlinkRule.php';
+require_once __DIR__ . '/src/Lifecycle/Cleanup.php';
+
+// Always: stop scheduled work, drop cached lookups, and remove the uploads rule this plugin may have added.
+AmazingPlugins\Security\Lifecycle\Cleanup::clearCron();
+AmazingPlugins\Security\Lifecycle\Cleanup::resetScanCycle();
+AmazingPlugins\Security\Lifecycle\Cleanup::deleteTransients();
+AmazingPlugins\Security\Lifecycle\Cleanup::removeHotlinkBlock();
+
 if ( '1' !== get_option( 'amsec_login_erase_on_uninstall' ) ) {
 	return;
 }
@@ -127,3 +136,6 @@ $amsec_comment_rate         = $wpdb->esc_like( '_transient_amsec_cr_' ) . '%';
 $amsec_comment_rate_timeout = $wpdb->esc_like( '_transient_timeout_amsec_cr_' ) . '%';
 // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Explicit erase removes only the comment-minute transients.
 $wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->options} WHERE option_name LIKE %s OR option_name LIKE %s", $amsec_comment_rate, $amsec_comment_rate_timeout ) );
+
+// Anything the lists above missed: every option, user meta row and table this plugin created.
+AmazingPlugins\Security\Lifecycle\Cleanup::eraseAllData();

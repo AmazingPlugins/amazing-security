@@ -68,6 +68,8 @@ register_deactivation_hook(
 		wp_clear_scheduled_hook( 'amsec_activity_cleanup' );
 		( new AmazingPlugins\Security\Schedule\ScheduleHooks() )->clear();
 		( new AmazingPlugins\Security\Login\WordPressRateCounterStore( $GLOBALS['wpdb'] ) )->purge();
+		AmazingPlugins\Security\Lifecycle\Cleanup::resetScanCycle();
+		AmazingPlugins\Security\Lifecycle\Cleanup::removeHotlinkBlock();
 	}
 );
 add_action(

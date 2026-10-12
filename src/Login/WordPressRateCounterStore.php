@@ -76,6 +76,9 @@ final class WordPressRateCounterStore implements RateCounterStore {
 				if ( null === $exists ) {
 					// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Advisory lock keeps the count and insert in one admission section.
 					$count = $this->db->get_var( "SELECT COUNT(*) FROM {$this->table}" );
+					if ( null !== $count && (int) $count >= 10000 ) {
+						$count = $this->makeRoom( $now );
+					}
 					if ( $this->databaseFailed() || null === $count || (int) $count >= 10000 ) {
 						$this->markUnavailable();
 						return RateState::unavailable();
@@ -150,5 +153,23 @@ final class WordPressRateCounterStore implements RateCounterStore {
 		if ( function_exists( 'set_transient' ) ) {
 			set_transient( 'amsec_login_counter_fault', '1', 15 * MINUTE_IN_SECONDS );
 		}
+	}
+
+	/**
+	 * A full table must not switch the limiter off for a day. Rows whose window ended hold no information, so those go first.
+	 * If the table is still full, the oldest rows that are not blocked go next. Rows that block an address are kept.
+	 */
+	private function makeRoom( int $now ): ?int {
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Lossless: these windows already ended.
+		$this->db->query( $this->db->prepare( "DELETE FROM {$this->table} WHERE blocked_until <= %d AND window_started_at <= %d", $now, $now - 900 ) );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Count after the lossless purge.
+		$count = $this->db->get_var( "SELECT COUNT(*) FROM {$this->table}" );
+		if ( null !== $count && (int) $count >= 10000 ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Drop the oldest unblocked counters so new addresses can be tracked.
+			$this->db->query( $this->db->prepare( "DELETE FROM {$this->table} WHERE blocked_until <= %d ORDER BY updated_at ASC LIMIT 500", $now ) );
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Count after the oldest rows were dropped.
+			$count = $this->db->get_var( "SELECT COUNT(*) FROM {$this->table}" );
+		}
+		return null === $count ? null : (int) $count;
 	}
 }
