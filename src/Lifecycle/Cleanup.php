@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Lifecycle;
 
+use AmazingPlugins\Security\Files\AtomicWrite;
 use AmazingPlugins\Security\Free\TrafficGuard\HotlinkRule;
 
 /** Cleanup shared by deactivation and uninstall. Uses only WordPress core functions so uninstall.php can load it directly. */
@@ -53,8 +54,7 @@ final class Cleanup {
 			wp_delete_file( $path );
 			return;
 		}
-		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents -- Remove only the managed block.
-		file_put_contents( $path, $next, LOCK_EX );
+		AtomicWrite::write( $path, $next );
 	}
 
 	/** Cached lookups and short-lived counters. Safe to drop at any time. */

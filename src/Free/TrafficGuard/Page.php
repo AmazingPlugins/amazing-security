@@ -155,13 +155,13 @@ final class Page {
 			update_option( Options::LIVE, $live );
 			update_option( Options::HOTLINK, $hotlink );
 			Guard::syncLog( $live );
-			$this->syncHotlink( $hotlink );
+			$ruleWritten = $this->syncHotlink( $hotlink );
 		} catch ( \Throwable $exception ) {
 			if ( $exception instanceof \Throwable ) {
 				$this->redirect( 'save' );
 			}
 		}
-		$this->redirect( 'saved' );
+		$this->redirect( $ruleWritten ? 'saved' : 'rule' );
 	}
 
 	private function textarea( string $name, string $label, string $value ): void {
@@ -219,6 +219,7 @@ final class Page {
 			'prefix' => __( 'Referrer entries have to start with http:// or https://.', 'amazing-security' ),
 			'self'   => __( 'That list matches this request, so nothing was saved.', 'amazing-security' ),
 			'save'   => __( 'The traffic controls could not be saved.', 'amazing-security' ),
+			'rule'   => __( 'Settings were saved, but the uploads rule could not be written. Ask the host to add it.', 'amazing-security' ),
 		);
 		return $notes[ $status ] ?? '';
 	}
@@ -265,31 +266,32 @@ final class Page {
 		return '';
 	}
 
-	private function syncHotlink( string $flag ): void {
+	/** Returns false when the uploads rule could not be written. Other outcomes, including nothing to do, return true. */
+	private function syncHotlink( string $flag ): bool {
 		if ( ! defined( 'WP_CONTENT_DIR' ) ) {
-			return;
+			return true;
 		}
 		$dir = WP_CONTENT_DIR . '/uploads';
 		if ( ! is_dir( $dir ) ) {
-			return;
+			return true;
 		}
 		$path     = $dir . '/.htaccess';
 		$existing = is_file( $path ) ? $this->readFile( $path ) : '';
 		if ( null === $existing ) {
-			return;
+			return true;
 		}
 		$host = function_exists( 'home_url' ) ? wp_parse_url( home_url(), PHP_URL_HOST ) : '';
 		$next = HotlinkRule::apply( $existing, is_string( $host ) ? $host : '', '1' === $flag );
 		if ( $next === $existing ) {
-			return;
+			return true;
 		}
 		if ( '' === $next ) {
 			if ( is_file( $path ) ) {
 				wp_delete_file( $path );
 			}
-			return;
+			return true;
 		}
-		$this->writeFile( $path, $next );
+		return $this->writeFile( $path, $next );
 	}
 
 	private function readFile( string $path ): ?string {
@@ -298,9 +300,8 @@ final class Page {
 		return is_string( $contents ) ? $contents : null;
 	}
 
-	private function writeFile( string $path, string $contents ): void {
-		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents -- Confirmed local uploads rule.
-		file_put_contents( $path, $contents );
+	private function writeFile( string $path, string $contents ): bool {
+		return \AmazingPlugins\Security\Files\AtomicWrite::write( $path, $contents );
 	}
 
 	private function redirect( string $code ): void {

@@ -53,7 +53,9 @@ final class DatabaseDump {
 				)
 			);
 		}
-		$sql = "-- Amazing Security prefixed table dump\n-- This copy does not mean the site is clean.\n\n";
+		$header = "-- Amazing Security prefixed table dump\n-- This copy does not mean the site is clean.\n\n";
+		$parts  = array( $header );
+		$size   = strlen( $header );
 		foreach ( $names as $table ) {
 			$create = $this->source->createTable( $table );
 			if ( ! is_string( $create ) || ! $this->safeCreate( $create ) ) {
@@ -61,11 +63,9 @@ final class DatabaseDump {
 			}
 			$quoted = '`' . $table . '`';
 			$block  = 'DROP TABLE IF EXISTS ' . $quoted . ";\n" . rtrim( $create, " \t\r\n;" ) . ";\n";
-			$next   = $this->append( $sql, $block );
-			if ( null === $next ) {
+			if ( ! $this->append( $parts, $size, $block ) ) {
 				return $this->tooLarge();
 			}
-			$sql    = $next;
 			$offset = 0;
 			while ( $offset < 1000000 ) {
 				$rows = $this->source->rows( $table, 100, $offset );
@@ -77,11 +77,9 @@ final class DatabaseDump {
 					if ( null === $line ) {
 						return ChangeResult::failure( __( 'A table row could not be escaped. No SQL file was created.', 'amazing-security' ) );
 					}
-					$next = $this->append( $sql, $line );
-					if ( null === $next ) {
+					if ( ! $this->append( $parts, $size, $line ) ) {
 						return $this->tooLarge();
 					}
-					$sql = $next;
 				}
 				$count = count( $rows );
 				if ( $count < 100 ) {
@@ -93,6 +91,7 @@ final class DatabaseDump {
 				return ChangeResult::failure( __( 'A table is too large to export here. No SQL file was created.', 'amazing-security' ) );
 			}
 		}
+		$sql = implode( '', $parts );
 		if ( preg_match( '/CREATE\s+DATABASE/i', $sql ) ) {
 			return ChangeResult::failure( __( 'The SQL dump included a database statement. No file was created.', 'amazing-security' ) );
 		}
@@ -110,11 +109,15 @@ final class DatabaseDump {
 		return 1 === preg_match( '/CREATE\s+TABLE/i', $create );
 	}
 
-	private function append( string $sql, string $chunk ): ?string {
-		if ( strlen( $sql ) + strlen( $chunk ) > $this->maxBytes ) {
-			return null;
+	/** Collect chunks and join once at the end. Repeated string concatenation copies the whole dump every row. */
+	private function append( array &$parts, int &$size, string $chunk ): bool {
+		$length = strlen( $chunk );
+		if ( $size + $length > $this->maxBytes ) {
+			return false;
 		}
-		return $sql . $chunk;
+		$parts[] = $chunk;
+		$size   += $length;
+		return true;
 	}
 
 	private function insert( string $table, mixed $row ): ?string {

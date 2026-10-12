@@ -126,15 +126,6 @@ final class UploadsRulePage {
 	}
 
 	private function write( string $path, string $contents ): bool {
-		if ( strlen( $contents ) > 65536 || is_link( $path ) ) {
-			return false;
-		}
-		$dir = dirname( $path );
-		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_is_writable -- Confirmed write is limited to the uploads directory.
-		if ( is_link( $dir ) || ! is_dir( $dir ) || ! is_writable( $dir ) ) {
-			return false;
-		}
-		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents -- Confirmed Apache rule in the uploads folder only.
-		return false !== file_put_contents( $path, $contents, LOCK_EX );
+		return \AmazingPlugins\Security\Files\AtomicWrite::write( $path, $contents );
 	}
 }

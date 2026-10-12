@@ -6,6 +6,7 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) || ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+require_once __DIR__ . '/src/Files/AtomicWrite.php';
 require_once __DIR__ . '/src/Free/TrafficGuard/HotlinkRule.php';
 require_once __DIR__ . '/src/Lifecycle/Cleanup.php';
 
