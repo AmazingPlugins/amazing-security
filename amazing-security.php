@@ -19,6 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 define( 'AMAZING_SECURITY_FILE', __FILE__ );
+define( 'AMAZING_SECURITY_VERSION', '0.1.0' );
 
 $amsec_file_editor = get_option( 'amsec_disallow_file_edit', '0' );
 if ( '1' === $amsec_file_editor && ! defined( 'DISALLOW_FILE_EDIT' ) ) {

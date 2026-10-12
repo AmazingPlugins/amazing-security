@@ -34,7 +34,7 @@ final class Page {
 		if ( 'amsec-traffic-guard' !== $page ) {
 			return;
 		}
-		wp_enqueue_script( 'amazing-security-traffic', plugins_url( 'assets/admin-traffic.js', AMAZING_SECURITY_FILE ), array(), '0.1.0', true );
+		wp_enqueue_script( 'amazing-security-traffic', plugins_url( 'assets/admin-traffic.js', AMAZING_SECURITY_FILE ), array(), AMAZING_SECURITY_VERSION, true );
 		wp_localize_script(
 			'amazing-security-traffic',
 			'amsecTrafficExamples',

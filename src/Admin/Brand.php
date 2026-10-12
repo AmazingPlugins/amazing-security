@@ -24,16 +24,15 @@ final class Brand {
 		if ( ! self::onScreen() ) {
 			return;
 		}
-		wp_enqueue_style( 'amsec-fonts', 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,650&family=Inter:wght@400;600;700&display=swap', array(), '1' );
-		wp_enqueue_style( 'amazing-security-admin', plugins_url( 'assets/admin.css', AMAZING_SECURITY_FILE ), array( 'amsec-fonts' ), '0.1.45' );
+		wp_enqueue_style( 'amazing-security-admin', plugins_url( 'assets/admin.css', AMAZING_SECURITY_FILE ), array(), AMAZING_SECURITY_VERSION );
 		$page = self::page();
 		if ( in_array( $page, array( 'amsec-accounts', 'amsec-traffic-guard' ), true ) ) {
-			wp_enqueue_script( 'amazing-security-tabs', plugins_url( 'assets/admin-tabs.js', AMAZING_SECURITY_FILE ), array(), '0.1.0', true );
+			wp_enqueue_script( 'amazing-security-tabs', plugins_url( 'assets/admin-tabs.js', AMAZING_SECURITY_FILE ), array(), AMAZING_SECURITY_VERSION, true );
 		}
 		if ( 'amazing-security' !== $page ) {
 			return;
 		}
-		wp_enqueue_script( 'amazing-security-scan', plugins_url( 'assets/admin-scan.js', AMAZING_SECURITY_FILE ), array(), '0.1.12', true );
+		wp_enqueue_script( 'amazing-security-scan', plugins_url( 'assets/admin-scan.js', AMAZING_SECURITY_FILE ), array(), AMAZING_SECURITY_VERSION, true );
 		wp_localize_script( 'amazing-security-scan', 'amsecScan', array( 'error' => __( 'Scan could not be saved.', 'amazing-security' ) ) );
 	}
 
@@ -56,9 +55,9 @@ final class Brand {
 		}
 		echo '</div></div>';
 		echo '<p class="amsec-brand-links"><a href="' . esc_url( self::DOCS ) . '" target="_blank" rel="noopener noreferrer">';
-		echo '<img src="' . esc_url( $docs . '?ver=0.1.18' ) . '" alt="" width="22" height="22">' . esc_html__( 'Docs', 'amazing-security' ) . '</a>';
+		echo '<img src="' . esc_url( $docs . '?ver=' . AMAZING_SECURITY_VERSION ) . '" alt="" width="22" height="22">' . esc_html__( 'Docs', 'amazing-security' ) . '</a>';
 		echo '<a href="' . esc_url( self::GUIDE ) . '" target="_blank" rel="noopener noreferrer">';
-		echo '<img src="' . esc_url( $guide . '?ver=0.1.18' ) . '" alt="" width="22" height="22">' . esc_html__( 'Security guide', 'amazing-security' ) . '</a></p></div>';
+		echo '<img src="' . esc_url( $guide . '?ver=' . AMAZING_SECURITY_VERSION ) . '" alt="" width="22" height="22">' . esc_html__( 'Security guide', 'amazing-security' ) . '</a></p></div>';
 		if ( 'amazing-security' === self::page() ) {
 			return;
 		}
