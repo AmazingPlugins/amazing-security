@@ -92,7 +92,7 @@ final class FirstRun {
 				'text'   => __( 'Nothing runs until you press this.', 'amazing-security' ),
 			),
 			array(
-				'target' => '.amsec-cats',
+				'target' => '.amsec-scan .amsec-cats',
 				'edge'   => 'top',
 				'title'  => __( 'Results', 'amazing-security' ),
 				'text'   => __( 'Findings are sorted into these tabs. The number is how many are in each.', 'amazing-security' ),
