@@ -331,13 +331,6 @@
   }
 }
 
-.amsec-scan-form.amsec-rescan-bar {
-  box-sizing: border-box;
-  width: 100%;
-  max-width: 100%;
-  min-width: 0;
-}
-
 .amsec-rescan-bar {
   display: flex;
   flex-direction: column;
@@ -388,93 +381,16 @@ body.amsec-app #wpbody-content > .wrap.amazing-security-admin:not(.amsec-scan) >
   min-width: 0;
 }
 
-.amsec-scan-summary {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-  gap: 8px 22px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.amsec-scan-summary li {
-  display: flex;
-  align-items: baseline;
-  justify-content: flex-start;
-  gap: 6px;
-  color: #3a2e26;
-  font-weight: 650;
-}
-
-.amsec-scan-summary strong {
-  font-family: Fraunces, "Times New Roman", serif;
-  font-size: 28px;
-  font-weight: 650;
-  line-height: 1;
-}
-
-.amsec-scan-summary a {
-  display: flex;
-  align-items: baseline;
-  gap: 6px;
-  color: inherit;
-  text-decoration: none;
-}
-
-.amsec-scan-summary .is-success strong {
-  color: #1e7a46;
-}
-
-.amsec-scan-summary .is-error strong {
-  color: #d94b26;
-}
-
-.amsec-scan-summary .is-critical strong {
-  color: #9b1c1c;
-}
-
-.amsec-scan-summary .is-warn strong {
-  color: #8a5a10;
-}
-
-.amsec-scan-summary .is-recommended strong {
-  color: #5b3a6b;
-}
-
-.amsec-rescan-bar .amsec-scan-button {
+.amsec-scan-button.amsec-rescan-button {
   width: auto;
   height: auto;
   min-height: 44px;
-  justify-self: end;
-  padding: 10px 22px;
+  padding: 10px 28px;
   border-radius: 999px;
   font-family: Inter, sans-serif;
   font-size: 16px;
   font-weight: 650;
   box-shadow: none;
-}
-
-.amsec-rescan-bar .amsec-header-consent {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 8px;
-  max-width: none;
-  margin: 0;
-  text-align: right;
-}
-
-.amsec-rescan-row .amsec-scan-progress {
-  grid-column: 2;
-  grid-row: 1;
-  width: 180px;
-  justify-self: end;
-}
-
-.amsec-rescan-bar .amsec-scan-status {
-  margin: 0 0 8px;
-  font-size: 16px;
 }
 
 .amsec-header-consent {
@@ -504,16 +420,6 @@ body.amsec-app #wpbody-content > .wrap.amazing-security-admin:not(.amsec-scan) >
     height: 180px;
     font-size: 28px;
     box-shadow: 0 12px 28px rgba(242, 107, 58, 0.24);
-  }
-
-  .amsec-rescan-row .amsec-scan-button,
-  .amsec-rescan-row .amsec-scan-progress {
-    justify-self: end;
-    width: auto;
-  }
-
-  .amsec-rescan-bar .amsec-header-consent {
-    justify-content: flex-end;
   }
 
   .amazing-security-admin .amsec-overview {
@@ -1815,4 +1721,62 @@ body.amsec-app #wpbody-content .amsec-tab-panel .amsec-brief + .amsec-brief {
   margin-top: 18px;
   padding-top: 8px;
   border-top: 1px solid rgba(26, 20, 16, 0.12);
+}
+
+.amsec-scan-form.amsec-rescan-center {
+  margin: 20px auto 24px;
+  gap: 12px;
+}
+
+.amsec-cat-count {
+  display: inline-block;
+  min-width: 1.6em;
+  margin-left: 6px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: rgba(26, 20, 16, 0.08);
+  color: #3a2e26;
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.amsec-cats a.is-success .amsec-cat-count {
+  background: #dff3e6;
+  color: #1e7a46;
+}
+
+.amsec-cats a.is-error .amsec-cat-count {
+  background: #fbe3da;
+  color: #d94b26;
+}
+
+.amsec-cats a.is-critical .amsec-cat-count {
+  background: #f6d9d9;
+  color: #9b1c1c;
+}
+
+.amsec-cats a.is-warning .amsec-cat-count {
+  background: #f8ebd0;
+  color: #8a5a10;
+}
+
+.amsec-cats a.is-recommended .amsec-cat-count {
+  background: #eadff0;
+  color: #5b3a6b;
+}
+
+.amsec-tour-dim {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 14, 10, 0.55);
+  z-index: 9980;
+}
+
+#adminmenu .amsec-tour-target {
+  background: #d94b26 !important;
+  color: #fff !important;
+  border-radius: 6px;
+  box-shadow: 0 0 0 3px #f4a93c, 0 0 20px 4px rgba(217, 75, 38, 0.7);
 }

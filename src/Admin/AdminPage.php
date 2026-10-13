@@ -48,34 +48,16 @@ final class AdminPage {
 	/**
 	 * @param array<int, mixed>|null $results
 	 */
-	private function scanForm( bool $withConsent, string $label, ?array $results = null ): void {
-		$rescan = null !== $results;
-		echo '<form class="amsec-scan-form' . ( $rescan ? ' amsec-rescan-bar' : '' ) . '" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" method="post">';
+	private function scanForm( bool $withConsent, string $label, bool $rescan = false ): void {
+		echo '<form class="amsec-scan-form' . ( $rescan ? ' amsec-rescan-center' : '' ) . '" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" method="post">';
 		echo '<input type="hidden" name="action" value="amazing_security_scan">';
 		wp_nonce_field( 'amazing_security_scan' );
-		if ( $rescan ) {
-			echo '<div class="amsec-rescan-row">';
-			$counts = $this->scanCounts( $results );
-			echo '<ul class="amsec-scan-summary">';
-			echo '<li class="is-success"><a href="' . esc_url( $this->viewUrl( 'success' ) ) . '"><strong>' . esc_html( (string) $counts['success'] ) . '</strong> ' . esc_html__( 'Success', 'amazing-security' ) . '</a></li>';
-			echo '<li class="is-error"><a href="' . esc_url( $this->viewUrl( 'error' ) ) . '"><strong>' . esc_html( (string) $counts['fail'] ) . '</strong> ' . esc_html__( 'Errors', 'amazing-security' ) . '</a></li>';
-			echo '<li class="is-critical"><a href="' . esc_url( $this->viewUrl( 'critical' ) ) . '"><strong>' . esc_html( (string) $counts['critical'] ) . '</strong> ' . esc_html__( 'Critical', 'amazing-security' ) . '</a></li>';
-			echo '<li class="is-warn"><a href="' . esc_url( $this->viewUrl( 'warning' ) ) . '"><strong>' . esc_html( (string) $counts['warn'] ) . '</strong> ' . esc_html__( 'Warnings', 'amazing-security' ) . '</a></li>';
-			echo '<li class="is-recommended"><a href="' . esc_url( $this->viewUrl( 'recommended' ) ) . '"><strong>' . esc_html( (string) $counts['recommended'] ) . '</strong> ' . esc_html__( 'Recommended', 'amazing-security' ) . '</a></li>';
-			echo '</ul>';
-		}
 		echo '<button type="submit" class="amsec-scan-button' . ( $rescan ? ' amsec-rescan-button' : '' ) . '">' . esc_html( $label ) . '</button>';
-		if ( $rescan ) {
-			echo '<div class="amsec-scan-progress" hidden><p class="amsec-scan-status" role="status">' . esc_html__( 'Scanning', 'amazing-security' ) . '</p>';
-			echo '<div class="amsec-scan-track" aria-hidden="true"><span class="amsec-scan-fill"></span></div></div></div>';
-		}
 		if ( $withConsent ) {
 			echo '<label class="amsec-header-consent"><input type="checkbox" name="amsec_header_consent" value="1"> ' . esc_html__( "Request this site's homepage and read its response headers.", 'amazing-security' ) . '</label>';
 		}
-		if ( ! $rescan ) {
-			echo '<div class="amsec-scan-progress" hidden><p class="amsec-scan-status" role="status">' . esc_html__( 'Scanning', 'amazing-security' ) . '</p>';
-			echo '<div class="amsec-scan-track" aria-hidden="true"><span class="amsec-scan-fill"></span></div></div>';
-		}
+		echo '<div class="amsec-scan-progress" hidden><p class="amsec-scan-status" role="status">' . esc_html__( 'Scanning', 'amazing-security' ) . '</p>';
+		echo '<div class="amsec-scan-track" aria-hidden="true"><span class="amsec-scan-fill"></span></div></div>';
 		echo '</form>';
 	}
 
@@ -134,7 +116,7 @@ final class AdminPage {
 		$progress     = ( new WordPressIntegrityStore( $options ) )->latestProgress();
 		$fileProgress = ( new WordPressFileScanStore( $options ) )->latestProgress();
 		echo '<div class="wrap amazing-security-admin amsec-scan">';
-		$this->scanForm( true, __( 'Rescan', 'amazing-security' ), $run->results );
+		$this->scanForm( true, __( 'Rescan', 'amazing-security' ), true );
 		$contentScanId = '';
 		try {
 			$active = ( new WordPressContentService() )->create()->status()['active'] ?? null;
@@ -158,7 +140,7 @@ final class AdminPage {
 			echo '<div class="notice notice-error"><p>' . esc_html__( 'Scan could not be saved. The previous report is still shown.', 'amazing-security' ) . '</p></div>';
 		}
 		$category = $this->requestedCategory( $run->results );
-		$this->categoryNav( $category );
+		$this->categoryNav( $category, $this->scanCounts( $run->results ) );
 		$this->statusList( $category, $run->results, $integrityScanId, $contentScanId, $fileScanId );
 		echo '</div>';
 	}
@@ -368,17 +350,20 @@ final class AdminPage {
 		return add_query_arg( $args, admin_url( 'admin.php' ) );
 	}
 
-	private function categoryNav( string $current ): void {
+	/**
+	 * @param array{success: int, fail: int, critical: int, warn: int, recommended: int} $counts
+	 */
+	private function categoryNav( string $current, array $counts ): void {
 		$items = array(
-			'success'     => __( 'Success', 'amazing-security' ),
-			'error'       => __( 'Error', 'amazing-security' ),
-			'critical'    => __( 'Critical', 'amazing-security' ),
-			'warning'     => __( 'Warning', 'amazing-security' ),
-			'recommended' => __( 'Recommended', 'amazing-security' ),
+			'success'     => array( __( 'Success', 'amazing-security' ), $counts['success'] ),
+			'error'       => array( __( 'Error', 'amazing-security' ), $counts['fail'] ),
+			'critical'    => array( __( 'Critical', 'amazing-security' ), $counts['critical'] ),
+			'warning'     => array( __( 'Warning', 'amazing-security' ), $counts['warn'] ),
+			'recommended' => array( __( 'Recommended', 'amazing-security' ), $counts['recommended'] ),
 		);
 		echo '<nav class="amsec-cats" aria-label="' . esc_attr__( 'Report categories', 'amazing-security' ) . '">';
-		foreach ( $items as $slug => $label ) {
-			echo '<a' . ( $slug === $current ? ' class="is-current" aria-current="page"' : '' ) . ' href="' . esc_url( $this->viewUrl( $slug ) ) . '">' . esc_html( $label ) . '</a>';
+		foreach ( $items as $slug => $item ) {
+			echo '<a class="is-' . esc_attr( $slug ) . ( $slug === $current ? ' is-current' : '' ) . '"' . ( $slug === $current ? ' aria-current="page"' : '' ) . ' href="' . esc_url( $this->viewUrl( $slug ) ) . '">' . esc_html( $item[0] ) . ' <span class="amsec-cat-count">' . esc_html( (string) $item[1] ) . '</span></a>';
 		}
 		echo '</nav>';
 	}

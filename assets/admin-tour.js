@@ -1,0 +1,56 @@
+( function ( $ ) {
+	var d = window.amsecTour;
+	var steps = d.steps.filter( function ( s ) {
+		return $( s.target ).filter( ':visible' ).length;
+	} );
+	var i = 0;
+	var $dim = $( '<div class="amsec-tour-dim"></div>' );
+
+	function clear() {
+		$( '.amsec-tour-target' ).removeClass( 'amsec-tour-target' );
+	}
+
+	function finish() {
+		clear();
+		$dim.remove();
+		$.post( window.ajaxurl, { action: 'dismiss-wp-pointer', pointer: d.pointer } );
+	}
+
+	function show() {
+		var s = steps[ i ];
+		var last = i === steps.length - 1;
+		var $el = $( s.target ).filter( ':visible' ).first();
+		clear();
+		$el.addClass( 'amsec-tour-target' );
+		$el.pointer( {
+			content: $( '<div>' ).append( $( '<h3>' ).text( s.title ), $( '<p>' ).text( s.text ) ).html(),
+			position: { edge: 'left', align: 'center' },
+			close: function () {},
+			buttons: function ( e, t ) {
+				var $skip = $( '<a href="#" class="button-link">' ).text( d.skip ).css( { float: 'left', 'line-height': '2.4' } );
+				var $next = $( '<a href="#" class="button button-primary">' ).text( last ? d.done : d.next ).css( 'float', 'right' );
+				$skip.on( 'click', function ( ev ) {
+					ev.preventDefault();
+					t.element.pointer( 'close' );
+					finish();
+				} );
+				$next.on( 'click', function ( ev ) {
+					ev.preventDefault();
+					t.element.pointer( 'close' );
+					if ( last ) {
+						finish();
+					} else {
+						i++;
+						show();
+					}
+				} );
+				return $( '<span>' ).append( $skip, $next );
+			},
+		} ).pointer( 'open' );
+	}
+
+	if ( steps.length ) {
+		$( 'body' ).append( $dim );
+		show();
+	}
+}( jQuery ) );

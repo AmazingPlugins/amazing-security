@@ -59,6 +59,7 @@ spl_autoload_register(
 register_activation_hook( __FILE__, array( AmazingPlugins\Security\Login\WordPressRateCounterStore::class, 'install' ) );
 register_activation_hook( __FILE__, array( AmazingPlugins\Security\Fixes\FixTables::class, 'install' ) );
 register_activation_hook( __FILE__, array( AmazingPlugins\Security\Activity\ActivityTables::class, 'install' ) );
+add_action( 'admin_enqueue_scripts', array( AmazingPlugins\Security\Admin\FirstRun::class, 'assets' ) );
 register_deactivation_hook(
 	__FILE__,
 	static function (): void {
