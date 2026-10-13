@@ -1853,3 +1853,15 @@ body.amsec-app .amazing-security-admin fieldset > label {
     gap: 8px;
   }
 }
+
+.amsec-scan-button.amsec-tour-target,
+.amsec-cats.amsec-tour-target {
+  position: relative;
+  z-index: 9985;
+  box-shadow: 0 0 0 4px #f4a93c, 0 0 20px 4px rgba(217, 75, 38, 0.5);
+}
+
+.amsec-cats.amsec-tour-target {
+  border-radius: 14px;
+  background: #faf5ec;
+}

@@ -3,9 +3,12 @@
 	var steps = d.steps.filter( function ( s ) {
 		return $( s.target ).filter( ':visible' ).length;
 	} );
+	var hasMenu = steps.some( function ( s ) {
+		return $( s.target ).closest( '#adminmenu' ).length;
+	} );
 	// Phones hide the side menu behind a toggle, so one step points at the toggle instead.
-	if ( ! steps.length && $( d.phone.target ).filter( ':visible' ).length ) {
-		steps = [ d.phone ];
+	if ( ! hasMenu && $( d.phone.target ).filter( ':visible' ).length ) {
+		steps.unshift( d.phone );
 	}
 	var i = 0;
 	var $dim = $( '<div class="amsec-tour-dim"></div>' );
@@ -26,6 +29,9 @@
 		var $el = $( s.target ).filter( ':visible' ).first();
 		clear();
 		$el.addClass( 'amsec-tour-target' );
+		if ( ! $el.closest( '#adminmenu, #wpadminbar' ).length ) {
+			$el[ 0 ].scrollIntoView( { block: 'center' } );
+		}
 		$el.pointer( {
 			content: $( '<div>' ).append( $( '<h3>' ).text( s.title ), $( '<p>' ).text( s.text ) ).html(),
 			position: s.edge ? { edge: s.edge, align: 'left' } : { edge: 'left', align: 'center' },

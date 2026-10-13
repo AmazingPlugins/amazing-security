@@ -14,7 +14,7 @@ final class FirstRun {
 			return;
 		}
 		wp_enqueue_style( 'wp-pointer' );
-		wp_enqueue_script( 'amazing-security-tour', plugins_url( 'assets/admin-tour.js', AMAZING_SECURITY_FILE ), array( 'wp-pointer' ), '0.1.1', true );
+		wp_enqueue_script( 'amazing-security-tour', plugins_url( 'assets/admin-tour.js', AMAZING_SECURITY_FILE ), array( 'wp-pointer' ), '0.1.2', true );
 		wp_localize_script(
 			'amazing-security-tour',
 			'amsecTour',
@@ -25,7 +25,7 @@ final class FirstRun {
 					'target' => '#wp-admin-bar-menu-toggle',
 					'edge'   => 'top',
 					'title'  => __( 'Menu', 'amazing-security' ),
-					'text'   => __( 'Open the menu, then tap Amazing Security. Scan, Recommendations, Log In & Register, Traffic, Files, Records, Settings and AI & MCP are under it.', 'amazing-security' ),
+					'text'   => __( 'Open the menu and tap Amazing Security. Every section is under it.', 'amazing-security' ),
 				),
 				'next'    => __( 'Next', 'amazing-security' ),
 				'done'    => __( 'Done', 'amazing-security' ),
@@ -40,7 +40,7 @@ final class FirstRun {
 	}
 
 	/**
-	 * @return list<array{target: string, title: string, text: string}>
+	 * @return list<array{target: string, title: string, text: string, edge?: string}>
 	 */
 	public static function steps(): array {
 		$link = static fn ( string $page ): string => '#adminmenu a[href$="page=' . $page . '"]';
@@ -84,6 +84,18 @@ final class FirstRun {
 				'target' => $link( 'amsec-assistant' ),
 				'title'  => __( 'AI & MCP', 'amazing-security' ),
 				'text'   => __( 'Optional access for an AI assistant.', 'amazing-security' ),
+			),
+			array(
+				'target' => '.amsec-scan-button',
+				'edge'   => 'top',
+				'title'  => __( 'Scan button', 'amazing-security' ),
+				'text'   => __( 'Nothing runs until you press this.', 'amazing-security' ),
+			),
+			array(
+				'target' => '.amsec-cats',
+				'edge'   => 'top',
+				'title'  => __( 'Results', 'amazing-security' ),
+				'text'   => __( 'Findings are sorted into these tabs. The number is how many are in each.', 'amazing-security' ),
 			),
 		);
 	}
