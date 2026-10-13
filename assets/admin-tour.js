@@ -3,6 +3,10 @@
 	var steps = d.steps.filter( function ( s ) {
 		return $( s.target ).filter( ':visible' ).length;
 	} );
+	// Phones hide the side menu behind a toggle, so one step points at the toggle instead.
+	if ( ! steps.length && $( d.phone.target ).filter( ':visible' ).length ) {
+		steps = [ d.phone ];
+	}
 	var i = 0;
 	var $dim = $( '<div class="amsec-tour-dim"></div>' );
 
@@ -24,7 +28,7 @@
 		$el.addClass( 'amsec-tour-target' );
 		$el.pointer( {
 			content: $( '<div>' ).append( $( '<h3>' ).text( s.title ), $( '<p>' ).text( s.text ) ).html(),
-			position: { edge: 'left', align: 'center' },
+			position: s.edge ? { edge: s.edge, align: 'left' } : { edge: 'left', align: 'center' },
 			close: function () {},
 			buttons: function ( e, t ) {
 				var $skip = $( '<a href="#" class="button-link">' ).text( d.skip ).css( { float: 'left', 'line-height': '2.4' } );

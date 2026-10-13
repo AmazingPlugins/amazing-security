@@ -25,7 +25,7 @@ final class Brand {
 			return;
 		}
 		wp_enqueue_style( 'amsec-fonts', 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,650&family=Inter:wght@400;600;700&display=swap', array(), '1' );
-		wp_enqueue_style( 'amazing-security-admin', plugins_url( 'assets/admin.css', AMAZING_SECURITY_FILE ), array( 'amsec-fonts' ), '0.1.48' );
+		wp_enqueue_style( 'amazing-security-admin', plugins_url( 'assets/admin.css', AMAZING_SECURITY_FILE ), array( 'amsec-fonts' ), '0.1.50' );
 		$page = self::page();
 		if ( in_array( $page, array( 'amsec-accounts', 'amsec-traffic-guard' ), true ) ) {
 			wp_enqueue_script( 'amazing-security-tabs', plugins_url( 'assets/admin-tabs.js', AMAZING_SECURITY_FILE ), array(), '0.1.0', true );
