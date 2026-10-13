@@ -6,6 +6,7 @@ namespace AmazingPlugins\Security\Tests\Unit;
 
 use AmazingPlugins\Security\Activity\ActivityRenderer;
 use AmazingPlugins\Security\Admin\AccountChoice;
+use AmazingPlugins\Security\Admin\FirstRun;
 use AmazingPlugins\Security\Admin\StartPanel;
 use AmazingPlugins\Security\Free\Comments\SpamHold;
 use AmazingPlugins\Security\Free\Notices\Notice;
@@ -19,6 +20,13 @@ final class FirstRunTest extends TestCase {
 		self::assertStringContainsString( 'Log In & Register, and from Traffic', $steps );
 		self::assertStringContainsString( 'authenticator and passkey status', $steps );
 		self::assertStringNotContainsString( 'safe', strtolower( $steps ) );
+	}
+
+	public function test_tour_points_at_each_menu_page_and_promises_nothing_runs(): void {
+		$steps = FirstRun::steps();
+		self::assertCount( 8, $steps );
+		self::assertStringContainsString( 'page=amazing-security"', $steps[0]['target'] );
+		self::assertStringContainsString( 'does not change anything', $steps[0]['text'] );
 	}
 
 	public function test_account_label_shows_the_name_people_see(): void {
