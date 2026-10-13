@@ -40,7 +40,6 @@ final class AdminPage {
 		if ( isset( $_GET['amazing_security_error'] ) ) {
 			echo '<div class="notice notice-error" data-amsec-scan-error><p>' . esc_html__( 'Scan could not be saved.', 'amazing-security' ) . '</p></div>';
 		}
-		echo '<p class="amsec-scan-empty">' . esc_html__( 'No scan has been saved yet.', 'amazing-security' ) . '</p>';
 		$this->scanForm( false, __( 'Scan', 'amazing-security' ) );
 		echo '</div></div>';
 	}

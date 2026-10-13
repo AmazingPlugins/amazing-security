@@ -209,11 +209,6 @@
   align-items: center;
 }
 
-.amsec-scan-empty {
-  margin: 0 0 8px;
-  color: #6b5c4f;
-}
-
 .amsec-scan-form {
   display: flex;
   flex-direction: column;
