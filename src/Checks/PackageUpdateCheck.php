@@ -50,14 +50,14 @@ final class PackageUpdateCheck implements SecurityCheck {
 		$plugins = 'plugin-updates' === $this->checkId;
 		$summary = match ( $state ) {
 			'warn' => $plugins
-				? 'Plugin updates are waiting. Open Dashboard, then Updates. This check does not install them and does not contact WordPress.org.'
-				: 'Theme updates are waiting. Open Dashboard, then Updates. This check does not install them and does not contact WordPress.org.',
+				? __( 'Plugin updates are waiting. Open Dashboard, then Updates. This check does not install them and does not contact WordPress.org.', 'amazing-security' )
+				: __( 'Theme updates are waiting. Open Dashboard, then Updates. This check does not install them and does not contact WordPress.org.', 'amazing-security' ),
 			'pass' => $plugins
-				? 'WordPress does not report a plugin update waiting. This check does not install updates and does not contact WordPress.org.'
-				: 'WordPress does not report a theme update waiting. This check does not install updates and does not contact WordPress.org.',
+				? __( 'WordPress does not report a plugin update waiting. This check does not install updates and does not contact WordPress.org.', 'amazing-security' )
+				: __( 'WordPress does not report a theme update waiting. This check does not install updates and does not contact WordPress.org.', 'amazing-security' ),
 			default => $plugins
-				? 'Plugin update status could not be read. This check does not install updates and does not contact WordPress.org.'
-				: 'Theme update status could not be read. This check does not install updates and does not contact WordPress.org.',
+				? __( 'Plugin update status could not be read. This check does not install updates and does not contact WordPress.org.', 'amazing-security' )
+				: __( 'Theme update status could not be read. This check does not install updates and does not contact WordPress.org.', 'amazing-security' ),
 		};
 		return array(
 			new CheckResult( $this->id(), 'warn' === $state ? State::WARN : ( 'pass' === $state ? State::PASS : State::UNKNOWN ), $summary, self::SOURCE, new DateTimeImmutable( 'now', new DateTimeZone( 'UTC' ) ), 'unknown' === $state ? 'low' : 'medium', 'unknown' === $state ? 'unavailable' : 'complete', array( 'kind' => $kind ) ),

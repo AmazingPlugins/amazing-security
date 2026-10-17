@@ -50,7 +50,7 @@ final class SessionPage {
 		try {
 			$rows = $this->rows( $id );
 		} catch ( \Throwable ) {
-			echo '<div class="wrap amazing-security-admin"><div class="notice notice-error"><p>Session information is unavailable.</p></div></div>';
+			echo '<div class="wrap amazing-security-admin"><div class="notice notice-error"><p>' . esc_html__( 'Session information is unavailable.', 'amazing-security' ) . '</p></div></div>';
 			return;
 		}
 		if ( $this->wantsDetail() ) {
@@ -58,26 +58,26 @@ final class SessionPage {
 			return;
 		}
 		if ( ! $administrator ) {
-			echo '<div class="wrap amazing-security-admin"><h1>Your sessions</h1><p>Only you and an administrator can open this page.</p>';
+			echo '<div class="wrap amazing-security-admin"><h1>' . esc_html__( 'Your sessions', 'amazing-security' ) . '</h1><p>' . esc_html__( 'Only you and an administrator can open this page.', 'amazing-security' ) . '</p>';
 			$this->lines( $id, $rows );
 			echo '</div>';
 			return;
 		}
 		$accounts = $this->accountOptions( $id );
-		echo '<div class="wrap amazing-security-admin"><h1>Account sessions</h1><p>Pick an account. Ending a session signs that browser out. It cannot be undone. A new sign-in can start another session. An application password can be removed on its own.</p><form method="get"><input type="hidden" name="page" value="amsec-sessions"><label for="amsec-session-user">Account</label> <select id="amsec-session-user" name="user_id">';
+		echo '<div class="wrap amazing-security-admin"><h1>' . esc_html__( 'Account sessions', 'amazing-security' ) . '</h1><p>' . esc_html__( 'Pick an account. Ending a session signs that browser out. It cannot be undone. A new sign-in can start another session. An application password can be removed on its own.', 'amazing-security' ) . '</p><form method="get"><input type="hidden" name="page" value="amsec-sessions"><label for="amsec-session-user">' . esc_html__( 'Account', 'amazing-security' ) . '</label> <select id="amsec-session-user" name="user_id">';
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- accountOptions() escapes each login and display name.
 		echo $accounts;
-		echo '</select> <button class="button">View account</button></form>';
+		echo '</select> <button class="button">' . esc_html__( 'View account', 'amazing-security' ) . '</button></form>';
 		$this->lines( $id, $rows );
 		$this->applicationPasswords( $id );
-		echo '<h2>Revoke sessions</h2><p>' . ( get_current_user_id() === $id ? 'Your current session will be kept. Your other sessions will be revoked.' : 'All existing sessions for this selected account will be revoked.' ) . '</p>';
+		echo '<h2>' . esc_html__( 'Revoke sessions', 'amazing-security' ) . '</h2><p>' . ( get_current_user_id() === $id ? esc_html__( 'Your current session will be kept. Your other sessions will be revoked.', 'amazing-security' ) : esc_html__( 'All existing sessions for this selected account will be revoked.', 'amazing-security' ) ) . '</p>';
 		if ( ! is_ssl() ) {
-			echo '<p>Open this page over HTTPS to approve session revocation.</p></div>';
+			echo '<p>' . esc_html__( 'Open this page over HTTPS to approve session revocation.', 'amazing-security' ) . '</p></div>';
 			return;
 		}
 		echo '<form action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" method="post"><input type="hidden" name="action" value="amsec_sessions_revoke"><input type="hidden" name="user_id" value="' . esc_attr( (string) $id ) . '">';
 		wp_nonce_field( 'amsec_sessions_revoke_' . $id );
-		echo '<p><label for="amsec-session-password">Your password</label> <input id="amsec-session-password" type="password" name="password" autocomplete="current-password" required maxlength="1024"></p><p><label><input type="checkbox" name="confirm" value="1" required> I understand that revocation cannot be undone.</label></p>';
+		echo '<p><label for="amsec-session-password">' . esc_html__( 'Your password', 'amazing-security' ) . '</label> <input id="amsec-session-password" type="password" name="password" autocomplete="current-password" required maxlength="1024"></p><p><label><input type="checkbox" name="confirm" value="1" required> ' . esc_html__( 'I understand that revocation cannot be undone.', 'amazing-security' ) . '</label></p>';
 		submit_button( __( 'Revoke these sessions', 'amazing-security' ), 'secondary' );
 		echo '</form></div>';
 	}
@@ -110,7 +110,7 @@ final class SessionPage {
 	/** @param array<int, array{login: int, expiration: int, ip: string, ua: string, current: bool}> $rows */
 	private function lines( int $id, array $rows ): void {
 		if ( array() === $rows ) {
-			echo '<p>No sessions returned by the account session manager.</p>';
+			echo '<p>' . esc_html__( 'No sessions returned by the account session manager.', 'amazing-security' ) . '</p>';
 			return;
 		}
 		echo '<ul class="amsec-session-lines">';
@@ -121,7 +121,7 @@ final class SessionPage {
 			$place    = SessionDetail::place( $row['ip'] );
 			$parts    = array();
 			if ( $row['current'] ) {
-				$parts[] = 'This browser';
+				$parts[] = __( 'This browser', 'amazing-security' );
 			}
 			$parts[] = $title;
 			if ( '' !== $place ) {
@@ -149,9 +149,9 @@ final class SessionPage {
 	private function detail( array $rows, bool $administrator ): void {
 		$row  = SessionPolicy::rowFor( $rows, $this->requestedRef() );
 		$back = $administrator ? admin_url( 'admin.php?page=amsec-accounts#sessions' ) : admin_url( 'admin.php?page=amsec-sessions' );
-		echo '<div class="wrap amazing-security-admin"><p class="amsec-session-back"><a href="' . esc_url( $back ) . '">Back to sessions</a></p>';
+		echo '<div class="wrap amazing-security-admin"><p class="amsec-session-back"><a href="' . esc_url( $back ) . '">' . esc_html__( 'Back to sessions', 'amazing-security' ) . '</a></p>';
 		if ( null === $row ) {
-			echo '<h1>Session</h1><p>This session is no longer available.</p></div>';
+			echo '<h1>' . esc_html__( 'Session', 'amazing-security' ) . '</h1><p>' . esc_html__( 'This session is no longer available.', 'amazing-security' ) . '</p></div>';
 			return;
 		}
 		$browser  = SessionDetail::browser( $row['ua'] );
@@ -160,19 +160,19 @@ final class SessionPage {
 		$title    = $this->sessionTitle( $browser, $computer );
 		echo '<article class="amsec-session' . ( $row['current'] ? ' is-current' : '' ) . '">';
 		echo '<p class="amsec-session-kicker"><span class="dashicons ' . esc_attr( SessionDetail::icon( $computer ) ) . '" aria-hidden="true"></span> ';
-		echo esc_html( $row['current'] ? 'This browser' : 'Session' ) . '</p>';
+		echo esc_html( $row['current'] ? __( 'This browser', 'amazing-security' ) : __( 'Session', 'amazing-security' ) ) . '</p>';
 		echo '<h1>' . esc_html( $title ) . '</h1><dl>';
-		$this->fact( 'Browser', '' !== $browser ? $browser : 'Not recorded' );
-		$this->fact( 'Computer', '' !== $computer ? $computer : 'Not recorded' );
-		$this->fact( 'Location', '' !== $place ? $place : 'Not recorded' );
+		$this->fact( __( 'Browser', 'amazing-security' ), '' !== $browser ? $browser : __( 'Not recorded', 'amazing-security' ) );
+		$this->fact( __( 'Computer', 'amazing-security' ), '' !== $computer ? $computer : __( 'Not recorded', 'amazing-security' ) );
+		$this->fact( __( 'Location', 'amazing-security' ), '' !== $place ? $place : __( 'Not recorded', 'amazing-security' ) );
 		if ( '' !== $row['ip'] && $place !== $row['ip'] ) {
-			$this->fact( 'Address', $row['ip'] );
+			$this->fact( __( 'Address', 'amazing-security' ), $row['ip'] );
 		}
-		$this->fact( 'Signed in', $this->when( $row['login'] ) );
-		$this->fact( 'Expires', $this->when( $row['expiration'] ) );
+		$this->fact( __( 'Signed in', 'amazing-security' ), $this->when( $row['login'] ) );
+		$this->fact( __( 'Expires', 'amazing-security' ), $this->when( $row['expiration'] ) );
 		echo '</dl>';
 		if ( '' !== $row['ua'] ) {
-			echo '<h2>Browser details</h2><p class="amsec-session-agent">' . esc_html( $row['ua'] ) . '</p>';
+			echo '<h2>' . esc_html__( 'Browser details', 'amazing-security' ) . '</h2><p class="amsec-session-agent">' . esc_html( $row['ua'] ) . '</p>';
 		}
 		echo '</article></div>';
 	}
@@ -187,7 +187,7 @@ final class SessionPage {
 		if ( '' !== $computer ) {
 			return $computer;
 		}
-		return 'Session';
+		return __( 'Session', 'amazing-security' );
 	}
 
 	private function fact( string $label, string $value ): void {
@@ -196,7 +196,7 @@ final class SessionPage {
 
 	private function when( int $stamp ): string {
 		if ( $stamp < 1 ) {
-			return 'Not recorded';
+			return __( 'Not recorded', 'amazing-security' );
 		}
 		if ( function_exists( 'wp_date' ) ) {
 			return wp_date( 'j M Y, H:i', $stamp );
@@ -232,24 +232,24 @@ final class SessionPage {
 	}
 
 	private function applicationPasswords( int $id ): void {
-		echo '<h2>Application passwords</h2>';
+		echo '<h2>' . esc_html__( 'Application passwords', 'amazing-security' ) . '</h2>';
 		if ( ! class_exists( \WP_Application_Passwords::class ) ) {
-			echo '<p>Application passwords are unavailable on this site.</p>';
+			echo '<p>' . esc_html__( 'Application passwords are unavailable on this site.', 'amazing-security' ) . '</p>';
 			return;
 		}
 		$stored = \WP_Application_Passwords::get_user_application_passwords( $id );
 		$rows   = ApplicationPasswordList::rows( is_array( $stored ) ? $stored : array() );
 		if ( array() === $rows ) {
-			echo '<p>No application passwords are stored for this account.</p>';
+			echo '<p>' . esc_html__( 'No application passwords are stored for this account.', 'amazing-security' ) . '</p>';
 			return;
 		}
-		echo '<table class="widefat striped"><caption>Saved application passwords. The password itself is not shown.</caption><thead><tr><th scope="col">Name</th><th scope="col">Created UTC</th><th scope="col">Revoke</th></tr></thead><tbody>';
+		echo '<table class="widefat striped"><caption>' . esc_html__( 'Saved application passwords. The password itself is not shown.', 'amazing-security' ) . '</caption><thead><tr><th scope="col">' . esc_html__( 'Name', 'amazing-security' ) . '</th><th scope="col">' . esc_html__( 'Created UTC', 'amazing-security' ) . '</th><th scope="col">' . esc_html__( 'Revoke', 'amazing-security' ) . '</th></tr></thead><tbody>';
 		foreach ( $rows as $row ) {
-			echo '<tr><td>' . esc_html( $row['name'] ) . '</td><td>' . esc_html( $row['created'] > 0 ? gmdate( 'Y-m-d H:i:s', $row['created'] ) : 'Unknown' ) . '</td><td>';
+			echo '<tr><td>' . esc_html( $row['name'] ) . '</td><td>' . esc_html( $row['created'] > 0 ? gmdate( 'Y-m-d H:i:s', $row['created'] ) : __( 'Unknown', 'amazing-security' ) ) . '</td><td>';
 			if ( is_ssl() ) {
 				echo '<form action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" method="post"><input type="hidden" name="action" value="amsec_sessions_revoke"><input type="hidden" name="operation" value="revoke-application-password"><input type="hidden" name="user_id" value="' . esc_attr( (string) $id ) . '"><input type="hidden" name="uuid" value="' . esc_attr( $row['uuid'] ) . '">';
 				wp_nonce_field( 'amsec_sessions_revoke_' . $id );
-				echo '<p><label>Your password <input type="password" name="password" autocomplete="current-password" required maxlength="1024"></label></p><p><label><input type="checkbox" name="confirm" value="1" required> I understand that this application password will be removed.</label></p>';
+				echo '<p><label>' . esc_html__( 'Your password', 'amazing-security' ) . ' <input type="password" name="password" autocomplete="current-password" required maxlength="1024"></label></p><p><label><input type="checkbox" name="confirm" value="1" required> ' . esc_html__( 'I understand that this application password will be removed.', 'amazing-security' ) . '</label></p>';
 				submit_button( __( 'Revoke this application password', 'amazing-security' ), 'secondary', 'submit', false );
 				echo '</form>';
 			} else {

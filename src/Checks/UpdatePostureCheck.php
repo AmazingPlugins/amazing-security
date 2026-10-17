@@ -12,5 +12,5 @@ final class UpdatePostureCheck extends AbstractCheck {
 	public function id(): string {
 		return 'core-updates'; }
 	public function run( ScanContext $context ): array {
-		return $this->result( $this->values->coreUpdateAvailable(), 'WordPress does not report a core update waiting.', 'A WordPress update is waiting. Open Dashboard, then Updates, and review it.' ); }
+		return $this->result( $this->values->coreUpdateAvailable(), __( 'WordPress does not report a core update waiting.', 'amazing-security' ), __( 'A WordPress update is waiting. Open Dashboard, then Updates, and review it.', 'amazing-security' ) ); }
 }

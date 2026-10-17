@@ -22,8 +22,8 @@ final class MailStatus {
 			'email'      => $email,
 			'configured' => $configured,
 			'summary'    => $configured
-				? 'Notifications use WordPress mail to this administrator address. Delivery depends on the mail service configured for this site.'
-				: 'WordPress admin email is missing or invalid. Set a valid address under Settings → General before turning notifications on.',
+				? __( 'Notifications use WordPress mail to this administrator address. Delivery depends on the mail service configured for this site.', 'amazing-security' )
+				: __( 'WordPress admin email is missing or invalid. Set a valid address under Settings → General before turning notifications on.', 'amazing-security' ),
 		);
 	}
 }

@@ -54,9 +54,9 @@ final class ErrorLogCheck implements SecurityCheck {
 		$kind    = (string) ( $this->readKind )();
 		$state   = self::decide( $kind );
 		$summary = match ( $state ) {
-			'warn' => 'An error_log file is in the content directory. This check does not read or delete it. A custom log path is not checked.',
-			'pass' => 'No error_log file is in the content directory. This check does not read or delete it. A custom log path is not checked.',
-			default => 'The content directory error log could not be checked. This check does not read or delete it.',
+			'warn' => __( 'An error_log file is in the content directory. This check does not read or delete it. A custom log path is not checked.', 'amazing-security' ),
+			'pass' => __( 'No error_log file is in the content directory. This check does not read or delete it. A custom log path is not checked.', 'amazing-security' ),
+			default => __( 'The content directory error log could not be checked. This check does not read or delete it.', 'amazing-security' ),
 		};
 		return array(
 			new CheckResult( $this->id(), 'warn' === $state ? State::WARN : ( 'pass' === $state ? State::PASS : State::UNKNOWN ), $summary, self::SOURCE, new DateTimeImmutable( 'now', new DateTimeZone( 'UTC' ) ), 'low', 'unknown' === $state ? 'unavailable' : 'complete', array( 'kind' => $kind ) ),

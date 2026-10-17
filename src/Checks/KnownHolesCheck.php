@@ -103,13 +103,13 @@ final class KnownHolesCheck implements SecurityCheck {
 
 	private static function summary( string $enabled, string $stored ): string {
 		$text = match ( true ) {
-			'unknown' === $enabled => 'Vulnerability check status could not be read.',
-			'no' === $enabled => 'Known holes in installed plugins and themes are not being checked. Turn on vulnerability checks on this page when you want this site to ask the provider.',
-			'found' === $stored => 'A published issue matches an installed package. Review the vulnerability section on this page.',
-			'none' === $stored => 'Vulnerability checks are on, and no result is stored yet. Use Check installed versions on this page.',
-			'clean' === $stored => 'The last stored vulnerability check did not match a published issue to an installed package.',
-			'partial' === $stored => 'The last vulnerability check did not finish every package. Continue it from this page.',
-			default => 'The stored vulnerability result could not be read.',
+			'unknown' === $enabled => __( 'Vulnerability check status could not be read.', 'amazing-security' ),
+			'no' === $enabled => __( 'Known holes in installed plugins and themes are not being checked. Turn on vulnerability checks on this page when you want this site to ask the provider.', 'amazing-security' ),
+			'found' === $stored => __( 'A published issue matches an installed package. Review the vulnerability section on this page.', 'amazing-security' ),
+			'none' === $stored => __( 'Vulnerability checks are on, and no result is stored yet. Use Check installed versions on this page.', 'amazing-security' ),
+			'clean' === $stored => __( 'The last stored vulnerability check did not match a published issue to an installed package.', 'amazing-security' ),
+			'partial' === $stored => __( 'The last vulnerability check did not finish every package. Continue it from this page.', 'amazing-security' ),
+			default => __( 'The stored vulnerability result could not be read.', 'amazing-security' ),
 		};
 		return $text . ' This check does not contact the provider.';
 	}

@@ -46,24 +46,30 @@ final class DigestSettings {
 		$status  = ( new DigestHooks() )->delivery()->status();
 		$last    = $status['last_attempt'] ?? array();
 		$pending = $status['pending'] ?? null;
-		$state   = ! empty( $status['invalid'] ) ? 'invalid: no mail will be sent' : ( 'sending' === ( $pending['status'] ?? '' ) ? 'uncertain: previous in-flight attempt will not be resent' : ( ( $pending['attempts'] ?? 0 ) >= 3 ? 'exhausted: three failed attempts' : ( $last['status'] ?? 'none' ) ) );
-		echo '<div class="wrap amazing-security-admin"><h1>Weekly security digest</h1><p>Off by default. Sends a summary through this site’s WordPress mail transport to the current administrator email. The first interval is due seven days after enabling; an hourly WP-Cron check sends it when the site receives traffic. A quiet site can delay delivery.</p><p>The digest reports counts from stored hardening, integrity, file and vulnerability scans and recorded account/role changes and blocked login requests. It does not start scans. Missing, stale, partial and unknown coverage is stated explicitly. Initial findings are an initial snapshot; later new counts compare with the last accepted digest. Incomplete scans retain earlier identities. No finding details, account identities, addresses, file paths, credentials or review notes are included.</p><p>Failed calls retry after one hour, up to three attempts. An interrupted or unrecorded result is uncertain and is not automatically resent. Accepted means WordPress’s mail transport accepted the message; it does not confirm inbox delivery. The next weekly interval supersedes an older failed queue.</p><p>Mode: ' . esc_html( $mode ) . '. Last mail state: ' . esc_html( $state ) . '.</p>';
+		$state   = ! empty( $status['invalid'] ) ? __( 'invalid: no mail will be sent', 'amazing-security' ) : ( 'sending' === ( $pending['status'] ?? '' ) ? __( 'uncertain: previous in-flight attempt will not be resent', 'amazing-security' ) : ( ( $pending['attempts'] ?? 0 ) >= 3 ? __( 'exhausted: three failed attempts', 'amazing-security' ) : ( $last['status'] ?? __( 'none', 'amazing-security' ) ) ) );
+		echo '<div class="wrap amazing-security-admin"><h1>' . esc_html__( 'Weekly security digest', 'amazing-security' ) . '</h1><p>' . esc_html__( 'Off by default. Sends a summary through this site’s WordPress mail transport to the current administrator email. The first interval is due seven days after enabling; an hourly WP-Cron check sends it when the site receives traffic. A quiet site can delay delivery.', 'amazing-security' ) . '</p><p>' . esc_html__( 'The digest reports counts from stored hardening, integrity, file and vulnerability scans and recorded account/role changes and blocked login requests. It does not start scans. Missing, stale, partial and unknown coverage is stated explicitly. Initial findings are an initial snapshot; later new counts compare with the last accepted digest. Incomplete scans retain earlier identities. No finding details, account identities, addresses, file paths, credentials or review notes are included.', 'amazing-security' ) . '</p><p>' . esc_html__( 'Failed calls retry after one hour, up to three attempts. An interrupted or unrecorded result is uncertain and is not automatically resent. Accepted means WordPress’s mail transport accepted the message; it does not confirm inbox delivery. The next weekly interval supersedes an older failed queue.', 'amazing-security' ) . '</p><p>' .
+			/* translators: 1: mode, on or off; 2: last mail state. */
+			sprintf( esc_html__( 'Mode: %1$s. Last mail state: %2$s.', 'amazing-security' ), esc_html( 'on' === $mode ? __( 'on', 'amazing-security' ) : __( 'off', 'amazing-security' ) ), esc_html( $state ) ) . '</p>';
 		echo '<p><a href="' . esc_url( admin_url( 'admin.php?page=amsec-settings#amsec-notifications' ) ) . '">' . esc_html__( 'Notification settings (finding emails, test email, account-change email)', 'amazing-security' ) . '</a></p>';
 		if ( is_int( $status['next_due'] ?? null ) ) {
-			echo '<p>Next interval due UTC: ' . esc_html( gmdate( 'Y-m-d H:i:s', $status['next_due'] ) ) . '.</p>';
+			/* translators: %s: UTC timestamp when the next digest interval is due. */
+			echo '<p>' . sprintf( esc_html__( 'Next interval due UTC: %s.', 'amazing-security' ), esc_html( gmdate( 'Y-m-d H:i:s', $status['next_due'] ) ) ) . '</p>';
 		}
 		if ( ! is_ssl() ) {
-			echo '<p>Use HTTPS to approve a setting change.</p>';
+			echo '<p>' . esc_html__( 'Use HTTPS to approve a setting change.', 'amazing-security' ) . '</p>';
 			echo '</div>';
 			return;
 		}
-		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '"><input type="hidden" name="action" value="amsec_digest_settings"><label>Mode <select name="mode">';
-		foreach ( array( 'off', 'on' ) as $value ) {
-			echo '<option value="' . esc_attr( $value ) . '"' . selected( $mode, $value, false ) . '>' . esc_html( ucfirst( $value ) ) . '</option>';
+		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '"><input type="hidden" name="action" value="amsec_digest_settings"><label>' . esc_html__( 'Mode', 'amazing-security' ) . ' <select name="mode">';
+		foreach ( array(
+			'off' => __( 'Off', 'amazing-security' ),
+			'on'  => __( 'On', 'amazing-security' ),
+		) as $value => $label ) {
+			echo '<option value="' . esc_attr( $value ) . '"' . selected( $mode, $value, false ) . '>' . esc_html( $label ) . '</option>';
 		}
 		echo '</select></label>';
 		wp_nonce_field( 'amsec_digest_settings' );
-		echo '<p><label>Your password <input type="password" name="password" autocomplete="current-password" required maxlength="1024"></label></p><p><label><input type="checkbox" name="confirm" value="1" required> I understand that this summary is emailed to the current WordPress administrator email and does not establish a clean-site verdict.</label></p>';
+		echo '<p><label>' . esc_html__( 'Your password', 'amazing-security' ) . ' <input type="password" name="password" autocomplete="current-password" required maxlength="1024"></label></p><p><label><input type="checkbox" name="confirm" value="1" required> ' . esc_html__( 'I understand that this summary is emailed to the current WordPress administrator email and does not establish a clean-site verdict.', 'amazing-security' ) . '</label></p>';
 		submit_button( __( 'Approve digest setting', 'amazing-security' ), 'secondary' );
 		echo '</form></div>';
 	}

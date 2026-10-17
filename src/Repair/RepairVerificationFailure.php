@@ -10,6 +10,6 @@ use RuntimeException;
 
 final class RepairVerificationFailure extends RuntimeException {
 	public function __construct( public readonly RepairReceipt $receipt ) {
-		parent::__construct( 'Replacement verification failed; private backup retained.' );
+		parent::__construct( __( 'Replacement verification failed; private backup retained.', 'amazing-security' ) );
 	}
 }

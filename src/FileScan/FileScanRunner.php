@@ -41,7 +41,7 @@ final class FileScanRunner {
 			}
 			++$count;
 			if ( $item['extra'] ) {
-				$this->finding( $cursor, $target, $relative, 'warn', 'extra', '', 0, 'Review file not in the published release.', '' );
+				$this->finding( $cursor, $target, $relative, 'warn', 'extra', '', 0, __( 'Review file not in the published release.', 'amazing-security' ), '' );
 			}
 			if ( ! $this->mayScanContent( $target, $relative, $item['extra'] ) ) {
 				continue;
@@ -50,7 +50,7 @@ final class FileScanRunner {
 			if ( 'ok' !== $result->state ) {
 				++$cursor->unknown;
 				$cursor->partial = true;
-				$this->finding( $cursor, $target, $relative, 'inconclusive', 'unscanned', '', 0, 'File could not be scanned.', $result->state );
+				$this->finding( $cursor, $target, $relative, 'inconclusive', 'unscanned', '', 0, __( 'File could not be scanned.', 'amazing-security' ), $result->state );
 				continue;
 			}
 			if ( ! $this->selector->eligible( $target, $relative, $result->sha256, $item['extra'] ) ) {
@@ -62,7 +62,7 @@ final class FileScanRunner {
 			} catch ( RuntimeException $error ) {
 				++$cursor->unknown;
 				$cursor->partial = true;
-				$this->finding( $cursor, $target, $relative, 'inconclusive', 'unscanned', '', 0, 'Code rule check could not finish.', $error->getMessage() );
+				$this->finding( $cursor, $target, $relative, 'inconclusive', 'unscanned', '', 0, __( 'Code rule check could not finish.', 'amazing-security' ), $error->getMessage() );
 				continue;
 			}
 			++$cursor->scanned;

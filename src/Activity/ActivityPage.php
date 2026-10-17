@@ -31,7 +31,7 @@ final class ActivityPage {
 			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Renderer escapes every dynamic field.
 			echo ( new ActivityRenderer() )->render( $rows, $page, $event, $pages, $this->switchForm( $enabled ) );
 		} catch ( \RuntimeException ) {
-			echo '<div class="wrap amazing-security-admin"><h1>Security activity</h1><div class="notice notice-error"><p>Activity storage is unavailable. No complete history can be shown.</p></div></div>';
+			echo '<div class="wrap amazing-security-admin"><h1>' . esc_html__( 'Security activity', 'amazing-security' ) . '</h1><div class="notice notice-error"><p>' . esc_html__( 'Activity storage is unavailable. No complete history can be shown.', 'amazing-security' ) . '</p></div></div>';
 		}
 	}
 

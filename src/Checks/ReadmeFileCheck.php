@@ -52,9 +52,9 @@ final class ReadmeFileCheck implements SecurityCheck {
 		$kind    = (string) ( $this->readKind )();
 		$state   = self::decide( $kind );
 		$summary = match ( $state ) {
-			'warn' => 'A readme.html file is in the site root. This check does not delete it.',
-			'pass' => 'No readme.html file is in the site root. This check does not delete it.',
-			default => 'The site root readme could not be checked. This check does not delete it.',
+			'warn' => __( 'A readme.html file is in the site root. This check does not delete it.', 'amazing-security' ),
+			'pass' => __( 'No readme.html file is in the site root. This check does not delete it.', 'amazing-security' ),
+			default => __( 'The site root readme could not be checked. This check does not delete it.', 'amazing-security' ),
 		};
 		return array(
 			new CheckResult( $this->id(), 'warn' === $state ? State::WARN : ( 'pass' === $state ? State::PASS : State::UNKNOWN ), $summary, self::SOURCE, new DateTimeImmutable( 'now', new DateTimeZone( 'UTC' ) ), 'low', 'unknown' === $state ? 'unavailable' : 'complete', array( 'kind' => $kind ) ),

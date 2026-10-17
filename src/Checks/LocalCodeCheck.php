@@ -43,12 +43,12 @@ final class LocalCodeCheck implements SecurityCheck {
 		};
 		$files   = $scanned . ' files';
 		$summary = match ( $stored ) {
-			'none' => 'Plugin and theme PHP has not been scanned with the local patterns. Run local checks on this page. This scan does not contact WordPress.org.',
-			'running' => 'The local code scan has read ' . $files . ' and is still working. Run local checks again to continue it. This scan does not contact WordPress.org.',
-			'partial' => 'The local code scan read ' . $files . ' and stopped before every file was read. Run local checks again. This scan does not contact WordPress.org.',
-			'found' => 'The local code scan read ' . $files . '. ' . ( '' !== $matches ? $matches . '. ' : '' ) . 'This scan does not contact WordPress.org and does not prove the site is clean.',
-			'clean' => 'The local code scan read ' . $files . ' and finished without a pattern match. This scan does not contact WordPress.org and does not prove the site is clean.',
-			default => 'The local code scan could not be read. This scan does not contact WordPress.org.',
+			'none' => __( 'Plugin and theme PHP has not been scanned with the local patterns. Run local checks on this page. This scan does not contact WordPress.org.', 'amazing-security' ),
+			'running' => sprintf( /* translators: %s: number of files read, for example 12 files. */ __( 'The local code scan has read %s and is still working. Run local checks again to continue it. This scan does not contact WordPress.org.', 'amazing-security' ), $files ),
+			'partial' => sprintf( /* translators: %s: number of files read, for example 12 files. */ __( 'The local code scan read %s and stopped before every file was read. Run local checks again. This scan does not contact WordPress.org.', 'amazing-security' ), $files ),
+			'found' => sprintf( /* translators: %s: number of files read, for example 12 files. */ __( 'The local code scan read %s.', 'amazing-security' ), $files ) . ' ' . ( '' !== $matches ? $matches . '. ' : '' ) . __( 'This scan does not contact WordPress.org and does not prove the site is clean.', 'amazing-security' ),
+			'clean' => sprintf( /* translators: %s: number of files read, for example 12 files. */ __( 'The local code scan read %s and finished without a pattern match. This scan does not contact WordPress.org and does not prove the site is clean.', 'amazing-security' ), $files ),
+			default => __( 'The local code scan could not be read. This scan does not contact WordPress.org.', 'amazing-security' ),
 		};
 		return array(
 			new CheckResult(

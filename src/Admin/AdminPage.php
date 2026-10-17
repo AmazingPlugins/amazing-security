@@ -220,15 +220,23 @@ final class AdminPage {
 			echo '</form>';
 			$scanProgress = get_transient( 'amsec_vuln_progress' );
 			if ( is_array( $scanProgress ) ) {
-				$phase = 'provenance' === ( $scanProgress['phase'] ?? null ) ? 'Verifying local release files' : 'Checking published issues';
-				echo '<p role="status">' . esc_html( $phase ) . ': ' . esc_html( (string) (int) ( $scanProgress['offset'] ?? 0 ) ) . ' of ' . esc_html( (string) (int) ( $scanProgress['total'] ?? 0 ) ) . ' packages processed. The next batch is scheduled.</p>';
+				$phase = 'provenance' === ( $scanProgress['phase'] ?? null ) ? __( 'Verifying local release files', 'amazing-security' ) : __( 'Checking published issues', 'amazing-security' );
+				echo '<p role="status">' . esc_html(
+					sprintf(
+						/* translators: 1: progress phase, 2: packages processed, 3: total packages. */
+						__( '%1$s: %2$d of %3$d packages processed. The next batch is scheduled.', 'amazing-security' ),
+						$phase,
+						(int) ( $scanProgress['offset'] ?? 0 ),
+						(int) ( $scanProgress['total'] ?? 0 )
+					)
+				) . '</p>';
 			}
 			echo '<form action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" method="post"><input type="hidden" name="action" value="amazing_security_vulnerability_disable">';
 			wp_nonce_field( 'amazing_security_vulnerability_disable' );
 			submit_button( __( 'Turn off vulnerability checks', 'amazing-security' ), 'secondary' );
 			echo '</form>';
 		} else {
-			echo '<section class="amsec-consent" aria-labelledby="amsec-consent-title"><h3 id="amsec-consent-title">Enable vulnerability checks</h3><p>This WordPress site will contact WPVulnerability directly for its core version and installed plugin and theme slugs. The provider can see this site’s request IP address and requested components. AmazingPlugins receives no inventory. Results are stored on this site. Read the <a href="https://www.wpvulnerability.com/privacy/" target="_blank" rel="noopener noreferrer">provider privacy policy</a> and <a href="https://www.wpvulnerability.com/license/" target="_blank" rel="noopener noreferrer">data license</a>.</p>';
+			echo '<section class="amsec-consent" aria-labelledby="amsec-consent-title"><h3 id="amsec-consent-title">' . esc_html__( 'Enable vulnerability checks', 'amazing-security' ) . '</h3><p>' . esc_html__( 'This WordPress site will contact WPVulnerability directly for its core version and installed plugin and theme slugs. The provider can see this site’s request IP address and requested components. AmazingPlugins receives no inventory. Results are stored on this site. Read the', 'amazing-security' ) . ' <a href="https://www.wpvulnerability.com/privacy/" target="_blank" rel="noopener noreferrer">' . esc_html__( 'provider privacy policy', 'amazing-security' ) . '</a> ' . esc_html__( 'and', 'amazing-security' ) . ' <a href="https://www.wpvulnerability.com/license/" target="_blank" rel="noopener noreferrer">' . esc_html__( 'data license', 'amazing-security' ) . '</a>.</p>';
 			echo '<form action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" method="post"><input type="hidden" name="action" value="amazing_security_vulnerability_enable">';
 			wp_nonce_field( 'amazing_security_vulnerability_enable' );
 			submit_button( __( 'Enable vulnerability checks', 'amazing-security' ) );
@@ -422,12 +430,12 @@ final class AdminPage {
 				default => $result->state,
 			};
 			$badge = match ( $tone ) {
-				'none' => 'Not run',
-				'partial' => 'Continue',
-				'critical' => 'Critical',
-				'warn', 'fail' => 'Review',
-				'pass' => 'Success',
-				default => 'Recommended',
+				'none' => __( 'Not run', 'amazing-security' ),
+				'partial' => __( 'Continue', 'amazing-security' ),
+				'critical' => __( 'Critical', 'amazing-security' ),
+				'warn', 'fail' => __( 'Review', 'amazing-security' ),
+				'pass' => __( 'Success', 'amazing-security' ),
+				default => __( 'Recommended', 'amazing-security' ),
 			};
 			echo '<li class="amsec-start-item' . ( $actions ? '' : ' is-quiet' ) . '" data-state="' . esc_attr( $tone ) . '"><span class="amsec-start-badge">' . esc_html( $badge ) . '</span><span class="amsec-start-copy"><strong>' . esc_html( StartHere::label( $result->checkId ) ) . '</strong> ' . esc_html( $result->summary ) . '</span>';
 			if ( $actions ) {
@@ -443,8 +451,8 @@ final class AdminPage {
 	private function reportDownload(): void {
 		echo '<form class="amsec-start-action" method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '"><input type="hidden" name="action" value="amsec_findings_report">';
 		wp_nonce_field( 'amsec_findings_report' );
-		echo '<button type="submit" class="button">Download findings</button></form>';
-		echo '<p>The file is a starting list for a host. It is not a compliance report, and it does not start a new check.</p>';
+		echo '<button type="submit" class="button">' . esc_html__( 'Download findings', 'amazing-security' ) . '</button></form>';
+		echo '<p>' . esc_html__( 'The file is a starting list for a host. It is not a compliance report, and it does not start a new check.', 'amazing-security' ) . '</p>';
 	}
 
 	/** @param array<string, string>|null $control */
@@ -478,17 +486,17 @@ final class AdminPage {
 		if ( '' !== $scan && '' === $scanId ) {
 			$control = match ( $scan ) {
 				'integrity' => array(
-					'label'  => 'Run integrity scan',
+					'label'  => __( 'Run integrity scan', 'amazing-security' ),
 					'action' => 'amazing_security_integrity_start',
 					'nonce'  => 'amazing_security_integrity_start',
 				),
 				'files' => array(
-					'label'  => 'Run file scan',
+					'label'  => __( 'Run file scan', 'amazing-security' ),
 					'action' => 'amazing_security_file_scan_start',
 					'nonce'  => 'amazing_security_file_scan_start',
 				),
 				default => array(
-					'label' => 'Review content scan',
+					'label' => __( 'Review content scan', 'amazing-security' ),
 					'page'  => 'amsec-content',
 				),
 			};

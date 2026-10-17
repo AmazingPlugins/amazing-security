@@ -32,8 +32,8 @@ final class LoginConfirmation {
 		if ( ! $this->isEnabled() ) {
 			return;
 		}
-		echo '<p class="amsec-login-confirm"><label><input type="checkbox" name="amsec_login_confirm" value="1"> Confirm this sign-in</label></p>';
-		echo '<p style="position:absolute;left:-9999px" aria-hidden="true"><label>Website <input type="text" name="amsec_login_website" value="" tabindex="-1" autocomplete="off"></label></p>';
+		echo '<p class="amsec-login-confirm"><label><input type="checkbox" name="amsec_login_confirm" value="1"> ' . esc_html__( 'Confirm this sign-in', 'amazing-security' ) . '</label></p>';
+		echo '<p style="position:absolute;left:-9999px" aria-hidden="true"><label>' . esc_html__( 'Website', 'amazing-security' ) . ' <input type="text" name="amsec_login_website" value="" tabindex="-1" autocomplete="off"></label></p>';
 	}
 
 	public function authenticate( mixed $user, string $username, string $password ): mixed {

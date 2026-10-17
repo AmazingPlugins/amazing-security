@@ -49,19 +49,22 @@ final class TrafficSettings {
 		$service = $this->service();
 		$state   = $service->status();
 		$fp      = $service->fingerprint();
-		echo '<div class="wrap amazing-security-admin"><header class="amsec-header"><div><h1>PHP traffic history</h1><p>A small local history for troubleshooting request behavior.</p></div></header><section class="amsec-overview"><h2>No visitor addresses</h2><p>Off by default. Optional rows contain time, a coarse endpoint category, HTTP method, best-effort response status and fixed security decision. No visitor addresses, URLs, query strings, content, cookies, headers, usernames or user agents are stored. Administrators identified at collection, CLI and cron are skipped.</p><p>This is not complete traffic history. Cached/static/CDN responses, terminated processes and dropped records are absent. Collection admits at most 100 rows per minute and 5,000 total rows, without replacing rows during requests. Busy, full or unavailable storage drops records and never changes protection. Records expire from this view after seven days; hourly cleanup deletes up to 500 expired rows. Delayed cron can retain older rows until cleanup.</p><p>A 200 response does not establish a safe request or successful login. Unclassified means no supported decision label was captured. This version labels network and REST-rate blocks only. Disabling stops future collection and retains existing history until expiry. Recovery: <code>wp amazing-security traffic disable</code>; <code>AMSEC_DISABLE_TRAFFIC</code> bypasses collection.</p></section>';
-		echo '<section class="amsec-file-scan"><h2>Collection settings</h2>';
+		echo '<div class="wrap amazing-security-admin"><header class="amsec-header"><div><h1>' . esc_html__( 'PHP traffic history', 'amazing-security' ) . '</h1><p>' . esc_html__( 'A small local history for troubleshooting request behavior.', 'amazing-security' ) . '</p></div></header><section class="amsec-overview"><h2>' . esc_html__( 'No visitor addresses', 'amazing-security' ) . '</h2><p>' . esc_html__( 'Off by default. Optional rows contain time, a coarse endpoint category, HTTP method, best-effort response status and fixed security decision. No visitor addresses, URLs, query strings, content, cookies, headers, usernames or user agents are stored. Administrators identified at collection, CLI and cron are skipped.', 'amazing-security' ) . '</p><p>' . esc_html__( 'This is not complete traffic history. Cached/static/CDN responses, terminated processes and dropped records are absent. Collection admits at most 100 rows per minute and 5,000 total rows, without replacing rows during requests. Busy, full or unavailable storage drops records and never changes protection. Records expire from this view after seven days; hourly cleanup deletes up to 500 expired rows. Delayed cron can retain older rows until cleanup.', 'amazing-security' ) . '</p><p>' .
+			/* translators: %1$s and %2$s are inline code snippets (a WP-CLI command or a constant name); keep them unchanged. */
+			sprintf( esc_html__( 'A 200 response does not establish a safe request or successful login. Unclassified means no supported decision label was captured. This version labels network and REST-rate blocks only. Disabling stops future collection and retains existing history until expiry. Recovery: %1$s; %2$s bypasses collection.', 'amazing-security' ), '<code>wp amazing-security traffic disable</code>', '<code>AMSEC_DISABLE_TRAFFIC</code>' ) . '</p></section>';
+		echo '<section class="amsec-file-scan"><h2>' . esc_html__( 'Collection settings', 'amazing-security' ) . '</h2>';
 		if ( ! empty( $state['invalid'] ) ) {
-			echo '<p>Traffic policy is invalid; collection is unavailable. Use the host recovery command.</p>'; } else {
-				echo '<p>Collection: ' . esc_html( $state['enabled'] ? 'on' : 'off' ) . '.</p>';
+			echo '<p>' . esc_html__( 'Traffic policy is invalid; collection is unavailable. Use the host recovery command.', 'amazing-security' ) . '</p>'; } else {
+				/* translators: %s: collection state, "on" or "off". */
+				echo '<p>' . sprintf( esc_html__( 'Collection: %s.', 'amazing-security' ), esc_html( $state['enabled'] ? __( 'on', 'amazing-security' ) : __( 'off', 'amazing-security' ) ) ) . '</p>';
 			if ( is_ssl() ) {
-				echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '"><input type="hidden" name="action" value="amsec_traffic_settings"><input type="hidden" name="fingerprint" value="' . esc_attr( $fp ) . '"><p><label>Collection <select name="enabled"><option value="0"' . selected( $state['enabled'], false, false ) . '>Off</option><option value="1"' . selected( $state['enabled'], true, false ) . '>On</option></select></label></p>';
+				echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '"><input type="hidden" name="action" value="amsec_traffic_settings"><input type="hidden" name="fingerprint" value="' . esc_attr( $fp ) . '"><p><label>' . esc_html__( 'Collection', 'amazing-security' ) . ' <select name="enabled"><option value="0"' . selected( $state['enabled'], false, false ) . '>' . esc_html__( 'Off', 'amazing-security' ) . '</option><option value="1"' . selected( $state['enabled'], true, false ) . '>' . esc_html__( 'On', 'amazing-security' ) . '</option></select></label></p>';
 				wp_nonce_field( 'amsec_traffic_' . $fp );
-				echo '<p><label>Your password <input type="password" name="password" autocomplete="current-password" maxlength="1024" required></label></p><p><label><input type="checkbox" name="confirm" value="1" required> I have reviewed the stored fields, retention and incomplete coverage.</label></p>';
+				echo '<p><label>' . esc_html__( 'Your password', 'amazing-security' ) . ' <input type="password" name="password" autocomplete="current-password" maxlength="1024" required></label></p><p><label><input type="checkbox" name="confirm" value="1" required> ' . esc_html__( 'I have reviewed the stored fields, retention and incomplete coverage.', 'amazing-security' ) . '</label></p>';
 				submit_button( __( 'Approve traffic collection', 'amazing-security' ), 'secondary' );
 				echo '</form>';
 			} else {
-				echo '<p>Use HTTPS to approve collection changes.</p>'; }
+				echo '<p>' . esc_html__( 'Use HTTPS to approve collection changes.', 'amazing-security' ) . '</p>'; }
 			}
 			echo '</section>';
 			$this->history();
@@ -74,7 +77,7 @@ final class TrafficSettings {
 		$category = is_string( $_GET['category'] ?? null ) ? sanitize_key( wp_unslash( $_GET['category'] ) ) : '';
 		if ( ! in_array( $category, TrafficEvent::CATEGORIES, true ) ) {
 			$category = ''; }
-		echo '<section class="amsec-file-scan"><h2>Recent PHP requests</h2><form method="get"><input type="hidden" name="page" value="amsec-traffic"><label>Endpoint category <select name="category"><option value="">All categories</option>';
+		echo '<section class="amsec-file-scan"><h2>' . esc_html__( 'Recent PHP requests', 'amazing-security' ) . '</h2><form method="get"><input type="hidden" name="page" value="amsec-traffic"><label>' . esc_html__( 'Endpoint category', 'amazing-security' ) . ' <select name="category"><option value="">' . esc_html__( 'All categories', 'amazing-security' ) . '</option>';
 		foreach ( TrafficEvent::CATEGORIES as $label ) {
 			echo '<option value="' . esc_attr( $label ) . '"' . selected( $category, $label, false ) . '>' . esc_html( $label ) . '</option>'; }
 		echo '</select></label> ';
@@ -82,28 +85,29 @@ final class TrafficSettings {
 		echo '</form>';
 		try {
 			$rows = ( new TrafficRepository( $GLOBALS['wpdb'] ) )->page( $page, $category ); } catch ( \Throwable ) {
-					echo '<p>Traffic storage is unavailable. No complete history can be shown.</p></section>';
+					echo '<p>' . esc_html__( 'Traffic storage is unavailable. No complete history can be shown.', 'amazing-security' ) . '</p></section>';
 					return; }
 			if ( array() === $rows ) {
-				echo '<p>No retained rows on this page. Empty history does not establish complete collection or safe traffic.</p>'; } else {
-						echo '<table class="widefat striped"><thead><tr><th scope="col">Time (UTC)</th><th scope="col">Method</th><th scope="col">Category</th><th scope="col">HTTP status</th><th scope="col">Decision</th></tr></thead><tbody>';
+				echo '<p>' . esc_html__( 'No retained rows on this page. Empty history does not establish complete collection or safe traffic.', 'amazing-security' ) . '</p>'; } else {
+						echo '<table class="widefat striped"><thead><tr><th scope="col">' . esc_html__( 'Time (UTC)', 'amazing-security' ) . '</th><th scope="col">' . esc_html__( 'Method', 'amazing-security' ) . '</th><th scope="col">' . esc_html__( 'Category', 'amazing-security' ) . '</th><th scope="col">' . esc_html__( 'HTTP status', 'amazing-security' ) . '</th><th scope="col">' . esc_html__( 'Decision', 'amazing-security' ) . '</th></tr></thead><tbody>';
 				foreach ( $rows as $row ) {
 					$timestamp = ctype_digit( (string) ( $row['created_at'] ?? '' ) ) ? (int) $row['created_at'] : 0;
 					$status    = ctype_digit( (string) ( $row['status'] ?? '' ) ) ? (int) $row['status'] : 0;
-					echo '<tr><td>' . esc_html( $timestamp > 0 ? gmdate( 'Y-m-d H:i:s', $timestamp ) : 'Unknown' ) . '</td>';
+					echo '<tr><td>' . esc_html( $timestamp > 0 ? gmdate( 'Y-m-d H:i:s', $timestamp ) : __( 'Unknown', 'amazing-security' ) ) . '</td>';
 					foreach ( array(
 						'method'   => TrafficEvent::METHODS,
 						'category' => TrafficEvent::CATEGORIES,
 					) as $key => $allowed ) {
-						echo '<td>' . esc_html( in_array( $row[ $key ] ?? null, $allowed, true ) ? $row[ $key ] : 'Unknown' ) . '</td>'; }
-					echo '<td>' . esc_html( $status >= 100 && $status <= 599 ? (string) $status : 'Unknown' ) . '</td><td>' . esc_html( in_array( $row['decision'] ?? null, TrafficEvent::DECISIONS, true ) ? $row['decision'] : 'Unknown' ) . '</td></tr>';
+						echo '<td>' . esc_html( in_array( $row[ $key ] ?? null, $allowed, true ) ? $row[ $key ] : __( 'Unknown', 'amazing-security' ) ) . '</td>'; }
+					echo '<td>' . esc_html( $status >= 100 && $status <= 599 ? (string) $status : __( 'Unknown', 'amazing-security' ) ) . '</td><td>' . esc_html( in_array( $row['decision'] ?? null, TrafficEvent::DECISIONS, true ) ? $row['decision'] : __( 'Unknown', 'amazing-security' ) ) . '</td></tr>';
 				}
 				echo '</tbody></table>';
 				}
-				echo '<p>Page ' . esc_html( (string) $page ) . ' · Up to 50 rows per page</p><p>';
+				/* translators: %s: current page number in the traffic history list. */
+				echo '<p>' . sprintf( esc_html__( 'Page %s · Up to 50 rows per page', 'amazing-security' ), esc_html( (string) $page ) ) . '</p><p>';
 				foreach ( array(
-					'Previous' => max( 1, $page - 1 ),
-					'Next'     => min( 100, $page + 1 ),
+					__( 'Previous', 'amazing-security' ) => max( 1, $page - 1 ),
+					__( 'Next', 'amazing-security' )     => min( 100, $page + 1 ),
 				) as $label => $target ) {
 					echo '<a class="button" href="' . esc_url(
 						add_query_arg(

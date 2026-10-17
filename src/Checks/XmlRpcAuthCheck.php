@@ -41,9 +41,9 @@ final class XmlRpcAuthCheck implements SecurityCheck {
 			default => State::UNKNOWN,
 		};
 		$summary = match ( $auth ) {
-			'open' => 'Sign-in over XML-RPC is still allowed. A script can try passwords there without the login form. This check does not turn that off.',
-			'closed' => 'Sign-in over XML-RPC is turned off. Pingbacks stay a separate setting.',
-			default => 'The XML-RPC sign-in setting could not be read.',
+			'open' => __( 'Sign-in over XML-RPC is still allowed. A script can try passwords there without the login form. This check does not turn that off.', 'amazing-security' ),
+			'closed' => __( 'Sign-in over XML-RPC is turned off. Pingbacks stay a separate setting.', 'amazing-security' ),
+			default => __( 'The XML-RPC sign-in setting could not be read.', 'amazing-security' ),
 		};
 		return array(
 			new CheckResult(

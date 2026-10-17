@@ -60,9 +60,9 @@ final class ConfigBackupCheck implements SecurityCheck {
 		$kind    = (string) ( $this->readKind )();
 		$state   = self::decide( $kind );
 		$summary = match ( $state ) {
-			'warn' => 'A backup copy of wp-config.php is in the site root. This check does not read or delete it.',
-			'pass' => 'No backup copy of wp-config.php is in the site root. This check does not read or delete it.',
-			default => 'A backup copy of wp-config.php could not be checked. This check does not read or delete it.',
+			'warn' => __( 'A backup copy of wp-config.php is in the site root. This check does not read or delete it.', 'amazing-security' ),
+			'pass' => __( 'No backup copy of wp-config.php is in the site root. This check does not read or delete it.', 'amazing-security' ),
+			default => __( 'A backup copy of wp-config.php could not be checked. This check does not read or delete it.', 'amazing-security' ),
 		};
 		return array(
 			new CheckResult( $this->id(), 'warn' === $state ? State::WARN : ( 'pass' === $state ? State::PASS : State::UNKNOWN ), $summary, self::SOURCE, new DateTimeImmutable( 'now', new DateTimeZone( 'UTC' ) ), 'low', 'unknown' === $state ? 'unavailable' : 'complete', array( 'kind' => $kind ) ),

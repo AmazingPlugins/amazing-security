@@ -118,7 +118,7 @@ final class ActivityRenderer {
 		if ( isset( $this->names[ $id ] ) ) {
 			return $this->names[ $id ];
 		}
-		$name = 'Account ' . $id;
+		$name = sprintf( /* translators: %d: user ID of an account that cannot be read. */ __( 'Account %d', 'amazing-security' ), $id );
 		if ( function_exists( 'get_userdata' ) ) {
 			$user = get_userdata( $id );
 			if ( is_object( $user ) && isset( $user->user_login ) && is_string( $user->user_login ) && '' !== $user->user_login ) {

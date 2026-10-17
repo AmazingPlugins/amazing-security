@@ -43,10 +43,10 @@ final class RestRateCheck implements SecurityCheck {
 			default => State::UNKNOWN,
 		};
 		$summary = match ( $mode ) {
-			'off' => 'REST user and comment limits are off.',
-			'observe' => 'REST user and comment limits are recording only.',
-			'block' => 'REST user and comment limits can reject excess unauthenticated requests.',
-			default => 'The REST rate policy could not be read.',
+			'off' => __( 'REST user and comment limits are off.', 'amazing-security' ),
+			'observe' => __( 'REST user and comment limits are recording only.', 'amazing-security' ),
+			'block' => __( 'REST user and comment limits can reject excess unauthenticated requests.', 'amazing-security' ),
+			default => __( 'The REST rate policy could not be read.', 'amazing-security' ),
 		};
 		return array(
 			new CheckResult(

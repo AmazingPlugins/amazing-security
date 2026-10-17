@@ -86,7 +86,7 @@ final class TargetDiscovery {
 		return new CheckResult(
 			'integrity-package',
 			State::UNKNOWN,
-			'Package could not be verified against a WordPress.org release.',
+			__( 'Package could not be verified against a WordPress.org release.', 'amazing-security' ),
 			'https://wordpress.org/plugins/',
 			new DateTimeImmutable(),
 			'low',

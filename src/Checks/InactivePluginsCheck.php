@@ -70,9 +70,9 @@ final class InactivePluginsCheck implements SecurityCheck {
 		$state   = self::decide( $kind );
 		$count   = self::count( $kind );
 		$summary = match ( $state ) {
-			'warn' => ( $count > 0 ? $count . ' inactive ' . ( 1 === $count ? 'plugin is' : 'plugins are' ) . ' installed. ' : 'Inactive plugins are installed. ' ) . 'Open Plugins to review them. This check does not deactivate or delete them.',
-			'pass' => 'Every installed plugin is active. This check does not deactivate or delete plugins.',
-			default => 'Inactive plugins could not be listed. This check does not deactivate or delete plugins.',
+			'warn' => ( $count > 0 ? sprintf( /* translators: %d: number of inactive plugins. */ _n( '%d inactive plugin is installed.', '%d inactive plugins are installed.', $count, 'amazing-security' ), $count ) . ' ' : __( 'Inactive plugins are installed.', 'amazing-security' ) . ' ' ) . __( 'Open Plugins to review them. This check does not deactivate or delete them.', 'amazing-security' ),
+			'pass' => __( 'Every installed plugin is active. This check does not deactivate or delete plugins.', 'amazing-security' ),
+			default => __( 'Inactive plugins could not be listed. This check does not deactivate or delete plugins.', 'amazing-security' ),
 		};
 		return array(
 			new CheckResult( $this->id(), 'warn' === $state ? State::WARN : ( 'pass' === $state ? State::PASS : State::UNKNOWN ), $summary, self::SOURCE, new DateTimeImmutable( 'now', new DateTimeZone( 'UTC' ) ), 'low', 'unknown' === $state ? 'unavailable' : 'complete', array( 'kind' => $kind ) ),

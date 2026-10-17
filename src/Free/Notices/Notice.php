@@ -24,17 +24,21 @@ final class Notice {
 		if ( 'administrator' === $kind ) {
 			$login = trim( $login );
 			if ( '' === $login || strlen( $login ) > 60 || 1 !== preg_match( '/^[A-Za-z0-9 _.@-]+$/', $login ) ) {
-				$login = 'an account';
+				$login = __( 'an account', 'amazing-security' );
 			}
 			return array(
-				'subject' => 'Administrator role added',
-				'body'    => 'An account was given the administrator role: ' . $login . '.',
+				'subject' => __( 'Administrator role added', 'amazing-security' ),
+				'body'    => sprintf(
+					/* translators: %s: account login name, or "an account" when the name is not safe to show. */
+					__( 'An account was given the administrator role: %s.', 'amazing-security' ),
+					$login
+				),
 			);
 		}
 		if ( 'limited' === $kind ) {
 			return array(
-				'subject' => 'Sign-in limited',
-				'body'    => 'A sign-in was limited by the local repeat check.',
+				'subject' => __( 'Sign-in limited', 'amazing-security' ),
+				'body'    => __( 'A sign-in was limited by the local repeat check.', 'amazing-security' ),
 			);
 		}
 		return null;

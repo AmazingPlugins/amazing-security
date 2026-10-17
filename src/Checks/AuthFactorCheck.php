@@ -58,15 +58,15 @@ final class AuthFactorCheck implements SecurityCheck {
 			default                     => State::CRITICAL,
 		};
 		$kind     = 'passkeys-status' === $this->checkId ? 'passkeys' : 'authenticator';
-		$provider = is_string( $factor['provider'] ?? null ) && '' !== $factor['provider'] ? $factor['provider'] : 'That plugin';
+		$provider = is_string( $factor['provider'] ?? null ) && '' !== $factor['provider'] ? $factor['provider'] : __( 'That plugin', 'amazing-security' );
 		$summary  = match ( $kind . ':' . $stateKey ) {
 			'authenticator:active' => $provider . ' is handling authenticator codes for this account. Amazing Security does not store backup codes; manage enrollment there.',
 			'authenticator:available' => $provider . ' is installed but not in use for this account. Turn it on there. Amazing Security only reports status.',
-			'authenticator:missing' => 'No authenticator-app plugin was detected. Install a dedicated plugin such as Two Factor if you want app codes. Amazing Security does not enroll devices.',
+			'authenticator:missing' => __( 'No authenticator-app plugin was detected. Install a dedicated plugin such as Two Factor if you want app codes. Amazing Security does not enroll devices.', 'amazing-security' ),
 			'passkeys:active' => $provider . ' is handling passkeys for this account. Manage devices there. Amazing Security does not enroll passkeys.',
 			'passkeys:available' => $provider . ' is installed but not in use for this account. Turn it on there. Amazing Security only reports status.',
-			'passkeys:missing' => 'No passkey plugin was detected. Install a dedicated plugin such as Two Factor if you want passkeys. Amazing Security does not enroll devices.',
-			default => 'Authenticator status could not be read. Amazing Security does not enroll devices.',
+			'passkeys:missing' => __( 'No passkey plugin was detected. Install a dedicated plugin such as Two Factor if you want passkeys. Amazing Security does not enroll devices.', 'amazing-security' ),
+			default => __( 'Authenticator status could not be read. Amazing Security does not enroll devices.', 'amazing-security' ),
 		};
 		$confidence = match ( $state ) {
 			State::CRITICAL => 'high',
