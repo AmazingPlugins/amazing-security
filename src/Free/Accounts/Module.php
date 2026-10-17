@@ -150,6 +150,13 @@ final class Module {
 		if ( 'send' === $decision ) {
 			return self::sendEmailCode( $user );
 		}
+		if ( null !== $stored && '' !== self::posted( 'amsec_email_code' ) ) {
+			// shortcut: read-modify-write meta, so parallel guesses can exceed TRIES slightly; use an atomic counter if that matters.
+			$json = wp_json_encode( EmailFactor::failedTry( $stored ) );
+			if ( is_string( $json ) ) {
+				update_user_meta( $user->ID, EmailFactor::META, $json );
+			}
+		}
 		return new \WP_Error( 'amsec_email_factor', __( 'Enter the email code and sign in again.', 'amazing-security' ) );
 	}
 
@@ -183,13 +190,18 @@ final class Module {
 		if ( '1' !== self::option( LoginChallenge::OPTION ) ) {
 			return 'allow';
 		}
-		$token = self::challengeToken();
+		$token    = self::challengeToken();
+		$expected = self::expectedSum( $token );
+		if ( '' !== $token ) {
+			// One answer per question: a retry must load the new pair that login_init just issued.
+			delete_transient( LoginChallenge::transientKey( $token ) );
+		}
 		return LoginChallenge::decision(
 			true,
 			defined( 'XMLRPC_REQUEST' ) && XMLRPC_REQUEST,
 			self::apiRequest(),
 			$token,
-			self::expectedSum( $token ),
+			$expected,
 			self::posted( LoginChallenge::SUM ),
 			self::posted( LoginChallenge::HONEYPOT )
 		);

@@ -127,3 +127,15 @@ $amsec_comment_rate         = $wpdb->esc_like( '_transient_amsec_cr_' ) . '%';
 $amsec_comment_rate_timeout = $wpdb->esc_like( '_transient_timeout_amsec_cr_' ) . '%';
 // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Explicit erase removes only the comment-minute transients.
 $wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->options} WHERE option_name LIKE %s OR option_name LIKE %s", $amsec_comment_rate, $amsec_comment_rate_timeout ) );
+
+// Sweep every remaining plugin-owned option, transient, user meta row and cron hook. Both prefixes belong only to this plugin.
+foreach ( array( 'amsec\_%', 'amazing\_security\_%', '\_transient\_amsec\_%', '\_transient\_timeout\_amsec\_%', '\_transient\_amazing\_security\_%', '\_transient\_timeout\_amazing\_security\_%', '\_site\_transient\_amsec\_%', '\_site\_transient\_timeout\_amsec\_%' ) as $amsec_like ) {
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Explicit erase removes only rows with this plugin's prefixes.
+	$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->options} WHERE option_name LIKE %s", $amsec_like ) );
+}
+// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Explicit erase removes only this plugin's user meta.
+$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->usermeta} WHERE meta_key LIKE %s", 'amsec\_%' ) );
+foreach ( array( 'amsec_activity_cleanup', 'amsec_alert_retry', 'amsec_bot_cleanup', 'amsec_file_tick', 'amsec_fix_cleanup', 'amsec_integrity_tick', 'amsec_login_cleanup', 'amsec_passkey_cleanup', 'amsec_traffic_cleanup', 'amsec_vuln_tick', 'amsec_weekly_digest_tick' ) as $amsec_hook ) {
+	wp_clear_scheduled_hook( $amsec_hook );
+}
+wp_cache_flush();

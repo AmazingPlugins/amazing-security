@@ -37,6 +37,7 @@ final class AccountPage {
 		$challenge = Settings::flag( self::stored( LoginChallenge::OPTION ) );
 		$rate      = LoginExtras::rate( self::stored( LoginExtras::RATE ) ) ?? 'off';
 		$xmlrpc    = LoginExtras::xmlrpc( self::stored( LoginExtras::XMLRPC ) ) ?? '0';
+		$erase     = Settings::flag( self::stored( Settings::ERASE ) );
 		echo '<div class="wrap amazing-security-admin">';
 		ScreenTabs::bar(
 			array(
@@ -78,6 +79,10 @@ final class AccountPage {
 		self::choice( '0', $xmlrpc, __( 'Allowed', 'amazing-security' ) );
 		self::choice( '1', $xmlrpc, __( 'Turned off', 'amazing-security' ) );
 		echo '</select><p>' . esc_html__( 'Turned off stops password tries through xmlrpc.php. Pingbacks stay separate. Some apps still need this allowed.', 'amazing-security' ) . '</p></div>';
+		echo '</fieldset>';
+		echo '<fieldset class="amsec-auth-group"><legend>' . esc_html__( 'Uninstall', 'amazing-security' ) . '</legend>';
+		self::flagField( Settings::ERASE, $erase, __( 'Erase all Amazing Security settings, logs and scan results when the plugin is deleted', 'amazing-security' ) );
+		echo '<p>' . esc_html__( 'Leave this off to keep your settings if you reinstall later. Repair backups stored outside the site folder are not removed.', 'amazing-security' ) . '</p>';
 		echo '</fieldset>';
 		submit_button( __( 'Save account protection', 'amazing-security' ) );
 		echo '</form>';

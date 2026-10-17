@@ -63,6 +63,20 @@ final class AccountProtectionTest extends TestCase {
 		self::assertSame( 'reject', EmailFactor::decision( true, false, false, 'secret', true, '000000', $record, 1_700_000_000, 'unit-key' ) );
 	}
 
+	public function test_email_factor_burns_the_code_after_five_wrong_tries(): void {
+		$code   = '482913';
+		$record = EmailFactor::record( $code, 1_700_000_000, 'unit-key' );
+		for ( $i = 0; $i < EmailFactor::TRIES - 1; ++$i ) {
+			$record = EmailFactor::failedTry( $record );
+		}
+		self::assertSame( 'accept', EmailFactor::decision( true, false, false, 'secret', true, $code, $record, 1_700_000_010, 'unit-key' ) );
+		$record = EmailFactor::unpack( (string) json_encode( EmailFactor::failedTry( $record ) ) );
+		self::assertSame( EmailFactor::TRIES, $record['tries'] );
+		self::assertSame( 'reject', EmailFactor::decision( true, false, false, 'secret', true, $code, $record, 1_700_000_010, 'unit-key' ) );
+		self::assertSame( 'reject', EmailFactor::decision( true, false, false, 'secret', true, '', $record, 1_700_000_030, 'unit-key' ), 'A burned code still waits for the resend interval.' );
+		self::assertSame( 'send', EmailFactor::decision( true, false, false, 'secret', true, '', $record, 1_700_000_061, 'unit-key' ) );
+	}
+
 	public function test_breach_block_uses_a_fake_listed_callback(): void {
 		$calls = 0;
 		$fake  = static function ( string $password ) use ( &$calls ): bool {
@@ -113,6 +127,7 @@ final class AccountProtectionTest extends TestCase {
 				'amsec_approve_registrations' => '0',
 				'amsec_email_factor'          => '0',
 				'amsec_login_challenge'       => '0',
+				'amsec_login_erase_on_uninstall' => '0',
 			),
 			$saved
 		);
