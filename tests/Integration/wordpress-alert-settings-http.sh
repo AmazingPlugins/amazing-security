@@ -44,7 +44,7 @@ test "$status" = 400 || test "$status" = 403
 stage=login
 curl -sS -c "$cookies" -b "$cookies" -L -o /dev/null --data-urlencode "log=$AMSEC_TEST_LOGIN" --data-urlencode "pwd=$AMSEC_TEST_PASSWORD" --data-urlencode 'wp-submit=Log In' "$base/wp-login.php"
 stage=page
-status="$(curl -sS -b "$cookies" -o "$page" -w '%{http_code}' "$base/wp-admin/admin.php?page=amazing-security")"
+status="$(curl -sS -b "$cookies" -o "$page" -w '%{http_code}' "$base/wp-admin/admin.php?page=amsec-settings")"
 test "$status" = 200
 grep -q 'name="action" value="amsec_alert_settings"' "$page"
 stage=nonce
