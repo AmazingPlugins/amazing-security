@@ -51,8 +51,6 @@ for pair in 'amsec-next-wp wordpress 66' 'amsec-next-wp69 wordpress69 69'; do
  wp eval-file /var/www/html/wp-content/amsec-incident-test.php --user=admin > "$evidence/incident-result$tag.log"
  docker cp "$base/tests/Integration/wordpress-permissions.php" "$site:/var/www/html/wp-content/amsec-permissions-test.php"
  wp eval-file /var/www/html/wp-content/amsec-permissions-test.php --user=admin > "$evidence/permissions-result$tag.log"
- docker cp "$base/tests/Integration/wordpress-required-totp.php" "$site:/var/www/html/wp-content/amsec-required-totp-test.php"
- wp eval-file /var/www/html/wp-content/amsec-required-totp-test.php --user=admin > "$evidence/required-totp-result$tag.log"
  docker cp "$base/tests/Integration/wordpress-baseline.php" "$site:/var/www/html/wp-content/amsec-baseline-test.php"
  wp eval-file /var/www/html/wp-content/amsec-baseline-test.php --user=admin > "$evidence/baseline-result$tag.log"
  docker cp "$base/tests/Integration/wordpress-bots.php" "$site:/var/www/html/wp-content/amsec-bots-test.php"

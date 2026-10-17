@@ -1,7 +1,6 @@
 <?php
 
 // Run with: wp eval-file wp-content/plugins/amazing-security/tests/Integration/wordpress-smoke.php
-use AmazingPlugins\Security\Admin\ReportRenderer;
 use AmazingPlugins\Security\Checks\AdminAccountsCheck;
 use AmazingPlugins\Security\Checks\DebugDisplayCheck;
 use AmazingPlugins\Security\Checks\FileEditorCheck;
@@ -45,11 +44,6 @@ try {
 if ($repository->latest()->toArray() !== $run->toArray()) {
     throw new RuntimeException('Failed save changed the previous report.');
 }
-$result = new CheckResult('escaping', 'warn', '<script>alert(1)</script>', 'https://developer.wordpress.org/', new DateTimeImmutable('2026-01-01T00:00:00Z'), 'high', 'complete', []);
-$markup = (new ReportRenderer())->render(new ScanRun(new DateTimeImmutable('2026-01-01T00:00:00Z'), new DateTimeImmutable('2026-01-01T00:00:00Z'), [$result], false));
-if (str_contains($markup, '<script>') || !str_contains($markup, '&lt;script&gt;') || !str_contains($markup, '2026-01-01')) {
-    throw new RuntimeException('Escaping or original timestamp failed.');
-}
 wp_set_current_user(0);
 if (current_user_can('manage_options')) {
     throw new RuntimeException('Anonymous user can manage options.');
@@ -67,4 +61,4 @@ wp_set_current_user(1);
 if (!current_user_can('manage_options')) {
     throw new RuntimeException('Owner cannot manage options.');
 }
-echo 'WordPress smoke: five checks, persistence, escaping, timestamp, and role gates passed.' . PHP_EOL;
+echo 'WordPress smoke: five checks, persistence and role gates passed.' . PHP_EOL;

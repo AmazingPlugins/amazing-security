@@ -1,3 +1,20 @@
+/* Bundled fonts (SIL OFL 1.1, see assets/fonts/OFL-*.txt). Latin subset; other scripts fall back to system fonts. */
+@font-face {
+  font-family: Fraunces;
+  font-style: normal;
+  font-weight: 650;
+  font-display: swap;
+  src: url(fonts/fraunces-650-latin.woff2) format("woff2");
+}
+
+@font-face {
+  font-family: Inter;
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url(fonts/inter-latin.woff2) format("woff2");
+}
+
 .amazing-security-admin {
   --amsec-ink: #1a1410;
   --amsec-line: rgba(26, 20, 16, 0.12);
