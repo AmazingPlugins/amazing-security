@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Scan;
 
+defined( 'ABSPATH' ) || exit;
+
 use AmazingPlugins\Security\FileScan\FileScanCursor;
 use AmazingPlugins\Security\FileScan\FileScanPlanBuilder;
 use AmazingPlugins\Security\FileScan\FileScanRunner;

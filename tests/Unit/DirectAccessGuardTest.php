@@ -16,7 +16,9 @@ final class DirectAccessGuardTest extends TestCase {
 				continue;
 			}
 			++$count;
-			self::assertMatchesRegularExpression( "/defined\\( 'ABSPATH' \\)/", (string) file_get_contents( $file->getPathname() ), $file->getPathname() );
+			// The guard must be the first statement after the opening tag, declare, namespace and use lines.
+			$code = (string) preg_replace( '~\A<\?php\s*|^\s*(//.*|/?\*.*|declare\(.*\);|namespace .*;|use .*;)\s*$~m', '', (string) file_get_contents( $file->getPathname() ) );
+			self::assertMatchesRegularExpression( "/\\A\\s*(defined\\( 'ABSPATH' \\) \\|\\| exit;|if \\( ! defined\\( 'ABSPATH' \\) \\))/", $code, $file->getPathname() );
 		}
 		self::assertGreaterThan( 300, $count );
 	}
