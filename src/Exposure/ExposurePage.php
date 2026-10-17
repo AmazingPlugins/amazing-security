@@ -3,6 +3,8 @@
 declare(strict_types=1);
 namespace AmazingPlugins\Security\Exposure;
 
+defined( 'ABSPATH' ) || exit;
+
 final class ExposurePage {
 	public function register(): void {
 		$hook = add_submenu_page( 'amazing-security', __( 'Local exposure inventory', 'amazing-security' ), __( 'Local inventory', 'amazing-security' ), 'manage_options', 'amsec-exposure', array( $this, 'render' ) );

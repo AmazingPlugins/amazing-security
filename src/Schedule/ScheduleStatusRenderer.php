@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Schedule;
 
+defined( 'ABSPATH' ) || exit;
+
 final class ScheduleStatusRenderer {
 	public function render( array $status ): string {
 		$state  = (string) ( $status['state'] ?? 'never' );

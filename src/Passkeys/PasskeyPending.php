@@ -3,6 +3,8 @@
 declare(strict_types=1);
 namespace AmazingPlugins\Security\Passkeys;
 
+defined( 'ABSPATH' ) || exit;
+
 final class PasskeyPending {
 	public function read( mixed $raw, int $now ): ?array {
 		$s = PasskeyState::object( $raw, 4096, array( 'version', 'purpose', 'user_id', 'session_hash', 'account_revision', 'challenge', 'ticket_hash', 'binding_hash', 'policy_revision', 'context_revision', 'created_at', 'expires_at' ) );

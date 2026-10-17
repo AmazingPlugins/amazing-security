@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Firewall;
 
+defined( 'ABSPATH' ) || exit;
+
 final class BundledRequestRules {
 	public function version(): string {
 		return '2026.10.09.1';

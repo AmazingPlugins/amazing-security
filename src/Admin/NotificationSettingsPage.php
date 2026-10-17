@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Admin;
 
+defined( 'ABSPATH' ) || exit;
+
 use AmazingPlugins\Security\Alerts\AlertDelivery;
 use AmazingPlugins\Security\Alerts\AlertSettingsRenderer;
 use AmazingPlugins\Security\Alerts\MailStatus;

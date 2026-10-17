@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Hardening;
 
+defined( 'ABSPATH' ) || exit;
+
 /** Apache uploads rule text. Writing the file is a separate, confirmed step. */
 final class UploadsRule {
 	public const BEGIN = '# Begin Amazing Security uploads';

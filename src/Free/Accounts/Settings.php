@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Free\Accounts;
 
+defined( 'ABSPATH' ) || exit;
+
 /** Posted account settings. Does not read or write the common-password switch. */
 final class Settings {
 	/**

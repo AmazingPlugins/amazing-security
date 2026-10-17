@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Free\Comments;
 
+defined( 'ABSPATH' ) || exit;
+
 /** One comment per minute for the same account or email. No WordPress calls. */
 final class Rate {
 	public const OPTION = 'amsec_comment_rate';

@@ -3,6 +3,8 @@
 declare(strict_types=1);
 namespace AmazingPlugins\Security\Repository;
 
+defined( 'ABSPATH' ) || exit;
+
 final class WordPressDirectoryClient implements DirectoryClient {
 	public function fetch( string $slug, int $now ): array {
 		$parser = new DirectoryRecord();

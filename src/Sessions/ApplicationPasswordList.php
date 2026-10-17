@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Sessions;
 
+defined( 'ABSPATH' ) || exit;
+
 /** Names saved application passwords. It does not reveal or send the password. */
 final class ApplicationPasswordList {
 	public static function rows( array $stored ): array {

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Free\TrafficGuard;
 
+defined( 'ABSPATH' ) || exit;
+
 /** Local request rows: REMOTE_ADDR, path, and UTC time. */
 final class LiveTraffic {
 	public const CAP         = 500;

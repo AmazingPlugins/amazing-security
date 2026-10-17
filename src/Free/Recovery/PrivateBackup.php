@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Free\Recovery;
 
+defined( 'ABSPATH' ) || exit;
+
 /** Writes private copies outside the install. A failed backup does not delete the source. */
 final class PrivateBackup {
 	private readonly string $siteRoot;

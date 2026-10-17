@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Free\Accounts;
 
+defined( 'ABSPATH' ) || exit;
+
 /** Idle logout decisions. Stored 0 stays off. */
 final class IdleLogout {
 	public const OPTION = 'amsec_idle_minutes';

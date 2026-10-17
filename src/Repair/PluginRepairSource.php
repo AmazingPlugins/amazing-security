@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Repair;
 
+defined( 'ABSPATH' ) || exit;
+
 use AmazingPlugins\Security\Integrity\ChecksumManifestProvider;
 use AmazingPlugins\Security\Integrity\HttpClient;
 use ZipArchive;

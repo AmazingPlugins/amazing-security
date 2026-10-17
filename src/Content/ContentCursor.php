@@ -3,6 +3,8 @@
 declare(strict_types=1);
 namespace AmazingPlugins\Security\Content;
 
+defined( 'ABSPATH' ) || exit;
+
 final class ContentCursor {
 	public string $phase   = 'post';
 	public int $after      = 0;

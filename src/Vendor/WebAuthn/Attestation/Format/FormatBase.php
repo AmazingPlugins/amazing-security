@@ -3,6 +3,8 @@
 
 
 namespace AmazingPlugins\Security\Vendor\WebAuthn\Attestation\Format;
+
+defined( 'ABSPATH' ) || exit;
 use AmazingPlugins\Security\Vendor\WebAuthn\WebAuthnException;
 use AmazingPlugins\Security\Vendor\WebAuthn\Attestation\AuthenticatorData;
 

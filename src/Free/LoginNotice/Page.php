@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Free\LoginNotice;
 
+defined( 'ABSPATH' ) || exit;
+
 /** Sign-in email screen. The option stays off until an administrator saves it. */
 final class Page {
 	public static function menu(): void {

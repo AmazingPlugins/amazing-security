@@ -3,6 +3,8 @@
 declare(strict_types=1);
 namespace AmazingPlugins\Security\Headers;
 
+defined( 'ABSPATH' ) || exit;
+
 use Closure;
 
 /** Fixed anonymous HEAD with public IPv4 pinning. No stream/proxy fallback. */

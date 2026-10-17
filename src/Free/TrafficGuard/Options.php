@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Free\TrafficGuard;
 
+defined( 'ABSPATH' ) || exit;
+
 /** Option names for the free traffic controls. */
 final class Options {
 	public const HOSTNAMES = 'amsec_block_hostnames';

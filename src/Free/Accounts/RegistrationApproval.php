@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Free\Accounts;
 
+defined( 'ABSPATH' ) || exit;
+
 /** New accounts can wait for approval. Missing meta is not pending. */
 final class RegistrationApproval {
 	public const OPTION = 'amsec_approve_registrations';

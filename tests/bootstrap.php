@@ -2,6 +2,10 @@
 
 declare(strict_types=1);
 
+if ( ! defined( 'ABSPATH' ) ) {
+	define( 'ABSPATH', sys_get_temp_dir() . '/amsec-no-wordpress/' );
+}
+
 require dirname(__DIR__) . '/vendor/autoload.php';
 
 if ( ! function_exists( 'esc_html' ) ) {

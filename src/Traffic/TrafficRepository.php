@@ -3,6 +3,8 @@
 declare(strict_types=1);
 namespace AmazingPlugins\Security\Traffic;
 
+defined( 'ABSPATH' ) || exit;
+
 use RuntimeException;
 final class TrafficRepository {
 	private readonly string $table;

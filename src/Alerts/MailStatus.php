@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Alerts;
 
+defined( 'ABSPATH' ) || exit;
+
 /** WordPress admin email readiness for notifications. Transport stays the site’s wp_mail setup. */
 final class MailStatus {
 	/**

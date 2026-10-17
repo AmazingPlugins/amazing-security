@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Free;
 
+defined( 'ABSPATH' ) || exit;
+
 /** Loads each src/Free/<Name>/Module.php without a shared edit point. */
 final class FreeSuite {
 	public static function boot(): void {

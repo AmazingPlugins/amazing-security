@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Vulnerabilities;
 
+defined( 'ABSPATH' ) || exit;
+
 use AmazingPlugins\Security\Integrity\FileReader;
 use AmazingPlugins\Security\Integrity\IntegrityBudget;
 use AmazingPlugins\Security\Integrity\Manifest;

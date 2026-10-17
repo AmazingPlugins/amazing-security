@@ -3,6 +3,8 @@
 declare(strict_types=1);
 namespace AmazingPlugins\Security\Firewall;
 
+defined( 'ABSPATH' ) || exit;
+
 use AmazingPlugins\Security\Admin\FixApprovalAction;
 use AmazingPlugins\Security\Sessions\SessionPolicy;
 use AmazingPlugins\Security\Integrity\WordPressOptions;

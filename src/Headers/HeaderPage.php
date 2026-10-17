@@ -3,6 +3,8 @@
 declare(strict_types=1);
 namespace AmazingPlugins\Security\Headers;
 
+defined( 'ABSPATH' ) || exit;
+
 final class HeaderPage {
 	public function __construct( private readonly ?HeaderService $service = null ) {}
 	public function register(): void {

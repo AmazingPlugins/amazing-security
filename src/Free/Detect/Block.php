@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Free\Detect;
 
+defined( 'ABSPATH' ) || exit;
+
 /** Precise request block. It stays quiet unless the option is on. */
 final class Block {
 	/** @param array<mixed> $get */

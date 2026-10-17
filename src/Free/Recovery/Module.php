@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Free\Recovery;
 
+defined( 'ABSPATH' ) || exit;
+
 /** Recovery submenu. Changes run from POST handlers, never from the page view. */
 final class Module {
 	public static function boot(): void {

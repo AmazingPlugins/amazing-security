@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Free\Recovery;
 
+defined( 'ABSPATH' ) || exit;
+
 /** Path checks for recovery actions. Nothing here changes a file by itself. */
 final class Guard {
 	/** @param array<int, string> $allowed */

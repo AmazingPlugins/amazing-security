@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Activity;
 
+defined( 'ABSPATH' ) || exit;
+
 final class ActivityEvent {
 	public const TYPES = array( 'login_succeeded', 'login_failed', 'login_rate_blocked', 'user_created', 'user_deleted', 'user_role_changed', 'plugin_activated', 'plugin_deactivated', 'plugin_updated', 'theme_switched', 'theme_updated', 'security_setting_changed', 'sessions_revoked', 'password_reset_required', 'password_reset_cleared', 'totp_policy_changed', 'totp_grace_granted', 'baseline_approved', 'bot_policy_changed' );
 

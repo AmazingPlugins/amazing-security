@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Alerts;
 
+defined( 'ABSPATH' ) || exit;
+
 final class AlertSettingsRenderer {
 	/**
 	 * @param array<string, mixed>               $status

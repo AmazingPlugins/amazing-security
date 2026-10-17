@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Login;
 
+defined( 'ABSPATH' ) || exit;
+
 final class RequiredTotpPolicy {
 	public const OPTION = 'amsec_required_totp_policy';
 	public const META   = 'amsec_required_totp_grace';

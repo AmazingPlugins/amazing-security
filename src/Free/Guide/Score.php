@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Free\Guide;
 
+defined( 'ABSPATH' ) || exit;
+
 /** Counts local protections that are on. A full score does not mean the site is clean. */
 final class Score {
 	/** @var array<string, string> */

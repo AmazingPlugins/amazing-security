@@ -3,6 +3,8 @@
 declare(strict_types=1);
 namespace AmazingPlugins\Security\Proxy;
 
+defined( 'ABSPATH' ) || exit;
+
 use AmazingPlugins\Security\Network\Cidr;
 final class ProxyPolicy {
 	public function read( mixed $raw ): ?array {

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Login;
 
+defined( 'ABSPATH' ) || exit;
+
 /** Code screen after the password is accepted for an account that already has verification. */
 final class LoginSecondStep {
 	public const COOKIE = 'amsec_login_step';

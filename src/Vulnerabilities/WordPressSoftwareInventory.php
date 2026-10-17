@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Vulnerabilities;
 
+defined( 'ABSPATH' ) || exit;
+
 final class WordPressSoftwareInventory implements SoftwareInventory {
 	private bool $complete = true;
 

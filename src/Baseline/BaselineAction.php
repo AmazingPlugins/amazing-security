@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Baseline;
 
+defined( 'ABSPATH' ) || exit;
+
 use AmazingPlugins\Security\Activity\ActivityHooks;
 use AmazingPlugins\Security\Activity\ActivityRepository;
 use AmazingPlugins\Security\Admin\FixApprovalAction;

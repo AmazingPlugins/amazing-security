@@ -3,6 +3,8 @@
 declare(strict_types=1);
 namespace AmazingPlugins\Security\Content;
 
+defined( 'ABSPATH' ) || exit;
+
 interface ContentInventory {
 	public function bounds(): array;
 	public function candidates( string $kind, int $after, int $max, int $limit ): array;

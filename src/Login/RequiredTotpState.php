@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Login;
 
+defined( 'ABSPATH' ) || exit;
+
 final class RequiredTotpState {
 	public static function evaluate( mixed $record, string $generation, int $now ): string {
 		if ( '' === $record ) {

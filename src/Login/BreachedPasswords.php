@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Login;
 
+defined( 'ABSPATH' ) || exit;
+
 /** Have I Been Pwned range check. It sends a hash prefix, not the password. */
 final class BreachedPasswords {
 	public static function matchesSuffix( string $suffix, string $body ): bool {

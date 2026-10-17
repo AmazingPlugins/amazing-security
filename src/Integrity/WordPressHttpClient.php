@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Integrity;
 
+defined( 'ABSPATH' ) || exit;
+
 final class WordPressHttpClient implements HttpClient {
 	public function get( string $url, int $maxBytes ): HttpResult {
 		$response = wp_safe_remote_get(

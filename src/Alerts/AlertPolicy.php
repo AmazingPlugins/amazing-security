@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Alerts;
 
+defined( 'ABSPATH' ) || exit;
+
 use AmazingPlugins\Security\FileScan\FileScanReport;
 use AmazingPlugins\Security\Scan\ScanRun;
 use AmazingPlugins\Security\Vulnerabilities\VulnerabilityReport;

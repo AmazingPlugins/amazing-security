@@ -3,6 +3,8 @@
 declare(strict_types=1);
 namespace AmazingPlugins\Security\Headers;
 
+defined( 'ABSPATH' ) || exit;
+
 final class HeaderAssessment {
 	public const NAMES = array(
 		'hsts'            => 'strict-transport-security',

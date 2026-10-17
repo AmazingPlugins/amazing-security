@@ -3,6 +3,8 @@
 declare(strict_types=1);
 namespace AmazingPlugins\Security\Traffic;
 
+defined( 'ABSPATH' ) || exit;
+
 final class TrafficPolicy {
 	public function read( mixed $raw ): ?array {
 		if ( null === $raw ) {

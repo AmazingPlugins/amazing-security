@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Free\TrafficGuard;
 
+defined( 'ABSPATH' ) || exit;
+
 /** Recommended traffic-list lines. Each line already fits the list rules. */
 final class Examples {
 	/**

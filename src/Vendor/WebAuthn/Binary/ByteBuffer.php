@@ -3,6 +3,8 @@
 
 
 namespace AmazingPlugins\Security\Vendor\WebAuthn\Binary;
+
+defined( 'ABSPATH' ) || exit;
 use AmazingPlugins\Security\Vendor\WebAuthn\WebAuthnException;
 
 /**

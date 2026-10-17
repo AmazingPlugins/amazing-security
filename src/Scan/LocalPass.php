@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Scan;
 
+defined( 'ABSPATH' ) || exit;
+
 use AmazingPlugins\Security\Content\WordPressContentService;
 use AmazingPlugins\Security\Exposure\WordPressExposureService;
 use Throwable;

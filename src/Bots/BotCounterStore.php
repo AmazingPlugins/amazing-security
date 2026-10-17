@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Bots;
 
+defined( 'ABSPATH' ) || exit;
+
 final class BotCounterStore {
 	private string $table;
 

@@ -3,6 +3,8 @@
 declare(strict_types=1);
 namespace AmazingPlugins\Security\Repository;
 
+defined( 'ABSPATH' ) || exit;
+
 final class WordPressDirectoryInventory {
 	public function all(): array {
 		if ( ! function_exists( 'get_plugins' ) ) {

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Bots;
 
+defined( 'ABSPATH' ) || exit;
+
 final class BotHooks {
 	private bool $checked = false;
 

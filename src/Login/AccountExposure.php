@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Login;
 
+defined( 'ABSPATH' ) || exit;
+
 use Closure;
 
 /** Local account-name exposure gates. They do not send site data anywhere. */

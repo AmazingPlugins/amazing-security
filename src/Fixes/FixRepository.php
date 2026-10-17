@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Fixes;
 
+defined( 'ABSPATH' ) || exit;
+
 interface FixRepository {
 	public function create( FixProposal $proposal ): bool;
 	public function get( string $id ): ?FixProposal;

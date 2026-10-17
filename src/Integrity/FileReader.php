@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Integrity;
 
+defined( 'ABSPATH' ) || exit;
+
 final class FileReader {
 	public function hash( string $root, string $relativePath, string $algorithm, IntegrityBudget $budget ): FileHashResult {
 		if ( ! WordPressOrgManifestProvider::safePath( $relativePath ) || ! in_array( $algorithm, array( 'md5', 'sha256' ), true ) ) {

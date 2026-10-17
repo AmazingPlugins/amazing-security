@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Free\Assistant;
 
+defined( 'ABSPATH' ) || exit;
+
 use AmazingPlugins\Security\Admin\McpSettingsRenderer;
 use AmazingPlugins\Security\Integrity\WordPressOptions;
 use AmazingPlugins\Security\Mcp\McpPreferences;

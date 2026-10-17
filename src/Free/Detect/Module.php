@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Free\Detect;
 
+defined( 'ABSPATH' ) || exit;
+
 final class Module {
 	public const OPTION = 'amsec_precise_block';
 

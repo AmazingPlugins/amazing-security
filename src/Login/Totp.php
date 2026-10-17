@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Login;
 
+defined( 'ABSPATH' ) || exit;
+
 final class Totp {
 	public function verify( string $secret, string $code, int $now, ?int $lastStep ): ?int {
 		if ( strlen( $secret ) < 16 || ! preg_match( '/\A[0-9]{6}\z/', $code ) || $now < 0 ) {

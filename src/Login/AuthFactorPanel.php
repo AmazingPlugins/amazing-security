@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Login;
 
+defined( 'ABSPATH' ) || exit;
+
 /** Status-only card for passkeys / authenticator apps. */
 final class AuthFactorPanel {
 	/**

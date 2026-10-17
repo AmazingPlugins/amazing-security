@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Admin;
 
+defined( 'ABSPATH' ) || exit;
+
 use AmazingPlugins\Security\Fixes\WordPressFixRepository;
 use AmazingPlugins\Security\Scan\LocalHardeningScanService;
 use Throwable;

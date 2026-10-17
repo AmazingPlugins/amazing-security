@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Admin;
 
+defined( 'ABSPATH' ) || exit;
+
 use AmazingPlugins\Security\Alerts\WordPressAlertNotifier;
 use AmazingPlugins\Security\Integrity\FileReader;
 use AmazingPlugins\Security\Integrity\CompletedIntegrityReport;

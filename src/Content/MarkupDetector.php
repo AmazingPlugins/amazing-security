@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Content;
 
+defined( 'ABSPATH' ) || exit;
+
 use RuntimeException;
 
 /** Selected markup review patterns; never renders or evaluates input. */

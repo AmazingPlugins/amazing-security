@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Free\Notices;
 
+defined( 'ABSPATH' ) || exit;
+
 /** Email copy for an administrator role or a limited sign-in. Off until the option is on. */
 final class Notice {
 	public const OPTION = 'amsec_event_mail';

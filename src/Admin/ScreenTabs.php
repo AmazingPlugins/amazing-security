@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Admin;
 
+defined( 'ABSPATH' ) || exit;
+
 /** In-page tabs. A click stays on this screen. */
 final class ScreenTabs {
 	/**

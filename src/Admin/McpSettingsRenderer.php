@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Admin;
 
+defined( 'ABSPATH' ) || exit;
+
 final class McpSettingsRenderer {
 	public function render( bool $enabled, bool $abilitiesAvailable, bool $adapterAvailable, string $actionUrl, string $nonce ): string {
 		$status = $enabled ? 'enabled' : 'disabled';

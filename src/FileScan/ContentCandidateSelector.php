@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\FileScan;
 
+defined( 'ABSPATH' ) || exit;
+
 final class ContentCandidateSelector {
 	public function eligible( FileScanTarget $target, string $relativePath, ?string $observedSha256, bool $extra = false ): bool {
 		if ( ! preg_match( '/\.(?:php|phtml|php[0-9]+)$/iD', $relativePath ) ) {

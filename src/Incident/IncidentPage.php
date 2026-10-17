@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Incident;
 
+defined( 'ABSPATH' ) || exit;
+
 final class IncidentPage {
 	public function register(): void {
 		add_submenu_page( 'amazing-security', __( 'Incident response', 'amazing-security' ), __( 'Incident response', 'amazing-security' ), 'manage_options', 'amsec-incident', array( $this, 'render' ) );

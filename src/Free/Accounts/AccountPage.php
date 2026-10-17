@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Free\Accounts;
 
+defined( 'ABSPATH' ) || exit;
+
 use AmazingPlugins\Security\Admin\ScreenTabs;
 use AmazingPlugins\Security\Login\AuthFactorDetector;
 use AmazingPlugins\Security\Login\AuthFactorPanel;

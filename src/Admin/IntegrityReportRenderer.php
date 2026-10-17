@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Admin;
 
+defined( 'ABSPATH' ) || exit;
+
 use AmazingPlugins\Security\Integrity\IntegrityStep;
 use AmazingPlugins\Security\Repair\RepairCandidate;
 use AmazingPlugins\Security\Scan\ScanRun;

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Integrity;
 
+defined( 'ABSPATH' ) || exit;
+
 final class IntegrityBudget {
 	private int $files = 0;
 	private int $bytes = 0;

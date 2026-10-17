@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Checks;
 
+defined( 'ABSPATH' ) || exit;
+
 use AmazingPlugins\Security\Content\ContentCursor;
 use AmazingPlugins\Security\FileScan\FileScanReport;
 use AmazingPlugins\Security\Findings\CheckResult;

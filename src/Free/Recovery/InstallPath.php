@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Free\Recovery;
 
+defined( 'ABSPATH' ) || exit;
+
 /** Resolves a relative path inside a WordPress install without following links. */
 final class InstallPath {
 	private readonly string $root;

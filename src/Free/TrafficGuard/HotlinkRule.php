@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Free\TrafficGuard;
 
+defined( 'ABSPATH' ) || exit;
+
 /** Apache rule for image requests. Nginx does not read this file. */
 final class HotlinkRule {
 	public const BEGIN = '# Begin Amazing Security hotlink';

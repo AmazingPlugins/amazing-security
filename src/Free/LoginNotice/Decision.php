@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Free\LoginNotice;
 
+defined( 'ABSPATH' ) || exit;
+
 /** Send or skip an administrator sign-in email. No WordPress calls. */
 final class Decision {
 	public const OPTION = 'amsec_login_email';

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Activity;
 
+defined( 'ABSPATH' ) || exit;
+
 final class ActivityRenderer {
 	/** @var array<int, string> */
 	private array $names = array();

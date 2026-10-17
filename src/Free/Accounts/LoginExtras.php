@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Free\Accounts;
 
+defined( 'ABSPATH' ) || exit;
+
 /** Posted sign-in limit and XML-RPC choices. Unknown values are ignored. */
 final class LoginExtras {
 	public const RATE = 'amsec_login_rate_mode';

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Admin;
 
+defined( 'ABSPATH' ) || exit;
+
 /** A short pointer tour of the side menu. Nothing runs or changes; it only labels where things are. */
 final class FirstRun {
 	/** WordPress stores this id in the account's dismissed pointers once the tour ends. */

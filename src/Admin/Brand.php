@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Admin;
 
+defined( 'ABSPATH' ) || exit;
+
 /** Landing-page frame for Amazing Security screens. */
 final class Brand {
 	public const DOCS = 'https://amazingplugins.com/plugins/amazing-security/';

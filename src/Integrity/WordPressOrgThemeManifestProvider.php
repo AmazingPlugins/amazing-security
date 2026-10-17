@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Integrity;
 
+defined( 'ABSPATH' ) || exit;
+
 final class WordPressOrgThemeManifestProvider implements ThemeManifestProvider {
 	public function __construct( private readonly HttpClient $client, private readonly ThemeArchiveParser $parser ) {}
 

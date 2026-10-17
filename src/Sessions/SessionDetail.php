@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Sessions;
 
+defined( 'ABSPATH' ) || exit;
+
 /** Readable browser, computer, and network labels from a WordPress session. */
 final class SessionDetail {
 	public static function browser( string $agent ): string {

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Login;
 
+defined( 'ABSPATH' ) || exit;
+
 final class LoginFormFields {
 	/** The password form stays username and password. The code has its own screen. */
 	public function render(): void {

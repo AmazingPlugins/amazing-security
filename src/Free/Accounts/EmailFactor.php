@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Free\Accounts;
 
+defined( 'ABSPATH' ) || exit;
+
 /** Email code checks. The stored record keeps a hash, never the code. */
 final class EmailFactor {
 	public const OPTION   = 'amsec_email_factor';

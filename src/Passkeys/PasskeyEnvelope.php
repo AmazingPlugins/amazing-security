@@ -3,6 +3,8 @@
 declare(strict_types=1);
 namespace AmazingPlugins\Security\Passkeys;
 
+defined( 'ABSPATH' ) || exit;
+
 final class PasskeyEnvelope {
 	public function read( string $json, bool $registration ): ?array {
 		if ( strlen( $json ) > 98304 ) {

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Free\Recovery;
 
+defined( 'ABSPATH' ) || exit;
+
 /** Moves one unexpected file out of uploads, a theme, or a plugin. */
 final class UnexpectedFile {
 	private readonly string $root;

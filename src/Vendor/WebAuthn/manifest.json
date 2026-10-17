@@ -15,62 +15,62 @@
     {
       "path": "Attestation/AttestationObject.php",
       "upstream_sha256": "1dd9541e45c5d07cdac8a118b5eed7aec6d3d1d2f4442beae9d8701d5556d1d6",
-      "bundled_sha256": "3d8b2fa78695d0c1c9c36aa9a5936cf290d516335a572de1040f663e979567eb"
+      "bundled_sha256": "4af226387d79eb31cee2e15c4b4c08e708e999cfc800de6e0a2aa346973b0abc"
     },
     {
       "path": "Attestation/AuthenticatorData.php",
       "upstream_sha256": "4539fc9eab08ec38835b332c0afbd09832985c57a421043d12d92bc42e66762d",
-      "bundled_sha256": "276bc855d57b6d33e36b228a3cd1a2eb869b7fb28f61be61b99a9da61779d4fe"
+      "bundled_sha256": "d982eed4edae3bdd25bcf17b676fb1da23d483cbd4cfe0c42afbc10546b8a5ed"
     },
     {
       "path": "Attestation/Format/AndroidKey.php",
       "upstream_sha256": "36b7120a882994914738d7520e2a99d8881c28e5db7ff416395f6dff8d186348",
-      "bundled_sha256": "b8d72b1fd335aff5061a2f7a664dbe805f9cffeba0a391ba2484e867fa0c7e37"
+      "bundled_sha256": "e7d0a17baeced79367935469c2ca04695e9af04c4f4e736c53ac8df22c6c0db0"
     },
     {
       "path": "Attestation/Format/AndroidSafetyNet.php",
       "upstream_sha256": "b469688d02a9af095dce47d22d6560fad583742e03cf7c3f639eed745ff51958",
-      "bundled_sha256": "7a38eb7517bed058fe66bcd9b9d3c65399bed6044503db6cbc5bb8b6f04a1d9a"
+      "bundled_sha256": "691b7c293969c6ed140032f3b620593d2a353a430f9a36e449f7fa0f854e65b6"
     },
     {
       "path": "Attestation/Format/Apple.php",
       "upstream_sha256": "2a3e7a26bf057c0488cbcdf9fa2ae047042a44c0d06eeccd3ebd9eeb32cc44f5",
-      "bundled_sha256": "1faed697012c656e1c647a844ab9f34c98237417099a0c4e68b2418711b878ee"
+      "bundled_sha256": "c99dc8d7c349409f2a06354c17dac2227e7f56133c82bdab0f26d4716625f097"
     },
     {
       "path": "Attestation/Format/FormatBase.php",
       "upstream_sha256": "426b68c571fbdbc880dc5eea85e61b37738293c6fd49aaa363ed0f1e0f495301",
-      "bundled_sha256": "be2183183fcf2c8f542b10a8bfef2973d154b804b24b29a96653cdfec53a276d"
+      "bundled_sha256": "22af38ab9f651d4cb1d5b1ad18a2e40f5a5a9ed395de6e8bf567e6445b38b542"
     },
     {
       "path": "Attestation/Format/None.php",
       "upstream_sha256": "c1db089954f2450f632b07f95491549ef50112f8cc822d21f72ee49ac1bc4771",
-      "bundled_sha256": "48d54de32e61ae55cb3020a4e8b99f2eecea6e5052eb85979689af5512daa512"
+      "bundled_sha256": "a157e4df9b3d2d85c858669f24c6f1745b15296401b884ba0b0d7f8259905fe4"
     },
     {
       "path": "Attestation/Format/Packed.php",
       "upstream_sha256": "42b8740014e9846de50801a476b66c7b65fae4b1844c7e714650ef32e204bb76",
-      "bundled_sha256": "01a8c898ff6a70f08613d39bf6e67ed146d608008670acde1b1ccd26bfc84e58"
+      "bundled_sha256": "86b00ef03652960cf3b2b2bbbe8512408c9a0d84c1a6584752a0e78f6ea5f9dd"
     },
     {
       "path": "Attestation/Format/Tpm.php",
       "upstream_sha256": "3cfeba175dc6c88e6891a33bfbe8bcb5b5e357f3337439c91a51630402245a4a",
-      "bundled_sha256": "7b541e58267ef5d7936b4db1fbea307f8df7391ec80e3f26905ab495d3aa9615"
+      "bundled_sha256": "f717b925249db636fc1488d3d150496f6eda2b0d22a112d91626009624f63d65"
     },
     {
       "path": "Attestation/Format/U2f.php",
       "upstream_sha256": "595aec3dd2e8985d6a01226a17cba8952881342ce52f99df486c96ac600a96a6",
-      "bundled_sha256": "399ed1dead944087694490e2af51e9f4260586cd7378c1b64c6559d88f4614cf"
+      "bundled_sha256": "815c6ecd6c46b8db42ce5c2d084b05335039b8c1318b923e01b589a3d64ad610"
     },
     {
       "path": "Binary/ByteBuffer.php",
       "upstream_sha256": "ffc0a9efec90b9744cb2c7e91653b3c57c4bda75fee48cd2c3b4a44583eb227a",
-      "bundled_sha256": "801eefad4e71174346579abdb1a84f2228957ae025daa60f1a929e7f6047c214"
+      "bundled_sha256": "0b5e6d295a7838a789a8864d384612e1090e26787cc1e58b69c7440386c4416a"
     },
     {
       "path": "CBOR/CborDecoder.php",
       "upstream_sha256": "3c4d302ce63b76c80350318cfa664db3d0b28fabff73a4560f009ec1ad6acb1f",
-      "bundled_sha256": "1ec4f03addee838366f22010c2387afe300339958b9ae46569fadc68abb73ec7"
+      "bundled_sha256": "a970c7408a6fa37104d2e014ec7268645312bb6af9d7e02e2cf824d845442cc6"
     },
     {
       "path": "WebAuthn.php",
@@ -80,7 +80,7 @@
     {
       "path": "WebAuthnException.php",
       "upstream_sha256": "9564ae6ae79a0c201971b7c6f691c76e50a925076d1f4a5a7b0fcf5645bb442c",
-      "bundled_sha256": "1d823067379cb32445aff4adc99273c5b63e80a72f65e140fca0ff2a78654e14"
+      "bundled_sha256": "d16a83ffb085abdeefa8548d9449b05abbe6428465198e9615691dafc52709e6"
     }
   ]
 }

@@ -3,6 +3,8 @@
 declare(strict_types=1);
 namespace AmazingPlugins\Security\Repository;
 
+defined( 'ABSPATH' ) || exit;
+
 final class DirectoryPage {
 	public function register(): void {
 		$hook = add_submenu_page( 'amazing-security', __( 'Plugin directory status', 'amazing-security' ), __( 'Directory status', 'amazing-security' ), 'manage_options', 'amsec-repository', array( $this, 'render' ) );

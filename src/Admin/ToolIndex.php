@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Admin;
 
+defined( 'ABSPATH' ) || exit;
+
 /** Old address. File settings now live on Files. */
 final class ToolIndex {
 	public function register(): void {

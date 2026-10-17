@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Login;
 
+defined( 'ABSPATH' ) || exit;
+
 interface TotpStore {
 	public function enroll( int $userId, string $encryptedSecret, array $recoveryHashes ): bool;
 	public function isEnrolled( int $userId ): bool;

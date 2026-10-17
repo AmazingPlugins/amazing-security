@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Baseline;
 
+defined( 'ABSPATH' ) || exit;
+
 final class BaselineTarget {
 	public function __construct( public readonly string $kind, public readonly string $identity, public readonly string $root, public readonly ?string $singleFile = null ) {}
 

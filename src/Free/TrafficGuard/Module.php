@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Free\TrafficGuard;
 
+defined( 'ABSPATH' ) || exit;
+
 /** Boots on plugins_loaded and enforces controls on init. */
 final class Module {
 	public static function boot(): void {

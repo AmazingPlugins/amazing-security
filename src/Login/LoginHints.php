@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Login;
 
+defined( 'ABSPATH' ) || exit;
+
 use Closure;
 
 /** One WordPress login message. It does not send login attempts anywhere. */

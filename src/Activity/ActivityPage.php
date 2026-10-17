@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Activity;
 
+defined( 'ABSPATH' ) || exit;
+
 final class ActivityPage {
 	public function register(): void {
 		add_submenu_page( 'amazing-security', __( 'Security activity', 'amazing-security' ), __( 'Activity', 'amazing-security' ), 'manage_options', 'amsec-activity', array( $this, 'render' ) );

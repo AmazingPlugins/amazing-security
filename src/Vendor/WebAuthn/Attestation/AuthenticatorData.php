@@ -2,6 +2,8 @@
 // phpcs:ignoreFile -- Pinned third-party verifier; integrity checked by scripts/passkey-vendor-manifest.php.
 
 namespace AmazingPlugins\Security\Vendor\WebAuthn\Attestation;
+
+defined( 'ABSPATH' ) || exit;
 use AmazingPlugins\Security\Vendor\WebAuthn\WebAuthnException;
 use AmazingPlugins\Security\Vendor\WebAuthn\CBOR\CborDecoder;
 use AmazingPlugins\Security\Vendor\WebAuthn\Binary\ByteBuffer;

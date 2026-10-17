@@ -3,6 +3,8 @@
 declare(strict_types=1);
 namespace AmazingPlugins\Security\Rules;
 
+defined( 'ABSPATH' ) || exit;
+
 final class RulePage {
 	public function register(): void {
 		$hook = add_submenu_page( 'amazing-security', __( 'Rule information', 'amazing-security' ), __( 'Rule information', 'amazing-security' ), 'manage_options', 'amsec-rules', array( $this, 'render' ) );

@@ -3,6 +3,8 @@
 declare(strict_types=1);
 namespace AmazingPlugins\Security\Passkeys;
 
+defined( 'ABSPATH' ) || exit;
+
 final class PasskeyContext {
 	private function __construct( private readonly string $rp, private readonly string $siteOrigin, private readonly string $directory ) {}
 	public static function fromSiteUrl( string $url ): ?self {

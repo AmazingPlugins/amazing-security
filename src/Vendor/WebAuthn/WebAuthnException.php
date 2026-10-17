@@ -2,6 +2,8 @@
 // phpcs:ignoreFile -- Pinned third-party verifier; integrity checked by scripts/passkey-vendor-manifest.php.
 namespace AmazingPlugins\Security\Vendor\WebAuthn;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * @author Lukas Buchs
  * @license https://github.com/lbuchs/WebAuthn/blob/master/LICENSE MIT

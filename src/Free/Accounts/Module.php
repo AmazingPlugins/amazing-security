@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Free\Accounts;
 
+defined( 'ABSPATH' ) || exit;
+
 use AmazingPlugins\Security\Login\BreachedPasswords;
 
 /** Wires account protections. Each one stays off until an administrator turns it on. */

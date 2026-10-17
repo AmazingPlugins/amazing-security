@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Free\PasswordRules;
 
+defined( 'ABSPATH' ) || exit;
+
 /** Local password rules for a new or reset password. No WordPress calls. */
 final class Decision {
 	public const OPTION = 'amsec_password_min_length';

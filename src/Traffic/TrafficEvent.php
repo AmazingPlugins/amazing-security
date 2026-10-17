@@ -3,6 +3,8 @@
 declare(strict_types=1);
 namespace AmazingPlugins\Security\Traffic;
 
+defined( 'ABSPATH' ) || exit;
+
 final class TrafficEvent {
 	public const METHODS    = array( 'GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'OTHER' );
 	public const CATEGORIES = array( 'login', 'xmlrpc', 'admin', 'frontend', 'core-rest', 'store-rest', 'form-rest', 'other-rest', 'other' );

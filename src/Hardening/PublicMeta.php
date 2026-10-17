@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Hardening;
 
+defined( 'ABSPATH' ) || exit;
+
 use Closure;
 
 /** Hides the generator tag and two discovery links when the owner turns them on. */

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Free\Comments;
 
+defined( 'ABSPATH' ) || exit;
+
 /** Comment checks screen. Posts to admin-post.php. */
 final class Page {
 	public static function menu(): void {

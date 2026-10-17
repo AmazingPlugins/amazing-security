@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Firewall;
 
+defined( 'ABSPATH' ) || exit;
+
 final class RestFirewall {
 	public function __construct( private readonly RequestInspector $inspector, private readonly ObservationStore $store ) {}
 

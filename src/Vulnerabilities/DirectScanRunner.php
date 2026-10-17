@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Vulnerabilities;
 
+defined( 'ABSPATH' ) || exit;
+
 final class DirectScanRunner {
 	/** @param null|callable(InstalledSoftware):?string $provenance
 	 *  @param null|callable(InstalledSoftware,string):bool $stateStillMatches

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Free\PasswordRules;
 
+defined( 'ABSPATH' ) || exit;
+
 /** Boots the password-rule screen and rejects a new or reset password that fails an enabled rule. */
 final class Module {
 	public static function boot(): void {

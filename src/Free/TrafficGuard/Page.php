@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Free\TrafficGuard;
 
+defined( 'ABSPATH' ) || exit;
+
 use AmazingPlugins\Security\Admin\ScreenTabs;
 use AmazingPlugins\Security\Bots\BotSettings;
 use AmazingPlugins\Security\Firewall\RestRateSettings;

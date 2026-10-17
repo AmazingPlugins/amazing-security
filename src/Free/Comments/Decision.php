@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Free\Comments;
 
+defined( 'ABSPATH' ) || exit;
+
 /** Accept or reject from the extra comment field. No WordPress calls. */
 final class Decision {
 	public const OPTION = 'amsec_comment_honeypot';

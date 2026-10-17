@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Admin;
 
+defined( 'ABSPATH' ) || exit;
+
 /** Scan stays first. Recommendations, Log In & Register, Traffic, Files, and Records stay beside it. */
 final class Submenu {
 	public const PARENT = 'amazing-security';

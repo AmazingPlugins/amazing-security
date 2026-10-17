@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Login;
 
+defined( 'ABSPATH' ) || exit;
+
 final class AddressKey {
 	private readonly ?\Closure $resolver;
 	public function __construct( private string $salt, ?callable $resolver = null ) {

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Sessions;
 
+defined( 'ABSPATH' ) || exit;
+
 final class SessionPage {
 	public function register(): void {
 		// Empty parent keeps this off the side menu. Capability is read so the account owner can open it. render() still allows only an administrator or that owner.

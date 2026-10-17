@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Baseline;
 
+defined( 'ABSPATH' ) || exit;
+
 final class BaselineService {
 	public function __construct( private readonly BaselineRepository $repository, private readonly ManifestBuilder $builder = new ManifestBuilder() ) {}
 

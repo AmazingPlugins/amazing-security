@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Free\Guide;
 
+defined( 'ABSPATH' ) || exit;
+
 use AmazingPlugins\Security\Login\LoginFormFields;
 
 final class Module {

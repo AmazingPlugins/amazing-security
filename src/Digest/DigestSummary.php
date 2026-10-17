@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Digest;
 
+defined( 'ABSPATH' ) || exit;
+
 final class DigestSummary {
 	public const SOURCES = array( 'hardening', 'integrity', 'files', 'vulnerabilities' );
 

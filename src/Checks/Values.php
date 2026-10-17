@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Checks;
 
+defined( 'ABSPATH' ) || exit;
+
 interface Values {
 	public function coreUpdateAvailable(): ?bool;
 	public function debugDisplayed(): ?bool;

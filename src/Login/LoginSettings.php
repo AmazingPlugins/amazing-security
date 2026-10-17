@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Login;
 
+defined( 'ABSPATH' ) || exit;
+
 interface LoginSettings {
 	public function rateMode(): string;
 	public function setRateMode( string $mode ): void;

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Findings;
 
+defined( 'ABSPATH' ) || exit;
+
 use AmazingPlugins\Security\Scan\ScanRun;
 use RuntimeException;
 

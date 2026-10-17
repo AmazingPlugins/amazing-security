@@ -3,6 +3,8 @@
 declare(strict_types=1);
 namespace AmazingPlugins\Security\Proxy;
 
+defined( 'ABSPATH' ) || exit;
+
 final class SecurityApprovalLock {
 	public function __construct( private readonly object $db ) {}
 	public function run( callable $operation ): string {

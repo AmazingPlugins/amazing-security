@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Integrity;
 
+defined( 'ABSPATH' ) || exit;
+
 interface OptionGateway {
 	public function get( string $key ): mixed;
 	public function add( string $key, string $value ): bool;

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Fixes;
 
+defined( 'ABSPATH' ) || exit;
+
 /** Decides one approved setting change. It does not write the setting. */
 final class ApprovedSetting {
 	public static function pingStatus( string $current ): string {

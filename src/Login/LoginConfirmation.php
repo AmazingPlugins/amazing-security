@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Login;
 
+defined( 'ABSPATH' ) || exit;
+
 use Closure;
 
 /** Local WordPress login confirmation. It does not call a CAPTCHA service. */

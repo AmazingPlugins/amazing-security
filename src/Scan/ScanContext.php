@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Scan;
 
+defined( 'ABSPATH' ) || exit;
+
 final class ScanContext {
 	public readonly float $deadline;
 	public readonly int $entryLimit;

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Free\LoginNotice;
 
+defined( 'ABSPATH' ) || exit;
+
 /** Sends one plain sign-in email after an administrator login, when the option is on. */
 final class Module {
 	public static function boot(): void {

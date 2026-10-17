@@ -3,6 +3,8 @@
 declare(strict_types=1);
 namespace AmazingPlugins\Security\Content;
 
+defined( 'ABSPATH' ) || exit;
+
 final class ContentPage {
 	public function register(): void {
 		$hook = add_submenu_page( 'amazing-security', __( 'Published content', 'amazing-security' ), __( 'Content scan', 'amazing-security' ), 'manage_options', 'amsec-content', array( $this, 'render' ) );

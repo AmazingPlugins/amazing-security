@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Mcp;
 
+defined( 'ABSPATH' ) || exit;
+
 use Closure;
 use AmazingPlugins\Security\Fixes\FixProposalService;
 

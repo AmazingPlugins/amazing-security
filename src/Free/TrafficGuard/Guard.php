@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Free\TrafficGuard;
 
+defined( 'ABSPATH' ) || exit;
+
 /** Runs the request checks and keeps the local log option in sync. */
 final class Guard {
 	public function enforce(): void {
