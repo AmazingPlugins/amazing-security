@@ -190,6 +190,7 @@ add_action(
 
 add_action( 'plugins_loaded', array( AmazingPlugins\Security\Free\FreeSuite::class, 'boot' ), 20 );
 add_action( 'admin_menu', array( new AmazingPlugins\Security\Admin\AdminPage(), 'register' ) );
+add_action( 'admin_post_amsec_uploads_rule', array( new AmazingPlugins\Security\Admin\UploadsRulePage(), 'save' ) );
 add_action( 'admin_menu', array( new AmazingPlugins\Security\Admin\FixReviewPage(), 'register' ) );
 add_action( 'admin_menu', array( new AmazingPlugins\Security\Admin\RepairPage(), 'register' ) );
 add_action( 'admin_post_amsec_findings_report', array( new AmazingPlugins\Security\Admin\FindingsReportAction(), 'handle' ) );
@@ -236,6 +237,8 @@ add_action( 'wp_abilities_api_init', array( $amsec_abilities, 'registerAbilities
 
 ( new AmazingPlugins\Security\Activity\ActivityHooks( new AmazingPlugins\Security\Activity\ActivityRepository( $GLOBALS['wpdb'] ) ) )->register();
 add_action( 'admin_menu', array( new AmazingPlugins\Security\Activity\ActivityPage(), 'register' ) );
+// admin-post.php never runs admin_menu, so form handlers register here.
+add_action( 'admin_post_amsec_activity_recording', array( new AmazingPlugins\Security\Activity\ActivityPage(), 'save' ) );
 
 add_action( 'admin_menu', array( new AmazingPlugins\Security\Sessions\SessionPage(), 'register' ) );
 add_action( 'admin_post_amsec_sessions_revoke', array( new AmazingPlugins\Security\Sessions\SessionAction(), 'handle' ) );

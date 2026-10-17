@@ -9,7 +9,6 @@ defined( 'ABSPATH' ) || exit;
 final class ActivityPage {
 	public function register(): void {
 		add_submenu_page( 'amazing-security', __( 'Security activity', 'amazing-security' ), __( 'Activity', 'amazing-security' ), 'manage_options', 'amsec-activity', array( $this, 'render' ) );
-		add_action( 'admin_post_amsec_activity_recording', array( $this, 'save' ) );
 	}
 
 	public function render(): void {
