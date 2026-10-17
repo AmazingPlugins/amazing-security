@@ -3,6 +3,8 @@
 declare(strict_types=1);
 namespace AmazingPlugins\Security\Network;
 
+defined( 'ABSPATH' ) || exit;
+
 use AmazingPlugins\Security\Integrity\WordPressOptions;
 use AmazingPlugins\Security\Admin\FixApprovalAction;
 use AmazingPlugins\Security\Sessions\SessionPolicy;
@@ -49,7 +51,7 @@ final class NetworkSettings {
 		if ( 'saved' !== $result ) {
 			wp_die( esc_html__( 'Policy changed, invalid rules or self-lockout risk. Review the current policy and your host address before approving.', 'amazing-security' ), '', array( 'response' => 409 ) );}
 		( new ActivityHooks( new ActivityRepository( $GLOBALS['wpdb'] ) ) )->record( 'security_setting_changed', 0, 'network-' . $mode );
-		wp_safe_redirect( admin_url( 'admin.php?page=amsec-network' ) );
+		wp_safe_redirect( \AmazingPlugins\Security\Admin\Brand::saved( admin_url( 'admin.php?page=amsec-traffic-guard#network' ) ) );
 		exit;
 	}
 	public function render(): void {
@@ -59,30 +61,40 @@ final class NetworkSettings {
 		$state  = $s->status();
 		$fp     = $s->fingerprint();
 		$metric = ( new NetworkObservation( new WordPressOptions() ) )->status();
-		echo '<div class="wrap amazing-security-admin"><header class="amsec-header"><div><h1>Manual network controls</h1><p>Approve explicit network rules without changing host infrastructure.</p></div></header><section class="amsec-overview"><h2>PHP requests only</h2><p>Off by default. Observe records an approximate redacted match count without denying traffic. Block denies matching IPv4/IPv6 CIDRs for selected methods on requests reaching WordPress PHP. Static assets, cached pages or CDN responses that bypass PHP are outside this scope. This is not a server firewall or automatic ban service.</p><p>CLI, cron and administrators already identified by WordPress at the check point are exempt. Authentication handled later in an API request may still be denied. By default use the host-provided PHP REMOTE_ADDR; optional approved trusted-proxy settings can resolve a reported client only with host-confirmed direct peer configuration. The host may already have rewritten the address. Verify proxy trust before enforcing. Shared networks can group legitimate visitors.</p><p>Approval refuses a block policy covering your current resolved address to reduce self-lockout. A later network change can still lock you out. Recovery: <code>wp amazing-security network disable</code>, or bypass with <code>AMSEC_DISABLE_FIREWALL</code>. Recovery clears this feature’s advisory count.</p><p>Configured CIDRs are stored as explicit policy. Visitor addresses, URLs, content and usernames are not collected by the match counter. Counts can miss concurrent or failed writes and cap at one million; they never decide enforcement.</p></section>';
+		echo '<div class="wrap amazing-security-admin"><header class="amsec-header"><div><h1>' . esc_html__( 'Manual network controls', 'amazing-security' ) . '</h1><p>' . esc_html__( 'Approve explicit network rules without changing host infrastructure.', 'amazing-security' ) . '</p></div></header><section class="amsec-overview"><h2>' . esc_html__( 'PHP requests only', 'amazing-security' ) . '</h2><p>' . esc_html__( 'Off by default. Observe records an approximate redacted match count without denying traffic. Block denies matching IPv4/IPv6 CIDRs for selected methods on requests reaching WordPress PHP. Static assets, cached pages or CDN responses that bypass PHP are outside this scope. This is not a server firewall or automatic ban service.', 'amazing-security' ) . '</p><p>' . esc_html__( 'CLI, cron and administrators already identified by WordPress at the check point are exempt. Authentication handled later in an API request may still be denied. By default use the host-provided PHP REMOTE_ADDR; optional approved trusted-proxy settings can resolve a reported client only with host-confirmed direct peer configuration. The host may already have rewritten the address. Verify proxy trust before enforcing. Shared networks can group legitimate visitors.', 'amazing-security' ) . '</p><p>' .
+			/* translators: %1$s and %2$s are inline code snippets (a WP-CLI command or a constant name); keep them unchanged. */
+			sprintf( esc_html__( 'Approval refuses a block policy covering your current resolved address to reduce self-lockout. A later network change can still lock you out. Recovery: %1$s, or bypass with %2$s. Recovery clears this feature’s advisory count.', 'amazing-security' ), '<code>wp amazing-security network disable</code>', '<code>AMSEC_DISABLE_FIREWALL</code>' ) . '</p><p>' . esc_html__( 'Configured CIDRs are stored as explicit policy. Visitor addresses, URLs, content and usernames are not collected by the match counter. Counts can miss concurrent or failed writes and cap at one million; they never decide enforcement.', 'amazing-security' ) . '</p></section>';
 		if ( ! empty( $state['invalid'] ) ) {
-			echo '<div class="notice notice-error"><p>Network policy is invalid; enforcement is unavailable. Use host recovery to set an explicit off policy.</p></div></div>';
+			echo '<div class="notice notice-error"><p>' . esc_html__( 'Network policy is invalid; enforcement is unavailable. Use host recovery to set an explicit off policy.', 'amazing-security' ) . '</p></div></div>';
 			return;}
-		echo '<section class="amsec-file-scan"><h2>Current policy</h2><p>Mode: ' . esc_html( $state['mode'] ) . '.</p>';
+		echo '<section class="amsec-file-scan"><h2>' . esc_html__( 'Current policy', 'amazing-security' ) . '</h2><p>' .
+			/* translators: %s: current mode slug, for example off, observe or block. */
+			sprintf( esc_html__( 'Mode: %s.', 'amazing-security' ), esc_html( $state['mode'] ) ) . '</p>';
 		if ( ! empty( $metric['invalid'] ) ) {
-			echo '<p>Observed match count is unavailable.</p>';
+			echo '<p>' . esc_html__( 'Observed match count is unavailable.', 'amazing-security' ) . '</p>';
 		} elseif ( $metric['revision'] === $state['revision'] ) {
-			echo '<p>Approximate matches for this policy revision: ' . esc_html( (string) $metric['count'] ) . '.</p>';
+			echo '<p>' .
+				/* translators: %s: approximate match count for this policy revision. */
+				sprintf( esc_html__( 'Approximate matches for this policy revision: %s.', 'amazing-security' ), esc_html( (string) $metric['count'] ) ) . '</p>';
 		} else {
-			echo '<p>No advisory count for this policy revision; earlier counts are historical.</p>';}
-		echo '<p>Configured networks:</p><pre>' . esc_html( implode( "\n", $state['cidrs'] ) ) . '</pre>';
+			echo '<p>' . esc_html__( 'No advisory count for this policy revision; earlier counts are historical.', 'amazing-security' ) . '</p>';}
+		echo '<p>' . esc_html__( 'Configured networks:', 'amazing-security' ) . '</p><pre>' . esc_html( implode( "\n", $state['cidrs'] ) ) . '</pre>';
 		if ( ! is_ssl() ) {
-			echo '<p>Use HTTPS to approve changes.</p></section></div>';
+			echo '<p>' . esc_html__( 'Use HTTPS to approve changes.', 'amazing-security' ) . '</p></section></div>';
 			return;}
-		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '"><input type="hidden" name="action" value="amsec_network_settings"><input type="hidden" name="fingerprint" value="' . esc_attr( $fp ) . '"><p><label>Mode <select name="mode">';
-		foreach ( array( 'off', 'observe', 'block' ) as $mode ) {
-			echo '<option value="' . esc_attr( $mode ) . '"' . selected( $state['mode'], $mode, false ) . '>' . esc_html( ucfirst( $mode ) ) . '</option>';
-		}echo '</select></label></p><p><label>Networks to deny (one IP or CIDR per line, up to 50)<br><textarea name="rules" rows="6" class="large-text code" maxlength="4096">' . esc_html( implode( "\n", $state['cidrs'] ) ) . '</textarea></label></p><fieldset><legend>Methods: choose all, or selected methods</legend>';
+		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '"><input type="hidden" name="action" value="amsec_network_settings"><input type="hidden" name="fingerprint" value="' . esc_attr( $fp ) . '"><p><label>' . esc_html__( 'Mode', 'amazing-security' ) . ' <select name="mode">';
+		foreach ( array(
+			'off'     => __( 'Off', 'amazing-security' ),
+			'observe' => __( 'Observe', 'amazing-security' ),
+			'block'   => __( 'Block', 'amazing-security' ),
+		) as $mode => $label ) {
+			echo '<option value="' . esc_attr( $mode ) . '"' . selected( $state['mode'], $mode, false ) . '>' . esc_html( $label ) . '</option>';
+		}echo '</select></label></p><p><label>' . esc_html__( 'Networks to deny (one IP or CIDR per line, up to 50)', 'amazing-security' ) . '<br><textarea name="rules" rows="6" class="large-text code" maxlength="4096">' . esc_html( implode( "\n", $state['cidrs'] ) ) . '</textarea></label></p><fieldset><legend>' . esc_html__( 'Methods: choose all, or selected methods', 'amazing-security' ) . '</legend>';
 		foreach ( array_merge( array( '*' ), NetworkPolicy::METHODS ) as $method ) {
-			echo '<label style="margin-right:1rem"><input type="checkbox" name="methods[]" value="' . esc_attr( $method ) . '"' . checked( in_array( $method, $state['methods'], true ), true, false ) . '> ' . esc_html( '*' === $method ? 'All methods' : $method ) . '</label>';
+			echo '<label style="margin-right:1rem"><input type="checkbox" name="methods[]" value="' . esc_attr( $method ) . '"' . checked( in_array( $method, $state['methods'], true ), true, false ) . '> ' . esc_html( '*' === $method ? __( 'All methods', 'amazing-security' ) : $method ) . '</label>';
 		}echo '</fieldset>';
 		wp_nonce_field( 'amsec_network_' . $fp );
-		echo '<p><label>Your password <input type="password" name="password" autocomplete="current-password" maxlength="1024" required></label></p><p><label><input type="checkbox" name="confirm" value="1" required> I have reviewed proxy trust, shared-network and API effects, tested observe mode, and know the host recovery command.</label></p>';
+		echo '<p><label>' . esc_html__( 'Your password', 'amazing-security' ) . ' <input type="password" name="password" autocomplete="current-password" maxlength="1024" required></label></p><p><label><input type="checkbox" name="confirm" value="1" required> ' . esc_html__( 'I have reviewed proxy trust, shared-network and API effects, tested observe mode, and know the host recovery command.', 'amazing-security' ) . '</label></p>';
 		submit_button( __( 'Approve current network policy', 'amazing-security' ), 'secondary' );
 		echo '</form></section></div>';
 	}

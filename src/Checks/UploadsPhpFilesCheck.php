@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Checks;
 
+defined( 'ABSPATH' ) || exit;
+
 use AmazingPlugins\Security\Findings\CheckResult;
 use AmazingPlugins\Security\Findings\State;
 use AmazingPlugins\Security\Scan\ScanContext;
@@ -87,9 +89,9 @@ final class UploadsPhpFilesCheck implements SecurityCheck {
 		$kind    = (string) ( $this->readKind )();
 		$state   = self::decide( $kind );
 		$summary = match ( $state ) {
-			'warn' => 'A PHP file is in the uploads folder. This check does not open, run, or delete it.',
-			'pass' => 'No PHP file was found in the uploads folder. This check does not open, run, or delete files.',
-			default => 'The uploads folder could not be fully checked for PHP files. This check does not open, run, or delete files.',
+			'warn' => __( 'A PHP file is in the uploads folder. This check does not open, run, or delete it.', 'amazing-security' ),
+			'pass' => __( 'No PHP file was found in the uploads folder. This check does not open, run, or delete files.', 'amazing-security' ),
+			default => __( 'The uploads folder could not be fully checked for PHP files. This check does not open, run, or delete files.', 'amazing-security' ),
 		};
 		return array(
 			new CheckResult( $this->id(), 'warn' === $state ? State::WARN : ( 'pass' === $state ? State::PASS : State::UNKNOWN ), $summary, self::SOURCE, new DateTimeImmutable( 'now', new DateTimeZone( 'UTC' ) ), 'medium', 'unknown' === $state ? 'unavailable' : 'complete', array( 'kind' => $kind ) ),

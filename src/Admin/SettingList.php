@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Admin;
 
+defined( 'ABSPATH' ) || exit;
+
 /** A category of settings. Each row opens that screen. */
 final class SettingList {
 	/**

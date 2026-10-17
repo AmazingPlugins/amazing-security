@@ -3,6 +3,8 @@
 declare(strict_types=1);
 namespace AmazingPlugins\Security\Exposure;
 
+defined( 'ABSPATH' ) || exit;
+
 use AmazingPlugins\Security\Integrity\WordPressOptions;
 final class WordPressExposureService {
 	public function create(): ExposureService {

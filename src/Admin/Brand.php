@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Admin;
 
+defined( 'ABSPATH' ) || exit;
+
 /** Landing-page frame for Amazing Security screens. */
 final class Brand {
 	public const DOCS = 'https://amazingplugins.com/plugins/amazing-security/';
@@ -14,6 +16,29 @@ final class Brand {
 		add_filter( 'admin_body_class', array( self::class, 'bodyClass' ) );
 		add_action( 'admin_enqueue_scripts', array( self::class, 'assets' ) );
 		add_action( 'all_admin_notices', array( self::class, 'bar' ), 1000 );
+		add_action( 'all_admin_notices', array( self::class, 'savedNotice' ) );
+		add_filter( 'removable_query_args', array( self::class, 'removableArgs' ) );
+	}
+
+	/** Marks a settings redirect so the next screen confirms the save. */
+	public static function saved( string $url ): string {
+		return add_query_arg( 'amsec_saved', '1', $url );
+	}
+
+	public static function savedNotice(): void {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only flash flag after a nonce-checked save.
+		if ( self::onScreen() && isset( $_GET['amsec_saved'] ) && '1' === $_GET['amsec_saved'] ) {
+			echo '<div class="notice notice-success is-dismissible" role="status"><p>' . esc_html__( 'Settings saved.', 'amazing-security' ) . '</p></div>';
+		}
+	}
+
+	/**
+	 * @param array<int, string> $args
+	 * @return array<int, string>
+	 */
+	public static function removableArgs( array $args ): array {
+		$args[] = 'amsec_saved';
+		return $args;
 	}
 
 	public static function bodyClass( string $classes ): string {
@@ -24,11 +49,10 @@ final class Brand {
 		if ( ! self::onScreen() ) {
 			return;
 		}
-		wp_enqueue_style( 'amsec-fonts', 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,650&family=Inter:wght@400;600;700&display=swap', array(), '1' );
-		wp_enqueue_style( 'amazing-security-admin', plugins_url( 'assets/admin.css', AMAZING_SECURITY_FILE ), array( 'amsec-fonts' ), '0.1.52' );
+		wp_enqueue_style( 'amazing-security-admin', plugins_url( 'assets/admin.css', AMAZING_SECURITY_FILE ), array(), '0.1.53' );
 		$page = self::page();
 		if ( in_array( $page, array( 'amsec-accounts', 'amsec-traffic-guard' ), true ) ) {
-			wp_enqueue_script( 'amazing-security-tabs', plugins_url( 'assets/admin-tabs.js', AMAZING_SECURITY_FILE ), array(), '0.1.0', true );
+			wp_enqueue_script( 'amazing-security-tabs', plugins_url( 'assets/admin-tabs.js', AMAZING_SECURITY_FILE ), array(), '0.1.1', true );
 		}
 		if ( 'amazing-security' !== $page ) {
 			return;

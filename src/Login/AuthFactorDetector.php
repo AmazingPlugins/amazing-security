@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Login;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Detects third-party passkey / TOTP providers. Amazing Security’s own stacks do not count.
  *

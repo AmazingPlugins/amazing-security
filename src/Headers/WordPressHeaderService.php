@@ -3,6 +3,8 @@
 declare(strict_types=1);
 namespace AmazingPlugins\Security\Headers;
 
+defined( 'ABSPATH' ) || exit;
+
 use AmazingPlugins\Security\Integrity\WordPressOptions;
 final class WordPressHeaderService {
 	public function create(): HeaderService {

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Checks;
 
+defined( 'ABSPATH' ) || exit;
+
 use AmazingPlugins\Security\Findings\CheckResult;
 use AmazingPlugins\Security\Findings\State;
 use AmazingPlugins\Security\Scan\ScanContext;
@@ -18,7 +20,7 @@ abstract class AbstractCheck implements SecurityCheck {
 
 	protected function result( ?bool $condition, string $pass, string $warn, array $evidence = array() ): array {
 		$state   = null === $condition ? State::UNKNOWN : ( $condition ? State::WARN : State::PASS );
-		$summary = null === $condition ? 'Could not inspect this setting.' : ( $condition ? $warn : $pass );
+		$summary = null === $condition ? __( 'Could not inspect this setting.', 'amazing-security' ) : ( $condition ? $warn : $pass );
 		return array( new CheckResult( $this->id(), $state, $summary, self::SOURCE, new DateTimeImmutable( 'now', new DateTimeZone( 'UTC' ) ), null === $condition ? 'low' : 'high', null === $condition ? 'unavailable' : 'complete', $evidence ) );
 	}
 }

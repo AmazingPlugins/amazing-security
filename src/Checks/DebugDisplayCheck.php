@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Checks;
 
+defined( 'ABSPATH' ) || exit;
+
 use AmazingPlugins\Security\Findings\CheckResult;
 use AmazingPlugins\Security\Findings\State;
 use AmazingPlugins\Security\Scan\ScanContext;
@@ -21,7 +23,7 @@ final class DebugDisplayCheck extends AbstractCheck {
 				new CheckResult(
 					$this->id(),
 					State::PASS,
-					'Error details are hidden for requests that load this plugin. wp-config.php was not changed.',
+					__( 'Error details are hidden for requests that load this plugin. wp-config.php was not changed.', 'amazing-security' ),
 					self::SOURCE,
 					new DateTimeImmutable( 'now', new DateTimeZone( 'UTC' ) ),
 					'high',
@@ -36,7 +38,7 @@ final class DebugDisplayCheck extends AbstractCheck {
 				new CheckResult(
 					$this->id(),
 					State::WARN,
-					'Visitors may see WordPress error details. You can hide them for requests that load this plugin. This plugin will not edit wp-config.php.',
+					__( 'Visitors may see WordPress error details. You can hide them for requests that load this plugin. This plugin will not edit wp-config.php.', 'amazing-security' ),
 					self::SOURCE,
 					new DateTimeImmutable( 'now', new DateTimeZone( 'UTC' ) ),
 					'high',
@@ -45,6 +47,6 @@ final class DebugDisplayCheck extends AbstractCheck {
 				),
 			);
 		}
-		return $this->result( $displayed, 'WordPress error details are hidden from visitors.', 'Visitors may see WordPress error details. You can hide them for requests that load this plugin. This plugin will not edit wp-config.php.' );
+		return $this->result( $displayed, __( 'WordPress error details are hidden from visitors.', 'amazing-security' ), __( 'Visitors may see WordPress error details. You can hide them for requests that load this plugin. This plugin will not edit wp-config.php.', 'amazing-security' ) );
 	}
 }

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Rules;
 
+defined( 'ABSPATH' ) || exit;
+
 use AmazingPlugins\Security\Content\MarkupDetector;
 use AmazingPlugins\Security\FileScan\BundledRulePack;
 use AmazingPlugins\Security\Firewall\BundledRequestRules;

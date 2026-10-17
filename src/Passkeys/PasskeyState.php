@@ -3,6 +3,8 @@
 declare(strict_types=1);
 namespace AmazingPlugins\Security\Passkeys;
 
+defined( 'ABSPATH' ) || exit;
+
 /** Shared type/budget guards for plugin-owned passkey records. */
 final class PasskeyState {
 	public static function object( mixed $raw, int $maximum, array $keys ): ?array {

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Checks;
 
+defined( 'ABSPATH' ) || exit;
+
 use AmazingPlugins\Security\Findings\CheckResult;
 use AmazingPlugins\Security\Findings\State;
 use AmazingPlugins\Security\Scan\ScanContext;
@@ -60,9 +62,9 @@ final class BackgroundUpdatesCheck implements SecurityCheck {
 		$kind    = (string) ( $this->readKind )();
 		$state   = self::decide( $kind );
 		$summary = match ( $state ) {
-			'warn' => 'WordPress background updates are turned off. This check does not turn them on.',
-			'pass' => 'WordPress background updates are not turned off. This check does not turn them on.',
-			default => 'WordPress background updates could not be read. This check does not turn them on.',
+			'warn' => __( 'WordPress background updates are turned off. This check does not turn them on.', 'amazing-security' ),
+			'pass' => __( 'WordPress background updates are not turned off. This check does not turn them on.', 'amazing-security' ),
+			default => __( 'WordPress background updates could not be read. This check does not turn them on.', 'amazing-security' ),
 		};
 		return array(
 			new CheckResult( $this->id(), 'warn' === $state ? State::WARN : ( 'pass' === $state ? State::PASS : State::UNKNOWN ), $summary, self::SOURCE, new DateTimeImmutable( 'now', new DateTimeZone( 'UTC' ) ), 'low', 'unknown' === $state ? 'unavailable' : 'complete', array( 'kind' => $kind ) ),

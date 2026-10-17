@@ -3,6 +3,8 @@
 declare(strict_types=1);
 namespace AmazingPlugins\Security\Network;
 
+defined( 'ABSPATH' ) || exit;
+
 use AmazingPlugins\Security\Integrity\OptionGateway;
 final class NetworkSettingsService {
 	private mixed $raw = null;

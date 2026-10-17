@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Checks;
 
+defined( 'ABSPATH' ) || exit;
+
 use AmazingPlugins\Security\Findings\CheckResult;
 use AmazingPlugins\Security\Findings\State;
 use AmazingPlugins\Security\Scan\ScanContext;
@@ -46,9 +48,9 @@ final class PhpVersionCheck implements SecurityCheck {
 		$kind    = (string) ( $this->readKind )();
 		$state   = self::decide( $kind );
 		$summary = match ( $state ) {
-			'warn' => 'PHP is older than the version this WordPress release requires. This check does not change PHP and does not contact WordPress.org.',
-			'pass' => 'PHP meets the version this WordPress release requires. This check does not change PHP and does not contact WordPress.org.',
-			default => 'The required PHP version could not be read. This check does not change PHP and does not contact WordPress.org.',
+			'warn' => __( 'PHP is older than the version this WordPress release requires. This check does not change PHP and does not contact WordPress.org.', 'amazing-security' ),
+			'pass' => __( 'PHP meets the version this WordPress release requires. This check does not change PHP and does not contact WordPress.org.', 'amazing-security' ),
+			default => __( 'The required PHP version could not be read. This check does not change PHP and does not contact WordPress.org.', 'amazing-security' ),
 		};
 		return array(
 			new CheckResult( $this->id(), 'warn' === $state ? State::WARN : ( 'pass' === $state ? State::PASS : State::UNKNOWN ), $summary, self::SOURCE, new DateTimeImmutable( 'now', new DateTimeZone( 'UTC' ) ), 'low', 'unknown' === $state ? 'unavailable' : 'complete', array( 'kind' => $kind ) ),

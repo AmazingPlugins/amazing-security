@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Free\Recovery;
 
+defined( 'ABSPATH' ) || exit;
+
 /** Prefixed table reads through $wpdb. Queries are prepared, including %i identifiers. */
 final class WordPressTables implements TableSource {
 	public function __construct( private readonly \wpdb $wpdb ) {}

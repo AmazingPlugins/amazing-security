@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Vulnerabilities;
 
+defined( 'ABSPATH' ) || exit;
+
 use AmazingPlugins\Security\Integrity\HttpClient;
 use AmazingPlugins\Security\Integrity\HttpResult;
 

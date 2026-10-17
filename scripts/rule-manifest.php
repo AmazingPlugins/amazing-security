@@ -1,6 +1,7 @@
 <?php
 // Explicit development command; never invoked by plugin requests.
 declare(strict_types=1);
+if(!defined('ABSPATH'))define('ABSPATH',sys_get_temp_dir().'/');
 foreach(['src/Content/MarkupDetector.php','src/FileScan/BundledRulePack.php','src/Firewall/BundledRequestRules.php','src/Rules/RuleCatalog.php'] as $file){require dirname(__DIR__).'/'.$file;}
 use AmazingPlugins\Security\Rules\RuleCatalog;
 $root=dirname(__DIR__);$catalog=new RuleCatalog($root);$path=$root.'/assets/rule-manifest.json';

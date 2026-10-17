@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Free\Recovery;
 
+defined( 'ABSPATH' ) || exit;
+
 /** Reads prefixed tables. Tests supply this. Production uses WordPressTables. */
 interface TableSource {
 	/**

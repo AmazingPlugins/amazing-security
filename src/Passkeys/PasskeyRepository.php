@@ -3,6 +3,8 @@
 declare(strict_types=1);
 namespace AmazingPlugins\Security\Passkeys;
 
+defined( 'ABSPATH' ) || exit;
+
 // phpcs:disable WordPress.DB.DirectDatabaseQuery -- Bounded plugin-owned tables require fresh reads, atomic claims and guarded admission; all runtime values are prepared.
 final class PasskeyRepository {
 	private readonly string $pending;

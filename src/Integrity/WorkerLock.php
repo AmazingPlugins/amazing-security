@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Integrity;
 
+defined( 'ABSPATH' ) || exit;
+
 final class WorkerLock {
 	private const OPTION       = 'amazing_security_integrity_worker_lock';
 	private ?string $heldValue = null;

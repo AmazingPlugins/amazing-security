@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Fixes;
 
+defined( 'ABSPATH' ) || exit;
+
 final class FixTables {
 	public static function install(): void {
 		global $wpdb;

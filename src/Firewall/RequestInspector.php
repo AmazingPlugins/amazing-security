@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Firewall;
 
+defined( 'ABSPATH' ) || exit;
+
 final class RequestInspector {
 	public function __construct( private readonly BundledRequestRules $rules = new BundledRequestRules() ) {}
 

@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Activity;
 
+defined( 'ABSPATH' ) || exit;
+
 final class ActivityPage {
 	public function register(): void {
 		add_submenu_page( 'amazing-security', __( 'Security activity', 'amazing-security' ), __( 'Activity', 'amazing-security' ), 'manage_options', 'amsec-activity', array( $this, 'render' ) );
-		add_action( 'admin_post_amsec_activity_recording', array( $this, 'save' ) );
 	}
 
 	public function render(): void {
@@ -29,7 +30,7 @@ final class ActivityPage {
 			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Renderer escapes every dynamic field.
 			echo ( new ActivityRenderer() )->render( $rows, $page, $event, $pages, $this->switchForm( $enabled ) );
 		} catch ( \RuntimeException ) {
-			echo '<div class="wrap amazing-security-admin"><h1>Security activity</h1><div class="notice notice-error"><p>Activity storage is unavailable. No complete history can be shown.</p></div></div>';
+			echo '<div class="wrap amazing-security-admin"><h1>' . esc_html__( 'Security activity', 'amazing-security' ) . '</h1><div class="notice notice-error"><p>' . esc_html__( 'Activity storage is unavailable. No complete history can be shown.', 'amazing-security' ) . '</p></div></div>';
 		}
 	}
 
@@ -42,7 +43,7 @@ final class ActivityPage {
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce checked above.
 		$raw = isset( $_POST['amsec_activity_enabled'] ) ? sanitize_text_field( wp_unslash( $_POST['amsec_activity_enabled'] ) ) : '0';
 		update_option( 'amsec_activity_enabled', '1' === $raw ? '1' : '0', false );
-		wp_safe_redirect( admin_url( 'admin.php?page=amsec-activity' ) );
+		wp_safe_redirect( \AmazingPlugins\Security\Admin\Brand::saved( admin_url( 'admin.php?page=amsec-activity' ) ) );
 		exit;
 	}
 

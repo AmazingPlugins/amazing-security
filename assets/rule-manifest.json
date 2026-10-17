@@ -50,9 +50,9 @@
                 "AS-PHP-043"
             ],
             "sha256": {
-                "src/FileScan/BundledRulePack.php": "995ef43d540e2b9a20108cb1f6f61b9759e43633d6aebe8415ae77757078dfdf",
-                "src/FileScan/RuleMatcher.php": "787ee60e12cfdda288045c3a66d1734ca5fcde1c26d66e739214eda04ca7df86",
-                "src/FileScan/AdjacentFlow.php": "90681fd3e9d1f277a7b54a64309a52cc3524e59f14c8ec329a58d6ab7a8a87ab"
+                "src/FileScan/BundledRulePack.php": "969cac43d60fb9f534bc55041f69cdc8b36fb079f54de61556f6a9e918ac2b21",
+                "src/FileScan/RuleMatcher.php": "641f70c490cd9dea26e8f356c250443278ff4f94033f9ea347bfb40c515f4c5e",
+                "src/FileScan/AdjacentFlow.php": "7c0e67c176d14acaccc8fedb693df46f8a23e61bab3111ab1049cb21b2b2c852"
             }
         },
         "content": {
@@ -66,7 +66,7 @@
                 "AS-JS-001"
             ],
             "sha256": {
-                "src/Content/MarkupDetector.php": "d3acceb2b6efac28e67ba9778e298af3b3e6d764fcf913d2daf86cfa53025fcd"
+                "src/Content/MarkupDetector.php": "be1363d3f5c59b546bec7b0b8575b779d0a540fdec88406af80e811d7980c36e"
             }
         },
         "requests": {
@@ -82,7 +82,7 @@
                 "AS-REST-007"
             ],
             "sha256": {
-                "src/Firewall/BundledRequestRules.php": "93336844f3c30f367aaaf7f976a92a91455f7ebe5affe1cf3ee85752bbc0e6fb"
+                "src/Firewall/BundledRequestRules.php": "424f3b9c4f9d84286b11639267540a58f05458283ea1266f493e894bdda2bea9"
             }
         }
     }

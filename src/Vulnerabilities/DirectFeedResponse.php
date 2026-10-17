@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Vulnerabilities;
 
+defined( 'ABSPATH' ) || exit;
+
 final class DirectFeedResponse {
 	/** @param array<int,array<string,mixed>> $records */
 	private function __construct(

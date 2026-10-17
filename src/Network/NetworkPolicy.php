@@ -3,6 +3,8 @@
 declare(strict_types=1);
 namespace AmazingPlugins\Security\Network;
 
+defined( 'ABSPATH' ) || exit;
+
 final class NetworkPolicy {
 	public const METHODS = array( 'GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS' );
 	public function read( mixed $raw ): ?array {

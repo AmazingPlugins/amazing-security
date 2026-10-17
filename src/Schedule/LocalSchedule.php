@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Schedule;
 
+defined( 'ABSPATH' ) || exit;
+
 use AmazingPlugins\Security\Integrity\OptionGateway;
 use AmazingPlugins\Security\Integrity\WorkerLock;
 use AmazingPlugins\Security\Scan\LocalHardeningScanService;

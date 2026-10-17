@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Vulnerabilities;
 
+defined( 'ABSPATH' ) || exit;
+
 final class WordPressDirectFeedCache implements DirectFeedCache {
 	private const INDEX = 'amazing_security_vulnerability_cache_index';
 

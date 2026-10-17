@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Free\Recovery;
 
+defined( 'ABSPATH' ) || exit;
+
 /** Preview and 0755 repair for four wp-content directories. */
 final class DirectoryModes {
 	public const MODE = 0755;

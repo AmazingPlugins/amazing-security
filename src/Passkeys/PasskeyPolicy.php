@@ -3,6 +3,8 @@
 declare(strict_types=1);
 namespace AmazingPlugins\Security\Passkeys;
 
+defined( 'ABSPATH' ) || exit;
+
 final class PasskeyPolicy {
 	public const OPTION = 'amsec_passkey_policy';
 	public function read( mixed $raw ): ?array {

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Free\Comments;
 
+defined( 'ABSPATH' ) || exit;
+
 /** Comment form extra field. Off until an administrator turns it on. */
 final class Module {
 	public static function boot(): void {

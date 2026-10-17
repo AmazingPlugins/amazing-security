@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Bots;
 
+defined( 'ABSPATH' ) || exit;
+
 final class BotHooks {
 	private bool $checked = false;
 
@@ -16,7 +18,7 @@ final class BotHooks {
 		if ( 'off' === $this->mode() || is_user_logged_in() ) {
 			return;
 		}
-		echo '<div hidden aria-hidden="true"><label for="amsec-contact-hint">Leave this field empty</label><input id="amsec-contact-hint" type="text" name="amsec_contact_hint" value="" autocomplete="off" tabindex="-1"></div>';
+		echo '<div hidden aria-hidden="true"><label for="amsec-contact-hint">' . esc_html__( 'Leave this field empty', 'amazing-security' ) . '</label><input id="amsec-contact-hint" type="text" name="amsec_contact_hint" value="" autocomplete="off" tabindex="-1"></div>';
 	}
 
 	public function comment( array $data ): array {

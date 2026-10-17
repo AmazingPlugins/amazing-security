@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security;
 
+defined( 'ABSPATH' ) || exit;
+
 /** Who may see or change an account. */
 final class Access {
 	/** Session list and detail. An administrator, or the account owner. */

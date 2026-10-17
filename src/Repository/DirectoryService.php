@@ -3,6 +3,8 @@
 declare(strict_types=1);
 namespace AmazingPlugins\Security\Repository;
 
+defined( 'ABSPATH' ) || exit;
+
 use AmazingPlugins\Security\Integrity\OptionGateway;
 use AmazingPlugins\Security\Integrity\WorkerLock;
 use Closure;

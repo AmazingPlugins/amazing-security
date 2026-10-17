@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Free\Accounts;
 
+defined( 'ABSPATH' ) || exit;
+
 /** Administrator sign-in breach check. The listed callback is injected. */
 final class AdminBreachBlock {
 	/**

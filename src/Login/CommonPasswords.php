@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Login;
 
+defined( 'ABSPATH' ) || exit;
+
 /** Compares a password with a short local list. It does not send the password anywhere. */
 final class CommonPasswords {
 	private const HASHES = array(

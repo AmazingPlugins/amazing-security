@@ -3,6 +3,8 @@
 declare(strict_types=1);
 namespace AmazingPlugins\Security\Content;
 
+defined( 'ABSPATH' ) || exit;
+
 final class ContentPage {
 	public function register(): void {
 		$hook = add_submenu_page( 'amazing-security', __( 'Published content', 'amazing-security' ), __( 'Content scan', 'amazing-security' ), 'manage_options', 'amsec-content', array( $this, 'render' ) );
@@ -23,33 +25,33 @@ final class ContentPage {
 		} catch ( \Throwable ) {
 			$state = array( 'invalid' => true );
 		}
-		echo '<div class="wrap amazing-security-admin"><header class="amsec-header"><div><h1>Published content</h1><p>Review selected hidden-link and redirect patterns in public posts, pages and their approved comments.</p></div>';
+		echo '<div class="wrap amazing-security-admin"><header class="amsec-header"><div><h1>' . esc_html__( 'Published content', 'amazing-security' ) . '</h1><p>' . esc_html__( 'Review selected hidden-link and redirect patterns in public posts, pages and their approved comments.', 'amazing-security' ) . '</p></div>';
 		$active  = $state['active'] ?? null;
 		$expired = is_array( $active ) && ! $active['finished'] && time() > $active['started_at'] + 86400;
 		if ( empty( $state['invalid'] ) ) {
 			$this->form( is_array( $active ) && ! $active['finished'] && ! $expired ? 'resume' : 'start', $active['scan_id'] ?? '' );
 		}
-		echo '</header><section class="amsec-overview"><h2>Coverage</h2><p>Published, non-password-protected posts/pages and approved native comments only. Private/draft content, custom post types, products/reviews, order/customer records and other database tables are excluded. Links are not contacted or checked against a reputation service. A match can be legitimate and needs review.</p><p>Each step processes up to 50 items, with a five-second work target. A run stops at 1,000 items, 16 MiB read or 30 seconds of work. Items over 128 KiB are skipped; at most 250 findings are retained. Slow database responses can take longer. Items added after a scan starts are checked on the next scan. Content can change while scanning, and later edits can be missed. No stored content is rendered here or changed.</p></section>';
+		echo '</header><section class="amsec-overview"><h2>' . esc_html__( 'Coverage', 'amazing-security' ) . '</h2><p>' . esc_html__( 'Published, non-password-protected posts/pages and approved native comments only. Private/draft content, custom post types, products/reviews, order/customer records and other database tables are excluded. Links are not contacted or checked against a reputation service. A match can be legitimate and needs review.', 'amazing-security' ) . '</p><p>' . esc_html__( 'Each step processes up to 50 items, with a five-second work target. A run stops at 1,000 items, 16 MiB read or 30 seconds of work. Items over 128 KiB are skipped; at most 250 findings are retained. Slow database responses can take longer. Items added after a scan starts are checked on the next scan. Content can change while scanning, and later edits can be missed. No stored content is rendered here or changed.', 'amazing-security' ) . '</p></section>';
 		if ( ! empty( $state['invalid'] ) ) {
-			echo '<div class="notice notice-error"><p>Scan state is unavailable or invalid. No coverage can be established. Ask the host administrator to review the local scan state before restarting.</p></div></div>';
+			echo '<div class="notice notice-error"><p>' . esc_html__( 'Scan state is unavailable or invalid. No coverage can be established. Ask the host administrator to review the local scan state before restarting.', 'amazing-security' ) . '</p></div></div>';
 			return;
 		}
 		if ( ! is_array( $active ) ) {
-			echo '<section class="amsec-file-scan"><h2>No content scan yet</h2><p>Start a scan to review selected patterns. A scan with no findings does not establish that the site is malware-free.</p></section></div>';
+			echo '<section class="amsec-file-scan"><h2>' . esc_html__( 'No content scan yet', 'amazing-security' ) . '</h2><p>' . esc_html__( 'Start a scan to review selected patterns. A scan with no findings does not establish that the site is malware-free.', 'amazing-security' ) . '</p></section></div>';
 			return;
 		}
 	 // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only administrator report pagination.
 		$page = max( 1, min( 10, absint( $_GET['content_page'] ?? 1 ) ) );
 		$this->report( $active, $page, $expired );
 		foreach ( array(
-			'previous' => 'Previous finished review',
-			'complete' => 'Last review without bounded-work gaps',
+			'previous' => __( 'Previous finished review', 'amazing-security' ),
+			'complete' => __( 'Last review without bounded-work gaps', 'amazing-security' ),
 		) as $key => $title ) {
 			$old = $state[ $key ];
 			if ( ! is_array( $old ) || $old['scan_id'] === $active['scan_id'] || ( 'complete' === $key && ( $state['previous']['scan_id'] ?? '' ) === $old['scan_id'] ) ) {
 				continue;
 			}
-			echo '<details class="amsec-file-scan"><summary>' . esc_html( $title ) . ' (' . esc_html( (string) count( $old['findings'] ) ) . ' stored findings)</summary><p>These are earlier results, not a statement about current content. Showing up to five earlier findings.</p>';
+			echo '<details class="amsec-file-scan"><summary>' . esc_html( sprintf( /* translators: 1: title of an earlier review, 2: number of stored findings. */ __( '%1$s (%2$s stored findings)', 'amazing-security' ), $title, (string) count( $old['findings'] ) ) ) . '</summary><p>' . esc_html__( 'These are earlier results, not a statement about current content. Showing up to five earlier findings.', 'amazing-security' ) . '</p>';
 			$this->table( array_slice( $old['findings'], 0, 5 ) );
 			echo '</details>';
 		}
@@ -62,28 +64,28 @@ final class ContentPage {
 		echo '</form>';
 	}
 	private function report( array $report, int $page, bool $expired ): void {
-		$label = $expired ? 'Expired: incomplete review' : ( $report['partial'] ? 'Partial coverage' : ( $report['finished'] ? 'Selected pattern review finished' : 'Review in progress' ) );
-		echo '<section class="amsec-file-scan"><div class="amsec-file-heading"><h2>Latest review</h2><span class="amsec-file-rule-age">Installed content rules ' . esc_html( MarkupDetector::VERSION ) . '</span></div><div class="amsec-file-status" role="status"><strong>' . esc_html( $label ) . '</strong><span>' . esc_html( (string) $report['processed'] ) . ' items processed; ' . esc_html( (string) $report['unknown'] ) . ' unknown; ' . esc_html( (string) $report['omitted'] ) . ' findings omitted.</span></div><p>Started UTC: ' . esc_html( gmdate( 'Y-m-d H:i:s', $report['started_at'] ) ) . '. A completed review covers selected patterns and cannot certify the site as malware-free.</p>';
+		$label = $expired ? __( 'Expired: incomplete review', 'amazing-security' ) : ( $report['partial'] ? __( 'Partial coverage', 'amazing-security' ) : ( $report['finished'] ? __( 'Selected pattern review finished', 'amazing-security' ) : __( 'Review in progress', 'amazing-security' ) ) );
+		echo '<section class="amsec-file-scan"><div class="amsec-file-heading"><h2>' . esc_html__( 'Latest review', 'amazing-security' ) . '</h2><span class="amsec-file-rule-age">' . esc_html( sprintf( /* translators: %s: version of the installed content rules. */ __( 'Installed content rules %s', 'amazing-security' ), MarkupDetector::VERSION ) ) . '</span></div><div class="amsec-file-status" role="status"><strong>' . esc_html( $label ) . '</strong><span>' . esc_html( sprintf( /* translators: 1: number of processed items, 2: number of unknown items, 3: number of omitted findings. */ __( '%1$s items processed; %2$s unknown; %3$s findings omitted.', 'amazing-security' ), (string) $report['processed'], (string) $report['unknown'], (string) $report['omitted'] ) ) . '</span></div><p>' . esc_html( sprintf( /* translators: %s: UTC date and time when the review started. */ __( 'Started UTC: %s. A completed review covers selected patterns and cannot certify the site as malware-free.', 'amazing-security' ), gmdate( 'Y-m-d H:i:s', $report['started_at'] ) ) ) . '</p>';
 		if ( $report['finished'] && '' !== $report['reason'] ) {
-			echo '<p>Stop reason: ' . esc_html(
+			echo '<p>' . esc_html__( 'Stop reason:', 'amazing-security' ) . ' ' . esc_html(
 				match ( $report['reason'] ) {
-				'budget' => 'resource limit reached',
-				'database' => 'database unavailable',
-				'expired' => 'scan expired',
-				'context' => 'site address or rule version changed',
-				default => 'incomplete work' }
+				'budget' => __( 'resource limit reached', 'amazing-security' ),
+				'database' => __( 'database unavailable', 'amazing-security' ),
+				'expired' => __( 'scan expired', 'amazing-security' ),
+				'context' => __( 'site address or rule version changed', 'amazing-security' ),
+				default => __( 'incomplete work', 'amazing-security' ) }
 			) . '.</p>';
 		}
 		$count = count( $report['findings'] );
 		$pages = max( 1, (int) ceil( $count / 25 ) );
 		$page  = min( $page, $pages );
 		if ( 0 === $count ) {
-			echo '<p>No selected review pattern has been recorded in this scan.</p>';
+			echo '<p>' . esc_html__( 'No selected review pattern has been recorded in this scan.', 'amazing-security' ) . '</p>';
 		} else {
 			$this->table( array_slice( $report['findings'], ( $page - 1 ) * 25, 25 ) );
 		}
 		if ( $pages > 1 ) {
-			echo '<nav aria-label="Content finding pages">'; for ( $n = 1; $n <= $pages; ++$n ) {
+			echo '<nav aria-label="' . esc_attr__( 'Content finding pages', 'amazing-security' ) . '">'; for ( $n = 1; $n <= $pages; ++$n ) {
 					echo '<a class="button" href="' . esc_url(
 						add_query_arg(
 							array(
@@ -98,14 +100,14 @@ final class ContentPage {
 		echo '</section>';
 	}
 	private function table( array $findings ): void {
-		echo '<table class="widefat striped amsec-stacked-table"><thead><tr><th>Item</th><th>Pattern to review</th><th>Line</th><th>Review</th></tr></thead><tbody>';
+		echo '<table class="widefat striped amsec-stacked-table"><thead><tr><th>' . esc_html__( 'Item', 'amazing-security' ) . '</th><th>' . esc_html__( 'Pattern to review', 'amazing-security' ) . '</th><th>' . esc_html__( 'Line', 'amazing-security' ) . '</th><th>' . esc_html__( 'Review', 'amazing-security' ) . '</th></tr></thead><tbody>';
 		foreach ( $findings as $finding ) {
 			$url      = $this->reviewUrl( $finding['kind'], $finding['id'] );
 			$guidance = match ( $finding['rule'] ) {
-				'AS-HTML-001' => 'Hidden external link: confirm why the link is present and hidden.', 'AS-HTML-002' => 'External meta refresh: confirm the intended destination.', 'AS-HTML-003' => 'Executable link scheme: review the action and its origin.', 'AS-HTML-004' => 'Hidden external frame: confirm why the frame is present and hidden. A visible frame is not matched.', 'AS-JS-001' => 'Literal external script redirect: confirm who added it.', default => 'Review selected markup.' };
+				'AS-HTML-001' => __( 'Hidden external link: confirm why the link is present and hidden.', 'amazing-security' ), 'AS-HTML-002' => __( 'External meta refresh: confirm the intended destination.', 'amazing-security' ), 'AS-HTML-003' => __( 'Executable link scheme: review the action and its origin.', 'amazing-security' ), 'AS-HTML-004' => __( 'Hidden external frame: confirm why the frame is present and hidden. A visible frame is not matched.', 'amazing-security' ), 'AS-JS-001' => __( 'Literal external script redirect: confirm who added it.', 'amazing-security' ), default => __( 'Review selected markup.', 'amazing-security' ) };
 			echo '<tr><td data-label="Item">' . esc_html( ucfirst( $finding['kind'] ) . ' #' . $finding['id'] ) . '</td><td data-label="Finding">' . esc_html( $guidance ) . '<br><small>' . esc_html( $finding['rule'] . ' / ' . $finding['version'] ) . '</small></td><td data-label="Line">' . esc_html( (string) $finding['line'] ) . '</td><td data-label="Review">';
 			if ( '' !== $url ) {
-				echo '<a href="' . esc_url( $url ) . '">Open editor</a>';
+				echo '<a href="' . esc_url( $url ) . '">' . esc_html__( 'Open editor', 'amazing-security' ) . '</a>';
 			} else {
 					esc_html_e( 'Item changed or editor access unavailable', 'amazing-security' );
 			} echo '</td></tr>';

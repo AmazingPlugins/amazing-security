@@ -3,6 +3,8 @@
 declare(strict_types=1);
 namespace AmazingPlugins\Security\Proxy;
 
+defined( 'ABSPATH' ) || exit;
+
 use AmazingPlugins\Security\Integrity\OptionGateway;
 final class FreshSecurityOptions implements OptionGateway {
 	public function __construct( private readonly object $db, private readonly OptionGateway $writes ) {}

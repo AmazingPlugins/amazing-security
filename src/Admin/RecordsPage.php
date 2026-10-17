@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Admin;
 
+defined( 'ABSPATH' ) || exit;
+
 /** Record settings. Each row opens that screen. */
 final class RecordsPage {
 	public function register(): void {

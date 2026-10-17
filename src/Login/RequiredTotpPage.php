@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Login;
 
+defined( 'ABSPATH' ) || exit;
+
 /** Status-only Verification tab. Enrollment lives in a dedicated 2FA plugin. */
 final class RequiredTotpPage {
 	public function register(): void {

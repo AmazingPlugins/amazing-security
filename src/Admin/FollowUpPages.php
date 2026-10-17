@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Admin;
 
+defined( 'ABSPATH' ) || exit;
+
 /** Integrity, file scan, vulnerability checks, and the daily cycle. Hidden from the side menu. */
 final class FollowUpPages {
 	public function register(): void {

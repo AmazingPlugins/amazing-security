@@ -4,7 +4,10 @@ set -euo pipefail
 plugin_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 php "${plugin_dir}/scripts/rule-manifest.php" --check
 php "${plugin_dir}/scripts/passkey-vendor-manifest.php"
-output_path="${1:-${plugin_dir}/dist/amazing-security-0.1.0-preview.zip}"
+version="$(sed -n 's/^ \* Version: *//p' "${plugin_dir}/amazing-security.php" | head -1)"
+stable="$(sed -n 's/^Stable tag: *//p' "${plugin_dir}/readme.txt" | head -1)"
+[[ -n "${version}" && "${version}" == "${stable}" ]] || { echo "Header version '${version}' and readme Stable tag '${stable}' differ." >&2; exit 1; }
+output_path="${1:-${plugin_dir}/dist/amazing-security-${version}.zip}"
 mkdir -p "$(dirname "${output_path}")"
 staging_dir="$(mktemp -d)"
 trap 'rm -rf "${staging_dir}"' EXIT
@@ -14,4 +17,7 @@ find "${staging_dir}/amazing-security" -type f -exec touch -t 202001010000 {} +
 rm -f "${output_path}"
 ( cd "${staging_dir}" && find amazing-security -type f -print | LC_ALL=C sort | zip -Xq "${output_path}" -@ )
 unzip -tq "${output_path}"
+# The release must hold only runtime files under the slug folder.
+if unzip -Z1 "${output_path}" | grep -vE '^amazing-security/(amazing-security\.php|uninstall\.php|readme\.txt|LICENSE|src/|assets/)' | grep -q .; then echo "Unexpected top-level entry in ZIP." >&2; exit 1; fi
+if unzip -Z1 "${output_path}" | grep -E '(^|/)(\.[^/]+|tests?|vendor|node_modules|\.wordpress-org|composer\.(json|lock)|phpunit[^/]*|phpcs[^/]*)(/|$)' | grep -v '^amazing-security/src/Vendor/' | grep -q .; then echo "Development file found in ZIP." >&2; exit 1; fi
 shasum -a 256 "${output_path}"

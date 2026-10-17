@@ -3,6 +3,8 @@
 declare(strict_types=1);
 namespace AmazingPlugins\Security\Content;
 
+defined( 'ABSPATH' ) || exit;
+
 use RuntimeException;
 final class WordPressContentInventory implements ContentInventory {
 	public function __construct( private readonly object $db ) {}

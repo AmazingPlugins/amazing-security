@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Mcp;
 
+defined( 'ABSPATH' ) || exit;
+
 use Closure;
 use AmazingPlugins\Security\Fixes\FixProposalService;
 
@@ -26,7 +28,7 @@ final class AbilityRegistrar {
 				'amazing-security',
 				array(
 					'label'       => 'Amazing Security',
-					'description' => 'Security findings and bounded checks for this site.',
+					'description' => __( 'Security findings and bounded checks for this site.', 'amazing-security' ),
 				)
 			);
 		}
@@ -120,18 +122,18 @@ final class AbilityRegistrar {
 			),
 		);
 		$labels  = array(
-			'list-findings'  => 'List security findings',
-			'get-finding'    => 'Get a security finding',
-			'start-scan'     => 'Run local hardening checks',
-			'get-scan'       => 'Get a local hardening scan',
-			'propose-fix'    => 'Propose a login protection setting change',
-			'get-fix-status' => 'Get a proposed fix status',
+			'list-findings'  => __( 'List security findings', 'amazing-security' ),
+			'get-finding'    => __( 'Get a security finding', 'amazing-security' ),
+			'start-scan'     => __( 'Run local hardening checks', 'amazing-security' ),
+			'get-scan'       => __( 'Get a local hardening scan', 'amazing-security' ),
+			'propose-fix'    => __( 'Propose a login protection setting change', 'amazing-security' ),
+			'get-fix-status' => __( 'Get a proposed fix status', 'amazing-security' ),
 		);
 		$out     = array();
 		foreach ( $schemas as $short => $schema ) {
 			$out[ 'amazing-security/' . $short ] = array(
 				'label'               => $labels[ $short ],
-				'description'         => $labels[ $short ] . ' for an authenticated site administrator.',
+				'description'         => sprintf( /* translators: %s: short description of the assistant ability. */ __( '%s for an authenticated site administrator.', 'amazing-security' ), $labels[ $short ] ),
 				'category'            => 'amazing-security',
 				'input_schema'        => $schema,
 				'execute_callback'    => fn( $input = array() ): array => $this->execute( $short, $input ),

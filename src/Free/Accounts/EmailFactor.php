@@ -4,12 +4,17 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Free\Accounts;
 
+defined( 'ABSPATH' ) || exit;
+
 /** Email code checks. The stored record keeps a hash, never the code. */
 final class EmailFactor {
 	public const OPTION   = 'amsec_email_factor';
 	public const META     = 'amsec_email_factor_pending';
 	public const TTL      = 600;
 	public const INTERVAL = 60;
+	public const TRIES    = 5;
+
+	public const TRIES_META = 'amsec_email_factor_tries';
 
 	public static function code(): string {
 		return str_pad( (string) random_int( 0, 999999 ), 6, '0', STR_PAD_LEFT );
@@ -31,18 +36,19 @@ final class EmailFactor {
 	}
 
 	/**
-	 * @return array{hash: string, expires: int, sent: int}
+	 * @return array{hash: string, expires: int, sent: int, tries: int}
 	 */
 	public static function record( string $code, int $now, string $key ): array {
 		return array(
 			'hash'    => self::hashCode( $code, $key ),
 			'expires' => $now + self::TTL,
 			'sent'    => $now,
+			'tries'   => 0,
 		);
 	}
 
 	/**
-	 * @return array{hash: string, expires: int, sent: int}|null
+	 * @return array{hash: string, expires: int, sent: int, tries: int}|null
 	 */
 	public static function unpack( mixed $raw ): ?array {
 		if ( ! is_string( $raw ) || '' === $raw ) {
@@ -61,13 +67,14 @@ final class EmailFactor {
 			'hash'    => $hash,
 			'expires' => (int) $decoded['expires'],
 			'sent'    => (int) $decoded['sent'],
+			'tries'   => (int) ( $decoded['tries'] ?? 0 ),
 		);
 	}
 
 	/**
 	 * Skip, accept, reject, or send. Send is rate limited to one code per minute.
 	 *
-	 * @param array{hash?: string, expires?: int, sent?: int}|null $stored
+	 * @param array{hash?: string, expires?: int, sent?: int, tries?: int}|null $stored
 	 */
 	public static function decision( bool $enabled, bool $hasTotp, bool $api, string $password, bool $authenticated, string $postedCode, ?array $stored, int $now, string $key ): string {
 		if ( ! $enabled || $hasTotp || $api || ! $authenticated || '' === $password ) {
@@ -88,7 +95,7 @@ final class EmailFactor {
 	}
 
 	/**
-	 * @param array{hash?: string, expires?: int, sent?: int}|null $stored
+	 * @param array{hash?: string, expires?: int, sent?: int, tries?: int}|null $stored
 	 */
 	public static function matches( string $posted, ?array $stored, int $now, string $key ): bool {
 		if ( '' === $posted || ! is_array( $stored ) ) {
@@ -96,7 +103,7 @@ final class EmailFactor {
 		}
 		$hash    = $stored['hash'] ?? '';
 		$expires = $stored['expires'] ?? 0;
-		if ( ! is_string( $hash ) || '' === $hash || $now > (int) $expires ) {
+		if ( ! is_string( $hash ) || '' === $hash || $now > (int) $expires || (int) ( $stored['tries'] ?? 0 ) >= self::TRIES ) {
 			return false;
 		}
 		return hash_equals( $hash, self::hashCode( $posted, $key ) );

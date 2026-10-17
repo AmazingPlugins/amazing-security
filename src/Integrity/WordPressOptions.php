@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Integrity;
 
+defined( 'ABSPATH' ) || exit;
+
 final class WordPressOptions implements OptionGateway {
 	public function get( string $key ): mixed {
 		return get_option( $key, null );

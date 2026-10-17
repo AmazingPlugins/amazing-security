@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Free\TrafficGuard;
 
+defined( 'ABSPATH' ) || exit;
+
 /** Uploads image requests with an external HTTP referrer. */
 final class Hotlink {
 	public function blocked( bool $enabled, array $server, string $site_host ): bool {

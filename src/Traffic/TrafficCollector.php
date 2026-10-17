@@ -3,6 +3,8 @@
 declare(strict_types=1);
 namespace AmazingPlugins\Security\Traffic;
 
+defined( 'ABSPATH' ) || exit;
+
 final class TrafficCollector {
 	private bool $knownAdministrator = false;
 	private bool $finished           = false;

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\FileScan;
 
+defined( 'ABSPATH' ) || exit;
+
 use AmazingPlugins\Security\Findings\State;
 use AmazingPlugins\Security\Integrity\WordPressOrgManifestProvider;
 

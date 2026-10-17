@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Repair;
 
+defined( 'ABSPATH' ) || exit;
+
 final class RepairRecoveryCommand {
 	/**
 	 * Roll back a verified plugin file repair while its replacement hash still matches.

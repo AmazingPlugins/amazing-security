@@ -3,6 +3,8 @@
 declare(strict_types=1);
 namespace AmazingPlugins\Security\Traffic;
 
+defined( 'ABSPATH' ) || exit;
+
 final class TrafficHooks {
 	public static function register(): void {
 		if ( ( defined( 'AMSEC_DISABLE_TRAFFIC' ) && AMSEC_DISABLE_TRAFFIC ) || ( defined( 'WP_CLI' ) && WP_CLI ) || ( defined( 'DOING_CRON' ) && DOING_CRON ) ) {

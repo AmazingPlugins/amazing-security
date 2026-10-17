@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Baseline;
 
+defined( 'ABSPATH' ) || exit;
+
 use AmazingPlugins\Security\Integrity\WordPressOptions;
 
 final class BaselinePage {
@@ -15,17 +17,17 @@ final class BaselinePage {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_die( esc_html__( 'Administrator access required.', 'amazing-security' ), '', array( 'response' => 403 ) );
 		}
-		echo '<div class="wrap amazing-security-admin"><h1>Watch a plugin or theme</h1><p>Pick an installed package, preview the file list, then approve it with your password. Later you can compare that reference with the files on disk. A reference is not proof the code was clean. WordPress.org checksums stay a separate check.</p><details><summary>What the reference covers</summary><p>PHP, PHTML, INC, JS, CSS, HTML, HTM, SVG, JSON and Twig. Up to 300 files. A mu-plugin or a plugin with one file covers that entry file. Linked, unreadable, or oversized files make the collection incomplete.</p></details>';
+		echo '<div class="wrap amazing-security-admin"><h1>' . esc_html__( 'Watch a plugin or theme', 'amazing-security' ) . '</h1><p>' . esc_html__( 'Pick an installed package, preview the file list, then approve it with your password. Later you can compare that reference with the files on disk. A reference is not proof the code was clean. WordPress.org checksums stay a separate check.', 'amazing-security' ) . '</p><details><summary>' . esc_html__( 'What the reference covers', 'amazing-security' ) . '</summary><p>' . esc_html__( 'PHP, PHTML, INC, JS, CSS, HTML, HTM, SVG, JSON and Twig. Up to 300 files. A mu-plugin or a plugin with one file covers that entry file. Linked, unreadable, or oversized files make the collection incomplete.', 'amazing-security' ) . '</p></details>';
 		$repository = new BaselineRepository( new WordPressOptions() );
 		try {
 			list( , $state ) = $repository->snapshot();
 			$targets         = ( new TargetResolver() )->targets();
 		} catch ( \Throwable ) {
-			echo '<p>Baseline storage or installed-package inventory is unavailable.</p></div>';
+			echo '<p>' . esc_html__( 'Baseline storage or installed-package inventory is unavailable.', 'amazing-security' ) . '</p></div>';
 			return;
 		}
 		if ( is_ssl() ) {
-			echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '"><input type="hidden" name="action" value="amsec_baseline"><input type="hidden" name="mode" value="preview"><label>Installed package <select name="target">';
+			echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '"><input type="hidden" name="action" value="amsec_baseline"><input type="hidden" name="mode" value="preview"><label>' . esc_html__( 'Installed package', 'amazing-security' ) . ' <select name="target">';
 			foreach ( $targets as $key => $target ) {
 				echo '<option value="' . esc_attr( $key ) . '">' . esc_html( $key ) . '</option>';
 			}
@@ -35,20 +37,22 @@ final class BaselinePage {
 			echo '</form>';
 			$preview = $state['previews'][ (string) get_current_user_id() ] ?? null;
 			if ( is_array( $preview ) && $preview['expires'] > time() ) {
-				echo '<h2>Pending reference</h2><p>' . esc_html( $preview['key'] ) . ': ' . esc_html( (string) count( $preview['files'] ) ) . ' covered files. Approval replaces any existing reference for this package after checking that the covered files and target are unchanged.</p><details><summary>Covered relative files and SHA-256 hashes</summary><pre>' . esc_html( wp_json_encode( $preview['files'], JSON_PRETTY_PRINT ) ) . '</pre></details><form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '"><input type="hidden" name="action" value="amsec_baseline"><input type="hidden" name="mode" value="approve"><input type="hidden" name="target" value="' . esc_attr( $preview['key'] ) . '"><input type="hidden" name="token" value="' . esc_attr( $preview['token'] ) . '">';
+				echo '<h2>' . esc_html__( 'Pending reference', 'amazing-security' ) . '</h2><p>' .
+					/* translators: 1: package key; 2: number of covered files. */
+					sprintf( esc_html__( '%1$s: %2$s covered files. Approval replaces any existing reference for this package after checking that the covered files and target are unchanged.', 'amazing-security' ), esc_html( $preview['key'] ), esc_html( (string) count( $preview['files'] ) ) ) . '</p><details><summary>' . esc_html__( 'Covered relative files and SHA-256 hashes', 'amazing-security' ) . '</summary><pre>' . esc_html( wp_json_encode( $preview['files'], JSON_PRETTY_PRINT ) ) . '</pre></details><form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '"><input type="hidden" name="action" value="amsec_baseline"><input type="hidden" name="mode" value="approve"><input type="hidden" name="target" value="' . esc_attr( $preview['key'] ) . '"><input type="hidden" name="token" value="' . esc_attr( $preview['token'] ) . '">';
 				wp_nonce_field( 'amsec_baseline_approve_' . $preview['token'] );
-				echo '<p><label>Your password <input type="password" name="password" autocomplete="current-password" maxlength="1024" required></label></p><p><label><input type="checkbox" name="confirm" value="1" required> I approve this reference and understand it replaces an existing baseline without establishing that the code is clean.</label></p>';
+				echo '<p><label>' . esc_html__( 'Your password', 'amazing-security' ) . ' <input type="password" name="password" autocomplete="current-password" maxlength="1024" required></label></p><p><label><input type="checkbox" name="confirm" value="1" required> ' . esc_html__( 'I approve this reference and understand it replaces an existing baseline without establishing that the code is clean.', 'amazing-security' ) . '</label></p>';
 				submit_button( __( 'Approve reference', 'amazing-security' ), 'secondary' );
 				echo '</form>';
 			}
 		} else {
-			echo '<p>Use HTTPS to prepare and approve a baseline.</p>';
+			echo '<p>' . esc_html__( 'Use HTTPS to prepare and approve a baseline.', 'amazing-security' ) . '</p>';
 		}
-		echo '<h2>Compare an approved package</h2>';
+		echo '<h2>' . esc_html__( 'Compare an approved package', 'amazing-security' ) . '</h2>';
 		if ( array() === $state['baselines'] ) {
-			echo '<p>There is no approved reference yet. Prepare one over HTTPS, then compare it here.</p>';
+			echo '<p>' . esc_html__( 'There is no approved reference yet. Prepare one over HTTPS, then compare it here.', 'amazing-security' ) . '</p>';
 		} else {
-			echo '<form method="get"><input type="hidden" name="page" value="amsec-baselines"><label>Reference <select name="compare">';
+			echo '<form method="get"><input type="hidden" name="page" value="amsec-baselines"><label>' . esc_html__( 'Reference', 'amazing-security' ) . ' <select name="compare">';
 			foreach ( $state['baselines'] as $key => $baseline ) {
 				echo '<option value="' . esc_attr( $key ) . '">' . esc_html( $key ) . '</option>';
 			}
@@ -64,11 +68,22 @@ final class BaselinePage {
 			try {
 				$changes = ( new BaselineService( $repository ) )->compare( ( new TargetResolver() )->resolve( $key ) );
 				foreach ( $changes as $kind => $files ) {
-					echo '<h3>' . esc_html( ucfirst( $kind ) ) . ': ' . esc_html( (string) count( $files ) ) . '</h3><pre>' . esc_html( implode( "\n", $files ) ) . '</pre>';
+					echo '<h3>' . sprintf(
+						/* translators: 1: change kind, one of Added, Modified or Deleted; 2: number of files. */
+						esc_html__( '%1$s: %2$s', 'amazing-security' ),
+						esc_html(
+							match ( $kind ) {
+								'added' => __( 'Added', 'amazing-security' ),
+								'modified' => __( 'Modified', 'amazing-security' ),
+								'deleted' => __( 'Deleted', 'amazing-security' ),
+								default => ucfirst( $kind ) }
+						),
+						esc_html( (string) count( $files ) )
+					) . '</h3><pre>' . esc_html( implode( "\n", $files ) ) . '</pre>';
 				}
-				echo '<p>Comparison completed for the declared source assets. It does not establish malware status or cover excluded file types.</p>';
+				echo '<p>' . esc_html__( 'Comparison completed for the declared source assets. It does not establish malware status or cover excluded file types.', 'amazing-security' ) . '</p>';
 			} catch ( \Throwable ) {
-				echo '<p>Comparison unavailable or incomplete. No clean result or deleted-file conclusion is available.</p>';
+				echo '<p>' . esc_html__( 'Comparison unavailable or incomplete. No clean result or deleted-file conclusion is available.', 'amazing-security' ) . '</p>';
 			}
 		}
 		echo '</div>';

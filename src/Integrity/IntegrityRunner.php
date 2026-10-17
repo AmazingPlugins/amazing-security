@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Integrity;
 
+defined( 'ABSPATH' ) || exit;
+
 use AmazingPlugins\Security\Findings\CheckResult;
 use AmazingPlugins\Security\Findings\State;
 use AmazingPlugins\Security\Scan\ScanContext;
@@ -82,7 +84,7 @@ final class IntegrityRunner {
 				$cursor->findings[] = new CheckResult(
 					'integrity-file',
 					$state,
-					'ok' === $result->state ? 'Release file differs from the published checksum.' : ( 'missing' === $result->state ? 'Release file is missing.' : 'Release file could not be checked.' ),
+					'ok' === $result->state ? __( 'Release file differs from the published checksum.', 'amazing-security' ) : ( 'missing' === $result->state ? __( 'Release file is missing.', 'amazing-security' ) : __( 'Release file could not be checked.', 'amazing-security' ) ),
 					$target->manifest->sourceUrl,
 					new DateTimeImmutable(),
 					'high',

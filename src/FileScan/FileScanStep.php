@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\FileScan;
 
+defined( 'ABSPATH' ) || exit;
+
 final class FileScanStep {
 	public function __construct( public readonly FileScanCursor $cursor, public readonly bool $finished, public readonly array $observations = array() ) {}
 

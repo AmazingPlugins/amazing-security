@@ -3,6 +3,8 @@
 declare(strict_types=1);
 namespace AmazingPlugins\Security\Network;
 
+defined( 'ABSPATH' ) || exit;
+
 final class Cidr {
 	private static function address( string $ip ): ?array {
 		if ( strlen( $ip ) > 45 || false === filter_var( $ip, FILTER_VALIDATE_IP ) ) {

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Mcp;
 
+defined( 'ABSPATH' ) || exit;
+
 use AmazingPlugins\Security\Findings\FindingsRepository;
 use AmazingPlugins\Security\Integrity\OptionGateway;
 use AmazingPlugins\Security\Scan\LocalHardeningScanService;

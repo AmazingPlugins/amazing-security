@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Free\TrafficGuard;
 
+defined( 'ABSPATH' ) || exit;
+
 /** Exact host, exact browser, and referrer-prefix decisions. */
 final class BlockList {
 	public const MAX_ENTRIES = 20;

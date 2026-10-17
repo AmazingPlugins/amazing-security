@@ -3,6 +3,8 @@
 declare(strict_types=1);
 namespace AmazingPlugins\Security\Passkeys;
 
+defined( 'ABSPATH' ) || exit;
+
 /** Reject unsupported authenticator layouts before the upstream verifier parses them. */
 final class AuthenticatorProfile {
 	public function registration( string $attestation, string $expectedCredentialId ): ?array {

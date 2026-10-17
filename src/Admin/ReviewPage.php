@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Admin;
 
+defined( 'ABSPATH' ) || exit;
+
 /** Old address. The screen list moved into the side menu. */
 final class ReviewPage {
 	public function register(): void {

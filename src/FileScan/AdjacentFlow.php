@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\FileScan;
 
+defined( 'ABSPATH' ) || exit;
+
 /** Recognizes only adjacent, explicit assignments. Never evaluates source. */
 final class AdjacentFlow {
 	public static function markers( array $tokens ): array {

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Vulnerabilities;
 
+defined( 'ABSPATH' ) || exit;
+
 final class DirectScanRunner {
 	/** @param null|callable(InstalledSoftware):?string $provenance
 	 *  @param null|callable(InstalledSoftware,string):bool $stateStillMatches
@@ -73,7 +75,7 @@ final class DirectScanRunner {
 		}
 		$report = $this->matcher->evaluate( $matchedInventory, $responses, $now );
 		if ( count( $inventory ) > $total ) {
-			$report = new VulnerabilityReport( $report->results, true, 'Inventory exceeded direct-check limit.', $report->snapshotGeneratedAt, null );
+			$report = new VulnerabilityReport( $report->results, true, __( 'Inventory exceeded direct-check limit.', 'amazing-security' ), $report->snapshotGeneratedAt, null );
 		}
 		return new DirectScanStep( $total, $report, $allFetched && count( $inventory ) <= $total, 'complete', $verified );
 	}

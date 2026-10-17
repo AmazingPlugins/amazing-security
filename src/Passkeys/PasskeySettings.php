@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Passkeys;
 
+defined( 'ABSPATH' ) || exit;
+
 use AmazingPlugins\Security\Activity\ActivityHooks;
 use AmazingPlugins\Security\Activity\ActivityRepository;
 use AmazingPlugins\Security\Integrity\WordPressOptions;

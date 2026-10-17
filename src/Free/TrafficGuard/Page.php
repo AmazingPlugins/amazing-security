@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Free\TrafficGuard;
 
+defined( 'ABSPATH' ) || exit;
+
 use AmazingPlugins\Security\Admin\ScreenTabs;
 use AmazingPlugins\Security\Bots\BotSettings;
 use AmazingPlugins\Security\Firewall\RestRateSettings;
@@ -70,7 +72,7 @@ final class Page {
 		}
 		ScreenTabs::bar(
 			array(
-				'bots'    => __( 'Bots', 'amazing-security' ),
+				'bots'    => __( 'Comments and registration', 'amazing-security' ),
 				'lists'   => __( 'Lists', 'amazing-security' ),
 				'rest'    => __( 'REST rate controls', 'amazing-security' ),
 				'precise' => __( 'Precise blocks', 'amazing-security' ),

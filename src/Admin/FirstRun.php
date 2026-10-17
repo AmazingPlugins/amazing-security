@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Admin;
 
+defined( 'ABSPATH' ) || exit;
+
 /** A short pointer tour of the side menu. Nothing runs or changes; it only labels where things are. */
 final class FirstRun {
 	/** WordPress stores this id in the account's dismissed pointers once the tour ends. */
@@ -14,18 +16,18 @@ final class FirstRun {
 			return;
 		}
 		wp_enqueue_style( 'wp-pointer' );
-		wp_enqueue_script( 'amazing-security-tour', plugins_url( 'assets/admin-tour.js', AMAZING_SECURITY_FILE ), array( 'wp-pointer' ), '0.1.2', true );
+		wp_enqueue_script( 'amazing-security-tour', plugins_url( 'assets/admin-tour.js', AMAZING_SECURITY_FILE ), array( 'wp-pointer' ), '0.1.3', true );
 		wp_localize_script(
 			'amazing-security-tour',
 			'amsecTour',
 			array(
 				'pointer' => self::POINTER,
-				'steps'   => self::steps(),
+				'steps'   => self::steps( false !== get_option( 'amazing_security_latest_run', false ) ),
 				'phone'   => array(
 					'target' => '#wp-admin-bar-menu-toggle',
 					'edge'   => 'top',
 					'title'  => __( 'Menu', 'amazing-security' ),
-					'text'   => __( 'Open the menu and tap Amazing Security. Every section is under it.', 'amazing-security' ),
+					'text'   => __( 'Every Amazing Security section is in the admin menu, under Amazing Security.', 'amazing-security' ),
 				),
 				'next'    => __( 'Next', 'amazing-security' ),
 				'done'    => __( 'Done', 'amazing-security' ),
@@ -42,9 +44,9 @@ final class FirstRun {
 	/**
 	 * @return list<array{target: string, title: string, text: string, edge?: string}>
 	 */
-	public static function steps(): array {
-		$link = static fn ( string $page ): string => '#adminmenu a[href$="page=' . $page . '"]';
-		return array(
+	public static function steps( bool $scanned = false ): array {
+		$link  = static fn ( string $page ): string => '#adminmenu a[href$="page=' . $page . '"]';
+		$steps = array(
 			array(
 				'target' => $link( 'amazing-security' ),
 				'title'  => __( 'Scan', 'amazing-security' ),
@@ -88,15 +90,18 @@ final class FirstRun {
 			array(
 				'target' => '.amsec-scan-button',
 				'edge'   => 'top',
-				'title'  => __( 'Scan button', 'amazing-security' ),
-				'text'   => __( 'Nothing runs until you press this.', 'amazing-security' ),
+				'title'  => $scanned ? __( 'Rescan button', 'amazing-security' ) : __( 'Scan button', 'amazing-security' ),
+				'text'   => $scanned ? __( 'Runs the checks again after you change something. It does not change the site.', 'amazing-security' ) : __( 'Nothing runs until you press this.', 'amazing-security' ),
 			),
-			array(
+		);
+		if ( $scanned ) {
+			$steps[] = array(
 				'target' => '.amsec-scan .amsec-cats',
 				'edge'   => 'top',
 				'title'  => __( 'Results', 'amazing-security' ),
 				'text'   => __( 'Findings are sorted into these tabs. The number is how many are in each.', 'amazing-security' ),
-			),
-		);
+			);
+		}
+		return $steps;
 	}
 }

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Checks;
 
+defined( 'ABSPATH' ) || exit;
+
 use AmazingPlugins\Security\Findings\CheckResult;
 use AmazingPlugins\Security\Findings\State;
 use AmazingPlugins\Security\Firewall\BundledRequestRules;
@@ -39,8 +41,18 @@ final class RestWatchCheck implements SecurityCheck {
 				$this->id(),
 				$off ? State::WARN : State::PASS,
 				$off
-					? 'The REST request watch is disabled by AMSEC_DISABLE_FIREWALL. Public REST queries are not observed. Pack ' . $ver . ' has ' . $count . ' observe rules unused while disabled.'
-					: 'The REST request watch is on (observe only). Pack ' . $ver . ' records matches for ' . $count . ' public REST rules and does not block requests.',
+					? sprintf(
+						/* translators: 1: version of the bundled REST rule pack, 2: number of observe rules. */
+						__( 'The REST request watch is disabled by AMSEC_DISABLE_FIREWALL. Public REST queries are not observed. Pack %1$s has %2$s observe rules unused while disabled.', 'amazing-security' ),
+						$ver,
+						$count
+					)
+					: sprintf(
+						/* translators: 1: version of the bundled REST rule pack, 2: number of public REST rules. */
+						__( 'The REST request watch is on (observe only). Pack %1$s records matches for %2$s public REST rules and does not block requests.', 'amazing-security' ),
+						$ver,
+						$count
+					),
 				self::SOURCE,
 				new DateTimeImmutable( 'now', new DateTimeZone( 'UTC' ) ),
 				'medium',

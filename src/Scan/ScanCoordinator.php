@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Scan;
 
+defined( 'ABSPATH' ) || exit;
+
 use AmazingPlugins\Security\Findings\CheckResult;
 use AmazingPlugins\Security\Findings\State;
 use DateTimeImmutable;
@@ -28,7 +30,7 @@ final class ScanCoordinator {
 			if ( microtime( true ) >= $context->deadline || count( $results ) >= $context->entryLimit ) {
 				$partial = true;
 				if ( count( $results ) < $context->entryLimit ) {
-					$results[] = self::unknown( $check->id(), 'Scan budget reached. This check was not completed.' );
+					$results[] = self::unknown( $check->id(), __( 'Scan budget reached. This check was not completed.', 'amazing-security' ) );
 				}
 				continue;
 			}
@@ -46,7 +48,7 @@ final class ScanCoordinator {
 			} catch ( Throwable $error ) {
 				$partial = true;
 				if ( count( $results ) < $context->entryLimit ) {
-					$results[] = self::unknown( $check->id(), 'This check could not be completed.' );
+					$results[] = self::unknown( $check->id(), __( 'This check could not be completed.', 'amazing-security' ) );
 				}
 			}
 		}

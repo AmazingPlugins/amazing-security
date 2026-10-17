@@ -3,6 +3,8 @@
 declare(strict_types=1);
 namespace AmazingPlugins\Security\Headers;
 
+defined( 'ABSPATH' ) || exit;
+
 final class HeaderTarget {
 	public static function url( string $raw ): ?string {
 		if ( strlen( $raw ) > 512 || preg_match( '/[^\x21-\x7E]|[\\\\%]/', $raw ) ) {

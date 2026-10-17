@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Checks;
 
+defined( 'ABSPATH' ) || exit;
+
 final class WordPressValues implements Values {
 	public function coreUpdateAvailable(): ?bool {
 		$updates = get_site_transient( 'update_core' );

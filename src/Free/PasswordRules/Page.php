@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Free\PasswordRules;
 
+defined( 'ABSPATH' ) || exit;
+
 /** Password rule screen. Posts to admin-post.php. */
 final class Page {
 	public function register(): void {

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Admin;
 
+defined( 'ABSPATH' ) || exit;
+
 use AmazingPlugins\Security\Free\Guide\Score;
 
 /** Recommendations stay off the scan report. */

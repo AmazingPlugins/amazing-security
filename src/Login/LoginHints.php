@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Login;
 
+defined( 'ABSPATH' ) || exit;
+
 use Closure;
 
 /** One WordPress login message. It does not send login attempts anywhere. */
@@ -26,7 +28,7 @@ final class LoginHints {
 			}
 		}
 		if ( $changed ) {
-			$messages['amsec_generic_login'] = 'The username or password is incorrect.';
+			$messages['amsec_generic_login'] = __( 'The username or password is incorrect.', 'amazing-security' );
 		}
 		return $messages;
 	}

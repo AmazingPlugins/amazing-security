@@ -3,6 +3,8 @@
 declare(strict_types=1);
 namespace AmazingPlugins\Security\Content;
 
+defined( 'ABSPATH' ) || exit;
+
 use Closure;
 final class ContentRunner {
 	private readonly Closure $clock;

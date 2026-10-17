@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Integrity;
 
+defined( 'ABSPATH' ) || exit;
+
 use AmazingPlugins\Security\Findings\CheckResult;
 use AmazingPlugins\Security\Findings\State;
 use DateTimeImmutable;
@@ -84,7 +86,7 @@ final class TargetDiscovery {
 		return new CheckResult(
 			'integrity-package',
 			State::UNKNOWN,
-			'Package could not be verified against a WordPress.org release.',
+			__( 'Package could not be verified against a WordPress.org release.', 'amazing-security' ),
 			'https://wordpress.org/plugins/',
 			new DateTimeImmutable(),
 			'low',

@@ -2,6 +2,10 @@
 
 declare(strict_types=1);
 
+if ( ! defined( 'ABSPATH' ) ) {
+	define( 'ABSPATH', sys_get_temp_dir() . '/amsec-no-wordpress/' );
+}
+
 require dirname(__DIR__) . '/vendor/autoload.php';
 
 if ( ! function_exists( 'esc_html' ) ) {
@@ -25,6 +29,7 @@ if ( ! function_exists( 'wp_strip_all_tags' ) ) {
 }
 if ( ! function_exists( '__' ) ) {
 	function __( string $text, string $domain = 'default' ): string { return $text; }
+	function _n( string $single, string $plural, int $number, string $domain = 'default' ): string { return 1 === $number ? $single : $plural; }
 	function esc_html__( string $text, string $domain = 'default' ): string { return htmlspecialchars( $text, ENT_QUOTES, 'UTF-8' ); }
 	function esc_attr__( string $text, string $domain = 'default' ): string { return htmlspecialchars( $text, ENT_QUOTES, 'UTF-8' ); }
 	function esc_html_e( string $text, string $domain = 'default' ): void { echo esc_html__( $text, $domain ); }

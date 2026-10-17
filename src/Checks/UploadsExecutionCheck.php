@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Checks;
 
+defined( 'ABSPATH' ) || exit;
+
 use AmazingPlugins\Security\Findings\CheckResult;
 use AmazingPlugins\Security\Findings\State;
 use AmazingPlugins\Security\Scan\ScanContext;
@@ -32,12 +34,12 @@ final class UploadsExecutionCheck implements SecurityCheck {
 		$label = is_string( $rule ) && in_array( $rule, array( 'engine-off', 'user-ini-engine-off', 'filesmatch-deny' ), true ) ? $rule : '';
 		if ( '' !== $label ) {
 			$state    = State::UNKNOWN;
-			$summary  = 'A local uploads rule (' . $label . ') was found. That does not prove PHP is blocked. Ask your host how this server runs PHP. No test file was written.';
+			$summary  = sprintf( /* translators: %s: code of the local uploads rule that was found, such as engine-off. */ __( 'A local uploads rule (%s) was found. That does not prove PHP is blocked. Ask your host how this server runs PHP. No test file was written.', 'amazing-security' ), $label );
 			$coverage = 'partial';
 			$method   = 'local_rule';
 		} else {
 			$state    = State::WARN;
-			$summary  = 'No local uploads rule that disables PHP was found. Ask your host whether that folder can run PHP, or add an approved rule. No test file was written.';
+			$summary  = __( 'No local uploads rule that disables PHP was found. Ask your host whether that folder can run PHP, or add an approved rule. No test file was written.', 'amazing-security' );
 			$coverage = 'complete';
 			$method   = 'no_runtime_probe';
 		}

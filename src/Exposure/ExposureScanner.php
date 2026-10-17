@@ -3,6 +3,8 @@
 declare(strict_types=1);
 namespace AmazingPlugins\Security\Exposure;
 
+defined( 'ABSPATH' ) || exit;
+
 use Closure;
 use DirectoryIterator;
 

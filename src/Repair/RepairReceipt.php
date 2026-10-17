@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Repair;
 
+defined( 'ABSPATH' ) || exit;
+
 final class RepairReceipt {
 	public function __construct( public readonly string $relativePath, public readonly string $backupPath, public readonly string $beforeSha256, public readonly string $afterSha256 ) {}
 

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Checks;
 
+defined( 'ABSPATH' ) || exit;
+
 use AmazingPlugins\Security\Content\ContentCursor;
 use AmazingPlugins\Security\FileScan\FileScanReport;
 use AmazingPlugins\Security\Findings\CheckResult;
@@ -89,7 +91,7 @@ final class FollowUpCheck implements SecurityCheck {
 			'clean' => State::PASS,
 			default => State::UNKNOWN,
 		};
-		$line = self::COPY[ $this->checkId ][ $stored ] ?? 'The stored result could not be read.';
+		$line = self::COPY[ $this->checkId ][ $stored ] ?? __( 'The stored result could not be read.', 'amazing-security' );
 		return array(
 			new CheckResult(
 				$this->id(),

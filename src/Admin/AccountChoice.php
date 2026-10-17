@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Admin;
 
+defined( 'ABSPATH' ) || exit;
+
 /** Plain account label for session and incident pickers. */
 final class AccountChoice {
 	public static function label( string $login, string $display ): string {

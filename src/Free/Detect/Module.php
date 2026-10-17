@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Free\Detect;
 
+defined( 'ABSPATH' ) || exit;
+
 final class Module {
 	public const OPTION = 'amsec_precise_block';
 
@@ -72,7 +74,7 @@ final class Module {
 		$posted = isset( $_POST['amsec_precise_block'] ) ? sanitize_text_field( wp_unslash( $_POST['amsec_precise_block'] ) ) : '0'; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce checked above.
 		$raw    = is_string( $posted ) ? $posted : '0';
 		update_option( self::OPTION, '1' === $raw ? '1' : '0', false );
-		wp_safe_redirect( admin_url( 'admin.php?page=amsec-precise-block' ) );
+		wp_safe_redirect( \AmazingPlugins\Security\Admin\Brand::saved( admin_url( 'admin.php?page=amsec-traffic-guard#precise' ) ) );
 		exit;
 	}
 

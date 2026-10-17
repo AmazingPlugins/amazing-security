@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Checks;
 
+defined( 'ABSPATH' ) || exit;
+
 use AmazingPlugins\Security\Integrity\WordPressOptions;
 use AmazingPlugins\Security\Findings\CheckResult;
 use AmazingPlugins\Security\Findings\State;
@@ -129,7 +131,7 @@ final class SiteWatchCheck implements SecurityCheck {
 			in_array( $status, self::ATTENTION[ $this->checkId ], true ) => State::WARN,
 			default => State::PASS,
 		};
-		$line = self::COPY[ $this->checkId ][ $status ] ?? 'The stored setting could not be read.';
+		$line = self::COPY[ $this->checkId ][ $status ] ?? __( 'The stored setting could not be read.', 'amazing-security' );
 		return array(
 			new CheckResult(
 				$this->id(),

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Incident;
 
+defined( 'ABSPATH' ) || exit;
+
 use AmazingPlugins\Security\Access;
 use AmazingPlugins\Security\Sessions\SessionPolicy;
 use AmazingPlugins\Security\Sessions\SessionAction;

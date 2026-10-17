@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Free\Recovery;
 
+defined( 'ABSPATH' ) || exit;
+
 /** A recovery attempt. Failures never carry a partial SQL body. */
 final class ChangeResult {
 	private function __construct(

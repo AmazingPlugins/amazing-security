@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Scan;
 
+defined( 'ABSPATH' ) || exit;
+
 use AmazingPlugins\Security\Checks\AiReadersCheck;
 use AmazingPlugins\Security\Checks\AiReadinessCheck;
 use AmazingPlugins\Security\Checks\KnownHolesCheck;

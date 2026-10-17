@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Checks;
 
+defined( 'ABSPATH' ) || exit;
+
 use AmazingPlugins\Security\Findings\CheckResult;
 use AmazingPlugins\Security\Findings\State;
 use AmazingPlugins\Security\Scan\ScanContext;
@@ -66,11 +68,11 @@ final class RootExposureCheck implements SecurityCheck {
 		$kind    = (string) ( $this->readKind )();
 		$state   = self::decide( $kind );
 		$summary = match ( $kind ) {
-			'env' => 'A .env file is in the site root. This check does not read or delete it.',
-			'git' => 'A .git directory is in the site root. This check does not read or delete it.',
-			'both' => 'A .env file and a .git directory are in the site root. This check does not read or delete them.',
-			'absent' => 'No .env file or .git directory is in the site root. This check does not read or delete them.',
-			default => 'The site root could not be checked for a .env file or a .git directory. This check does not read or delete them.',
+			'env' => __( 'A .env file is in the site root. This check does not read or delete it.', 'amazing-security' ),
+			'git' => __( 'A .git directory is in the site root. This check does not read or delete it.', 'amazing-security' ),
+			'both' => __( 'A .env file and a .git directory are in the site root. This check does not read or delete them.', 'amazing-security' ),
+			'absent' => __( 'No .env file or .git directory is in the site root. This check does not read or delete them.', 'amazing-security' ),
+			default => __( 'The site root could not be checked for a .env file or a .git directory. This check does not read or delete them.', 'amazing-security' ),
 		};
 		return array(
 			new CheckResult( $this->id(), 'warn' === $state ? State::WARN : ( 'pass' === $state ? State::PASS : State::UNKNOWN ), $summary, self::SOURCE, new DateTimeImmutable( 'now', new DateTimeZone( 'UTC' ) ), 'medium', 'unknown' === $state ? 'unavailable' : 'complete', array( 'kind' => $kind ) ),

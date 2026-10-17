@@ -3,6 +3,8 @@
 declare(strict_types=1);
 namespace AmazingPlugins\Security\Firewall;
 
+defined( 'ABSPATH' ) || exit;
+
 final class RestRatePolicy {
 	public const IDS = array( 'users-read', 'comments-create' );
 	public function read( mixed $raw ): ?array {

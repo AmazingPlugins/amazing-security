@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Vulnerabilities;
 
+defined( 'ABSPATH' ) || exit;
+
 final class VersionRangeMatcher {
 	public function contains( string $installed, array $range ): ?bool {
 		if ( ! $this->validVersion( $installed ) || ! isset( $range['from'], $range['to'], $range['from_inclusive'], $range['to_inclusive'] ) || ! is_string( $range['from'] ) || ! is_string( $range['to'] ) || ! is_bool( $range['from_inclusive'] ) || ! is_bool( $range['to_inclusive'] ) ) {

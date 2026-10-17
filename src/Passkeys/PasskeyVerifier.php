@@ -3,6 +3,8 @@
 declare(strict_types=1);
 namespace AmazingPlugins\Security\Passkeys;
 
+defined( 'ABSPATH' ) || exit;
+
 use AmazingPlugins\Security\Vendor\WebAuthn\WebAuthn;
 
 /** The only application bridge to the pinned signature verifier. */

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Activity;
 
+defined( 'ABSPATH' ) || exit;
+
 final class ActivityHooks {
 	private int $recorded = 0;
 

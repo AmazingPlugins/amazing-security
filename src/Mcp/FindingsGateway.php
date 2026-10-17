@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Mcp;
 
+defined( 'ABSPATH' ) || exit;
+
 use AmazingPlugins\Security\FileScan\FileScanReport;
 use AmazingPlugins\Security\FileScan\WordPressFileScanStore;
 use AmazingPlugins\Security\Findings\CheckResult;

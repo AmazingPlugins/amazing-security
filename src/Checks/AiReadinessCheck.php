@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Checks;
 
+defined( 'ABSPATH' ) || exit;
+
 use AmazingPlugins\Security\Findings\CheckResult;
 use AmazingPlugins\Security\Findings\State;
 use AmazingPlugins\Security\Scan\ScanContext;
@@ -115,22 +117,22 @@ final class AiReadinessCheck implements SecurityCheck {
 
 	private static function summary( string $passwords, string $assistant, string $ready, string $guide ): string {
 		$tools = match ( $passwords ) {
-			'open' => 'Application passwords are available, so a tool can sign in without the login form. You can pause them here. Saved passwords stay stored.',
-			'plugin-off' => 'Application passwords are paused by this plugin. Saved passwords stay stored and work again if you allow them.',
-			'closed' => 'Application passwords are turned off.',
-			default => 'Application password availability could not be read.',
+			'open' => __( 'Application passwords are available, so a tool can sign in without the login form. You can pause them here. Saved passwords stay stored.', 'amazing-security' ),
+			'plugin-off' => __( 'Application passwords are paused by this plugin. Saved passwords stay stored and work again if you allow them.', 'amazing-security' ),
+			'closed' => __( 'Application passwords are turned off.', 'amazing-security' ),
+			default => __( 'Application password availability could not be read.', 'amazing-security' ),
 		};
 		$access = match ( true ) {
-			'on' === $assistant => 'AI assistant access is on.',
-			'off' === $assistant && 'yes' === $ready => 'AI assistant access is off. This site can connect an assistant when you turn that on.',
-			'off' === $assistant && 'no' === $ready => 'AI assistant access is off. This site is not ready to connect an assistant yet.',
-			'off' === $assistant => 'AI assistant access is off. Assistant readiness could not be read.',
-			default => 'AI assistant access could not be read.',
+			'on' === $assistant => __( 'AI assistant access is on.', 'amazing-security' ),
+			'off' === $assistant && 'yes' === $ready => __( 'AI assistant access is off. This site can connect an assistant when you turn that on.', 'amazing-security' ),
+			'off' === $assistant && 'no' === $ready => __( 'AI assistant access is off. This site is not ready to connect an assistant yet.', 'amazing-security' ),
+			'off' === $assistant => __( 'AI assistant access is off. Assistant readiness could not be read.', 'amazing-security' ),
+			default => __( 'AI assistant access could not be read.', 'amazing-security' ),
 		};
 		$file = match ( $guide ) {
-			'present' => 'An llms.txt guide is published for AI readers.',
-			'absent' => 'No llms.txt guide is published.',
-			default => 'The llms.txt guide could not be read.',
+			'present' => __( 'An llms.txt guide is published for AI readers.', 'amazing-security' ),
+			'absent' => __( 'No llms.txt guide is published.', 'amazing-security' ),
+			default => __( 'The llms.txt guide could not be read.', 'amazing-security' ),
 		};
 		return $tools . ' ' . $access . ' ' . $file . ' This check does not change those settings and does not send the site to a model.';
 	}

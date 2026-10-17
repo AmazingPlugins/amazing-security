@@ -3,6 +3,8 @@
 declare(strict_types=1);
 namespace AmazingPlugins\Security\Proxy;
 
+defined( 'ABSPATH' ) || exit;
+
 use AmazingPlugins\Security\Integrity\OptionGateway;
 use AmazingPlugins\Security\Network\{Cidr, NetworkPolicy};
 final class ProxySettingsService {

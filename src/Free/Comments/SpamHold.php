@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Free\Comments;
 
+defined( 'ABSPATH' ) || exit;
+
 /** Holds a later comment from an email that was already marked spam. No visitor address. */
 final class SpamHold {
 	public const OPTION = 'amsec_comment_spam_hold';

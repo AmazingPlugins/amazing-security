@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Free\Accounts;
 
+defined( 'ABSPATH' ) || exit;
+
 /** On-site addition question. It does not call another host. */
 final class LoginChallenge {
 	public const OPTION           = 'amsec_login_challenge';

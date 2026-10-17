@@ -3,6 +3,8 @@
 declare(strict_types=1);
 namespace AmazingPlugins\Security\Passkeys;
 
+defined( 'ABSPATH' ) || exit;
+
 /** Structural preflight for the supported WebAuthn profile, not a signature verifier. */
 final class BoundedCbor {
 	private string $bytes = '';

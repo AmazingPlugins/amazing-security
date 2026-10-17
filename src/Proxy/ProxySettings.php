@@ -3,6 +3,8 @@
 declare(strict_types=1);
 namespace AmazingPlugins\Security\Proxy;
 
+defined( 'ABSPATH' ) || exit;
+
 use AmazingPlugins\Security\Integrity\WordPressOptions;
 use AmazingPlugins\Security\Admin\FixApprovalAction;
 use AmazingPlugins\Security\Sessions\SessionPolicy;
@@ -43,37 +45,41 @@ final class ProxySettings {
 		if ( 'saved' !== $result ) {
 			wp_die( esc_html__( 'Proxy policy changed, approval is busy, host peer is unverified, rules are invalid or the operator cannot be resolved safely. Review host trust and network self-lockout before approving.', 'amazing-security' ), '', array( 'response' => 409 ) ); }
 		( new ActivityHooks( new ActivityRepository( $GLOBALS['wpdb'] ) ) )->record( 'security_setting_changed', 0, 'proxy-' . $mode );
-		wp_safe_redirect( admin_url( 'admin.php?page=amsec-proxies' ) );
+		wp_safe_redirect( \AmazingPlugins\Security\Admin\Brand::saved( admin_url( 'admin.php?page=amsec-traffic-guard#proxies' ) ) );
 		exit;
 	}
 	public function render(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_die( esc_html__( 'Administrator access required.', 'amazing-security' ), '', array( 'response' => 403 ) ); }
-		echo '<div class="wrap amazing-security-admin"><header class="amsec-header"><div><h1>Trusted proxy addresses</h1><p>Explicit address interpretation for verified host configurations.</p></div></header><section class="amsec-overview"><h2>Start with a host-confirmed direct peer</h2><p>Off by default. Login, native bot and REST counters and manual network controls normally use the host-provided PHP address. Optional header modes require the host to set <code>AMSEC_DIRECT_PEER_CONFIRMED</code> to the boolean true after verifying that REMOTE_ADDR is the unmodified connection peer. This plugin cannot reverse Apache/CDN address rewriting or prove host configuration.</p><p>Configure only the actual trusted upstream CIDRs. Origin access and header overwrite/append rules must be secured by the host. Trusted upstreams control the address they report; a header name alone does not identify a provider. No provider ranges are downloaded or inferred. Global /0 trust is refused. IPv4 and IPv6 are supported, including mapped-address normalization.</p><p>X-Forwarded-For walks a validated chain from right to left and stops at the first untrusted address. CF-Connecting-IP accepts one validated address from a configured trusted peer. Other headers are ignored. Untrusted direct peers cannot supply either header. Missing, oversized, malformed or all-trusted chains resolve unknown; address-dependent checks then skip enforcement. Hidden-field checks remain independent. No raw visitor headers or addresses are logged.</p><p>Changing this policy starts a new rate-counter namespace. Approval refuses a resolved operator covered by an existing network block. Shared proxies and later network changes can still affect access; test observe mode and recovery first. Recovery: <code>wp amazing-security proxies disable</code>, or <code>AMSEC_DISABLE_PROXY_HEADERS</code>. These restore host-provided semantics, which can group visitors at a proxy.</p></section>';
+		echo '<div class="wrap amazing-security-admin"><header class="amsec-header"><div><h1>' . esc_html__( 'Trusted proxy addresses', 'amazing-security' ) . '</h1><p>' . esc_html__( 'Explicit address interpretation for verified host configurations.', 'amazing-security' ) . '</p></div></header><section class="amsec-overview"><h2>' . esc_html__( 'Start with a host-confirmed direct peer', 'amazing-security' ) . '</h2><p>' .
+			/* translators: %1$s is an inline code snippet (a WP-CLI command or a constant name); keep it unchanged. */
+			sprintf( esc_html__( 'Off by default. Login, native bot and REST counters and manual network controls normally use the host-provided PHP address. Optional header modes require the host to set %1$s to the boolean true after verifying that REMOTE_ADDR is the unmodified connection peer. This plugin cannot reverse Apache/CDN address rewriting or prove host configuration.', 'amazing-security' ), '<code>AMSEC_DIRECT_PEER_CONFIRMED</code>' ) . '</p><p>' . esc_html__( 'Configure only the actual trusted upstream CIDRs. Origin access and header overwrite/append rules must be secured by the host. Trusted upstreams control the address they report; a header name alone does not identify a provider. No provider ranges are downloaded or inferred. Global /0 trust is refused. IPv4 and IPv6 are supported, including mapped-address normalization.', 'amazing-security' ) . '</p><p>' . esc_html__( 'X-Forwarded-For walks a validated chain from right to left and stops at the first untrusted address. CF-Connecting-IP accepts one validated address from a configured trusted peer. Other headers are ignored. Untrusted direct peers cannot supply either header. Missing, oversized, malformed or all-trusted chains resolve unknown; address-dependent checks then skip enforcement. Hidden-field checks remain independent. No raw visitor headers or addresses are logged.', 'amazing-security' ) . '</p><p>' . sprintf( esc_html__( 'Changing this policy starts a new rate-counter namespace. Approval refuses a resolved operator covered by an existing network block. Shared proxies and later network changes can still affect access; test observe mode and recovery first. Recovery: %1$s, or %2$s. These restore host-provided semantics, which can group visitors at a proxy.', 'amazing-security' ), '<code>wp amazing-security proxies disable</code>', '<code>AMSEC_DISABLE_PROXY_HEADERS</code>' ) . '</p></section>';
 		try {
 			$service = $this->service();
 			$state   = $service->status();
 			$fp      = $service->fingerprint(); } catch ( \Throwable ) {
-					echo '<section class="amsec-file-scan"><p>Proxy policy storage is unavailable. No verified configuration can be shown.</p></section></div>';
+					echo '<section class="amsec-file-scan"><p>' . esc_html__( 'Proxy policy storage is unavailable. No verified configuration can be shown.', 'amazing-security' ) . '</p></section></div>';
 					return; }
 			if ( ! empty( $state['invalid'] ) ) {
-				echo '<section class="amsec-file-scan"><p>Proxy policy is invalid; address resolution is unknown. Use host recovery to set an explicit off policy.</p></section></div>';
+				echo '<section class="amsec-file-scan"><p>' . esc_html__( 'Proxy policy is invalid; address resolution is unknown. Use host recovery to set an explicit off policy.', 'amazing-security' ) . '</p></section></div>';
 				return; }
 			$confirmed = WordPressClientAddress::peerConfirmed();
-			echo '<section class="amsec-file-scan"><h2>Current trust policy</h2><p>Mode: ' . esc_html( $state['mode'] ) . '.</p><p>Host attestation: ' . esc_html( $confirmed ? 'present; operator must verify its correctness' : 'absent; header modes cannot be enabled' ) . '.</p><p>Configured trusted networks:</p><pre>' . esc_html( implode( "\n", $state['cidrs'] ) ) . '</pre>';
+			echo '<section class="amsec-file-scan"><h2>' . esc_html__( 'Current trust policy', 'amazing-security' ) . '</h2><p>' .
+				/* translators: %s: current mode slug, for example off, observe or block. */
+				sprintf( esc_html__( 'Mode: %s.', 'amazing-security' ), esc_html( $state['mode'] ) ) . '</p><p>' . sprintf( esc_html__( 'Host attestation: %s.', 'amazing-security' ), esc_html( $confirmed ? __( 'present; operator must verify its correctness', 'amazing-security' ) : __( 'absent; header modes cannot be enabled', 'amazing-security' ) ) ) . '</p><p>' . esc_html__( 'Configured trusted networks:', 'amazing-security' ) . '</p><pre>' . esc_html( implode( "\n", $state['cidrs'] ) ) . '</pre>';
 			if ( ! is_ssl() ) {
-				echo '<p>Use HTTPS to approve changes.</p></section></div>';
+				echo '<p>' . esc_html__( 'Use HTTPS to approve changes.', 'amazing-security' ) . '</p></section></div>';
 				return; }
-			echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '"><input type="hidden" name="action" value="amsec_proxy_settings"><input type="hidden" name="fingerprint" value="' . esc_attr( $fp ) . '"><p><label>Header interpretation <select name="mode">';
+			echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '"><input type="hidden" name="action" value="amsec_proxy_settings"><input type="hidden" name="fingerprint" value="' . esc_attr( $fp ) . '"><p><label>' . esc_html__( 'Header interpretation', 'amazing-security' ) . ' <select name="mode">';
 			foreach ( array(
-				'off'    => 'Off: host-provided address',
-				'xff'    => 'X-Forwarded-For: trusted chain',
-				'single' => 'CF-Connecting-IP: one trusted sender',
+				'off'    => __( 'Off: host-provided address', 'amazing-security' ),
+				'xff'    => __( 'X-Forwarded-For: trusted chain', 'amazing-security' ),
+				'single' => __( 'CF-Connecting-IP: one trusted sender', 'amazing-security' ),
 			) as $mode => $label ) {
 				echo '<option value="' . esc_attr( $mode ) . '"' . selected( $state['mode'], $mode, false ) . '>' . esc_html( $label ) . '</option>'; }
-			echo '</select></label></p><p><label>Trusted proxy networks (one IP/CIDR per line, up to 50)<br><textarea name="rules" rows="6" class="large-text code" maxlength="4096">' . esc_html( implode( "\n", $state['cidrs'] ) ) . '</textarea></label></p>';
+			echo '</select></label></p><p><label>' . esc_html__( 'Trusted proxy networks (one IP/CIDR per line, up to 50)', 'amazing-security' ) . '<br><textarea name="rules" rows="6" class="large-text code" maxlength="4096">' . esc_html( implode( "\n", $state['cidrs'] ) ) . '</textarea></label></p>';
 			wp_nonce_field( 'amsec_proxy_' . $fp );
-			echo '<p><label>Your password <input type="password" name="password" autocomplete="current-password" maxlength="1024" required></label></p><p><label><input type="checkbox" name="confirm" value="1" required> The host verified socket-peer origin, upstream ranges and header behavior. I reviewed shared-network and self-lockout effects and know the recovery command.</label></p>';
+			echo '<p><label>' . esc_html__( 'Your password', 'amazing-security' ) . ' <input type="password" name="password" autocomplete="current-password" maxlength="1024" required></label></p><p><label><input type="checkbox" name="confirm" value="1" required> ' . esc_html__( 'The host verified socket-peer origin, upstream ranges and header behavior. I reviewed shared-network and self-lockout effects and know the recovery command.', 'amazing-security' ) . '</label></p>';
 			submit_button( __( 'Approve current proxy policy', 'amazing-security' ), 'secondary' );
 			echo '</form></section></div>';
 	}

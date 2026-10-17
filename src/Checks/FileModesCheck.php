@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Checks;
 
+defined( 'ABSPATH' ) || exit;
+
 use AmazingPlugins\Security\Findings\CheckResult;
 use AmazingPlugins\Security\Findings\State;
 use AmazingPlugins\Security\Scan\ScanContext;
@@ -34,9 +36,9 @@ final class FileModesCheck implements SecurityCheck {
 		}
 		$state   = $warn > 0 ? State::WARN : ( $unknown > 0 || array() === $rows ? State::UNKNOWN : State::PASS );
 		$summary = match ( $state ) {
-			State::WARN => 'A listed location is world-writable, or the configuration file is world-readable. Ask the host before changing modes.',
-			State::UNKNOWN => 'A listed location could not be read. Ask the host to review it.',
-			default => 'No selected world-write or configuration world-read mode was found.',
+			State::WARN => __( 'A listed location is world-writable, or the configuration file is world-readable. Ask the host before changing modes.', 'amazing-security' ),
+			State::UNKNOWN => __( 'A listed location could not be read. Ask the host to review it.', 'amazing-security' ),
+			default => __( 'No selected world-write or configuration world-read mode was found.', 'amazing-security' ),
 		};
 		return array(
 			new CheckResult(

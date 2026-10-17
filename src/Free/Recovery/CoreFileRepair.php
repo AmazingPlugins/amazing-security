@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Free\Recovery;
 
+defined( 'ABSPATH' ) || exit;
+
 /** Replaces one existing core or active-theme file from caller-supplied bytes. */
 final class CoreFileRepair {
 	private readonly string $root;

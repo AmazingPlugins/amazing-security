@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Login;
 
+defined( 'ABSPATH' ) || exit;
+
 final class WordPressRateCounterStore implements RateCounterStore {
 	private string $table;
 

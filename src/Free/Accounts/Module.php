@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Free\Accounts;
 
+defined( 'ABSPATH' ) || exit;
+
 use AmazingPlugins\Security\Login\BreachedPasswords;
 
 /** Wires account protections. Each one stays off until an administrator turns it on. */
@@ -123,7 +125,10 @@ final class Module {
 		if ( ! $user instanceof \WP_User ) {
 			return $user;
 		}
-		$stored   = EmailFactor::unpack( get_user_meta( $user->ID, EmailFactor::META, true ) );
+		$stored = EmailFactor::unpack( get_user_meta( $user->ID, EmailFactor::META, true ) );
+		if ( null !== $stored && '' !== self::posted( 'amsec_email_code' ) ) {
+			$stored['tries'] = self::reserveEmailTry( $user->ID ) ? 0 : EmailFactor::TRIES;
+		}
 		$decision = EmailFactor::decision(
 			RegistrationApproval::enabled( self::option( EmailFactor::OPTION ) ),
 			EmailFactor::enrolled(
@@ -151,6 +156,15 @@ final class Module {
 		return new \WP_Error( 'amsec_email_factor', __( 'Enter the email code and sign in again.', 'amazing-security' ) );
 	}
 
+	/** Atomically spends one of the current code's tries, so parallel guesses can't exceed EmailFactor::TRIES. */
+	private static function reserveEmailTry( int $user_id ): bool {
+		global $wpdb;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- A single conditional UPDATE is the atomic counter; the meta cache is cleared below.
+		$reserved = $wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->usermeta} SET meta_value = CAST(meta_value AS UNSIGNED) + 1 WHERE user_id = %d AND meta_key = %s AND CAST(meta_value AS UNSIGNED) < %d", $user_id, EmailFactor::TRIES_META, EmailFactor::TRIES ) );
+		wp_cache_delete( $user_id, 'user_meta' );
+		return 1 === $reserved;
+	}
+
 	private static function sendEmailCode( \WP_User $user ): \WP_Error {
 		$failed = new \WP_Error( 'amsec_email_factor', __( 'The email code could not be sent. Try again.', 'amazing-security' ) );
 		$email  = $user->user_email;
@@ -174,6 +188,7 @@ final class Module {
 		if ( ! is_string( $json ) || false === update_user_meta( $user->ID, EmailFactor::META, $json ) ) {
 			return $failed;
 		}
+		update_user_meta( $user->ID, EmailFactor::TRIES_META, '0' );
 		return new \WP_Error( 'amsec_email_factor', __( 'Enter the email code and sign in again.', 'amazing-security' ) );
 	}
 
@@ -181,13 +196,18 @@ final class Module {
 		if ( '1' !== self::option( LoginChallenge::OPTION ) ) {
 			return 'allow';
 		}
-		$token = self::challengeToken();
+		$token    = self::challengeToken();
+		$expected = self::expectedSum( $token );
+		if ( '' !== $token ) {
+			// One answer per question: a retry must load the new pair that login_init just issued.
+			delete_transient( LoginChallenge::transientKey( $token ) );
+		}
 		return LoginChallenge::decision(
 			true,
 			defined( 'XMLRPC_REQUEST' ) && XMLRPC_REQUEST,
 			self::apiRequest(),
 			$token,
-			self::expectedSum( $token ),
+			$expected,
 			self::posted( LoginChallenge::SUM ),
 			self::posted( LoginChallenge::HONEYPOT )
 		);

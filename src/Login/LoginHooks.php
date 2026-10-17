@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Login;
 
+defined( 'ABSPATH' ) || exit;
+
 final class LoginHooks {
 	public function __construct( private RateLimiter $limiter, private AddressKey $addresses ) {}
 

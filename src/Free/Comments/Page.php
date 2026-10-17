@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Free\Comments;
 
+defined( 'ABSPATH' ) || exit;
+
 /** Comment checks screen. Posts to admin-post.php. */
 final class Page {
 	public static function menu(): void {
@@ -66,7 +68,7 @@ final class Page {
 		update_option( Decision::OPTION, Decision::flag( self::posted( Decision::OPTION ) ) );
 		update_option( Rate::OPTION, Rate::flag( self::posted( Rate::OPTION ) ) );
 		update_option( SpamHold::OPTION, SpamHold::flag( self::posted( SpamHold::OPTION ) ) );
-		wp_safe_redirect( admin_url( 'admin.php?page=amsec-comments' ) );
+		wp_safe_redirect( \AmazingPlugins\Security\Admin\Brand::saved( admin_url( 'admin.php?page=amsec-traffic-guard#bots' ) ) );
 		exit;
 	}
 

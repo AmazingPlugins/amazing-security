@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Free\LoginNotice;
 
+defined( 'ABSPATH' ) || exit;
+
 /** Sign-in email screen. The option stays off until an administrator saves it. */
 final class Page {
 	public static function menu(): void {
@@ -49,7 +51,7 @@ final class Page {
 		}
 		check_admin_referer( 'amsec_login_notice_save' );
 		update_option( Decision::OPTION, self::postedFlag() );
-		wp_safe_redirect( admin_url( 'admin.php?page=amsec-login-notice' ) );
+		wp_safe_redirect( \AmazingPlugins\Security\Admin\Brand::saved( admin_url( 'admin.php?page=amsec-accounts#sign-in-email' ) ) );
 		exit;
 	}
 

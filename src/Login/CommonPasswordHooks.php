@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Login;
 
+defined( 'ABSPATH' ) || exit;
+
 use Closure;
 
 /** Rejects a new password on the local list or a breach-list prefix. It does not block an existing sign-in. */

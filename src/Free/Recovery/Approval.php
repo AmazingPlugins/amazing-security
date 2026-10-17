@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Free\Recovery;
 
+defined( 'ABSPATH' ) || exit;
+
 /** HTTPS, manage_options, and a valid nonce. A missing piece blocks every change. */
 final class Approval {
 	public function __construct(

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Free\Recovery;
 
+defined( 'ABSPATH' ) || exit;
+
 use Closure;
 
 /** Builds a prefixed SQL dump in memory. Over the cap, the body is discarded. */
