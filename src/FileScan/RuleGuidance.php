@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\FileScan;
 
-defined( __( 'ABSPATH', 'amazing-security' ) ) || exit;
+defined( 'ABSPATH' ) || exit;
 
 final class RuleGuidance {
 	public static function forRule( string $id ): string {

@@ -19,28 +19,28 @@ final class RuleCatalog {
 	public static function descriptors(): array {
 		return array(
 			'files'    => array(
-				'label'    => __( 'File review patterns', 'amazing-security' ),
+				'label'    => 'File review patterns',
 				'version'  => ( new BundledRulePack() )->version(),
 				'ids'      => array_keys( ( new BundledRulePack() )->rules() ),
 				'files'    => array( 'src/FileScan/BundledRulePack.php', 'src/FileScan/RuleMatcher.php', 'src/FileScan/AdjacentFlow.php' ),
 				'fixtures' => 'tests/Fixtures/FileScan/corpus.json',
-				'scope'    => __( 'Selected PHP and inline-HTML patterns; broad malware detection remains incomplete.', 'amazing-security' ),
+				'scope'    => 'Selected PHP and inline-HTML patterns; broad malware detection remains incomplete.',
 			),
 			'content'  => array(
-				'label'    => __( 'Published-content patterns', 'amazing-security' ),
+				'label'    => 'Published-content patterns',
 				'version'  => MarkupDetector::VERSION,
 				'ids'      => MarkupDetector::RULES,
 				'files'    => array( 'src/Content/MarkupDetector.php' ),
 				'fixtures' => 'tests/Unit/Content/MarkupTest.php',
-				'scope'    => __( 'Selected public-content patterns; links are not contacted or checked against a reputation service.', 'amazing-security' ),
+				'scope'    => 'Selected public-content patterns; links are not contacted or checked against a reputation service.',
 			),
 			'requests' => array(
-				'label'    => __( 'REST observation patterns', 'amazing-security' ),
+				'label'    => 'REST observation patterns',
 				'version'  => ( new BundledRequestRules() )->version(),
 				'ids'      => ( new BundledRequestRules() )->ids(),
 				'files'    => array( 'src/Firewall/BundledRequestRules.php' ),
 				'fixtures' => 'tests/Unit/Firewall/',
-				'scope'    => __( 'Observe-only patterns with known benign matches; they must not be used as blocking rules.', 'amazing-security' ),
+				'scope'    => 'Observe-only patterns with known benign matches; they must not be used as blocking rules.',
 			),
 		);
 	}
@@ -89,9 +89,9 @@ final class RuleCatalog {
 				'status'      => $ok ? ( $now - $date >= 90 * 86400 ? 'overdue' : 'recent' ) : 'unknown',
 				'reviewed_at' => $ok ? $pack['reviewed_at'] : '',
 				'age_days'    => $ok ? (int) floor( ( $now - $date ) / 86400 ) : null,
-				'origin'      => __( 'AmazingPlugins authored local review patterns', 'amazing-security' ),
+				'origin'      => 'AmazingPlugins authored local review patterns',
 				'license'     => 'GPL-2.0-or-later',
-				'owner'       => __( 'AmazingPlugins rule maintainer (staffing required before public release)', 'amazing-security' ),
+				'owner'       => 'AmazingPlugins rule maintainer (staffing required before public release)',
 			);
 		}
 		return $status;

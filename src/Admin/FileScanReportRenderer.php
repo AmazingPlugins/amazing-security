@@ -58,7 +58,7 @@ final class FileScanReportRenderer {
 			$html .= '<details class="amsec-file-history"><summary>' . esc_html__( 'Earlier warnings', 'amazing-security' ) . '</summary><ul>';
 			foreach ( $older as $report ) {
 				$count = count( $report->findings );
-				$html .= '<li><details><summary><time datetime="' . esc_attr( $report->finishedAt->format( 'c' ) ) . '">' . esc_html( $report->finishedAt->format( 'Y-m-d H:i:s' ) . ' UTC' ) . '</time>: ' . esc_html( (string) $count ) . ' ' . ( 1 === $count ? esc_html__( 'finding', 'amazing-security' ) : esc_html__( 'findings', 'amazing-security' ) ) . '</summary><ul>';
+				$html .= '<li><details><summary><time datetime="' . esc_attr( $report->finishedAt->format( 'c' ) ) . '">' . esc_html( $report->finishedAt->format( 'Y-m-d H:i:s' ) . ' UTC' ) . '</time>: ' . esc_html( sprintf( /* translators: %d: number of findings. */ _n( '%d finding', '%d findings', $count, 'amazing-security' ), $count ) ) . '</summary><ul>';
 				foreach ( $report->findings as $finding ) {
 					$id      = (string) ( $finding['id'] ?? '' );
 					$present = false;
