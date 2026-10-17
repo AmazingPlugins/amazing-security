@@ -24,9 +24,14 @@ final class FirstRunTest extends TestCase {
 
 	public function test_tour_points_at_each_menu_page_and_promises_nothing_runs(): void {
 		$steps = FirstRun::steps();
-		self::assertCount( 10, $steps );
+		self::assertCount( 9, $steps );
 		self::assertStringContainsString( 'page=amazing-security"', $steps[0]['target'] );
 		self::assertStringContainsString( 'does not change anything', $steps[0]['text'] );
+		self::assertSame( 'Scan button', $steps[8]['title'] );
+		$scanned = FirstRun::steps( true );
+		self::assertCount( 10, $scanned );
+		self::assertSame( 'Rescan button', $scanned[8]['title'] );
+		self::assertSame( '.amsec-scan .amsec-cats', $scanned[9]['target'] );
 	}
 
 	public function test_account_label_shows_the_name_people_see(): void {

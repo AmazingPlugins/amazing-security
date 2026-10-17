@@ -63,17 +63,13 @@ final class AccountProtectionTest extends TestCase {
 		self::assertSame( 'reject', EmailFactor::decision( true, false, false, 'secret', true, '000000', $record, 1_700_000_000, 'unit-key' ) );
 	}
 
-	public function test_email_factor_burns_the_code_after_five_wrong_tries(): void {
+	public function test_email_factor_refuses_a_code_once_its_tries_are_spent(): void {
 		$code   = '482913';
 		$record = EmailFactor::record( $code, 1_700_000_000, 'unit-key' );
-		for ( $i = 0; $i < EmailFactor::TRIES - 1; ++$i ) {
-			$record = EmailFactor::failedTry( $record );
-		}
 		self::assertSame( 'accept', EmailFactor::decision( true, false, false, 'secret', true, $code, $record, 1_700_000_010, 'unit-key' ) );
-		$record = EmailFactor::unpack( (string) json_encode( EmailFactor::failedTry( $record ) ) );
-		self::assertSame( EmailFactor::TRIES, $record['tries'] );
+		$record['tries'] = EmailFactor::TRIES;
 		self::assertSame( 'reject', EmailFactor::decision( true, false, false, 'secret', true, $code, $record, 1_700_000_010, 'unit-key' ) );
-		self::assertSame( 'reject', EmailFactor::decision( true, false, false, 'secret', true, '', $record, 1_700_000_030, 'unit-key' ), 'A burned code still waits for the resend interval.' );
+		self::assertSame( 'reject', EmailFactor::decision( true, false, false, 'secret', true, '', $record, 1_700_000_030, 'unit-key' ), 'A spent code still waits for the resend interval.' );
 		self::assertSame( 'send', EmailFactor::decision( true, false, false, 'secret', true, '', $record, 1_700_000_061, 'unit-key' ) );
 	}
 

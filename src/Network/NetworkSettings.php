@@ -51,7 +51,7 @@ final class NetworkSettings {
 		if ( 'saved' !== $result ) {
 			wp_die( esc_html__( 'Policy changed, invalid rules or self-lockout risk. Review the current policy and your host address before approving.', 'amazing-security' ), '', array( 'response' => 409 ) );}
 		( new ActivityHooks( new ActivityRepository( $GLOBALS['wpdb'] ) ) )->record( 'security_setting_changed', 0, 'network-' . $mode );
-		wp_safe_redirect( admin_url( 'admin.php?page=amsec-network' ) );
+		wp_safe_redirect( \AmazingPlugins\Security\Admin\Brand::saved( admin_url( 'admin.php?page=amsec-traffic-guard#network' ) ) );
 		exit;
 	}
 	public function render(): void {

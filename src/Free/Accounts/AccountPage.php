@@ -128,7 +128,7 @@ final class AccountPage {
 		if ( null !== $xmlrpc ) {
 			update_option( LoginExtras::XMLRPC, $xmlrpc );
 		}
-		wp_safe_redirect( admin_url( 'admin.php?page=amsec-accounts' ) );
+		wp_safe_redirect( \AmazingPlugins\Security\Admin\Brand::saved( admin_url( 'admin.php?page=amsec-accounts#sign-in' ) ) );
 		exit;
 	}
 

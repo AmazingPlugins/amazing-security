@@ -34,7 +34,7 @@ final class DigestSettings {
 			wp_die( esc_html__( 'The setting change could not be verified.', 'amazing-security' ), '', array( 'response' => 409 ) );
 		}
 		( new DigestHooks() )->ensure();
-		wp_safe_redirect( admin_url( 'admin.php?page=amsec-digest' ) );
+		wp_safe_redirect( \AmazingPlugins\Security\Admin\Brand::saved( admin_url( 'admin.php?page=amsec-digest' ) ) );
 		exit;
 	}
 

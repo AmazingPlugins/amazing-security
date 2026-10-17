@@ -59,7 +59,7 @@ final class Module {
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce checked above.
 		$raw = isset( $_POST[ Notice::OPTION ] ) ? sanitize_text_field( wp_unslash( $_POST[ Notice::OPTION ] ) ) : '0';
 		update_option( Notice::OPTION, Notice::flag( is_string( $raw ) ? $raw : '0' ), false );
-		wp_safe_redirect( admin_url( 'admin.php?page=amsec-settings#amsec-event-mail' ) );
+		wp_safe_redirect( \AmazingPlugins\Security\Admin\Brand::saved( admin_url( 'admin.php?page=amsec-settings#amsec-event-mail' ) ) );
 		exit;
 	}
 

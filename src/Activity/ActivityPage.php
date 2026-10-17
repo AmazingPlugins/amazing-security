@@ -44,7 +44,7 @@ final class ActivityPage {
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce checked above.
 		$raw = isset( $_POST['amsec_activity_enabled'] ) ? sanitize_text_field( wp_unslash( $_POST['amsec_activity_enabled'] ) ) : '0';
 		update_option( 'amsec_activity_enabled', '1' === $raw ? '1' : '0', false );
-		wp_safe_redirect( admin_url( 'admin.php?page=amsec-activity' ) );
+		wp_safe_redirect( \AmazingPlugins\Security\Admin\Brand::saved( admin_url( 'admin.php?page=amsec-activity' ) ) );
 		exit;
 	}
 

@@ -51,7 +51,7 @@ final class Page {
 		}
 		check_admin_referer( 'amsec_login_notice_save' );
 		update_option( Decision::OPTION, self::postedFlag() );
-		wp_safe_redirect( admin_url( 'admin.php?page=amsec-login-notice' ) );
+		wp_safe_redirect( \AmazingPlugins\Security\Admin\Brand::saved( admin_url( 'admin.php?page=amsec-accounts#sign-in-email' ) ) );
 		exit;
 	}
 

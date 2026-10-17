@@ -40,7 +40,7 @@ final class TrafficSettings {
 		if ( 'saved' !== $service->apply( $fp, '1' === $post['enabled'] ) ) {
 			wp_die( esc_html__( 'Traffic policy changed or could not be saved. Review it before approving again.', 'amazing-security' ), '', array( 'response' => 409 ) ); }
 		( new ActivityHooks( new ActivityRepository( $GLOBALS['wpdb'] ) ) )->record( 'security_setting_changed', 0, 'traffic-' . ( '1' === $post['enabled'] ? 'on' : 'off' ) );
-		wp_safe_redirect( admin_url( 'admin.php?page=amsec-traffic' ) );
+		wp_safe_redirect( \AmazingPlugins\Security\Admin\Brand::saved( admin_url( 'admin.php?page=amsec-traffic-guard#history' ) ) );
 		exit;
 	}
 	public function render(): void {

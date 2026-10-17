@@ -34,7 +34,7 @@ final class AlertSettingsAction {
 		if ( $options->get( 'amsec_alerts_enabled' ) !== $value && ! $options->set( 'amsec_alerts_enabled', $value ) ) {
 			wp_die( esc_html__( 'Alert setting could not be saved.', 'amazing-security' ), '', array( 'response' => 500 ) );
 		}
-		wp_safe_redirect( admin_url( 'admin.php?page=amsec-settings#amsec-alerts' ) );
+		wp_safe_redirect( \AmazingPlugins\Security\Admin\Brand::saved( admin_url( 'admin.php?page=amsec-settings#amsec-alerts' ) ) );
 		exit;
 	}
 }

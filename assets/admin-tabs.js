@@ -11,19 +11,42 @@
       var on = button.getAttribute('data-amsec-tab') === id;
       button.classList.toggle('is-current', on);
       button.setAttribute('aria-selected', on ? 'true' : 'false');
+      button.tabIndex = on ? 0 : -1;
     });
     panels.forEach(function (panel) {
       panel.hidden = panel.getAttribute('data-amsec-panel') !== id;
     });
   }
 
-  buttons.forEach(function (button) {
+  function select(button) {
+    var id = button.getAttribute('data-amsec-tab');
+    show(id);
+    if (window.history && window.history.replaceState) {
+      window.history.replaceState(null, '', '#' + id);
+    }
+  }
+
+  // WAI-ARIA tabs: arrows move between tabs, Home and End jump to the ends.
+  var keys = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 };
+  buttons.forEach(function (button, index) {
     button.addEventListener('click', function () {
-      var id = button.getAttribute('data-amsec-tab');
-      show(id);
-      if (window.history && window.history.replaceState) {
-        window.history.replaceState(null, '', '#' + id);
+      select(button);
+    });
+    button.addEventListener('keydown', function (event) {
+      var next = null;
+      if (keys[event.key]) {
+        next = (index + keys[event.key] + buttons.length) % buttons.length;
+      } else if (event.key === 'Home') {
+        next = 0;
+      } else if (event.key === 'End') {
+        next = buttons.length - 1;
       }
+      if (next === null) {
+        return;
+      }
+      event.preventDefault();
+      select(buttons[next]);
+      buttons[next].focus();
     });
   });
 

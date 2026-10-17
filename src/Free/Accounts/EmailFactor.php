@@ -14,6 +14,8 @@ final class EmailFactor {
 	public const INTERVAL = 60;
 	public const TRIES    = 5;
 
+	public const TRIES_META = 'amsec_email_factor_tries';
+
 	public static function code(): string {
 		return str_pad( (string) random_int( 0, 999999 ), 6, '0', STR_PAD_LEFT );
 	}
@@ -43,17 +45,6 @@ final class EmailFactor {
 			'sent'    => $now,
 			'tries'   => 0,
 		);
-	}
-
-	/**
-	 * Counts one wrong code. The record keeps its send time, so a burned code still waits out INTERVAL.
-	 *
-	 * @param array{hash: string, expires: int, sent: int, tries?: int} $stored
-	 * @return array{hash: string, expires: int, sent: int, tries: int}
-	 */
-	public static function failedTry( array $stored ): array {
-		$stored['tries'] = min( self::TRIES, (int) ( $stored['tries'] ?? 0 ) + 1 );
-		return $stored;
 	}
 
 	/**

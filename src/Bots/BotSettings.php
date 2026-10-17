@@ -36,7 +36,7 @@ final class BotSettings {
 			wp_die( esc_html__( 'The setting change could not be verified.', 'amazing-security' ), '', array( 'response' => 409 ) );
 		}
 		( new ActivityHooks( new ActivityRepository( $GLOBALS['wpdb'] ) ) )->record( 'bot_policy_changed', 0, $mode );
-		wp_safe_redirect( admin_url( 'admin.php?page=amsec-bots' ) );
+		wp_safe_redirect( \AmazingPlugins\Security\Admin\Brand::saved( admin_url( 'admin.php?page=amsec-traffic-guard#bots' ) ) );
 		exit;
 	}
 
@@ -73,7 +73,7 @@ final class BotSettings {
 			echo '<p class="amsec-brief-note">' . esc_html__( 'Use HTTPS to change this mode.', 'amazing-security' ) . '</p></div>';
 			return;
 		}
-		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '"><input type="hidden" name="action" value="amsec_bot_settings"><label>Mode <select name="mode">';
+		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '"><input type="hidden" name="action" value="amsec_bot_settings"><label>' . esc_html__( 'Mode', 'amazing-security' ) . ' <select name="mode">';
 		$choices = array(
 			'off'     => __( 'Off', 'amazing-security' ),
 			'observe' => __( 'Observe', 'amazing-security' ),

@@ -124,7 +124,7 @@ final class Module {
 		foreach ( Score::preset( $name ) as $key => $value ) {
 			update_option( $key, $value );
 		}
-		wp_safe_redirect( admin_url( 'admin.php?page=amsec-guide' ) );
+		wp_safe_redirect( \AmazingPlugins\Security\Admin\Brand::saved( admin_url( 'admin.php?page=amsec-guide' ) ) );
 		exit;
 	}
 

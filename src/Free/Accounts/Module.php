@@ -125,7 +125,10 @@ final class Module {
 		if ( ! $user instanceof \WP_User ) {
 			return $user;
 		}
-		$stored   = EmailFactor::unpack( get_user_meta( $user->ID, EmailFactor::META, true ) );
+		$stored = EmailFactor::unpack( get_user_meta( $user->ID, EmailFactor::META, true ) );
+		if ( null !== $stored && '' !== self::posted( 'amsec_email_code' ) ) {
+			$stored['tries'] = self::reserveEmailTry( $user->ID ) ? 0 : EmailFactor::TRIES;
+		}
 		$decision = EmailFactor::decision(
 			RegistrationApproval::enabled( self::option( EmailFactor::OPTION ) ),
 			EmailFactor::enrolled(
@@ -150,14 +153,16 @@ final class Module {
 		if ( 'send' === $decision ) {
 			return self::sendEmailCode( $user );
 		}
-		if ( null !== $stored && '' !== self::posted( 'amsec_email_code' ) ) {
-			// shortcut: read-modify-write meta, so parallel guesses can exceed TRIES slightly; use an atomic counter if that matters.
-			$json = wp_json_encode( EmailFactor::failedTry( $stored ) );
-			if ( is_string( $json ) ) {
-				update_user_meta( $user->ID, EmailFactor::META, $json );
-			}
-		}
 		return new \WP_Error( 'amsec_email_factor', __( 'Enter the email code and sign in again.', 'amazing-security' ) );
+	}
+
+	/** Atomically spends one of the current code's tries, so parallel guesses can't exceed EmailFactor::TRIES. */
+	private static function reserveEmailTry( int $user_id ): bool {
+		global $wpdb;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- A single conditional UPDATE is the atomic counter; the meta cache is cleared below.
+		$reserved = $wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->usermeta} SET meta_value = CAST(meta_value AS UNSIGNED) + 1 WHERE user_id = %d AND meta_key = %s AND CAST(meta_value AS UNSIGNED) < %d", $user_id, EmailFactor::TRIES_META, EmailFactor::TRIES ) );
+		wp_cache_delete( $user_id, 'user_meta' );
+		return 1 === $reserved;
 	}
 
 	private static function sendEmailCode( \WP_User $user ): \WP_Error {
@@ -183,6 +188,7 @@ final class Module {
 		if ( ! is_string( $json ) || false === update_user_meta( $user->ID, EmailFactor::META, $json ) ) {
 			return $failed;
 		}
+		update_user_meta( $user->ID, EmailFactor::TRIES_META, '0' );
 		return new \WP_Error( 'amsec_email_factor', __( 'Enter the email code and sign in again.', 'amazing-security' ) );
 	}
 

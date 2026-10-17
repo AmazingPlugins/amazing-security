@@ -45,7 +45,7 @@ final class ProxySettings {
 		if ( 'saved' !== $result ) {
 			wp_die( esc_html__( 'Proxy policy changed, approval is busy, host peer is unverified, rules are invalid or the operator cannot be resolved safely. Review host trust and network self-lockout before approving.', 'amazing-security' ), '', array( 'response' => 409 ) ); }
 		( new ActivityHooks( new ActivityRepository( $GLOBALS['wpdb'] ) ) )->record( 'security_setting_changed', 0, 'proxy-' . $mode );
-		wp_safe_redirect( admin_url( 'admin.php?page=amsec-proxies' ) );
+		wp_safe_redirect( \AmazingPlugins\Security\Admin\Brand::saved( admin_url( 'admin.php?page=amsec-traffic-guard#proxies' ) ) );
 		exit;
 	}
 	public function render(): void {
