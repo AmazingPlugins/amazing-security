@@ -52,6 +52,11 @@ final class LocalCodeScan {
 
 	public const TICK = 'amsec_local_code_tick';
 
+	/** Entries read from one folder, and targets in one pass. Past either, the pass is marked partial. */
+	private const DIR_ENTRIES = 2000;
+
+	private bool $capped = false;
+
 	public static function cursor(): ?FileScanCursor {
 		$raw = function_exists( 'get_option' ) ? get_option( self::OPTION, null ) : null;
 		if ( ! is_string( $raw ) || '' === $raw ) {
@@ -62,9 +67,9 @@ final class LocalCodeScan {
 		return is_array( $data ) && 1 === ( $data['version'] ?? null ) && is_array( $data['cursor'] ?? null ) ? FileScanCursor::fromArray( $data['cursor'] ) : null;
 	}
 
-	/** A new Scan starts a fresh pass. The background tick only continues the current one. */
+	/** Each Scan starts a fresh pass, so files changed since the last one are read again. The background tick only continues. */
 	public function advance( bool $fresh = true ): string {
-		if ( $fresh && ( self::cursor()?->finished ?? true ) ) {
+		if ( $fresh ) {
 			delete_option( self::OPTION );
 		}
 		$deadline = microtime( true ) + 12;
@@ -99,9 +104,14 @@ final class LocalCodeScan {
 			$cursor = new FileScanCursor( function_exists( 'wp_generate_uuid4' ) ? wp_generate_uuid4() : bin2hex( random_bytes( 16 ) ) );
 		}
 		try {
-			$step = ( new FileScanRunner() )->step( $this->targets(), $cursor, new ScanContext( microtime( true ) + 6, 250 ) );
+			$targets = $this->targets();
+			$step    = ( new FileScanRunner() )->step( $targets, $cursor, new ScanContext( microtime( true ) + 6, 250 ) );
 		} catch ( Throwable ) {
 			return 'unknown';
+		}
+		// A capped folder listing means some files were never offered to the scan.
+		if ( $this->capped ) {
+			$step->cursor->partial = true;
 		}
 		$this->save( $step->cursor );
 		return self::snapshot()['stored'];
@@ -138,10 +148,9 @@ final class LocalCodeScan {
 			'plugin' => defined( 'WP_PLUGIN_DIR' ) ? WP_PLUGIN_DIR : '',
 			'theme'  => function_exists( 'get_theme_root' ) ? get_theme_root() : '',
 		) as $kind => $dir ) {
-			$dir   = rtrim( $dir, '/' );
-			$names = '' !== $dir && is_dir( $dir ) ? scandir( $dir ) : false;
-			foreach ( array_slice( is_array( $names ) ? $names : array(), 0, 500 ) as $name ) {
-				if ( '.' === $name || '..' === $name || is_link( $dir . '/' . $name ) ) {
+			$dir = rtrim( $dir, '/' );
+			foreach ( $this->entries( $dir ) as $name ) {
+				if ( is_link( $dir . '/' . $name ) ) {
 					continue;
 				}
 				if ( is_dir( $dir . '/' . $name ) && ! isset( $listed[ $dir . '/' . $name . '/' ] ) ) {
@@ -157,15 +166,45 @@ final class LocalCodeScan {
 			'content' => defined( 'WP_CONTENT_DIR' ) ? WP_CONTENT_DIR : '',
 		) as $kind => $dir ) {
 			$dir   = rtrim( $dir, '/' );
-			$names = '' !== $dir && is_dir( $dir ) ? scandir( $dir ) : false;
-			$names = array_values( preg_grep( '/\.(?:php|phtml|php[0-9]+|pht)$/iD', is_array( $names ) ? $names : array() ) );
-			foreach ( array_slice( $names, 0, 200 ) as $name ) {
+			$names = array_values( preg_grep( '/\.(?:php|phtml|php[0-9]+|pht)$/iD', $this->entries( $dir ) ) );
+			foreach ( $names as $name ) {
 				if ( is_file( $dir . '/' . $name ) ) {
 					$targets[] = new FileScanTarget( $kind . ':' . $name, $kind, $dir, null, $name );
 				}
 			}
 		}
+		if ( count( $targets ) > FileScanCursor::MAX_TARGETS ) {
+			$this->capped = true;
+			$targets      = array_slice( $targets, 0, FileScanCursor::MAX_TARGETS );
+		}
 		return $targets;
+	}
+
+	/**
+	 * Up to DIR_ENTRIES names from one folder, sorted, read without loading the whole listing.
+	 *
+	 * @return list<string>
+	 */
+	private function entries( string $dir ): array {
+		$names  = array();
+		$handle = '' !== $dir && is_dir( $dir ) ? opendir( $dir ) : false;
+		if ( false === $handle ) {
+			return $names;
+		}
+		// phpcs:ignore Generic.CodeAnalysis.AssignmentInCondition.FoundInWhileCondition -- Standard readdir loop.
+		while ( false !== ( $name = readdir( $handle ) ) ) {
+			if ( '.' === $name || '..' === $name ) {
+				continue;
+			}
+			if ( count( $names ) >= self::DIR_ENTRIES ) {
+				$this->capped = true;
+				break;
+			}
+			$names[] = $name;
+		}
+		closedir( $handle );
+		sort( $names, SORT_STRING );
+		return $names;
 	}
 
 	private function plugins(): array {
