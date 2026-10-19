@@ -37,13 +37,21 @@ final class AlertNotifierTest extends TestCase {
 		self::assertSame( 'off', $notifier->vulnerabilities( new VulnerabilityReport( array( $critical ), false, 'Complete' ), 1005 ) );
 	}
 
-	public function test_partial_reports_do_not_send_or_clear_alert_history(): void {
-		$options = $this->options();
-		$notifier = new AlertNotifier( new AlertPolicy(), new AlertDelivery( $options, static function (): never { throw new \RuntimeException( 'Unexpected email.' ); }, 'owner@example.test', 'https://example.test/report' ) );
-		$now = new DateTimeImmutable( '@1000' );
-		self::assertSame( 'partial', $notifier->integrity( new ScanRun( $now, $now, array(), true ), 1000 ) );
-		self::assertSame( 'partial', $notifier->files( new FileScanReport( 'scan-1', 'inconclusive', $now, true, 0, 0, 0, 0, 0, 0, 0, 0, array() ), 1000 ) );
-		self::assertSame( array(), $options->values );
+	public function test_partial_reports_send_confirmed_findings_and_keep_earlier_ones(): void {
+		$options  = $this->options();
+		$options->values['amsec_alerts_enabled'] = '1';
+		$messages = array();
+		$notifier = new AlertNotifier( new AlertPolicy(), new AlertDelivery( $options, static function ( string $to, string $subject, string $body ) use ( &$messages ): bool { $messages[] = $body; return true; }, 'owner@example.test', 'https://example.test/report' ) );
+		$now      = new DateTimeImmutable( '@1000' );
+		$hit      = static fn( string $c, string $rule ): array => array( 'id' => str_repeat( $c, 32 ), 'kind' => 'suspected', 'rule_id' => $rule, 'state' => 'warn' );
+		self::assertSame( 'none', $notifier->files( new FileScanReport( 'scan-1', 'inconclusive', $now, true, 0, 0, 0, 0, 0, 0, 0, 0, array() ), 1000 ) );
+		self::assertSame( 'accepted', $notifier->files( new FileScanReport( 'scan-2', 'warn', $now, true, 1, 10, 1, 0, 1, 0, 1, 0, array( $hit( 'a', 'AS-MAL-001' ) ) ), 1001 ) );
+		self::assertStringContainsString( str_repeat( 'a', 32 ), $messages[0] );
+		// A later partial run that didn't reach that file neither re-sends nor clears it.
+		self::assertSame( 'none', $notifier->files( new FileScanReport( 'scan-3', 'warn', $now, true, 1, 10, 1, 0, 1, 0, 1, 0, array() ), 1002 ) );
+		self::assertCount( 1, $messages );
+		self::assertSame( 'accepted', $notifier->files( new FileScanReport( 'scan-4', 'warn', $now, true, 1, 10, 1, 0, 1, 0, 1, 0, array( $hit( 'a', 'AS-MAL-001' ), $hit( 'b', 'AS-PHP-020' ) ) ), 1003 ) );
+		self::assertStringNotContainsString( str_repeat( 'a', 32 ), $messages[1] );
 	}
 
 	private function options(): OptionGateway {

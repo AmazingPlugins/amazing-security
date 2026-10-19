@@ -46,7 +46,11 @@ final class DirectScanRunner {
 					return new DirectScanStep( $i, null, false, 'feed', $verified );
 				}
 				$item = $inventory[ $i ];
-				$key  = 'core' === $item->type ? $item->version : $item->slug;
+				// A file with no real slug (such as hello.php) gets a placeholder name; never send that.
+				if ( str_starts_with( $item->slug, 'unsupported-' ) ) {
+					continue;
+				}
+				$key = 'core' === $item->type ? $item->version : $item->slug;
 				$this->client->lookup( $item->type, $key, $now );
 			}
 			if ( $next < $total ) {
@@ -66,7 +70,7 @@ final class DirectScanRunner {
 			}
 			$key                                   = 'core' === $item->type ? $item->version : $item->slug;
 			$responses[ $item->type . ':' . $key ] = $this->client->cached( $item->type, $key, $now );
-			$allFetched                            = $allFetched && null !== $responses[ $item->type . ':' . $key ];
+			$allFetched                            = $allFetched && ( null !== $responses[ $item->type . ':' . $key ] || str_starts_with( $item->slug, 'unsupported-' ) );
 			$identity                              = $item->type . ':' . $item->slug . ':' . $item->version;
 			$proof                                 = $verified[ $identity ] ?? null;
 			$eligible                              = 'plugin' === $item->type && is_string( $proof ) && is_callable( $this->stateStillMatches ) && microtime( true ) < $validationDeadline && ( $this->stateStillMatches )( $item, $proof );

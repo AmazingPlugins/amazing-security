@@ -19,7 +19,7 @@ final class AlertPolicyTest extends TestCase {
 		$unknown = new CheckResult( 'integrity-file', 'inconclusive', 'Unknown.', 'https://wordpress.org/', $now, 'low', 'partial', array(), 'unknown-file' );
 		$run = new ScanRun( $now, $now, array( $changed, $unknown ), false );
 		self::assertSame( array( 'changed-file' ), $policy->fromIntegrity( $run ) );
-		self::assertSame( array(), $policy->fromIntegrity( new ScanRun( $now, $now, array( $changed ), true ) ) );
+		self::assertSame( array( 'changed-file' ), $policy->fromIntegrity( new ScanRun( $now, $now, array( $changed ), true ) ) );
 	}
 
 	public function test_only_complete_suspicious_php_findings_alert(): void {
@@ -29,10 +29,11 @@ final class AlertPolicyTest extends TestCase {
 			array( 'id' => str_repeat( 'a', 32 ), 'kind' => 'suspected', 'rule_id' => 'AS-PHP-004', 'state' => 'warn' ),
 			array( 'id' => str_repeat( 'c', 32 ), 'kind' => 'suspected', 'rule_id' => 'AS-PHP-009', 'state' => 'warn' ),
 			array( 'id' => str_repeat( 'b', 32 ), 'kind' => 'extra', 'rule_id' => '', 'state' => 'warn' ),
+			array( 'id' => str_repeat( 'd', 32 ), 'kind' => 'suspected', 'rule_id' => 'AS-MAL-014', 'state' => 'warn' ),
 		);
 		$report = new FileScanReport( 'scan-1', 'warn', $now, false, 2, 100, 0, 0, 1, 0, 1, 0, $findings );
-		self::assertSame( array( str_repeat( 'a', 32 ), str_repeat( 'c', 32 ) ), $policy->fromFiles( $report ) );
+		self::assertSame( array( str_repeat( 'a', 32 ), str_repeat( 'c', 32 ), str_repeat( 'd', 32 ) ), $policy->fromFiles( $report ) );
 		$partial = new FileScanReport( 'scan-2', 'warn', $now, true, 2, 100, 1, 0, 1, 0, 1, 0, $findings );
-		self::assertSame( array(), $policy->fromFiles( $partial ) );
+		self::assertSame( array( str_repeat( 'a', 32 ), str_repeat( 'c', 32 ), str_repeat( 'd', 32 ) ), $policy->fromFiles( $partial ) );
 	}
 }
