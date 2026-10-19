@@ -73,7 +73,7 @@
                 "src/FileScan/BundledRulePack.php": "da7e2a7b4596c027eaae5d39a7660a83cfc54b0646c867f081d0051a3f11916b",
                 "src/FileScan/RuleMatcher.php": "a2e19b29abcc17bf61bf9f85715c11828f45ad576e1a94cc1b6b20041297d51e",
                 "src/FileScan/AdjacentFlow.php": "7c0e67c176d14acaccc8fedb693df46f8a23e61bab3111ab1049cb21b2b2c852",
-                "src/FileScan/MalwareSignatures.php": "50a8566b3357b7608956fc7da4efdf18929127907268df93bd69800a97811085"
+                "src/FileScan/MalwareSignatures.php": "f42d8f66f23277ab79388581ee5576af7c55821dd37e2514dc8f7b2df1617475"
             }
         },
         "content": {
