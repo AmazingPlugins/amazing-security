@@ -16,6 +16,7 @@ use AmazingPlugins\Security\Findings\CheckResult;
 use AmazingPlugins\Security\Findings\FindingsRepository;
 use AmazingPlugins\Security\Integrity\WordPressIntegrityStore;
 use AmazingPlugins\Security\Integrity\WordPressOptions;
+use AmazingPlugins\Security\Login\RequiredTotpPage;
 use AmazingPlugins\Security\Free\Guide\Score;
 use AmazingPlugins\Security\Schedule\LocalSchedule;
 use AmazingPlugins\Security\Schedule\ScheduleStatusRenderer;
@@ -538,6 +539,10 @@ final class AdminPage {
 		}
 		if ( isset( $control['screen'] ) && 1 === preg_match( '/^[a-z0-9-]+\\.php$/D', $control['screen'] ) ) {
 			echo ' <a class="button" href="' . esc_url( admin_url( $control['screen'] ) ) . '">' . esc_html( $control['label'] ) . '</a>';
+			return;
+		}
+		if ( isset( $control['install'] ) ) {
+			echo ' <a class="button" href="' . esc_url( RequiredTotpPage::directoryUrl( $control['install'] ) ) . '">' . esc_html( $control['label'] ) . '</a>';
 			return;
 		}
 		if ( isset( $control['page'] ) ) {

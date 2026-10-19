@@ -125,16 +125,23 @@ final class StartHere {
 				'page'  => 'amsec-accounts',
 				'hash'  => 'sign-in',
 			),
-			'authenticator-app' => State::PASS === $result->state ? null : array(
-				'label' => __( 'Open authenticator status', 'amazing-security' ),
-				'page'  => 'amsec-accounts',
-				'hash'  => 'verification',
-			),
-			'passkeys-status' => State::PASS === $result->state ? null : array(
-				'label' => __( 'Open passkey status', 'amazing-security' ),
-				'page'  => 'amsec-accounts',
-				'hash'  => 'passkeys',
-			),
+			'authenticator-app', 'passkeys-status' => match ( true ) {
+				State::PASS === $result->state => null,
+				'missing' === ( $result->evidence['status'] ?? '' ) => array(
+					'label'   => __( 'Install Two Factor', 'amazing-security' ),
+					'install' => 'two-factor',
+				),
+				'passkeys-status' === $result->checkId => array(
+					'label' => __( 'Open passkey status', 'amazing-security' ),
+					'page'  => 'amsec-accounts',
+					'hash'  => 'passkeys',
+				),
+				default => array(
+					'label' => __( 'Open authenticator status', 'amazing-security' ),
+					'page'  => 'amsec-accounts',
+					'hash'  => 'verification',
+				),
+			},
 			'pingbacks' => 'open' === ( $result->evidence['status'] ?? '' ) ? array(
 				'label'     => __( 'Turn off pingbacks', 'amazing-security' ),
 				'action'    => 'amsec_approved_setting',

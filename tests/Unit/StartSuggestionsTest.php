@@ -573,4 +573,11 @@ final class StartSuggestionsTest extends TestCase {
 		self::assertSame( 'pass', $rulesOk->state );
 		self::assertNull( StartHere::control( $rulesOk ) );
 	}
+
+	public function test_missing_two_factor_recommendation_installs_the_plugin(): void {
+		$missing = new \AmazingPlugins\Security\Findings\CheckResult( 'authenticator-app', 'critical', 'x', 'https://wordpress.org/plugins/two-factor/', new \DateTimeImmutable(), 'high', 'complete', array( 'status' => 'missing' ) );
+		$off     = new \AmazingPlugins\Security\Findings\CheckResult( 'passkeys-status', 'warn', 'x', 'https://wordpress.org/plugins/two-factor/', new \DateTimeImmutable(), 'medium', 'complete', array( 'status' => 'available' ) );
+		self::assertSame( 'two-factor', StartHere::control( $missing )['install'] );
+		self::assertSame( 'passkeys', StartHere::control( $off )['hash'] );
+	}
 }

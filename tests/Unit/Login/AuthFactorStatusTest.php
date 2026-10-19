@@ -58,6 +58,22 @@ final class AuthFactorStatusTest extends TestCase {
 		self::assertStringContainsString( 'two-factor', $html );
 		self::assertStringNotContainsString( 'amsec_totp_begin', $html );
 		self::assertStringNotContainsString( 'Set up verification codes', $html );
+		self::assertStringContainsString( 'View Two Factor on WordPress.org', $html );
+	}
+
+	public function test_panel_missing_links_to_installer_when_allowed(): void {
+		$html = AuthFactorPanel::html(
+			'Authenticator app',
+			array(
+				'state'        => AuthFactorStatus::MISSING,
+				'provider'     => '',
+				'suggest_slug' => 'two-factor',
+				'suggest_name' => 'Two Factor',
+			),
+			'https://example.test/wp-admin/update.php?action=install-plugin&plugin=two-factor&_wpnonce=abc'
+		);
+		self::assertStringContainsString( '>Install Two Factor</a>', $html );
+		self::assertStringContainsString( 'Activate Plugin', $html );
 	}
 
 	public function test_panel_escapes_provider_label(): void {
