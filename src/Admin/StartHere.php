@@ -99,6 +99,7 @@ final class StartHere {
 	public static function control( CheckResult $result ): ?array {
 		$stored  = is_string( $result->evidence['stored'] ?? null ) ? $result->evidence['stored'] : '';
 		$enabled = is_string( $result->evidence['enabled'] ?? null ) ? $result->evidence['enabled'] : '';
+		$status  = is_string( $result->evidence['status'] ?? null ) ? $result->evidence['status'] : '';
 		return match ( $result->checkId ) {
 			'inactive-plugins' => State::WARN === $result->state ? array(
 				'label'  => __( 'Review plugins', 'amazing-security' ),
@@ -127,8 +128,8 @@ final class StartHere {
 			),
 			'authenticator-app', 'passkeys-status' => match ( true ) {
 				State::PASS === $result->state => null,
-				'missing' === ( $result->evidence['status'] ?? '' ) => array(
-					'label'   => __( 'Install Two Factor', 'amazing-security' ),
+				'missing' === $status => array(
+					'label'   => __( 'Find Two Factor', 'amazing-security' ),
 					'install' => 'two-factor',
 				),
 				'passkeys-status' === $result->checkId => array(

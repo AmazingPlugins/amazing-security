@@ -61,7 +61,7 @@ final class AuthFactorStatusTest extends TestCase {
 		self::assertStringContainsString( 'View Two Factor on WordPress.org', $html );
 	}
 
-	public function test_panel_missing_links_to_installer_when_allowed(): void {
+	public function test_panel_missing_links_to_plugin_search_when_allowed(): void {
 		$html = AuthFactorPanel::html(
 			'Authenticator app',
 			array(
@@ -70,10 +70,10 @@ final class AuthFactorStatusTest extends TestCase {
 				'suggest_slug' => 'two-factor',
 				'suggest_name' => 'Two Factor',
 			),
-			'https://example.test/wp-admin/update.php?action=install-plugin&plugin=two-factor&_wpnonce=abc'
+			'https://example.test/wp-admin/plugin-install.php?s=two-factor&tab=search&type=term'
 		);
-		self::assertStringContainsString( '>Install Two Factor</a>', $html );
-		self::assertStringContainsString( 'Activate Plugin', $html );
+		self::assertStringContainsString( '>Find Two Factor</a>', $html );
+		self::assertStringContainsString( 'Install Now and Activate', $html );
 	}
 
 	public function test_panel_escapes_provider_label(): void {
