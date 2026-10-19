@@ -22,17 +22,17 @@ final class RuleMatcher {
 		}
 		$tokens  = null;
 		$refused = null;
+		$failed  = array();
 		try {
 			$tokens = $this->tokens( $bytes );
 		} catch ( RuntimeException $error ) {
 			$refused = $error;
 		}
-		$failed  = array();
 		$signals = $this->signatures->scan( null === $tokens ? $bytes : MalwareSignatures::view( $tokens ), $failed );
 		$hits    = array();
 		if ( null !== $tokens ) {
 			try {
-				$hits = $this->tokenHits( $tokens, $relativePath );
+				$hits = $this->tokenHits( $tokens, $relativePath, $failed );
 			} catch ( RuntimeException $error ) {
 				$refused = $error;
 			}
@@ -40,7 +40,7 @@ final class RuleMatcher {
 		// Any confirmed hit is reported. With none, a failed rule or a missing tokenizer leaves the file unchecked.
 		// Files only too large for the token rules still count as checked by the byte signatures.
 		if ( array() === $hits && array() === $signals ) {
-			if ( null !== $refused && 'rule_unavailable' === $refused->getMessage() ) {
+			if ( null !== $refused && 'rule_memory_limit' !== $refused->getMessage() ) {
 				throw $refused;
 			}
 			if ( array() !== $failed ) {
@@ -78,7 +78,7 @@ final class RuleMatcher {
 		}
 		$tokens = token_get_all( $bytes );
 		if ( count( $tokens ) > 100000 ) {
-			throw new RuntimeException( 'rule_limit' );
+			throw new RuntimeException( 'rule_memory_limit' );
 		}
 		return $tokens;
 	}
@@ -87,7 +87,7 @@ final class RuleMatcher {
 	 * @param array<int, array{0: int, 1: string, 2: int}|string> $tokens
 	 * @return RuleHit[]
 	 */
-	private function tokenHits( array $tokens, string $relativePath ): array {
+	private function tokenHits( array $tokens, string $relativePath, array &$failed ): array {
 		$markers  = AdjacentFlow::markers( $tokens );
 		$code     = '';
 		$previous = null;
@@ -135,7 +135,8 @@ final class RuleMatcher {
 			}
 			$result = preg_match( $rule['pattern'], $code, $match, PREG_OFFSET_CAPTURE );
 			if ( false === $result ) {
-				throw new RuntimeException( 'rule_limit' );
+				$failed[] = $id;
+				continue;
 			}
 			if ( 1 === $result ) {
 				$hits[] = new RuleHit( $id, $this->pack->version(), $relativePath, 1 + substr_count( $code, "\n", 0, $match[0][1] ), $rule['summary'] );

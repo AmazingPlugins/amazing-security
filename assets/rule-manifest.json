@@ -71,7 +71,7 @@
             ],
             "sha256": {
                 "src/FileScan/BundledRulePack.php": "da7e2a7b4596c027eaae5d39a7660a83cfc54b0646c867f081d0051a3f11916b",
-                "src/FileScan/RuleMatcher.php": "f2ade9519618ae7e5a9ab7e2dbbb8af9f066b6346155514113124c7e2795c1ab",
+                "src/FileScan/RuleMatcher.php": "66601f5499f0694ec165cc6e44cdcf3c7491627a8407644c769c48deac7068c1",
                 "src/FileScan/AdjacentFlow.php": "7c0e67c176d14acaccc8fedb693df46f8a23e61bab3111ab1049cb21b2b2c852",
                 "src/FileScan/MalwareSignatures.php": "1fac8da2ee2e0eeb9163da1d0343ff31565558e3bd278dcc65f92370c8e8c2f0"
             }
