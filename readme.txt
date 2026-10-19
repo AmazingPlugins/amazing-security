@@ -20,10 +20,12 @@ One button runs the local hardening checks: HTTPS, WordPress updates, the admin 
 
 A passing check means that check didn't find the problem it looks for. It doesn't prove the site is clean.
 
+**Malware scan.** Every scan also looks for code shaped like web shells and injected malware. It reads plugins, themes, uploads and mu-plugins. It also reads folders WordPress doesn't list as a plugin or theme, plus loose PHP files in the site root and in wp-content. There are 63 local rules. 43 read the PHP code. The other 20 read the raw file, so files too big for the code rules still get checked. On a large site the scan keeps going in the background until it has read every file. A hit names the file, the line and the rule. Nothing gets deleted, and your files stay on your server.
+
 = Files =
 
 * **Integrity scan.** Compares WordPress core and WordPress.org plugin files with the published checksums. WordPress.org themes are compared with their release ZIP. A changed file is different from the release, which doesn't make it malware. Custom and child themes stay "unknown".
-* **File scan.** Reads PHP-like files in plugins, themes, and uploads with 43 local patterns. A match shows the file, the line, and the rule, with a note on why it needs a look. A hit is suspected code, not proof of malware. Files never leave your server. The scan works in bounded steps (5,000 files, 128 MiB, or 30 seconds per step) and picks up where it stopped.
+* **File scan.** Reads PHP-like files in plugins, themes, and uploads with the same 63 local rules. A match shows the file, the line, and the rule, with a note on why it needs a look. A hit is suspected code, not proof of malware. Files never leave your server. The scan runs in short steps and picks up where it stopped. It stops for good after 50,000 files, 1 GiB, or 300 seconds of work.
 * **Repair.** When a WordPress.org plugin file differs from its release, an administrator can review a repair. The page shows the path and both SHA-256 hashes before you approve. The old file goes to a private backup outside the public site folder, and you can roll it back from wp-admin or with `wp amazing-security repair rollback <finding-id>`.
 
 = Login and accounts =
