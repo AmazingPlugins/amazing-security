@@ -231,7 +231,16 @@ final class AdminPage {
 		$direct       = ( new VulnerabilityPreferences( $options ) )->enabled();
 		if ( 'files' === $section ) {
 			$malware = LocalCodeScan::cursor();
-			if ( null !== $malware ) {
+			// Findings show once the pass is done; a running pass shows only how far it has got.
+			if ( null !== $malware && ! $malware->finished ) {
+				echo '<section class="amsec-file-scan" aria-labelledby="amsec-malware"><h2 id="amsec-malware">' . esc_html__( 'Malware scan', 'amazing-security' ) . '</h2><div class="amsec-file-status amsec-file-status-progress" role="status"><strong>' . esc_html__( 'Scan in progress', 'amazing-security' ) . '</strong><span>' . esc_html(
+					sprintf(
+						/* translators: %s: number of files checked so far. */
+						_n( '%s file checked so far. Results appear here when the scan finishes.', '%s files checked so far. Results appear here when the scan finishes.', $malware->processed, 'amazing-security' ),
+						number_format_i18n( $malware->processed )
+					)
+				) . '</span></div></section>';
+			} elseif ( null !== $malware ) {
 				// FileScanReportRenderer escapes dynamic values.
 				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				echo ( new FileScanReportRenderer( '', '', array(), __( 'Malware scan', 'amazing-security' ), 'amsec-malware' ) )->render( null, new FileScanStep( $malware, $malware->finished ), array() );

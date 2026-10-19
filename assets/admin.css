@@ -1891,3 +1891,10 @@ body.amsec-app .amazing-security-admin fieldset > label.amsec-check {
     line-height: 18px;
   }
 }
+
+/* A running scan hides the previous results; only the progress shows until the new report loads. */
+body.amsec-app .amsec-scan.is-scanning > :not(.amsec-scan-form),
+body.amsec-app .amsec-scan.is-scanning .amsec-header-consent,
+body.amsec-app .amsec-scan.is-scanning .amsec-scan-button {
+  display: none;
+}

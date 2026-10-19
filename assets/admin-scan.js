@@ -9,6 +9,16 @@
 			var progress = form.querySelector('.amsec-scan-progress');
 			var fill = form.querySelector('.amsec-scan-fill');
 			var stage = form.closest('.amsec-scan-first');
+			// While a scan runs, only its progress shows. The new results appear when the page reloads with them.
+			var screen = form.closest('.amsec-scan');
+			var restore = function () {
+				if (screen) {
+					screen.classList.remove('is-scanning');
+				}
+			};
+			if (screen) {
+				screen.classList.add('is-scanning');
+			}
 			if (button) {
 				button.hidden = true;
 				button.disabled = true;
@@ -33,6 +43,7 @@
 					var doc = new DOMParser().parseFromString(result.html, 'text/html');
 					var failed = result.response.url.indexOf('amazing_security_error=1') !== -1 || doc.querySelector('[data-amsec-scan-error]');
 					if (stage && failed) {
+						restore();
 						if (progress) {
 							progress.hidden = true;
 						}
@@ -54,6 +65,7 @@
 					window.location.assign(result.response.url || window.location.href);
 				}, 240);
 			}).catch(function () {
+				restore();
 				if (progress) {
 					progress.hidden = true;
 				}
