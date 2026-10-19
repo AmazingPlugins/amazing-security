@@ -31,6 +31,14 @@ final class Module {
 	}
 
 	/**
+	 * Subjects already let through in this request. WordPress runs pre_comment_approved twice per comment
+	 * (wp_allow_comment, then wp_new_comment), and the second pass must not count as another comment.
+	 *
+	 * @var array<string, true>
+	 */
+	private static array $allowed = array();
+
+	/**
 	 * preprocess_comment has to return the comment array. Returning WP_Error there
 	 * makes wp_new_comment read that array and crash. pre_comment_approved is the
 	 * filter WordPress returns to the comment form when the value is a WP_Error.
@@ -52,7 +60,7 @@ final class Module {
 		$rate    = self::rateStored();
 		$exempt  = self::exempt();
 		$subject = self::subject( $commentdata );
-		$last    = self::last( $subject );
+		$last    = isset( self::$allowed[ $subject ] ) ? null : self::last( $subject );
 		if ( 'wait' === Rate::decide( $rate, $exempt, $last, time() ) ) {
 			return new \WP_Error(
 				'amsec_comment_rate',
@@ -62,6 +70,7 @@ final class Module {
 		}
 		if ( '1' === $rate && ! $exempt && '' !== $subject && function_exists( 'set_transient' ) ) {
 			set_transient( self::transient( $subject ), (string) time(), Rate::GAP );
+			self::$allowed[ $subject ] = true;
 		}
 		$email = self::email( $commentdata );
 		$hash  = SpamHold::digest( $email, function_exists( 'wp_salt' ) ? (string) wp_salt( 'auth' ) : '' );

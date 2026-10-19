@@ -120,8 +120,9 @@ final class BlockList {
 		if ( '' === $agent || '' === trim( $raw ) ) {
 			return false;
 		}
+		// A name anywhere in the user agent, any case, so a new tool version is still caught.
 		foreach ( $this->lines( $raw ) as $entry ) {
-			if ( $entry === $agent ) {
+			if ( '' !== $entry && false !== stripos( $agent, $entry ) ) {
 				return true;
 			}
 		}
