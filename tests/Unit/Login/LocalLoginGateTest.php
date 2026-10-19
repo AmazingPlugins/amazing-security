@@ -54,10 +54,10 @@ final class LocalLoginGateTest extends TestCase {
 		self::assertStringContainsString( 'sign-in question', $on->summary );
 		self::assertSame( 'disable-login-confirm', StartHere::control( $on )['operation'] );
 
-		self::assertStringContainsString( 'does not send passwords', $passwords->summary );
+		self::assertStringContainsString( 'only the first 5 characters of a hash', $passwords->summary );
 		self::assertSame( 'enable-common-passwords', StartHere::control( $passwords )['operation'] );
-		self::assertStringContainsString( 'Existing sign-in is not blocked', $listed->summary );
-		self::assertStringContainsString( 'does not send passwords', $listed->summary );
+		self::assertStringContainsString( 'cannot sign in until it is changed', $listed->summary );
+		self::assertStringContainsString( 'Passwords are never sent', $listed->summary );
 		self::assertSame( 'disable-common-passwords', StartHere::control( $listed )['operation'] );
 
 		self::assertSame( 'unknown', $unread->state );

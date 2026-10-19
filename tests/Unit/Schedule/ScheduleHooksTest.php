@@ -12,6 +12,7 @@ final class ScheduleHooksTest extends TestCase {
 		$existing = false;
 		$scheduled = 0;
 		$cleared = array();
+		$started = false;
 		$hooks = new ScheduleHooks(
 			static function () use ( &$existing ): bool { return $existing; },
 			static function ( int $when, string $recurrence, string $hook ) use ( &$existing, &$scheduled ): bool {
@@ -22,8 +23,13 @@ final class ScheduleHooksTest extends TestCase {
 				++$scheduled;
 				return true;
 			},
-			static function ( string $hook ) use ( &$existing, &$cleared ): void { $existing = false; $cleared[] = $hook; }
+			static function ( string $hook ) use ( &$existing, &$cleared ): void { $existing = false; $cleared[] = $hook; },
+			static function () use ( &$started ): bool { return $started; }
 		);
+		$started = false;
+		$hooks->ensure();
+		self::assertSame( 0, $scheduled, 'Nothing is scheduled before the first manual scan.' );
+		$started = true;
 		$hooks->ensure();
 		$hooks->ensure();
 		self::assertSame( 1, $scheduled );
