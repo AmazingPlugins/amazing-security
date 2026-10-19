@@ -26,9 +26,10 @@ final class LocalLoginGateTest extends TestCase {
 		self::assertSame( 'allow', LoginConfirmation::decision( true, array( 'username' => 'a', 'password' => 'secret' ), false, false ) );
 		self::assertSame( 'allow', LoginConfirmation::decision( true, array( 'log' => 'a', 'pwd' => 'secret' ), true, false ) );
 		self::assertSame( 'allow', LoginConfirmation::decision( true, array( 'log' => 'a', 'pwd' => 'secret' ), false, true ) );
-		self::assertSame( 'reject', LoginConfirmation::decision( true, array( 'log' => 'a', 'pwd' => 'secret' ), false, false ) );
-		self::assertSame( 'reject', LoginConfirmation::decision( true, array( 'log' => 'a', 'pwd' => 'secret', 'amsec_login_confirm' => '1', 'amsec_login_website' => 'filled' ), false, false ) );
-		self::assertSame( 'allow', LoginConfirmation::decision( true, array( 'log' => 'a', 'pwd' => 'secret', 'amsec_login_confirm' => '1', 'amsec_login_website' => '' ), false, false ) );
+		// Nothing to tick: an untouched form, or one without the field, signs in. Only a filled hidden field is refused.
+		self::assertSame( 'allow', LoginConfirmation::decision( true, array( 'log' => 'a', 'pwd' => 'secret' ), false, false ) );
+		self::assertSame( 'allow', LoginConfirmation::decision( true, array( 'log' => 'a', 'pwd' => 'secret', LoginConfirmation::FIELD => '' ), false, false ) );
+		self::assertSame( 'reject', LoginConfirmation::decision( true, array( 'log' => 'a', 'pwd' => 'secret', LoginConfirmation::FIELD => 'filled' ), false, false ) );
 	}
 
 	public function test_gap_rows_do_not_send_data(): void {
@@ -44,13 +45,13 @@ final class LocalLoginGateTest extends TestCase {
 		) )->run( new ScanContext() )[0];
 
 		self::assertSame( 'warn', $off->state );
-		self::assertStringContainsString( 'does not send login attempts', $off->summary );
+		self::assertStringContainsString( 'people never see', $off->summary );
 		self::assertStringNotContainsString( 'safe', $off->summary );
 		self::assertSame( 'enable-login-confirm', StartHere::control( $off )['operation'] );
 
 		self::assertSame( 'pass', $on->state );
-		self::assertStringContainsString( 'not a CAPTCHA service', $on->summary );
-		self::assertStringContainsString( 'does not send login attempts', $on->summary );
+		self::assertStringContainsString( 'hidden field', $on->summary );
+		self::assertStringContainsString( 'sign-in question', $on->summary );
 		self::assertSame( 'disable-login-confirm', StartHere::control( $on )['operation'] );
 
 		self::assertStringContainsString( 'does not send passwords', $passwords->summary );

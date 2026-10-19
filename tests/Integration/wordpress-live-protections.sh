@@ -93,7 +93,16 @@ wp option update amsec_password_require_number 1 >/dev/null
 r=$(wp eval '$_POST["pass1"]="onlyletterspassword"; $e=new WP_Error(); $u=(object)array("ID"=>'"$uid"',"user_login"=>"amsectest","user_pass"=>"onlyletterspassword"); do_action_ref_array("user_profile_update_errors", array(&$e, true, &$u)); echo $e->has_errors() ? "refused" : "accepted";')
 [ "$r" = "refused" ] && ok "password without a number refused" || bad "password without a number $r"
 
-# 9. Comments: one per minute per email, first one allowed (core flood check switched off for this test)
+# 9. Login bot trap: no checkbox, people sign in untouched, a filled hidden field is refused
+wp option update amsec_login_confirm 1 >/dev/null
+f=$(curl -s "$B/wp-login.php")
+echo "$f" | grep -q 'type="checkbox" name="amsec_login_confirm"' && bad "sign-in checkbox still shown" || ok "no sign-in checkbox on the login form"
+echo "$f" | grep -q 'name="amsec_lt_note"' && ok "hidden bot field present" || bad "hidden bot field missing"
+r=$(login "$T/j5"); echo "$r" | grep -q '302' && ok "person signs in without ticking anything" || bad "plain sign-in refused ($r)"
+r=$(login "$T/j6" --data-urlencode amsec_lt_note=http://spam.example); echo "$r" | grep -q 'wp-admin' && bad "filled bot field signed in" || ok "filled bot field refused"
+wp option update amsec_login_confirm 0 >/dev/null
+
+# 10. Comments: one per minute per email, first one allowed (core flood check switched off for this test)
 docker exec $C bash -c 'printf "<?php\n// Temporary: core 15 s flood check off so the plugin rule is tested alone.\nadd_filter( \"wp_is_comment_flood\", \"__return_false\", 99 );\nremove_action( \"check_comment_flood\", \"check_comment_flood_db\" );\n" > /var/www/html/wp-content/mu-plugins/zz-amsec-noflood.php'
 pid=$(wp post create --post_title="amsec comment test" --post_status=publish --comment_status=open --porcelain)
 wp option update amsec_comment_rate 1 >/dev/null; e="guest$RANDOM@example.invalid"

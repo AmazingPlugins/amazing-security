@@ -28,7 +28,7 @@ final class StartHere {
 			'filesystem-permissions' => __( 'File permissions', 'amazing-security' ),
 			'pingbacks' => __( 'Pingbacks', 'amazing-security' ),
 			'xmlrpc-auth' => __( 'XML-RPC sign-in', 'amazing-security' ),
-			'captcha-login' => __( 'Login CAPTCHA', 'amazing-security' ),
+			'captcha-login' => __( 'Login bot trap', 'amazing-security' ),
 			'compromised-passwords' => __( 'Compromised passwords', 'amazing-security' ),
 			'login-hints' => __( 'Login messages', 'amazing-security' ),
 			'author-archives' => __( 'Author pages', 'amazing-security' ),
@@ -179,13 +179,13 @@ final class StartHere {
 			},
 			'captcha-login' => match ( $result->evidence['status'] ?? '' ) {
 				'off' => array(
-					'label'     => __( 'Turn on sign-in confirmation', 'amazing-security' ),
+					'label'     => __( 'Turn on the bot trap', 'amazing-security' ),
 					'action'    => 'amsec_approved_setting',
 					'nonce'     => 'amsec_approved_setting',
 					'operation' => 'enable-login-confirm',
 				),
 				'on' => array(
-					'label'     => __( 'Turn off sign-in confirmation', 'amazing-security' ),
+					'label'     => __( 'Turn off the bot trap', 'amazing-security' ),
 					'action'    => 'amsec_approved_setting',
 					'nonce'     => 'amsec_approved_setting',
 					'operation' => 'disable-login-confirm',

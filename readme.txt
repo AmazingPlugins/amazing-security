@@ -38,6 +38,7 @@ All of these are off until you turn them on under **Log In & Register**:
 * Hold new registrations until an administrator approves them.
 * Email a six-digit sign-in code. A code expires after 10 minutes and stops working after five wrong tries.
 * Ask a simple sum on the login form. This slows down basic bots. It isn't a CAPTCHA.
+* Add a hidden field to the login form. Simple bots fill it in and get refused. People never see it, and there is nothing to tick.
 * Block administrators from signing in with a password found in public breach data (see External services).
 * Password rules, session lists, and a sign-in email to the account owner.
 
