@@ -31,7 +31,7 @@ final class Module {
 	}
 
 	/**
-	 * Subjects already let through in this request. WordPress runs pre_comment_approved twice per comment
+	 * Comments already let through in this request, keyed by subject, post and text. WordPress runs pre_comment_approved twice per comment
 	 * (wp_allow_comment, then wp_new_comment), and the second pass must not count as another comment.
 	 *
 	 * @var array<string, true>
@@ -60,7 +60,8 @@ final class Module {
 		$rate    = self::rateStored();
 		$exempt  = self::exempt();
 		$subject = self::subject( $commentdata );
-		$last    = isset( self::$allowed[ $subject ] ) ? null : self::last( $subject );
+		$once    = self::fingerprint( $subject, $commentdata );
+		$last    = isset( self::$allowed[ $once ] ) ? null : self::last( $subject );
 		if ( 'wait' === Rate::decide( $rate, $exempt, $last, time() ) ) {
 			return new \WP_Error(
 				'amsec_comment_rate',
@@ -70,7 +71,7 @@ final class Module {
 		}
 		if ( '1' === $rate && ! $exempt && '' !== $subject && function_exists( 'set_transient' ) ) {
 			set_transient( self::transient( $subject ), (string) time(), Rate::GAP );
-			self::$allowed[ $subject ] = true;
+			self::$allowed[ $once ] = true;
 		}
 		$email = self::email( $commentdata );
 		$hash  = SpamHold::digest( $email, function_exists( 'wp_salt' ) ? (string) wp_salt( 'auth' ) : '' );
@@ -145,6 +146,13 @@ final class Module {
 		$user_id = $commentdata['user_id'] ?? $commentdata['user_ID'] ?? 0;
 		$email   = $commentdata['comment_author_email'] ?? '';
 		return Rate::subject( is_numeric( $user_id ) ? (int) $user_id : 0, is_string( $email ) ? $email : '' );
+	}
+
+	/** One comment's identity, so only its own second pass is let through, not another comment from the same person. */
+	private static function fingerprint( string $subject, mixed $commentdata ): string {
+		$post = is_array( $commentdata ) && is_numeric( $commentdata['comment_post_ID'] ?? null ) ? (int) $commentdata['comment_post_ID'] : 0;
+		$text = is_array( $commentdata ) && is_string( $commentdata['comment_content'] ?? null ) ? $commentdata['comment_content'] : '';
+		return hash( 'sha256', $subject . "\0" . $post . "\0" . $text );
 	}
 
 	private static function last( string $subject ): ?int {
