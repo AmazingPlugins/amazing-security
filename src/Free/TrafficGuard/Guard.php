@@ -9,6 +9,10 @@ defined( 'ABSPATH' ) || exit;
 /** Runs the request checks and keeps the local log option in sync. */
 final class Guard {
 	public function enforce(): void {
+		// WP-CLI is the way back in when a list is wrong, so it is never blocked.
+		if ( defined( 'WP_CLI' ) && WP_CLI ) {
+			return;
+		}
 		$server = $this->snapshot();
 		$this->record( $server );
 		$lists = new BlockList();
