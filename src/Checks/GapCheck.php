@@ -41,8 +41,8 @@ final class GapCheck implements SecurityCheck {
 			default => State::UNKNOWN,
 		};
 		$summary = match ( $this->checkId . ':' . $known ) {
-			'captcha-login:on' => __( 'The WordPress login form asks for a sign-in confirmation. This is not a CAPTCHA service, and this check does not send login attempts anywhere.', 'amazing-security' ),
-			'captcha-login:off' => __( 'Login CAPTCHA is not set up. You can turn on a local sign-in confirmation for the WordPress login form. This check does not send login attempts anywhere.', 'amazing-security' ),
+			'captcha-login:on' => __( 'The login form has a hidden field that simple bots fill in and people never see. Those sign-ins are refused. For password guessing, use the sign-in question or sign-in limits under Log In & Register.', 'amazing-security' ),
+			'captcha-login:off' => __( 'The login bot trap is off. It adds a hidden field that simple bots fill in, and people never see it. For password guessing, the sign-in question and sign-in limits under Log In & Register do more.', 'amazing-security' ),
 			'compromised-passwords:on' => __( 'New and reset passwords are compared with a short local list. A breach-list check may send a hash prefix, and this check does not send passwords anywhere. Existing sign-in is not blocked.', 'amazing-security' ),
 			'compromised-passwords:off' => __( 'Compromised-password checks are not set up. You can turn on a short local list and a breach-list prefix check. This check does not send passwords anywhere.', 'amazing-security' ),
 			'login-hints:on' => __( 'The WordPress login form uses one message for a wrong username and a wrong password. This check does not send login attempts anywhere.', 'amazing-security' ),

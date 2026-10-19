@@ -68,7 +68,7 @@ final class Module {
 		return array(
 			array(
 				'key'   => 'amsec_login_confirm',
-				'label' => __( 'Sign-in confirmation', 'amazing-security' ),
+				'label' => __( 'Login bot trap', 'amazing-security' ),
 				'page'  => 'amazing-security',
 			),
 			array(
