@@ -38,7 +38,8 @@ final class RequiredTotpPage {
 		$safe = preg_replace( '/[^a-z0-9\-]+/', '', strtolower( $slug ) );
 		$slug = is_string( $safe ) && '' !== $safe ? $safe : 'two-factor';
 		if ( current_user_can( 'install_plugins' ) ) {
-			return admin_url( 'plugin-install.php?tab=plugin-information&plugin=' . rawurlencode( $slug ) );
+			// WordPress's own installer: downloads the plugin, then offers "Activate Plugin".
+			return wp_nonce_url( self_admin_url( 'update.php?action=install-plugin&plugin=' . rawurlencode( $slug ) ), 'install-plugin_' . $slug );
 		}
 		return 'https://wordpress.org/plugins/' . rawurlencode( $slug ) . '/';
 	}
