@@ -27,7 +27,8 @@ final class RuleMatcher {
 		} catch ( RuntimeException $error ) {
 			$refused = $error;
 		}
-		$signals = $this->signatures->scan( null === $tokens ? $bytes : MalwareSignatures::view( $tokens ) );
+		$failed  = array();
+		$signals = $this->signatures->scan( null === $tokens ? $bytes : MalwareSignatures::view( $tokens ), $failed );
 		$hits    = array();
 		if ( null !== $tokens ) {
 			try {
@@ -36,9 +37,15 @@ final class RuleMatcher {
 				$refused = $error;
 			}
 		}
-		// Files too large for the token rules still get the byte signatures, so they count as checked.
-		if ( null !== $refused && 'rule_unavailable' === $refused->getMessage() && array() === $signals ) {
-			throw $refused;
+		// Any confirmed hit is reported. With none, a failed rule or a missing tokenizer leaves the file unchecked.
+		// Files only too large for the token rules still count as checked by the byte signatures.
+		if ( array() === $hits && array() === $signals ) {
+			if ( null !== $refused && 'rule_unavailable' === $refused->getMessage() ) {
+				throw $refused;
+			}
+			if ( array() !== $failed ) {
+				throw new RuntimeException( 'rule_limit' );
+			}
 		}
 		if ( array() !== $hits ) {
 			return $hits;
