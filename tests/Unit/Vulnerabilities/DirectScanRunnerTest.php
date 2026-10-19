@@ -43,6 +43,28 @@ final class DirectScanRunnerTest extends TestCase {
 		self::assertSame( array( 'unknown', 'unknown', 'unknown', 'unknown' ), array_map( static fn ( $row ): string => $row->state, $second->report->results ) );
 	}
 
+	public function test_placeholder_slugs_are_never_sent_but_real_unsupported_names_are(): void {
+		$http = new class implements HttpClient {
+			public int $calls = 0;
+			public function get( string $url, int $maxBytes ): HttpResult {
+				++$this->calls;
+				$slug = trim( basename( rtrim( $url, '/' ) ) );
+				return new HttpResult( 200, json_encode( array( 'error' => 0, 'message' => null, 'updated' => 1790675900, 'data' => array( 'plugin' => $slug, 'vulnerability' => null ) ) ) );
+			}
+		};
+		$cache = new class implements DirectFeedCache {
+			private array $values = array();
+			public function get( string $key ): ?array { return $this->values[ $key ] ?? null; }
+			public function put( string $key, string $body, int $fetchedAt ): void { $this->values[ $key ] = array( 'body' => $body, 'fetched_at' => $fetchedAt ); }
+		};
+		$items  = array( new InstalledSoftware( 'plugin', 'unsupported_4', '1.0', false ), new InstalledSoftware( 'plugin', 'unsupported-tools', '1.0', false ) );
+		$runner = new DirectScanRunner( new DirectFeedClient( $http, $cache ) );
+		$step   = $runner->step( $items, 0, 1790676000 );
+		self::assertSame( 1, $http->calls, 'Only the real slug is looked up.' );
+		$done = $runner->step( $items, $step->nextOffset, 1790676000 );
+		self::assertTrue( $done->allFetched );
+	}
+
 	public function test_optional_local_release_proof_runs_in_a_separate_step_before_clean_verdict(): void {
 		$http = new class implements HttpClient {
 			public function get( string $url, int $maxBytes ): HttpResult {

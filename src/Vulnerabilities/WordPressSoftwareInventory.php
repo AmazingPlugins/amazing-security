@@ -33,7 +33,7 @@ final class WordPressSoftwareInventory implements SoftwareInventory {
 					continue;
 				}
 				$rawSlug  = 'plugin' === $type ? dirname( (string) ( $record['file'] ?? '' ) ) : (string) ( $record['slug'] ?? '' );
-				$slug     = $this->validSlug( $rawSlug ) ? $rawSlug : 'unsupported-' . count( $items );
+				$slug     = $this->validSlug( $rawSlug ) ? $rawSlug : 'unsupported_' . count( $items );
 				$version  = (string) ( $record['version'] ?? '' );
 				$trusted  = (string) ( $record['repository_slug'] ?? '' );
 				$eligible = $slug === $trusted && true === ( $record['verified_release'] ?? false ) && $this->validSlug( $slug ) && $this->validVersion( $version ) && '' === (string) ( $record['update_uri'] ?? '' );
