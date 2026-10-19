@@ -14,11 +14,12 @@ final class AlertNotifier {
 	public function __construct( private readonly AlertPolicy $policy, private readonly AlertDelivery $delivery ) {}
 
 	public function integrity( ScanRun $run, int $now ): string {
-		return $run->partial ? 'partial' : $this->delivery->sendNew( $this->policy->fromIntegrity( $run ), $now, 'integrity' );
+		// A partial run still mails what it confirmed; earlier findings it didn't reach stay active.
+		return $this->delivery->sendNew( $this->policy->fromIntegrity( $run ), $now, 'integrity', ! $run->partial );
 	}
 
 	public function files( FileScanReport $report, int $now ): string {
-		return $report->partial ? 'partial' : $this->delivery->sendNew( $this->policy->fromFiles( $report ), $now, 'files' );
+		return $this->delivery->sendNew( $this->policy->fromFiles( $report ), $now, 'files', ! $report->partial );
 	}
 
 	public function vulnerabilities( VulnerabilityReport $report, int $now ): string {

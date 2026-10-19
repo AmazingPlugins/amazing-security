@@ -46,7 +46,11 @@ final class DirectScanRunner {
 					return new DirectScanStep( $i, null, false, 'feed', $verified );
 				}
 				$item = $inventory[ $i ];
-				$key  = 'core' === $item->type ? $item->version : $item->slug;
+				// A file with no real slug (such as hello.php) gets a placeholder that is never a valid slug; don't send it.
+				if ( ! self::sendable( $item ) ) {
+					continue;
+				}
+				$key = 'core' === $item->type ? $item->version : $item->slug;
 				$this->client->lookup( $item->type, $key, $now );
 			}
 			if ( $next < $total ) {
@@ -66,7 +70,7 @@ final class DirectScanRunner {
 			}
 			$key                                   = 'core' === $item->type ? $item->version : $item->slug;
 			$responses[ $item->type . ':' . $key ] = $this->client->cached( $item->type, $key, $now );
-			$allFetched                            = $allFetched && null !== $responses[ $item->type . ':' . $key ];
+			$allFetched                            = $allFetched && ( null !== $responses[ $item->type . ':' . $key ] || ! self::sendable( $item ) );
 			$identity                              = $item->type . ':' . $item->slug . ':' . $item->version;
 			$proof                                 = $verified[ $identity ] ?? null;
 			$eligible                              = 'plugin' === $item->type && is_string( $proof ) && is_callable( $this->stateStillMatches ) && microtime( true ) < $validationDeadline && ( $this->stateStillMatches )( $item, $proof );
@@ -82,5 +86,9 @@ final class DirectScanRunner {
 
 	private function canContinue(): bool {
 		return ! is_callable( $this->shouldContinue ) || ( $this->shouldContinue )();
+	}
+
+	private static function sendable( InstalledSoftware $item ): bool {
+		return 'core' === $item->type || 1 === preg_match( '/^[a-z0-9]+(?:-[a-z0-9]+)*$/D', $item->slug );
 	}
 }

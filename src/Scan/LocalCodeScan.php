@@ -11,6 +11,9 @@ use AmazingPlugins\Security\FileScan\FileScanPlanBuilder;
 use AmazingPlugins\Security\FileScan\FileScanRunner;
 use AmazingPlugins\Security\FileScan\FileScanTarget;
 use AmazingPlugins\Security\Integrity\DiscoveryResult;
+use AmazingPlugins\Security\Checks\LocalCodeCheck;
+use AmazingPlugins\Security\Findings\CheckResult;
+use AmazingPlugins\Security\Findings\FindingsRepository;
 use Throwable;
 
 /** Scans plugin, theme, and uploads PHP with the local patterns. It does not contact WordPress.org. */
@@ -99,6 +102,20 @@ final class LocalCodeScan {
 
 	public static function tick(): void {
 		( new self() )->advance( false );
+		if ( self::cursor()?->finished ) {
+			self::refreshSaved();
+		}
+	}
+
+	/** When the background pass ends, swap its "still running" row in the saved scan for the final result. */
+	private static function refreshSaved(): void {
+		$repository = new FindingsRepository();
+		$run        = $repository->latest();
+		if ( null === $run ) {
+			return;
+		}
+		$kept = array_values( array_filter( $run->results, static fn( CheckResult $result ): bool => 'local-code' !== $result->checkId ) );
+		$repository->save( new ScanRun( $run->startedAt, $run->finishedAt, array_merge( $kept, ( new LocalCodeCheck() )->run( new ScanContext() ) ), $run->partial ) );
 	}
 
 	private function step(): string {

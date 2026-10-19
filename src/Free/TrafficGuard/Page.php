@@ -92,7 +92,7 @@ final class Page {
 		echo '<input type="hidden" name="action" value="amsec_traffic_guard">';
 		wp_nonce_field( 'amsec_traffic_guard_save' );
 		echo '<h2>' . esc_html__( 'Block lists', 'amazing-security' ) . '</h2>';
-		echo '<p>' . esc_html__( 'One entry per line, 20 lines at most, 120 characters each. An empty box stays off. Host and browser lines must match the whole value. Referrer lines must start with http:// or https://. Administrators are not blocked. A list that matches this request is not saved.', 'amazing-security' ) . '</p>';
+		echo '<p>' . esc_html__( 'One entry per line, 20 lines at most, 120 characters each. An empty box stays off. Host lines must match the whole hostname. A browser line blocks any browser string that contains it. Referrer lines must start with http:// or https://. Administrators are not blocked. A list that matches this request is not saved.', 'amazing-security' ) . '</p>';
 		echo '<p class="amsec-example-actions"><button type="button" class="button" id="amsec-put-examples">' . esc_html__( 'Put recommended examples', 'amazing-security' ) . '</button></p>';
 		echo '<p id="amsec-example-note" class="amsec-example-note" hidden></p>';
 		$this->textarea( Options::HOSTNAMES, __( 'Hostname block list', 'amazing-security' ), $hostnames );
@@ -306,7 +306,7 @@ final class Page {
 	}
 
 	private function redirect( string $code ): void {
-		wp_safe_redirect( admin_url( 'admin.php?page=amsec-traffic-guard&amsec_traffic_guard=' . rawurlencode( $code ) ) );
+		wp_safe_redirect( admin_url( 'admin.php?page=amsec-traffic-guard&amsec_traffic_guard=' . rawurlencode( $code ) . '#lists' ) );
 		exit;
 	}
 }

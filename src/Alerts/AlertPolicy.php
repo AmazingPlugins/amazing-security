@@ -22,9 +22,6 @@ final class AlertPolicy {
 	}
 
 	public function fromIntegrity( ScanRun $run ): array {
-		if ( $run->partial ) {
-			return array();
-		}
 		$ids = array();
 		foreach ( $run->results as $result ) {
 			if ( 'integrity-file' === $result->checkId && 'warn' === $result->state && 'complete' === $result->coverage && null !== $result->findingId ) {
@@ -35,14 +32,11 @@ final class AlertPolicy {
 	}
 
 	public function fromFiles( FileScanReport $report ): array {
-		if ( $report->partial ) {
-			return array();
-		}
 		$ids = array();
 		foreach ( $report->findings as $finding ) {
 			$id   = $finding['id'] ?? null;
 			$rule = $finding['rule_id'] ?? null;
-			if ( 'suspected' === ( $finding['kind'] ?? null ) && 'warn' === ( $finding['state'] ?? null ) && is_string( $id ) && preg_match( '/^[a-f0-9]{32}$/D', $id ) && in_array( $rule, array( 'AS-PHP-001', 'AS-PHP-002', 'AS-PHP-003', 'AS-PHP-004', 'AS-PHP-005', 'AS-PHP-006', 'AS-PHP-007', 'AS-PHP-008', 'AS-PHP-009' ), true ) ) {
+			if ( 'suspected' === ( $finding['kind'] ?? null ) && 'warn' === ( $finding['state'] ?? null ) && is_string( $id ) && preg_match( '/^[a-f0-9]{32}$/D', $id ) && is_string( $rule ) && preg_match( '/^AS-(PHP|MAL)-[0-9]{3}$/D', $rule ) ) {
 				$ids[] = $id;
 			}
 		}

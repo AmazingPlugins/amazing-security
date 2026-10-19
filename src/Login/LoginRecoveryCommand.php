@@ -17,7 +17,11 @@ final class LoginRecoveryCommand {
 		$settings->setRateMode( 'off' );
 		( new WordPressRateCounterStore( $GLOBALS['wpdb'] ) )->purge();
 		$settings->setXmlRpcAuthDisabled( false );
-		\WP_CLI::success( 'Amazing Security login rate blocking and XML-RPC restriction are off.' );
+		// Every sign-in check that can refuse a correct password. Pending approvals stay as they are.
+		foreach ( array( 'amsec_email_factor', 'amsec_login_challenge', 'amsec_login_confirm', 'amsec_common_passwords', 'amsec_idle_minutes' ) as $option ) {
+			update_option( $option, '0' );
+		}
+		\WP_CLI::success( 'Amazing Security sign-in limits, XML-RPC restriction, email code, sum question, hidden field, breached-password block and idle sign-out are off.' );
 	}
 
 	public function disableTotp( array $args, array $assocArgs ): void {

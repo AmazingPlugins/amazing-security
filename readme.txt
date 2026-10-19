@@ -12,7 +12,7 @@ Security checks that show their evidence: hardening, file integrity, suspicious 
 
 == Description ==
 
-Amazing Security scans your site and shows what it found, with the evidence. Nothing changes until you approve it. Every protection is off when you install the plugin, so you choose what to turn on.
+Amazing Security scans your site and shows what it found, with the evidence. Nothing changes until you approve it. Every protection is off when you install the plugin, so you choose what to turn on. Nothing runs in the background until you press Scan for the first time. After that, the scan repeats once a day.
 
 = Scan =
 
@@ -20,39 +20,43 @@ One button runs the local hardening checks: HTTPS, WordPress updates, the admin 
 
 A passing check means that check didn't find the problem it looks for. It doesn't prove the site is clean.
 
-**Malware scan.** Every scan also looks for code shaped like web shells and injected malware. It reads plugins, themes, uploads and mu-plugins. It also reads folders WordPress doesn't list as a plugin or theme, plus loose PHP files in the site root and in wp-content. There are 63 local rules. 43 read the PHP code. The other 20 read the raw file, so files too big for the code rules still get checked. On a large site the scan keeps going in the background until it has read every file. A hit names the file, the line and the rule. Nothing gets deleted, and your files stay on your server.
+**Malware scan.** Every scan also looks for code shaped like web shells and injected malware. It reads plugins, themes, uploads and mu-plugins. It also reads folders WordPress doesn't list as a plugin or theme, plus loose PHP files in the site root and in wp-content. There are 63 local rules. 43 read the PHP code. The other 20 read the raw file, so files too big for the code rules still get checked, up to 2 MB. A bigger PHP file is listed as not checked. On a large site the scan keeps going in the background until it has read every file. A hit names the file, the line and the rule. Nothing gets deleted, and your files stay on your server.
 
 = Files =
 
-* **Integrity scan.** Compares WordPress core and WordPress.org plugin files with the published checksums. WordPress.org themes are compared with their release ZIP. A changed file is different from the release, which doesn't make it malware. Custom and child themes stay "unknown".
+* **Integrity scan.** Compares WordPress core and WordPress.org plugin files with the published checksums. Up to three WordPress.org themes are compared with their release ZIP. On a big site one pass may not reach them all, and the result says so. A changed file is different from the release, which doesn't make it malware. Custom and child themes stay "unknown".
 * **File scan.** Reads PHP-like files in plugins, themes, and uploads with the same 63 local rules. A match shows the file, the line, and the rule, with a note on why it needs a look. A hit is suspected code, not proof of malware. Files never leave your server. The scan runs in short steps and picks up where it stopped. It stops for good after 50,000 files, 1 GiB, or 300 seconds of work.
-* **Repair.** When a WordPress.org plugin file differs from its release, an administrator can review a repair. The page shows the path and both SHA-256 hashes before you approve. The old file goes to a private backup outside the public site folder, and you can roll it back from wp-admin or with `wp amazing-security repair rollback <finding-id>`.
+* **Repair.** When a WordPress.org plugin file differs from its release, an administrator can review a repair. The page shows the path and both SHA-256 hashes before you approve. The old file is saved to a private folder in the server's temporary directory, outside the site. Some hosts empty that directory on restart, so don't wait long to roll back. Roll back from wp-admin or with `wp amazing-security repair rollback <finding-id>`.
 
 = Login and accounts =
 
-All of these are off until you turn them on under **Log In & Register**:
+All of these are off until you turn them on. Most are under **Log In & Register**. The hidden field and the breached-password check are turned on from Recommendations.
 
 * Limit repeated sign-in attempts per address (record only, or limit).
 * Turn off password sign-in through xmlrpc.php. Pingbacks are separate.
-* Sign out idle wp-admin sessions after 15, 30 or 60 minutes.
+* Sign out signed-in users after 15, 30 or 60 minutes without activity.
 * Hold new registrations until an administrator approves them.
 * Email a six-digit sign-in code. A code expires after 10 minutes and stops working after five wrong tries.
 * Ask a simple sum on the login form. This slows down basic bots. It isn't a CAPTCHA.
 * Add a hidden field to the login form. Simple bots fill it in and get refused. People never see it, and there is nothing to tick.
-* Block administrators from signing in with a password found in public breach data (see External services).
-* Password rules, session lists, and a sign-in email to the account owner.
+* Check new and reset passwords against public breach data, and block administrators whose password shows up there (see External services).
+* Password rules, session lists, and an email to an administrator when they sign in (at most once an hour).
 
-If you get locked out, run `wp amazing-security login disable` from WP-CLI on the server.
+You need HTTPS and your password to end sessions or change some Traffic settings.
+
+If you get locked out, run `wp amazing-security login disable` from WP-CLI on the server. It turns off every sign-in check above. Accounts waiting for approval stay waiting.
 
 = Traffic =
 
-Hostname, browser and referrer block lists, a live request log, hotlink protection, comment and registration limits, REST rate controls, manual network rules, security headers, and trusted proxy settings. Each one stays off until you save it. Every blocking control has a WP-CLI command to turn it off again, for example `wp amazing-security traffic disable`.
+Hostname, browser and referrer block lists, a live request log, hotlink protection, comment and registration limits, REST rate controls, manual network rules, a security headers check, and trusted proxy settings. Each blocking control stays off until you save it, and each can be turned off from WP-CLI. `wp amazing-security traffic disable` turns off the block lists, live log, hotlink protection, precise blocks and comment checks. `bots disable`, `rest-rates disable`, `network disable` and `proxies disable` cover the rest.
 
-The REST request watch only records matches. It doesn't block requests. Set `AMSEC_DISABLE_FIREWALL` to `true` in `wp-config.php` to stop it.
+The security headers check reads your homepage's response headers and lists the missing ones. It doesn't add headers.
+
+The REST request watch is on from the start. It only records matches, on your server, and doesn't block requests. Set `AMSEC_DISABLE_FIREWALL` to `true` in `wp-config.php` to stop it.
 
 = Notifications =
 
-Optional emails for changed files, suspicious PHP matches, and high-severity vulnerabilities, plus a weekly digest. They use your site's WordPress mail and go to the admin email. Both are off by default.
+Optional emails for changed files, suspicious PHP matches, and high-severity plugin vulnerabilities, plus a weekly digest. They use your site's WordPress mail and go to the admin email. Both are off by default.
 
 = AI assistant access (MCP) =
 
@@ -69,7 +73,7 @@ Off by default. On WordPress 6.9 or newer, with the official MCP Adapter plugin 
 The plugin contacts these services only for the features listed below. It never sends file contents, passwords, or personal data, and AmazingPlugins doesn't receive any of it.
 
 **WordPress.org (api.wordpress.org, downloads.wordpress.org)**
-Used by the integrity scan, which runs when you start it and once a day on WP-Cron. It sends the WordPress version and installed plugin and theme slugs and versions, then downloads published checksums and theme release ZIPs. The Directory status screen also asks api.wordpress.org/plugins/info about installed plugin slugs when you click to look them up.
+Used by the integrity scan, which runs when you press Scan and then once a day on WP-Cron. It sends the WordPress version and locale and the installed plugin and theme slugs and versions, then downloads published checksums and theme release ZIPs. A file repair downloads that plugin's release ZIP. The Directory status screen also asks api.wordpress.org/plugins/info about installed plugin slugs when you click to look them up.
 [Terms](https://wordpress.org/about/domains/) · [Privacy policy](https://wordpress.org/about/privacy/)
 
 **WPVulnerability (www.wpvulnerability.net)**
@@ -77,7 +81,7 @@ Used only after an administrator turns on vulnerability checks. It sends the Wor
 [License and terms](https://www.wpvulnerability.com/license/) · [Privacy policy](https://www.wpvulnerability.com/privacy/)
 
 **Have I Been Pwned, Pwned Passwords (api.pwnedpasswords.com)**
-Used only after an administrator turns on the breached-password check, and only when an administrator signs in. It sends the first 5 characters of the password's SHA-1 hash, never the password or the full hash. The match is checked on your server.
+Used only after an administrator turns on breached-password checks. It runs when an administrator signs in and when anyone sets or resets a password. It sends the first 5 characters of the password's SHA-1 hash, never the password or the full hash. The match is checked on your server.
 [Terms](https://haveibeenpwned.com/API/v3#AcceptableUse) · [Privacy policy](https://haveibeenpwned.com/Privacy)
 
 **Your own site**

@@ -202,13 +202,13 @@ final class StartHere {
 			},
 			'compromised-passwords' => match ( $result->evidence['status'] ?? '' ) {
 				'off' => array(
-					'label'     => __( 'Turn on the local password list', 'amazing-security' ),
+					'label'     => __( 'Turn on breached-password checks', 'amazing-security' ),
 					'action'    => 'amsec_approved_setting',
 					'nonce'     => 'amsec_approved_setting',
 					'operation' => 'enable-common-passwords',
 				),
 				'on' => array(
-					'label'     => __( 'Turn off the local password list', 'amazing-security' ),
+					'label'     => __( 'Turn off breached-password checks', 'amazing-security' ),
 					'action'    => 'amsec_approved_setting',
 					'nonce'     => 'amsec_approved_setting',
 					'operation' => 'disable-common-passwords',
