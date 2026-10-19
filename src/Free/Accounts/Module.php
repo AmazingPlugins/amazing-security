@@ -47,7 +47,8 @@ final class Module {
 	}
 
 	public static function markPending( int $user_id ): void {
-		if ( $user_id < 1 || ! RegistrationApproval::enabled( self::option( RegistrationApproval::OPTION ) ) ) {
+		$manager = current_user_can( 'create_users' ) || ( defined( 'WP_CLI' ) && WP_CLI );
+		if ( $user_id < 1 || ! RegistrationApproval::marks( RegistrationApproval::enabled( self::option( RegistrationApproval::OPTION ) ), $manager ) ) {
 			return;
 		}
 		update_user_meta( $user_id, RegistrationApproval::META, '1' );

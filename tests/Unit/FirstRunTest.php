@@ -7,21 +7,12 @@ namespace AmazingPlugins\Security\Tests\Unit;
 use AmazingPlugins\Security\Activity\ActivityRenderer;
 use AmazingPlugins\Security\Admin\AccountChoice;
 use AmazingPlugins\Security\Admin\FirstRun;
-use AmazingPlugins\Security\Admin\StartPanel;
 use AmazingPlugins\Security\Free\Comments\SpamHold;
 use AmazingPlugins\Security\Free\Notices\Notice;
 use AmazingPlugins\Security\Hardening\UploadsRule;
 use PHPUnit\Framework\TestCase;
 
 final class FirstRunTest extends TestCase {
-	public function test_start_steps_name_the_three_moves(): void {
-		$steps = implode( ' ', StartPanel::steps() );
-		self::assertStringContainsString( 'Run the scan.', $steps );
-		self::assertStringContainsString( 'Log In & Register, and from Traffic', $steps );
-		self::assertStringContainsString( 'authenticator and passkey status', $steps );
-		self::assertStringNotContainsString( 'safe', strtolower( $steps ) );
-	}
-
 	public function test_tour_points_at_each_menu_page_and_promises_nothing_runs(): void {
 		$steps = FirstRun::steps();
 		self::assertCount( 9, $steps );

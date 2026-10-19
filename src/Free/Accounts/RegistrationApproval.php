@@ -19,6 +19,11 @@ final class RegistrationApproval {
 		return 1 === $meta || '1' === $meta;
 	}
 
+	/** Only self sign-ups wait. Accounts an administrator or WP-CLI adds do not. */
+	public static function marks( bool $enabled, bool $addedByManager ): bool {
+		return $enabled && ! $addedByManager;
+	}
+
 	public static function blocks( bool $enabled, mixed $meta ): bool {
 		return $enabled && self::flagged( $meta );
 	}

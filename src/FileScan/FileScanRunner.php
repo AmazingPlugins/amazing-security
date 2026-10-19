@@ -19,7 +19,7 @@ final class FileScanRunner {
 		$this->walker->beginStep();
 		$started   = microtime( true );
 		$stepLimit = min( 250, $context->entryLimit );
-		$budget    = new IntegrityBudget( $stepLimit, min( 33554432, max( 0, 134217728 - $cursor->bytes ) ), min( 5.0, max( 0.0, 30.0 - $cursor->elapsed ) ), max( 0.0, $context->deadline - $started ) );
+		$budget    = new IntegrityBudget( $stepLimit, min( 33554432, max( 0, FileScanCursor::MAX_BYTES - $cursor->bytes ) ), min( 5.0, max( 0.0, FileScanCursor::MAX_SECONDS - $cursor->elapsed ) ), max( 0.0, $context->deadline - $started ) );
 		$count     = 0;
 		while ( $count < $stepLimit && $budget->hasTime() && ! $cursor->finished ) {
 			$before = clone $cursor;
@@ -31,7 +31,7 @@ final class FileScanRunner {
 			$relative = $item['path'];
 			$size     = $item['size'];
 			if ( $this->mayScanContent( $target, $relative, $item['extra'] ) && $size <= 2097152 && $size > $budget->remainingBytes() ) {
-				if ( $cursor->bytes + $size > 134217728 ) {
+				if ( $cursor->bytes + $size > FileScanCursor::MAX_BYTES ) {
 					$cursor->partial  = true;
 					$cursor->finished = true;
 				} else {
@@ -72,7 +72,7 @@ final class FileScanRunner {
 		}
 		$cursor->bytes   += $budget->bytes();
 		$cursor->elapsed += microtime( true ) - $started;
-		if ( ! $cursor->finished && ( $cursor->processed >= 5000 || $cursor->bytes >= 134217728 || $cursor->elapsed >= 30 ) ) {
+		if ( ! $cursor->finished && ( $cursor->processed >= FileScanCursor::MAX_FILES || $cursor->bytes >= FileScanCursor::MAX_BYTES || $cursor->elapsed >= FileScanCursor::MAX_SECONDS ) ) {
 			$cursor->partial  = true;
 			$cursor->finished = true;
 		}
@@ -80,7 +80,7 @@ final class FileScanRunner {
 	}
 
 	private function mayScanContent( FileScanTarget $target, string $relative, bool $extra ): bool {
-		if ( ! preg_match( '/\.(?:php|phtml|php[0-9]+)$/iD', $relative ) ) {
+		if ( ! preg_match( '/\.(?:php|phtml|php[0-9]+|pht)$/iD', $relative ) ) {
 			return false;
 		}
 		return 'core' !== $target->kind || ( $extra && ( str_starts_with( $relative, 'wp-admin/' ) || str_starts_with( $relative, 'wp-includes/' ) ) );

@@ -118,6 +118,7 @@ add_action(
 );
 add_action( 'amsec_integrity_tick', array( new AmazingPlugins\Security\Admin\IntegrityScanAction(), 'scheduled' ) );
 add_action( 'amsec_file_tick', array( new AmazingPlugins\Security\Admin\FileScanAction(), 'scheduled' ) );
+add_action( AmazingPlugins\Security\Scan\LocalCodeScan::TICK, array( AmazingPlugins\Security\Scan\LocalCodeScan::class, 'tick' ) );
 add_action(
 	'amsec_alert_retry',
 	static function (): void {

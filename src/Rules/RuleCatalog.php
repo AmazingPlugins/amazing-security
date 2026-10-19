@@ -22,7 +22,7 @@ final class RuleCatalog {
 				'label'    => 'File review patterns',
 				'version'  => ( new BundledRulePack() )->version(),
 				'ids'      => array_keys( ( new BundledRulePack() )->rules() ),
-				'files'    => array( 'src/FileScan/BundledRulePack.php', 'src/FileScan/RuleMatcher.php', 'src/FileScan/AdjacentFlow.php' ),
+				'files'    => array( 'src/FileScan/BundledRulePack.php', 'src/FileScan/RuleMatcher.php', 'src/FileScan/AdjacentFlow.php', 'src/FileScan/MalwareSignatures.php' ),
 				'fixtures' => 'tests/Fixtures/FileScan/corpus.json',
 				'scope'    => 'Selected PHP and inline-HTML patterns; broad malware detection remains incomplete.',
 			),

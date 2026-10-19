@@ -8,6 +8,9 @@ defined( 'ABSPATH' ) || exit;
 
 final class RuleGuidance {
 	public static function forRule( string $id ): string {
+		if ( str_starts_with( $id, 'AS-MAL-' ) ) {
+			return __( 'This shape is common in web shells and injected malware. If the file is not part of the published plugin, theme or WordPress release, treat the site as compromised: keep a backup as evidence, replace the file with a clean copy, change administrator and hosting passwords, then scan again.', 'amazing-security' );
+		}
 		return match ( $id ) {
 			'AS-PHP-001', 'AS-PHP-006' => __( 'Decoded data reaches eval, which can run PHP code. Ask the developer why executable code is encoded and compare this file with its exact published release.', 'amazing-security' ),
 			'AS-PHP-002', 'AS-PHP-014' => __( 'A request value reaches a system command directly. Ask the developer to verify authorization, validation, and whether a shell command is necessary.', 'amazing-security' ),

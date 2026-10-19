@@ -9,6 +9,7 @@ defined( 'ABSPATH' ) || exit;
 use AmazingPlugins\Security\FileScan\FileScanCursor;
 use AmazingPlugins\Security\FileScan\FileScanPlanBuilder;
 use AmazingPlugins\Security\FileScan\FileScanRunner;
+use AmazingPlugins\Security\FileScan\FileScanTarget;
 use AmazingPlugins\Security\Integrity\DiscoveryResult;
 use Throwable;
 
@@ -28,9 +29,7 @@ final class LocalCodeScan {
 		if ( ! is_string( $raw ) || '' === $raw ) {
 			return $empty;
 		}
-		// phpcs:ignore WordPress.WP.AlternativeFunctions.json_decode_json_decode -- Local code-scan record only. No release request is made.
-		$data   = json_decode( $raw, true );
-		$cursor = is_array( $data ) && 1 === ( $data['version'] ?? null ) && is_array( $data['cursor'] ?? null ) ? FileScanCursor::fromArray( $data['cursor'] ) : null;
+		$cursor = self::cursor();
 		if ( ! $cursor instanceof FileScanCursor ) {
 			$empty['stored'] = 'unknown';
 			return $empty;
@@ -46,20 +45,43 @@ final class LocalCodeScan {
 		return array(
 			'stored'  => $stored,
 			'found'   => $found,
-			'scanned' => min( 5000, $cursor->scanned ),
+			'scanned' => min( FileScanCursor::MAX_FILES, $cursor->scanned ),
 			'matches' => self::matches( $cursor ),
 		);
 	}
 
-	public function advance(): string {
+	public const TICK = 'amsec_local_code_tick';
+
+	public static function cursor(): ?FileScanCursor {
+		$raw = function_exists( 'get_option' ) ? get_option( self::OPTION, null ) : null;
+		if ( ! is_string( $raw ) || '' === $raw ) {
+			return null;
+		}
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.json_decode_json_decode -- Local code-scan record only. No release request is made.
+		$data = json_decode( $raw, true );
+		return is_array( $data ) && 1 === ( $data['version'] ?? null ) && is_array( $data['cursor'] ?? null ) ? FileScanCursor::fromArray( $data['cursor'] ) : null;
+	}
+
+	/** A new Scan starts a fresh pass. The background tick only continues the current one. */
+	public function advance( bool $fresh = true ): string {
+		if ( $fresh && ( self::cursor()?->finished ?? true ) ) {
+			delete_option( self::OPTION );
+		}
 		$deadline = microtime( true ) + 12;
 		do {
-			$stored = $this->step();
-			if ( 'running' !== $stored ) {
-				return $stored;
+			// Findings do not end the pass; only a finished cursor or a failed step does.
+			if ( 'unknown' === $this->step() || ( self::cursor()?->finished ?? true ) ) {
+				return self::snapshot()['stored'];
 			}
 		} while ( microtime( true ) < $deadline );
+		if ( function_exists( 'wp_next_scheduled' ) && ! wp_next_scheduled( self::TICK ) ) {
+			wp_schedule_single_event( time() + 30, self::TICK );
+		}
 		return self::snapshot()['stored'];
+	}
+
+	public static function tick(): void {
+		( new self() )->advance( false );
 	}
 
 	private function step(): string {
@@ -103,7 +125,47 @@ final class LocalCodeScan {
 	private function targets(): array {
 		$uploads = function_exists( 'wp_upload_dir' ) ? wp_upload_dir( null, false ) : array();
 		$root    = is_array( $uploads ) && empty( $uploads['error'] ) && is_string( $uploads['basedir'] ?? null ) ? $uploads['basedir'] : '';
-		return ( new FileScanPlanBuilder() )->build( new DiscoveryResult( array(), array(), '', false ), $this->plugins(), $this->themes(), $root );
+		$targets = ( new FileScanPlanBuilder() )->build( new DiscoveryResult( array(), array(), '', false ), $this->plugins(), $this->themes(), $root );
+		if ( defined( 'WPMU_PLUGIN_DIR' ) && is_dir( WPMU_PLUGIN_DIR ) ) {
+			$targets[] = new FileScanTarget( 'mu-plugins', 'plugin', WPMU_PLUGIN_DIR );
+		}
+		// Folders WordPress does not list as a plugin or theme, for example a dropped folder without a header.
+		$listed = array();
+		foreach ( $targets as $target ) {
+			$listed[ rtrim( $target->root, '/' ) . '/' . ( $target->singleFile ?? '' ) ] = true;
+		}
+		foreach ( array(
+			'plugin' => defined( 'WP_PLUGIN_DIR' ) ? WP_PLUGIN_DIR : '',
+			'theme'  => function_exists( 'get_theme_root' ) ? get_theme_root() : '',
+		) as $kind => $dir ) {
+			$dir   = rtrim( $dir, '/' );
+			$names = '' !== $dir && is_dir( $dir ) ? scandir( $dir ) : false;
+			foreach ( array_slice( is_array( $names ) ? $names : array(), 0, 500 ) as $name ) {
+				if ( '.' === $name || '..' === $name || is_link( $dir . '/' . $name ) ) {
+					continue;
+				}
+				if ( is_dir( $dir . '/' . $name ) && ! isset( $listed[ $dir . '/' . $name . '/' ] ) ) {
+					$targets[] = new FileScanTarget( 'unlisted:' . $name, $kind, $dir . '/' . $name );
+				} elseif ( is_file( $dir . '/' . $name ) && preg_match( '/\.(?:php|phtml|php[0-9]+|pht)$/iD', $name ) && ! isset( $listed[ $dir . '/' . $name ] ) ) {
+					$targets[] = new FileScanTarget( 'unlisted:' . $name, $kind, $dir, null, $name );
+				}
+			}
+		}
+		// Loose PHP in the site root and in wp-content is a common hiding place. Folders there are covered above or by the release check.
+		foreach ( array(
+			'site'    => defined( 'ABSPATH' ) ? ABSPATH : '',
+			'content' => defined( 'WP_CONTENT_DIR' ) ? WP_CONTENT_DIR : '',
+		) as $kind => $dir ) {
+			$dir   = rtrim( $dir, '/' );
+			$names = '' !== $dir && is_dir( $dir ) ? scandir( $dir ) : false;
+			$names = array_values( preg_grep( '/\.(?:php|phtml|php[0-9]+|pht)$/iD', is_array( $names ) ? $names : array() ) );
+			foreach ( array_slice( $names, 0, 200 ) as $name ) {
+				if ( is_file( $dir . '/' . $name ) ) {
+					$targets[] = new FileScanTarget( $kind . ':' . $name, $kind, $dir, null, $name );
+				}
+			}
+		}
+		return $targets;
 	}
 
 	private function plugins(): array {

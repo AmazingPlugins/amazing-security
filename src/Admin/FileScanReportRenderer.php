@@ -13,13 +13,13 @@ use AmazingPlugins\Security\FileScan\RuleGuidance;
 use DateTimeImmutable;
 
 final class FileScanReportRenderer {
-	public function __construct( private readonly string $actionUrl = '', private readonly string $noteNonce = '', private readonly array $notes = array() ) {}
+	public function __construct( private readonly string $actionUrl = '', private readonly string $noteNonce = '', private readonly array $notes = array(), private readonly string $title = '', private readonly string $anchor = 'amsec-file-scan' ) {}
 
 	public function render( ?FileScanReport $completed, ?FileScanStep $progress, array $history ): string {
 		$version  = ( new BundledRulePack() )->version();
 		$released = DateTimeImmutable::createFromFormat( '!Y.m.d', substr( $version, 0, 10 ) );
 		$age      = false === $released ? 0 : max( 0, (int) floor( ( time() - $released->getTimestamp() ) / 86400 ) );
-		$html     = '<section class="amsec-file-scan" aria-labelledby="amsec-file-scan"><div class="amsec-file-heading"><div><h2 id="amsec-file-scan">' . esc_html__( 'Suspicious files', 'amazing-security' ) . '</h2><p>' . esc_html__( 'Checks unfamiliar PHP files on this site. A match needs review; no match does not prove the site is clean.', 'amazing-security' ) . '</p></div><span class="amsec-file-rule-age">' . sprintf(
+		$html     = '<section class="amsec-file-scan" aria-labelledby="' . esc_attr( $this->anchor ) . '"><div class="amsec-file-heading"><div><h2 id="' . esc_attr( $this->anchor ) . '">' . esc_html( '' !== $this->title ? $this->title : __( 'Suspicious files', 'amazing-security' ) ) . '</h2><p>' . esc_html__( 'Checks unfamiliar PHP files on this site. A match needs review; no match does not prove the site is clean.', 'amazing-security' ) . '</p></div><span class="amsec-file-rule-age">' . sprintf(
 				/* translators: 1: version of the bundled rule pack, 2: age of the rule pack in days. */
 			esc_html__( 'Bundled rules %1$s (%2$s days old)', 'amazing-security' ),
 			esc_html( $version ),

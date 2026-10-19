@@ -135,7 +135,7 @@ foreach ( array( 'amsec\_%', 'amazing\_security\_%', '\_transient\_amsec\_%', '\
 }
 // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Explicit erase removes only this plugin's user meta.
 $wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->usermeta} WHERE meta_key LIKE %s", 'amsec\_%' ) );
-foreach ( array( 'amsec_activity_cleanup', 'amsec_alert_retry', 'amsec_bot_cleanup', 'amsec_file_tick', 'amsec_fix_cleanup', 'amsec_integrity_tick', 'amsec_local_daily_scan', 'amsec_login_cleanup', 'amsec_passkey_cleanup', 'amsec_traffic_cleanup', 'amsec_vuln_tick', 'amsec_weekly_digest_tick' ) as $amsec_hook ) {
+foreach ( array( 'amsec_activity_cleanup', 'amsec_alert_retry', 'amsec_bot_cleanup', 'amsec_file_tick', 'amsec_fix_cleanup', 'amsec_integrity_tick', 'amsec_local_code_tick', 'amsec_local_daily_scan', 'amsec_login_cleanup', 'amsec_passkey_cleanup', 'amsec_traffic_cleanup', 'amsec_vuln_tick', 'amsec_weekly_digest_tick' ) as $amsec_hook ) {
 	wp_clear_scheduled_hook( $amsec_hook );
 }
 wp_cache_flush();
