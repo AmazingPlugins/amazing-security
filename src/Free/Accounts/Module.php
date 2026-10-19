@@ -12,6 +12,7 @@ use AmazingPlugins\Security\Login\BreachedPasswords;
 final class Module {
 	public static function boot(): void {
 		add_action( 'wp_loaded', array( self::class, 'idle' ) );
+		add_action( 'wp_login', array( self::class, 'signedIn' ), 10, 2 );
 		add_action( 'user_register', array( self::class, 'markPending' ), 10, 1 );
 		add_filter( 'wp_authenticate_user', array( self::class, 'beforePassword' ), 10, 2 );
 		add_filter( 'authenticate', array( self::class, 'afterPassword' ), 27, 3 );
@@ -44,6 +45,12 @@ final class Module {
 			self::endSession( $user_id );
 		}
 		update_user_meta( $user_id, IdleLogout::META, (string) $now );
+	}
+
+	/** A new sign-in starts the idle clock again, so an old timestamp can't sign it straight out. */
+	public static function signedIn( string $login, \WP_User $user ): void {
+		unset( $login );
+		update_user_meta( $user->ID, IdleLogout::META, (string) time() );
 	}
 
 	public static function markPending( int $user_id ): void {

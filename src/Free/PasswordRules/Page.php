@@ -60,7 +60,7 @@ final class Page {
 		foreach ( array_keys( $this->flags() ) as $option ) {
 			update_option( $option, $this->postedFlag( $option ), false );
 		}
-		wp_safe_redirect( admin_url( 'admin.php?page=amsec-password-rules&amsec_password_rules=updated' ) );
+		wp_safe_redirect( admin_url( 'admin.php?page=amsec-accounts&amsec_password_rules=updated#password-rules' ) );
 		exit;
 	}
 

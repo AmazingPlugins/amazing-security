@@ -5,6 +5,8 @@ namespace AmazingPlugins\Security\Traffic;
 
 defined( 'ABSPATH' ) || exit;
 
+use AmazingPlugins\Security\Free\TrafficGuard\Options;
+use AmazingPlugins\Security\Free\TrafficGuard\Page;
 use AmazingPlugins\Security\Integrity\WordPressOptions;
 use AmazingPlugins\Security\Admin\FixApprovalAction;
 use AmazingPlugins\Security\Sessions\SessionPolicy;
@@ -126,7 +128,15 @@ final class TrafficSettings {
 			\WP_CLI::error( 'This command accepts no arguments.' ); }
 		if ( ! $this->service()->disable() ) {
 			\WP_CLI::error( 'Traffic collection could not be disabled.' ); }
+		// The Traffic screen's blocking controls: block lists, live log, hotlink, precise blocks and comment checks.
+		foreach ( array( Options::HOSTNAMES, Options::AGENTS, Options::REFERRERS ) as $list ) {
+			update_option( $list, '' );
+		}
+		foreach ( array( Options::LIVE, Options::HOTLINK, 'amsec_precise_block', 'amsec_comment_honeypot', 'amsec_comment_rate', 'amsec_comment_spam_hold' ) as $flag ) {
+			update_option( $flag, '0' );
+		}
+		( new Page() )->syncHotlink( '0' );
 		( new ActivityHooks( new ActivityRepository( $GLOBALS['wpdb'] ) ) )->record( 'security_setting_changed', 0, 'traffic-off' );
-		\WP_CLI::success( 'Traffic collection is off; retained history expires separately.' );
+		\WP_CLI::success( 'Traffic history, block lists, live log, hotlink protection, precise blocks and comment checks are off. Retained history expires separately.' );
 	}
 }

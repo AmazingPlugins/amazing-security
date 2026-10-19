@@ -23,7 +23,7 @@ final class HeaderAction {
 			$result = 'failed';}
 		if ( ! in_array( $result, array( 'saved', 'cached' ), true ) ) {
 			wp_die( esc_html__( 'Assessment was not saved. Review the local state and retry; no new coverage is claimed.', 'amazing-security' ), '', array( 'response' => 503 ) );}
-		wp_safe_redirect( admin_url( 'admin.php?page=amsec-headers' ) );
+		wp_safe_redirect( admin_url( 'admin.php?page=amsec-traffic-guard#headers' ) );
 		exit;
 	}
 }

@@ -42,7 +42,7 @@ final class RestRateSettings {
 		if ( 'saved' !== $s->apply( $fp, $mode, $exemptions ) ) {
 			wp_die( esc_html__( 'Policy changed or could not be saved. Review and approve the current policy.', 'amazing-security' ), '', array( 'response' => 409 ) );}
 		( new ActivityHooks( new ActivityRepository( $GLOBALS['wpdb'] ) ) )->record( 'security_setting_changed', 0, 'rest-rate-' . $mode );
-		wp_safe_redirect( admin_url( 'admin.php?page=amsec-rest-rates' ) );
+		wp_safe_redirect( admin_url( 'admin.php?page=amsec-traffic-guard#rest' ) );
 		exit;
 	}
 	public function render(): void {

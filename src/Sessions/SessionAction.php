@@ -40,7 +40,7 @@ final class SessionAction {
 			wp_die( esc_html__( 'Session revocation could not be verified. Review the current sessions.', 'amazing-security' ), '', array( 'response' => 409 ) );
 		}
 		( new ActivityHooks( new ActivityRepository( $GLOBALS['wpdb'] ) ) )->record( 'sessions_revoked', $id );
-		wp_safe_redirect( admin_url( 'admin.php?page=amsec-sessions&user_id=' . $id . '&revoked=1' ) );
+		wp_safe_redirect( self::back( $id, 'revoked' ) );
 		exit;
 	}
 
@@ -52,7 +52,7 @@ final class SessionAction {
 			wp_die( esc_html__( 'That application password was not revoked.', 'amazing-security' ), '', array( 'response' => 409 ) );
 		}
 		( new ActivityHooks( new ActivityRepository( $GLOBALS['wpdb'] ) ) )->record( 'security_setting_changed', $id, 'application-password' );
-		wp_safe_redirect( admin_url( 'admin.php?page=amsec-sessions&user_id=' . $id . '&app-revoked=1' ) );
+		wp_safe_redirect( self::back( $id, 'app-revoked' ) );
 		exit;
 	}
 
@@ -72,5 +72,11 @@ final class SessionAction {
 				throw new \RuntimeException( 'Session revocation could not be verified.' );
 			}
 		}
+	}
+
+	/** Administrators land on the Sessions tab; other users keep their own sessions page. */
+	private static function back( int $id, string $flag ): string {
+		$page = current_user_can( 'manage_options' ) ? 'amsec-accounts' : 'amsec-sessions';
+		return admin_url( 'admin.php?page=' . $page . '&user_id=' . $id . '&' . $flag . '=1#sessions' );
 	}
 }
