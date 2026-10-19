@@ -35,10 +35,10 @@ final class LocalCodeScan {
 			return $empty;
 		}
 		$found = self::suspected( $cursor );
-		if ( $found > 0 ) {
-			$stored = 'found';
-		} elseif ( ! $cursor->finished ) {
+		if ( ! $cursor->finished ) {
 			$stored = 'running';
+		} elseif ( $found > 0 ) {
+			$stored = 'found';
 		} else {
 			$stored = $cursor->partial ? 'partial' : 'clean';
 		}
