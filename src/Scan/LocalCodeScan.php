@@ -57,6 +57,14 @@ final class LocalCodeScan {
 
 	private bool $capped = false;
 
+	/** When the current pass started, or 0 when there is none. */
+	private static function started(): int {
+		$raw = function_exists( 'get_option' ) ? get_option( self::OPTION, null ) : null;
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.json_decode_json_decode -- Local code-scan record only.
+		$data = is_string( $raw ) ? json_decode( $raw, true ) : null;
+		return is_array( $data ) && is_int( $data['started'] ?? null ) ? $data['started'] : 0;
+	}
+
 	public static function cursor(): ?FileScanCursor {
 		$raw = function_exists( 'get_option' ) ? get_option( self::OPTION, null ) : null;
 		if ( ! is_string( $raw ) || '' === $raw ) {
@@ -67,9 +75,13 @@ final class LocalCodeScan {
 		return is_array( $data ) && 1 === ( $data['version'] ?? null ) && is_array( $data['cursor'] ?? null ) ? FileScanCursor::fromArray( $data['cursor'] ) : null;
 	}
 
-	/** Each Scan starts a fresh pass, so files changed since the last one are read again. The background tick only continues. */
+	/**
+	 * A Scan continues a pass that started within the hour, so a big site can finish and its findings stay visible.
+	 * Otherwise it starts fresh, so files changed since then are read again. The background tick only continues.
+	 */
 	public function advance( bool $fresh = true ): string {
-		if ( $fresh ) {
+		$cursor = self::cursor();
+		if ( $fresh && ( null === $cursor || $cursor->finished || time() - self::started() > HOUR_IN_SECONDS ) ) {
 			delete_option( self::OPTION );
 		}
 		$deadline = microtime( true ) + 12;
@@ -122,6 +134,7 @@ final class LocalCodeScan {
 		$encoded = json_encode(
 			array(
 				'version' => 1,
+				'started' => 0 === self::started() ? time() : self::started(),
 				'cursor'  => $cursor->toArray(),
 			)
 		);

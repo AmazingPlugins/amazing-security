@@ -15,5 +15,8 @@ final class Module {
 		add_action( 'admin_post_amsec_traffic_guard', array( new Page(), 'save' ) );
 		add_action( 'update_option_' . Options::LIVE, array( Guard::class, 'syncFromUpdate' ), 10, 2 );
 		add_action( 'add_option_' . Options::LIVE, array( Guard::class, 'syncFromAdd' ), 10, 2 );
+		// Presets and other callers set the hotlink option directly; the uploads rule must follow it.
+		add_action( 'update_option_' . Options::HOTLINK, static fn ( mixed $old, mixed $value ) => ( new Page() )->syncHotlink( (string) $value ), 10, 2 );
+		add_action( 'add_option_' . Options::HOTLINK, static fn ( string $name, mixed $value ) => ( new Page() )->syncHotlink( (string) $value ), 10, 2 );
 	}
 }

@@ -21,4 +21,8 @@ final class HotlinkRuleTest extends TestCase {
 	public function test_a_blank_host_does_not_write_a_rule(): void {
 		self::assertSame( '', HotlinkRule::apply( '', ' ', true ) );
 	}
+
+	public function test_own_host_is_anchored_so_lookalike_hosts_are_blocked(): void {
+		self::assertStringContainsString( '!^https?://(www\\.)?example\\.com(:[0-9]+)?(/|$) [NC]', HotlinkRule::snippet( 'example.com' ) );
+	}
 }
