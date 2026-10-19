@@ -68,7 +68,9 @@ final class StartHere {
 			'release-files' => __( 'Release files', 'amazing-security' ),
 			'closed-plugins' => __( 'Closed plugins', 'amazing-security' ),
 			'public-content' => __( 'Posts and comments', 'amazing-security' ),
-			'local-code' => __( 'Local code scan', 'amazing-security' ),
+			'local-code' => __( 'Malware scan', 'amazing-security' ),
+			'authenticator-app' => __( 'Authenticator app', 'amazing-security' ),
+			'passkeys-status' => __( 'Passkeys', 'amazing-security' ),
 			'suspicious-files' => __( 'Suspicious files', 'amazing-security' ),
 			'local-inventory' => __( 'Local inventory', 'amazing-security' ),
 			'security-headers' => __( 'Security headers', 'amazing-security' ),
@@ -311,9 +313,9 @@ final class StartHere {
 				'hash'  => 'amsec-schedule',
 			),
 			'local-code' => State::PASS === $result->state ? null : array(
-				'label' => __( 'Review the file scan', 'amazing-security' ),
+				'label' => __( 'Review malware findings', 'amazing-security' ),
 				'page'  => 'amsec-file-checks',
-				'hash'  => 'amsec-file-scan',
+				'hash'  => 'amsec-malware',
 			),
 			'file-modes' => in_array( $result->state, array( State::WARN, State::UNKNOWN ), true ) ? array(
 				'label' => __( 'Review file modes', 'amazing-security' ),

@@ -8,7 +8,7 @@ defined( 'ABSPATH' ) || exit;
 
 final class BundledRulePack {
 	public function version(): string {
-		return '2026.10.09.2';
+		return '2026.10.19.1';
 	}
 
 	public function rules(): array {
@@ -184,6 +184,66 @@ final class BundledRulePack {
 			'AS-PHP-043' => array(
 				'pattern' => '/\x01INDIRECT_DATA_URI_COPY2\x02/',
 				'summary' => 'A data:// string is copied twice and then loaded with include or require. A fourth hop is not matched.',
+			),
+			'AS-MAL-001' => array(
+				'summary' => 'Decoded or decompressed text is run as PHP with eval or assert.',
+			),
+			'AS-MAL-002' => array(
+				'summary' => 'A command or eval call receives request or HTTP header data in the same statement.',
+			),
+			'AS-MAL-003' => array(
+				'summary' => 'A backtick shell command contains request data.',
+			),
+			'AS-MAL-004' => array(
+				'summary' => 'Request data is passed where a function expects a callback.',
+			),
+			'AS-MAL-005' => array(
+				'summary' => 'A request value is called as a function.',
+			),
+			'AS-MAL-006' => array(
+				'summary' => 'eval runs the result of a variable function call.',
+			),
+			'AS-MAL-007' => array(
+				'summary' => 'The file contains the name or marker of a known web shell.',
+			),
+			'AS-MAL-008' => array(
+				'summary' => 'A dangerous function name is hidden by splitting, reversing or rot13.',
+			),
+			'AS-MAL-009' => array(
+				'summary' => 'A very long encoded string sits in a file that also decodes text.',
+			),
+			'AS-MAL-010' => array(
+				'summary' => 'An upload is saved under the file name the visitor sent.',
+			),
+			'AS-MAL-011' => array(
+				'summary' => 'A standalone upload form that uses no WordPress functions.',
+			),
+			'AS-MAL-012' => array(
+				'summary' => 'A standalone mailer that sends mail from request data without WordPress.',
+			),
+			'AS-MAL-013' => array(
+				'summary' => 'The file writes over itself.',
+			),
+			'AS-MAL-014' => array(
+				'summary' => 'Text is built by combining many string pieces with ^, | or &, a common obfuscation.',
+			),
+			'AS-MAL-015' => array(
+				'summary' => 'A function name is assembled one character at a time from another string.',
+			),
+			'AS-MAL-016' => array(
+				'summary' => 'The file calls four or more different command functions.',
+			),
+			'AS-MAL-017' => array(
+				'summary' => 'A database query is taken straight from request data.',
+			),
+			'AS-MAL-018' => array(
+				'summary' => 'include or require loads an image, text file or hex-escaped path.',
+			),
+			'AS-MAL-019' => array(
+				'summary' => 'The file tries to undo disable_functions or safe_mode.',
+			),
+			'AS-MAL-020' => array(
+				'summary' => 'A variable filled from request data is run as a command or as PHP.',
 			),
 		);
 	}

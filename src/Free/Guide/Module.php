@@ -46,7 +46,7 @@ final class Module {
 				? in_array( (string) $options['amsec_idle_minutes'], array( '15', '30', '60' ), true )
 				: (string) ( $options[ $row['key'] ] ?? '0' ) === '1';
 			echo '<li class="amsec-start-item" data-state="' . esc_attr( $on ? 'pass' : 'none' ) . '"><span class="amsec-start-badge">' . esc_html( $on ? __( 'On', 'amazing-security' ) : __( 'Off', 'amazing-security' ) ) . '</span><span class="amsec-start-copy"><strong>' . esc_html( $row['label'] ) . '</strong></span>';
-			echo '<a class="button" href="' . esc_url( admin_url( 'admin.php?page=' . $row['page'] ) ) . '">' . esc_html__( 'Open', 'amazing-security' ) . '</a></li>';
+			echo '<a class="button" href="' . esc_url( admin_url( 'admin.php?page=' . $row['page'] ) . ( isset( $row['hash'] ) ? '#' . $row['hash'] : '' ) ) . '">' . esc_html__( 'Open', 'amazing-security' ) . '</a></li>';
 		}
 		echo '</ul>';
 		echo '<p>' . esc_html__( 'A preset turns on local checks only. It does not start a breach lookup, a vulnerability lookup, or request blocking.', 'amazing-security' ) . '</p>';
@@ -62,9 +62,9 @@ final class Module {
 	}
 
 	/**
-	 * @return list<array{key: string, label: string, page: string, idle?: bool}>
+	 * @return list<array{key: string, label: string, page: string, hash?: string, idle?: bool}>
 	 */
-	private static function rows(): array {
+	public static function rows(): array {
 		return array(
 			array(
 				'key'   => 'amsec_login_confirm',

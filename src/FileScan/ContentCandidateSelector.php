@@ -8,7 +8,7 @@ defined( 'ABSPATH' ) || exit;
 
 final class ContentCandidateSelector {
 	public function eligible( FileScanTarget $target, string $relativePath, ?string $observedSha256, bool $extra = false ): bool {
-		if ( ! preg_match( '/\.(?:php|phtml|php[0-9]+)$/iD', $relativePath ) ) {
+		if ( ! preg_match( '/\.(?:php|phtml|php[0-9]+|pht)$/iD', $relativePath ) ) {
 			return false;
 		}
 		if ( 'core' === $target->kind && ( ! $extra || ( ! str_starts_with( $relativePath, 'wp-admin/' ) && ! str_starts_with( $relativePath, 'wp-includes/' ) ) ) ) {

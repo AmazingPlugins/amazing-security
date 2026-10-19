@@ -267,7 +267,7 @@ final class Page {
 		return '';
 	}
 
-	private function syncHotlink( string $flag ): void {
+	public function syncHotlink( string $flag ): void {
 		if ( ! defined( 'WP_CONTENT_DIR' ) ) {
 			return;
 		}

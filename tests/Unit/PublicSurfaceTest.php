@@ -164,7 +164,7 @@ final class PublicSurfaceTest extends TestCase {
 		$clean   = ( new LocalCodeCheck( static fn(): array => array( 'stored' => 'clean', 'found' => 0 ) ) )->run( new ScanContext() )[0];
 		self::assertSame( 'unknown', $running->state );
 		self::assertSame( 'running', $running->evidence['stored'] );
-		self::assertStringContainsString( 'does not contact', $running->summary );
+		self::assertStringContainsString( 'keeps going in the background', $running->summary );
 		self::assertSame( 'pass', $clean->state );
 		self::assertStringContainsString( 'does not prove the site is clean', $clean->summary );
 		self::assertStringNotContainsString( 'safe', $running->summary );
@@ -178,7 +178,7 @@ final class PublicSurfaceTest extends TestCase {
 		) )->run( new ScanContext() )[0];
 		self::assertStringContainsString( '4 files', $match->summary );
 		self::assertStringContainsString( 'plugin.php line 12 AS-PHP-001', $match->summary );
-		self::assertStringContainsString( 'does not contact', $match->summary );
+		self::assertStringContainsString( 'check each file', $match->summary );
 		foreach ( array( $inactive, $env, $themes, $php, $clear ) as $row ) {
 			self::assertStringNotContainsString( 'safe', $row->summary );
 		}

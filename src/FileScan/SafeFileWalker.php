@@ -33,7 +33,7 @@ final class SafeFileWalker {
 			++$count;
 		}
 		$cursor->elapsed += microtime( true ) - $started;
-		if ( $cursor->elapsed >= 30 || $cursor->processed >= 5000 ) {
+		if ( $cursor->elapsed >= FileScanCursor::MAX_SECONDS || $cursor->processed >= FileScanCursor::MAX_FILES ) {
 			$cursor->partial  = true;
 			$cursor->finished = true;
 		}
@@ -51,7 +51,7 @@ final class SafeFileWalker {
 			++$cursor->unknown;
 			return null;
 		}
-		if ( $cursor->finished || $cursor->processed >= 5000 || $cursor->bytes >= 134217728 || $cursor->elapsed >= 30 ) {
+		if ( $cursor->finished || $cursor->processed >= FileScanCursor::MAX_FILES || $cursor->bytes >= FileScanCursor::MAX_BYTES || $cursor->elapsed >= FileScanCursor::MAX_SECONDS ) {
 			$cursor->partial  = $cursor->partial || ! $cursor->finished;
 			$cursor->finished = true;
 			return null;

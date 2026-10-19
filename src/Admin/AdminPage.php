@@ -10,6 +10,8 @@ use AmazingPlugins\Security\Alerts\AlertDelivery;
 use AmazingPlugins\Security\Alerts\AlertSettingsRenderer;
 use AmazingPlugins\Security\Content\WordPressContentService;
 use AmazingPlugins\Security\FileScan\WordPressFileScanStore;
+use AmazingPlugins\Security\Scan\LocalCodeScan;
+use AmazingPlugins\Security\FileScan\FileScanStep;
 use AmazingPlugins\Security\Findings\CheckResult;
 use AmazingPlugins\Security\Findings\FindingsRepository;
 use AmazingPlugins\Security\Integrity\WordPressIntegrityStore;
@@ -37,6 +39,7 @@ final class AdminPage {
 
 	private function renderFirstScan(): void {
 		echo '<div class="wrap amazing-security-admin amsec-scan amsec-scan-first"><div class="amsec-stage">';
+		echo '<h1 class="screen-reader-text">' . esc_html__( 'Scan', 'amazing-security' ) . '</h1>';
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only notice after a failed scan redirect.
 		if ( isset( $_GET['amazing_security_error'] ) ) {
 			echo '<div class="notice notice-error" data-amsec-scan-error><p>' . esc_html__( 'Scan could not be saved.', 'amazing-security' ) . '</p></div>';
@@ -112,11 +115,85 @@ final class AdminPage {
 			$this->renderFirstScan();
 			return;
 		}
-		$options      = new WordPressOptions();
-		$progress     = ( new WordPressIntegrityStore( $options ) )->latestProgress();
-		$fileProgress = ( new WordPressFileScanStore( $options ) )->latestProgress();
-		echo '<div class="wrap amazing-security-admin amsec-scan">';
+		echo '<div class="wrap amazing-security-admin amsec-scan"><h1 class="screen-reader-text">' . esc_html__( 'Scan', 'amazing-security' ) . '</h1>';
 		$this->scanForm( true, __( 'Rescan', 'amazing-security' ), true );
+		list( $integrityScanId, $contentScanId, $fileScanId ) = $this->scanIds();
+		// These flags select a static message only.
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( isset( $_GET['amazing_security_error'] ) ) {
+			echo '<div class="notice notice-error"><p>' . esc_html__( 'Scan could not be saved. The previous report is still shown.', 'amazing-security' ) . '</p></div>';
+		}
+		$category = $this->requestedCategory( $run->results );
+		$this->categoryNav( $category, $this->scanCounts( $run->results ) );
+		$this->statusList( $category, $run->results, $integrityScanId, $contentScanId, $fileScanId );
+		echo '</div>';
+	}
+
+	/**
+	 * Every result from the latest scan that is not a success, most serious first, with the same actions as the Scan page.
+	 */
+	public function recommendations(): void {
+		$run = ( new FindingsRepository() )->latest();
+		if ( null === $run ) {
+			echo '<p>' . esc_html__( 'Recommendations come from the scan. Run it once and this page fills in.', 'amazing-security' ) . '</p>';
+			$this->scanForm( false, __( 'Scan', 'amazing-security' ) );
+			return;
+		}
+		list( $integrityScanId, $contentScanId, $fileScanId ) = $this->scanIds();
+		$groups = array(
+			'fix'    => array( __( 'Fix first', 'amazing-security' ), array( 'critical', 'error' ) ),
+			'review' => array( __( 'Review', 'amazing-security' ), array( 'warning' ) ),
+			'worth'  => array( __( 'Worth doing', 'amazing-security' ), array( 'recommended' ) ),
+		);
+		$total  = 0;
+		$byKey  = array();
+		foreach ( $groups as $key => $group ) {
+			$rows = array();
+			foreach ( $run->results as $result ) {
+				if ( $result instanceof CheckResult && in_array( self::statusOf( $result ), $group[1], true ) ) {
+					$rows[] = $result;
+				}
+			}
+			$byKey[ $key ] = $this->ranked( $rows );
+			$total        += count( $rows );
+		}
+		echo '<p>' . esc_html(
+			sprintf(
+				/* translators: 1: number of items, 2: date and time of the last scan. */
+				_n( '%1$s item from the scan on %2$s needs attention, most serious first.', '%1$s items from the scan on %2$s need attention, most serious first.', $total, 'amazing-security' ),
+				(string) $total,
+				wp_date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $run->finishedAt->getTimestamp() )
+			)
+		) . ' <a class="button" href="' . esc_url( admin_url( 'admin.php?page=amazing-security' ) ) . '">' . esc_html__( 'Scan again', 'amazing-security' ) . '</a></p>';
+		if ( 0 === $total ) {
+			echo '<p>' . esc_html__( 'Nothing from the last scan needs attention. That does not prove the site is clean.', 'amazing-security' ) . '</p>';
+			return;
+		}
+		foreach ( $groups as $key => $group ) {
+			if ( array() === $byKey[ $key ] ) {
+				continue;
+			}
+			echo '<section class="amsec-overview" aria-labelledby="amsec-rec-' . esc_attr( $key ) . '"><h2 id="amsec-rec-' . esc_attr( $key ) . '">' . esc_html( $group[0] . ' (' . count( $byKey[ $key ] ) . ')' ) . '</h2>';
+			$this->startItems( $byKey[ $key ], $integrityScanId, $contentScanId, $fileScanId );
+			echo '</section>';
+		}
+	}
+
+	/**
+	 * @param list<CheckResult> $rows
+	 * @return list<CheckResult>
+	 */
+	private function ranked( array $rows ): array {
+		$ranked = array_flip( array_merge( StartHere::ORDER, StartHere::LATER ) );
+		usort( $rows, static fn ( CheckResult $left, CheckResult $right ): int => ( $ranked[ $left->checkId ] ?? 1000 ) <=> ( $ranked[ $right->checkId ] ?? 1000 ) );
+		return $rows;
+	}
+
+	/** @return array{0: string, 1: string, 2: string} Integrity, content and file scan IDs that can be resumed. */
+	private function scanIds(): array {
+		$options       = new WordPressOptions();
+		$progress      = ( new WordPressIntegrityStore( $options ) )->latestProgress();
+		$fileProgress  = ( new WordPressFileScanStore( $options ) )->latestProgress();
 		$contentScanId = '';
 		try {
 			$active = ( new WordPressContentService() )->create()->status()['active'] ?? null;
@@ -134,15 +211,7 @@ final class AdminPage {
 		if ( null !== $fileProgress && ! $fileProgress->finished && 1 === preg_match( '/^[a-zA-Z0-9-]{1,80}$/D', $fileProgress->cursor->scanId ) ) {
 			$fileScanId = $fileProgress->cursor->scanId;
 		}
-		// These flags select a static message only.
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		if ( isset( $_GET['amazing_security_error'] ) ) {
-			echo '<div class="notice notice-error"><p>' . esc_html__( 'Scan could not be saved. The previous report is still shown.', 'amazing-security' ) . '</p></div>';
-		}
-		$category = $this->requestedCategory( $run->results );
-		$this->categoryNav( $category, $this->scanCounts( $run->results ) );
-		$this->statusList( $category, $run->results, $integrityScanId, $contentScanId, $fileScanId );
-		echo '</div>';
+		return array( $integrityScanId, $contentScanId, $fileScanId );
 	}
 
 	public function renderSection( string $section ): void {
@@ -161,6 +230,13 @@ final class AdminPage {
 		$vulnCurrent  = $vulnStore->current();
 		$direct       = ( new VulnerabilityPreferences( $options ) )->enabled();
 		if ( 'files' === $section ) {
+			$malware = LocalCodeScan::cursor();
+			if ( null !== $malware ) {
+				// FileScanReportRenderer escapes dynamic values.
+				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				echo ( new FileScanReportRenderer( '', '', array(), __( 'Malware scan', 'amazing-security' ), 'amsec-malware' ) )->render( null, new FileScanStep( $malware, $malware->finished ), array() );
+				echo '<p><a class="button" href="' . esc_url( admin_url( 'admin.php?page=amazing-security' ) ) . '">' . esc_html__( 'Scan again', 'amazing-security' ) . '</a></p>';
+			}
 			if ( null === $progress || $progress->finished ) {
 				echo '<form action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" method="post"><input type="hidden" name="action" value="amazing_security_integrity_start">';
 				wp_nonce_field( 'amazing_security_integrity_start' );
@@ -268,21 +344,13 @@ final class AdminPage {
 			'warning'     => __( 'These need a look.', 'amazing-security' ),
 			'recommended' => __( 'These are suggestions, or checks that could not be confirmed yet.', 'amazing-security' ),
 		);
-		$ranked = array_flip( array_merge( StartHere::ORDER, StartHere::LATER ) );
 		$rows   = array();
 		foreach ( $results as $result ) {
 			if ( $result instanceof CheckResult && self::statusOf( $result ) === $category ) {
 				$rows[] = $result;
 			}
 		}
-		usort(
-			$rows,
-			static function ( CheckResult $left, CheckResult $right ) use ( $ranked ): int {
-				$leftRank  = $ranked[ $left->checkId ] ?? 1000;
-				$rightRank = $ranked[ $right->checkId ] ?? 1000;
-				return $leftRank <=> $rightRank;
-			}
-		);
+		$rows = $this->ranked( $rows );
 		echo '<section class="amsec-overview" data-amsec-results aria-labelledby="amsec-start-title"><h2 id="amsec-start-title">' . esc_html( $titles[ $category ] ) . '</h2>';
 		echo '<p>' . esc_html( $notes[ $category ] ) . '</p>';
 		$per   = 6;

@@ -374,15 +374,8 @@
 
 body.amsec-app #wpbody-content > .wrap.amazing-security-admin:not(.amsec-scan) > h1,
 body.amsec-app #wpbody-content > .wrap.amazing-security-admin:not(.amsec-scan) > .amsec-header h1 {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  margin: -1px;
-  padding: 0;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
+  /* The page bar above already shows this title as the h1; hide the copy from screen readers too. */
+  display: none;
 }
 
 .amsec-rescan-row {
@@ -1238,8 +1231,8 @@ body.amsec-app #wpbody-content .amsec-tab-panel .wrap {
   box-shadow: none;
 }
 
-.amsec-tab-panel .amsec-header h1,
-.amsec-tab-panel .wrap > h1 {
+.amsec-tab-panel .amsec-header h2:first-child,
+.amsec-tab-panel .wrap > h2:first-child {
   font-size: 22px;
 }
 
@@ -1876,4 +1869,25 @@ body.amsec-app .amazing-security-admin fieldset > label {
 .amsec-cats.amsec-tour-target {
   border-radius: 14px;
   background: #faf5ec;
+}
+
+/* Each setting gets its own row; the generic fieldset rule lays labels side by side. */
+body.amsec-app .amazing-security-admin fieldset > label.amsec-check {
+  display: flex;
+  margin-right: 0;
+}
+
+/* Standalone links and disclosure toggles need a 24px tap target on phones (WCAG 2.2 target size). */
+@media screen and (max-width: 782px) {
+  body.amsec-app .amazing-security-admin summary,
+  body.amsec-app .amazing-security-admin .amsec-tip-button,
+  body.amsec-app .amazing-security-admin li > a,
+  body.amsec-app .amazing-security-admin td > a,
+  body.amsec-app .amazing-security-admin p > a:only-child,
+  body.amsec-app .amazing-security-admin p > a:last-child {
+    display: inline-block;
+    min-height: 24px;
+    padding: 3px 0;
+    line-height: 18px;
+  }
 }

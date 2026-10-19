@@ -41,6 +41,9 @@ final class AccountProtectionTest extends TestCase {
 	}
 
 	public function test_pending_registration_blocks_only_flagged_users(): void {
+		self::assertTrue( RegistrationApproval::marks( true, false ) );
+		self::assertFalse( RegistrationApproval::marks( true, true ) );
+		self::assertFalse( RegistrationApproval::marks( false, false ) );
 		self::assertTrue( RegistrationApproval::blocks( true, '1' ) );
 		self::assertTrue( RegistrationApproval::blocks( true, 1 ) );
 		self::assertFalse( RegistrationApproval::blocks( true, '' ) );

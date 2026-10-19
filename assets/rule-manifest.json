@@ -2,8 +2,8 @@
     "schema": 1,
     "packs": {
         "files": {
-            "version": "2026.10.09.2",
-            "reviewed_at": "2026-10-09",
+            "version": "2026.10.19.1",
+            "reviewed_at": "2026-10-19",
             "ids": [
                 "AS-PHP-001",
                 "AS-PHP-002",
@@ -47,17 +47,38 @@
                 "AS-PHP-040",
                 "AS-PHP-041",
                 "AS-PHP-042",
-                "AS-PHP-043"
+                "AS-PHP-043",
+                "AS-MAL-001",
+                "AS-MAL-002",
+                "AS-MAL-003",
+                "AS-MAL-004",
+                "AS-MAL-005",
+                "AS-MAL-006",
+                "AS-MAL-007",
+                "AS-MAL-008",
+                "AS-MAL-009",
+                "AS-MAL-010",
+                "AS-MAL-011",
+                "AS-MAL-012",
+                "AS-MAL-013",
+                "AS-MAL-014",
+                "AS-MAL-015",
+                "AS-MAL-016",
+                "AS-MAL-017",
+                "AS-MAL-018",
+                "AS-MAL-019",
+                "AS-MAL-020"
             ],
             "sha256": {
-                "src/FileScan/BundledRulePack.php": "969cac43d60fb9f534bc55041f69cdc8b36fb079f54de61556f6a9e918ac2b21",
-                "src/FileScan/RuleMatcher.php": "641f70c490cd9dea26e8f356c250443278ff4f94033f9ea347bfb40c515f4c5e",
-                "src/FileScan/AdjacentFlow.php": "7c0e67c176d14acaccc8fedb693df46f8a23e61bab3111ab1049cb21b2b2c852"
+                "src/FileScan/BundledRulePack.php": "da7e2a7b4596c027eaae5d39a7660a83cfc54b0646c867f081d0051a3f11916b",
+                "src/FileScan/RuleMatcher.php": "66601f5499f0694ec165cc6e44cdcf3c7491627a8407644c769c48deac7068c1",
+                "src/FileScan/AdjacentFlow.php": "7c0e67c176d14acaccc8fedb693df46f8a23e61bab3111ab1049cb21b2b2c852",
+                "src/FileScan/MalwareSignatures.php": "1fac8da2ee2e0eeb9163da1d0343ff31565558e3bd278dcc65f92370c8e8c2f0"
             }
         },
         "content": {
             "version": "2026.10.02.1",
-            "reviewed_at": "2026-10-09",
+            "reviewed_at": "2026-10-19",
             "ids": [
                 "AS-HTML-001",
                 "AS-HTML-002",
@@ -71,7 +92,7 @@
         },
         "requests": {
             "version": "2026.10.09.1",
-            "reviewed_at": "2026-10-09",
+            "reviewed_at": "2026-10-19",
             "ids": [
                 "AS-REST-001",
                 "AS-REST-002",

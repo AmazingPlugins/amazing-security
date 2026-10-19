@@ -47,7 +47,9 @@ final class Module {
 	}
 
 	public static function markPending( int $user_id ): void {
-		if ( $user_id < 1 || ! RegistrationApproval::enabled( self::option( RegistrationApproval::OPTION ) ) ) {
+		// Only an administrator or WP-CLI skips approval; a custom role that can create users does not.
+		$manager = current_user_can( 'manage_options' ) || ( function_exists( 'is_super_admin' ) && is_super_admin() ) || ( defined( 'WP_CLI' ) && WP_CLI );
+		if ( $user_id < 1 || ! RegistrationApproval::marks( RegistrationApproval::enabled( self::option( RegistrationApproval::OPTION ) ), $manager ) ) {
 			return;
 		}
 		update_user_meta( $user_id, RegistrationApproval::META, '1' );

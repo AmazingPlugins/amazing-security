@@ -9,11 +9,59 @@ defined( 'ABSPATH' ) || exit;
 use RuntimeException;
 
 final class RuleMatcher {
-	public function __construct( private readonly BundledRulePack $pack ) {}
+	public function __construct( private readonly BundledRulePack $pack, private readonly MalwareSignatures $signatures = new MalwareSignatures() ) {}
 
-	/** @return RuleHit[] */
+	/**
+	 * Token rules first. Byte signatures report only when no token rule matched, and they alone cover files too large for tokens.
+	 *
+	 * @return RuleHit[]
+	 */
 	public function match( string $bytes, string $relativePath ): array {
-		if ( ! function_exists( 'token_get_all' ) || strlen( $bytes ) > 2097152 ) {
+		if ( strlen( $bytes ) > 2097152 ) {
+			throw new RuntimeException( 'rule_unavailable' );
+		}
+		$tokens  = null;
+		$refused = null;
+		$failed  = array();
+		try {
+			$tokens = $this->tokens( $bytes );
+		} catch ( RuntimeException $error ) {
+			$refused = $error;
+		}
+		$signals = $this->signatures->scan( null === $tokens ? $bytes : MalwareSignatures::view( $tokens ), $failed );
+		$hits    = array();
+		if ( null !== $tokens ) {
+			try {
+				$hits = $this->tokenHits( $tokens, $relativePath, $failed );
+			} catch ( RuntimeException $error ) {
+				$refused = $error;
+			}
+		}
+		// Any confirmed hit is reported. With none, a failed rule or a missing tokenizer leaves the file unchecked.
+		// Files only too large for the token rules still count as checked by the byte signatures.
+		if ( array() === $hits && array() === $signals ) {
+			if ( null !== $refused && 'rule_memory_limit' !== $refused->getMessage() ) {
+				throw $refused;
+			}
+			if ( array() !== $failed ) {
+				throw new RuntimeException( 'rule_limit' );
+			}
+		}
+		if ( array() !== $hits ) {
+			return $hits;
+		}
+		$rules = $this->pack->rules();
+		foreach ( $signals as $id => $line ) {
+			if ( isset( $rules[ $id ]['summary'] ) ) {
+				$hits[] = new RuleHit( $id, $this->pack->version(), $relativePath, $line, $rules[ $id ]['summary'] );
+			}
+		}
+		return $hits;
+	}
+
+	/** @return array<int, array{0: int, 1: string, 2: int}|string> */
+	private function tokens( string $bytes ): array {
+		if ( ! function_exists( 'token_get_all' ) ) {
 			throw new RuntimeException( 'rule_unavailable' );
 		}
 		// Token arrays can use hundreds of bytes per source byte. Refuse before allocation.
@@ -30,8 +78,16 @@ final class RuleMatcher {
 		}
 		$tokens = token_get_all( $bytes );
 		if ( count( $tokens ) > 100000 ) {
-			throw new RuntimeException( 'rule_limit' );
+			throw new RuntimeException( 'rule_memory_limit' );
 		}
+		return $tokens;
+	}
+
+	/**
+	 * @param array<int, array{0: int, 1: string, 2: int}|string> $tokens
+	 * @return RuleHit[]
+	 */
+	private function tokenHits( array $tokens, string $relativePath, array &$failed ): array {
 		$markers  = AdjacentFlow::markers( $tokens );
 		$code     = '';
 		$previous = null;
@@ -74,9 +130,13 @@ final class RuleMatcher {
 		}
 		$hits = array();
 		foreach ( $this->pack->rules() as $id => $rule ) {
+			if ( ! isset( $rule['pattern'] ) ) {
+				continue;
+			}
 			$result = preg_match( $rule['pattern'], $code, $match, PREG_OFFSET_CAPTURE );
 			if ( false === $result ) {
-				throw new RuntimeException( 'rule_limit' );
+				$failed[] = $id;
+				continue;
 			}
 			if ( 1 === $result ) {
 				$hits[] = new RuleHit( $id, $this->pack->version(), $relativePath, 1 + substr_count( $code, "\n", 0, $match[0][1] ), $rule['summary'] );

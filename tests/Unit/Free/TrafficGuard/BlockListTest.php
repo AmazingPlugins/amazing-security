@@ -62,4 +62,11 @@ final class BlockListTest extends TestCase {
 		self::assertFalse( $locked['ok'] );
 		self::assertSame( 'self', $locked['error'] );
 	}
+
+	public function test_agent_entry_matches_inside_the_user_agent_in_any_case(): void {
+		$list = new \AmazingPlugins\Security\Free\TrafficGuard\BlockList();
+		self::assertTrue( $list->agentMatches( 'sqlmap', 'sqlmap/1.9.2#stable (https://sqlmap.org)' ) );
+		self::assertTrue( $list->agentMatches( 'wpscan', 'WPScan v3.8.28' ) );
+		self::assertFalse( $list->agentMatches( 'sqlmap', 'Mozilla/5.0 (Macintosh) Safari/605' ) );
+	}
 }

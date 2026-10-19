@@ -62,15 +62,15 @@ final class FileScanRunnerTest extends TestCase {
 		self::assertSame( 'oversized', $step->cursor->findings[0]['reason'] );
 	}
 
-    public function test_memory_refusal_marks_coverage_partial_and_continues(): void {
+    public function test_file_too_large_for_tokens_gets_signatures_and_counts_as_checked(): void {
         $root = $this->root();
         file_put_contents( $root . '/dense.php', '<?php ' . str_repeat( '$a;', 600000 ) );
         file_put_contents( $root . '/small.php', '<?php eval($_POST["fixture"]);' );
         $step = ( new FileScanRunner() )->step( array( new FileScanTarget( 'uploads', 'uploads', $root ) ), new FileScanCursor( 'memory' ), new ScanContext() );
         self::assertTrue( $step->finished );
-        self::assertTrue( $step->cursor->partial );
-        self::assertSame( 1, $step->cursor->unknown );
-        self::assertContains( 'rule_memory_limit', array_column( $step->cursor->findings, 'reason' ) );
+        self::assertFalse( $step->cursor->partial );
+        self::assertSame( 0, $step->cursor->unknown );
+        self::assertSame( 2, $step->cursor->scanned );
         self::assertContains( 'AS-PHP-004', array_column( $step->cursor->findings, 'rule_id' ) );
     }
 
@@ -118,7 +118,7 @@ final class FileScanRunnerTest extends TestCase {
 		$root = $this->root();
 		file_put_contents( $root . '/code.php', '<?php echo 1;' );
 		$cursor = new FileScanCursor( 'scan-1' );
-		$cursor->elapsed = 30.0;
+		$cursor->elapsed = (float) FileScanCursor::MAX_SECONDS;
 		$step = ( new FileScanRunner() )->step( array( new FileScanTarget( 'uploads', 'uploads', $root ) ), $cursor, new ScanContext() );
 		self::assertTrue( $step->finished );
 		self::assertTrue( $step->cursor->partial );

@@ -375,9 +375,11 @@
     },
     {
       "name": "escaped-command",
-      "kind": "benign",
+      "kind": "caught",
       "code": "<?php system(escapeshellarg($_GET['cmd']));",
-      "expected": []
+      "expected": [
+        "AS-MAL-002"
+      ]
     },
     {
       "name": "validated-route",
@@ -729,16 +731,20 @@
     },
     {
       "name": "split-unused-command",
-      "kind": "benign",
+      "kind": "caught",
       "code": "<?php $run = 'sys'.'tem'; $other($_POST['cmd']);",
-      "expected": [],
+      "expected": [
+        "AS-MAL-008"
+      ],
       "provenance": "Original minimal regression; obfuscation cases informed by https://malware.expert/malware/website-backdoors-variable-functions/; hidden links informed by Sucuri research. Not a collected malware specimen."
     },
     {
       "name": "split-constant-argument",
-      "kind": "benign",
+      "kind": "caught",
       "code": "<?php $run = 'sys'.'tem'; $run('fixture');",
-      "expected": [],
+      "expected": [
+        "AS-MAL-008"
+      ],
       "provenance": "Original minimal regression; obfuscation cases informed by https://malware.expert/malware/website-backdoors-variable-functions/; hidden links informed by Sucuri research. Not a collected malware specimen."
     },
     {
@@ -791,9 +797,11 @@
     },
     {
       "name": "split-trailing-dot",
-      "kind": "benign",
+      "kind": "caught",
       "code": "<?php $f='sys'.'tem'.; $f($_POST['cmd']);",
-      "expected": []
+      "expected": [
+        "AS-MAL-008"
+      ]
     },
     {
       "name": "inline-data-style",
@@ -845,16 +853,20 @@
     },
     {
       "name": "validated-eval-gap",
-      "kind": "known-gap",
+      "kind": "caught",
       "code": "<?php $x=$_POST['code']; if (allowed($x)) { eval($x); }",
-      "expected": [],
+      "expected": [
+        "AS-MAL-020"
+      ],
       "provenance": "Original inert authored regression for adjacent indirect execution; not a collected malware specimen."
     },
     {
       "name": "reassigned-eval",
-      "kind": "benign",
+      "kind": "known-noise",
       "code": "<?php $x=$_POST['code']; $x='echo 1;'; eval($x);",
-      "expected": [],
+      "expected": [
+        "AS-MAL-020"
+      ],
       "provenance": "Original inert authored regression for adjacent indirect execution; not a collected malware specimen."
     },
     {
@@ -908,16 +920,20 @@
     },
     {
       "name": "dynamic-index-eval-gap",
-      "kind": "known-gap",
+      "kind": "caught",
       "code": "<?php $x=$_POST[$key]; eval($x);",
-      "expected": [],
+      "expected": [
+        "AS-MAL-020"
+      ],
       "provenance": "Original inert authored regression for adjacent indirect execution; not a collected malware specimen."
     },
     {
       "name": "eval-concat-gap",
-      "kind": "known-gap",
+      "kind": "caught",
       "code": "<?php $x=$_POST['code']; eval($x.';');",
-      "expected": [],
+      "expected": [
+        "AS-MAL-020"
+      ],
       "provenance": "Original inert authored regression for adjacent indirect execution; not a collected malware specimen."
     },
     {

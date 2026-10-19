@@ -19,7 +19,7 @@ final class HotlinkRule {
 			return '';
 		}
 		$quoted = preg_quote( $host, '/' );
-		return self::BEGIN . "\n<IfModule mod_rewrite.c>\nRewriteEngine On\nRewriteCond %{HTTP_REFERER} ^https?:// [NC]\nRewriteCond %{HTTP_REFERER} !^https?://(www\\.)?" . $quoted . " [NC]\nRewriteRule \\.(jpe?g|png|gif|webp)$ - [F,NC,L]\n</IfModule>\n" . self::END . "\n";
+		return self::BEGIN . "\n<IfModule mod_rewrite.c>\nRewriteEngine On\nRewriteCond %{HTTP_REFERER} ^https?:// [NC]\nRewriteCond %{HTTP_REFERER} !^https?://(www\\.)?" . $quoted . "(:[0-9]+)?(/|$) [NC]\nRewriteRule \\.(jpe?g|png|gif|webp)$ - [F,NC,L]\n</IfModule>\n" . self::END . "\n";
 	}
 
 	public static function apply( string $existing, string $host, bool $enabled ): string {

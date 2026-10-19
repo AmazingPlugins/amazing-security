@@ -29,11 +29,11 @@ final class Examples {
 	 */
 	public static function agents(): array {
 		return array(
-			'sqlmap/1.7.8#stable (https://sqlmap.org)',
-			'Mozilla/5.0 (compatible; Nmap Scripting Engine; https://nmap.org/book/nse.html)',
-			'masscan/1.3 (https://github.com/robertdavidgraham/masscan)',
-			'Mozilla/5.00 (Nikto/2.1.6)',
-			'WPScan v3.8.28 (https://wpscan.com/wordpress-security-scanner)',
+			'sqlmap',
+			'Nmap Scripting Engine',
+			'masscan',
+			'Nikto',
+			'WPScan',
 			'ZmEu',
 		);
 	}

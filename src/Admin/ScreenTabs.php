@@ -26,9 +26,14 @@ final class ScreenTabs {
 
 	public static function panel( string $id, bool $open ): void {
 		echo '<div class="amsec-tab-panel" role="tabpanel" id="amsec-panel-' . esc_attr( $id ) . '" aria-labelledby="amsec-tab-' . esc_attr( $id ) . '" tabindex="0" data-amsec-panel="' . esc_attr( $id ) . '"' . ( $open ? '' : ' hidden' ) . '>';
+		ob_start();
 	}
 
+	/** A screen embedded in a tab keeps one h1 per page: its own title becomes an h2. */
 	public static function close(): void {
+		$html = (string) ob_get_clean();
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Already-escaped panel markup; only the heading tag name changes.
+		echo preg_replace( '~<(/?)h1(?=[\s>])~i', '<$1h2', $html ) ?? $html;
 		echo '</div>';
 	}
 }

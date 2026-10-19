@@ -20,7 +20,7 @@ final class RulePatternTest extends TestCase {
 			array( "<?php shell_exec('id ' . \$_POST['cmd']);", array( 'AS-PHP-031' ) ),
 			array( "<?php passthru('id ' . \$_REQUEST['cmd']);", array( 'AS-PHP-031' ) ),
 			array( "<?php shell_exec('id ' . \$cmd);", array() ),
-			array( "<?php exec('id ' . \$_POST['cmd']);", array() ),
+			array( "<?php exec('id ' . \$_POST['cmd']);", array( 'AS-MAL-002' ) ),
 			array( "<?php copy(\$_POST['url'], 'wp-content/uploads/drop.php');", array( 'AS-PHP-032' ) ),
 			array( "<?php copy(\$_GET['url'], \$dest);", array() ),
 			array( "<?php copy(\$_COOKIE['url'], 'wp-content/uploads/drop.php');", array() ),
