@@ -39,6 +39,7 @@ final class AdminPage {
 
 	private function renderFirstScan(): void {
 		echo '<div class="wrap amazing-security-admin amsec-scan amsec-scan-first"><div class="amsec-stage">';
+		echo '<h1 class="screen-reader-text">' . esc_html__( 'Scan', 'amazing-security' ) . '</h1>';
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only notice after a failed scan redirect.
 		if ( isset( $_GET['amazing_security_error'] ) ) {
 			echo '<div class="notice notice-error" data-amsec-scan-error><p>' . esc_html__( 'Scan could not be saved.', 'amazing-security' ) . '</p></div>';
@@ -114,7 +115,7 @@ final class AdminPage {
 			$this->renderFirstScan();
 			return;
 		}
-		echo '<div class="wrap amazing-security-admin amsec-scan">';
+		echo '<div class="wrap amazing-security-admin amsec-scan"><h1 class="screen-reader-text">' . esc_html__( 'Scan', 'amazing-security' ) . '</h1>';
 		$this->scanForm( true, __( 'Rescan', 'amazing-security' ), true );
 		list( $integrityScanId, $contentScanId, $fileScanId ) = $this->scanIds();
 		// These flags select a static message only.
