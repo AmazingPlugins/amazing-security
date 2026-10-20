@@ -139,17 +139,20 @@ final class AdminPage {
 	 * Every result from the latest scan that is not a success, most serious first, with the same actions as the Scan page.
 	 */
 	public function recommendations(): void {
+		$off = StartPanel::offRows();
 		$run = ( new FindingsRepository() )->latest();
 		if ( null === $run ) {
 			echo '<p>' . esc_html__( 'Recommendations come from the scan. Run it once and this page fills in.', 'amazing-security' ) . '</p>';
 			$this->scanForm( false, __( 'Scan', 'amazing-security' ) );
+			StartPanel::protections( $off );
+			StartPanel::incident();
 			return;
 		}
 		list( $integrityScanId, $contentScanId, $fileScanId ) = $this->scanIds();
 		$groups = array(
-			'fix'    => array( __( 'Fix first', 'amazing-security' ), array( 'critical', 'error' ) ),
-			'review' => array( __( 'Review', 'amazing-security' ), array( 'warning' ) ),
-			'worth'  => array( __( 'Recommended', 'amazing-security' ), array( 'recommended' ) ),
+			'fix'         => array( __( 'Fix first', 'amazing-security' ), array( 'critical', 'error' ), 'is-critical' ),
+			'review'      => array( __( 'Review', 'amazing-security' ), array( 'warning' ), 'is-warning' ),
+			'recommended' => array( __( 'Recommended', 'amazing-security' ), array( 'recommended' ), 'is-recommended' ),
 		);
 		$total  = 0;
 		$byKey  = array();
@@ -171,23 +174,47 @@ final class AdminPage {
 				wp_date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $run->finishedAt->getTimestamp() )
 			)
 		) . ' <a class="button" href="' . esc_url( admin_url( 'admin.php?page=amazing-security' ) ) . '">' . esc_html__( 'Scan again', 'amazing-security' ) . '</a></p>';
-		$options  = new WordPressOptions();
-		$packages = ( new VulnerabilityPreferences( $options ) )->enabled() ? ( new WordPressVulnerabilityReportStore( $options ) )->current()?->results : null;
-		// SiteRiskCard escapes all dynamic values.
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		echo SiteRiskCard::render( SiteRisk::rows( $run->results, $packages, SiteRiskCard::botModes(), time() - $run->finishedAt->getTimestamp() ) );
-		if ( 0 === $total ) {
-			echo '<p>' . esc_html__( 'Nothing from the last scan needs attention. That does not prove the site is clean.', 'amazing-security' ) . '</p>';
-			return;
-		}
+		$tabs = array( 'overview' => array( __( 'Overview', 'amazing-security' ), null, '' ) );
 		foreach ( $groups as $key => $group ) {
-			if ( array() === $byKey[ $key ] ) {
-				continue;
+			$tabs[ $key ] = array( $group[0], count( $byKey[ $key ] ), $group[2] );
+		}
+		$tabs['off'] = array( __( 'Turned off', 'amazing-security' ), count( $off ), 'is-error' );
+		$raw         = isset( $_GET['amsec_tab'] ) ? sanitize_key( wp_unslash( $_GET['amsec_tab'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized,WordPress.Security.ValidatedSanitizedInput.MissingUnslash -- Read-only view switch.
+		$current     = isset( $tabs[ $raw ] ) ? $raw : 'overview';
+		echo '<nav class="amsec-cats" aria-label="' . esc_attr__( 'Recommendation groups', 'amazing-security' ) . '">';
+		foreach ( $tabs as $slug => $tab ) {
+			$url = add_query_arg(
+				array(
+					'page'      => 'amsec-recommendations',
+					'amsec_tab' => $slug,
+				),
+				admin_url( 'admin.php' )
+			);
+			echo '<a class="' . esc_attr( $tab[2] . ( $slug === $current ? ' is-current' : '' ) ) . '"' . ( $slug === $current ? ' aria-current="page"' : '' ) . ' href="' . esc_url( $url ) . '">' . esc_html( $tab[0] ) . ( null === $tab[1] ? '' : ' <span class="amsec-cat-count">' . esc_html( (string) $tab[1] ) . '</span>' ) . '</a>';
+		}
+		echo '</nav><div class="amsec-tab-panel">';
+		if ( 'overview' === $current ) {
+			$options  = new WordPressOptions();
+			$packages = ( new VulnerabilityPreferences( $options ) )->enabled() ? ( new WordPressVulnerabilityReportStore( $options ) )->current()?->results : null;
+			// SiteRiskCard escapes all dynamic values.
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			echo SiteRiskCard::render( SiteRisk::rows( $run->results, $packages, SiteRiskCard::botModes(), time() - $run->finishedAt->getTimestamp() ) );
+			if ( 0 === $total ) {
+				echo '<p>' . esc_html__( 'Nothing from the last scan needs attention. That does not prove the site is clean.', 'amazing-security' ) . '</p>';
 			}
-			echo '<section class="amsec-overview" aria-labelledby="amsec-rec-' . esc_attr( $key ) . '"><h2 id="amsec-rec-' . esc_attr( $key ) . '">' . esc_html( $group[0] . ' (' . count( $byKey[ $key ] ) . ')' ) . '</h2>';
-			$this->startItems( $byKey[ $key ], $integrityScanId, $contentScanId, $fileScanId );
+			StartPanel::incident();
+		} elseif ( 'off' === $current ) {
+			StartPanel::protections( $off );
+		} else {
+			echo '<section class="amsec-overview" aria-labelledby="amsec-rec-' . esc_attr( $current ) . '"><h2 id="amsec-rec-' . esc_attr( $current ) . '">' . esc_html( $groups[ $current ][0] . ' (' . count( $byKey[ $current ] ) . ')' ) . '</h2>';
+			if ( array() === $byKey[ $current ] ) {
+				echo '<p>' . esc_html__( 'Nothing in this group.', 'amazing-security' ) . '</p>';
+			} else {
+				$this->startItems( $byKey[ $current ], $integrityScanId, $contentScanId, $fileScanId );
+			}
 			echo '</section>';
 		}
+		echo '</div>';
 	}
 
 	/**

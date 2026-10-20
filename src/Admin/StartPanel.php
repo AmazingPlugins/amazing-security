@@ -29,27 +29,44 @@ final class StartPanel {
 		echo '<div class="wrap amazing-security-admin">';
 		echo '<h1>' . esc_html__( 'Recommendations', 'amazing-security' ) . '</h1>';
 		( new AdminPage() )->recommendations();
-		self::protections();
-		echo '<section class="amsec-overview"><h2>' . esc_html__( 'If something looks wrong', 'amazing-security' ) . '</h2><p>' . esc_html__( 'Review administrators, end other sessions, require a new password, then scan again.', 'amazing-security' ) . ' <a class="button" href="' . esc_url( admin_url( 'admin.php?page=amsec-incident' ) ) . '">' . esc_html__( 'Open incident steps', 'amazing-security' ) . '</a></p></section>';
 		echo '</div>';
 	}
 
-	/** Protections the scan does not list, still off. */
-	private static function protections(): void {
+	public static function incident(): void {
+		echo '<section class="amsec-overview"><h2>' . esc_html__( 'If something looks wrong', 'amazing-security' ) . '</h2><p>' . esc_html__( 'Review administrators, end other sessions, require a new password, then scan again.', 'amazing-security' ) . ' <a class="button" href="' . esc_url( admin_url( 'admin.php?page=amsec-incident' ) ) . '">' . esc_html__( 'Open incident steps', 'amazing-security' ) . '</a></p></section>';
+	}
+
+	/**
+	 * Protections the scan does not list, still off.
+	 *
+	 * @return list<array<string, mixed>>
+	 */
+	public static function offRows(): array {
+		$options = self::options();
+		$off     = array();
+		foreach ( Module::rows() as $row ) {
+			$on = ! empty( $row['idle'] ) ? in_array( (string) $options['amsec_idle_minutes'], array( '15', '30', '60' ), true ) : '1' === (string) ( $options[ $row['key'] ] ?? '0' );
+			// The scan list already offers the switches that live on the Scan page.
+			if ( ! $on && 'amazing-security' !== $row['page'] ) {
+				$off[] = $row;
+			}
+		}
+		return $off;
+	}
+
+	/** @return array<string, mixed> */
+	private static function options(): array {
 		$options = array();
 		foreach ( array_keys( Score::FLAGS ) as $key ) {
 			$options[ $key ] = get_option( $key, '0' );
 		}
 		$options['amsec_idle_minutes'] = get_option( 'amsec_idle_minutes', '0' );
-		$score                         = Score::tally( $options );
-		$off                           = array();
-		foreach ( Module::rows() as $row ) {
-			$on = ! empty( $row['idle'] ) ? in_array( (string) $options['amsec_idle_minutes'], array( '15', '30', '60' ), true ) : '1' === (string) ( $options[ $row['key'] ] ?? '0' );
-			// The scan list above already offers the switches that live on the Scan page.
-			if ( ! $on && 'amazing-security' !== $row['page'] ) {
-				$off[] = $row;
-			}
-		}
+		return $options;
+	}
+
+	/** @param list<array<string, mixed>> $off From offRows(). */
+	public static function protections( array $off ): void {
+		$score = Score::tally( self::options() );
 		echo '<section class="amsec-overview" aria-labelledby="amsec-rec-protections"><h2 id="amsec-rec-protections">' . esc_html( __( 'Protections that are off', 'amazing-security' ) . ' (' . count( $off ) . ')' ) . '</h2>';
 		echo '<p>' . esc_html(
 			sprintf(
