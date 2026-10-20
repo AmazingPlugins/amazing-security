@@ -97,11 +97,12 @@ final class RatePolicy {
 		if ( $xmlrpc || 'xmlrpc.php' === $pagenow ) {
 			return 'xmlrpc';
 		}
-		if ( $restRoute || ( '' !== $restPath && str_starts_with( $path, $restPath ) ) ) {
-			return 'rest';
-		}
+		// The entry script decides first, so wp-login.php?rest_route=… still counts as a sign-in post.
 		if ( 'POST' === strtoupper( $method ) && ( $ajax || 'wp-login.php' === $pagenow ) ) {
 			return 'login';
+		}
+		if ( 'index.php' === $pagenow && ( $restRoute || ( '' !== $restPath && str_starts_with( $path, $restPath ) ) ) ) {
+			return 'rest';
 		}
 		return 'page';
 	}

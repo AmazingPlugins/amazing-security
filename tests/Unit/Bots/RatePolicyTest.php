@@ -25,6 +25,10 @@ final class RatePolicyTest extends TestCase {
 		self::assertSame( 'page', self::kind( '/wp-login.php', 'GET', 'wp-login.php' ) );
 		self::assertSame( 'login', self::kind( '/wp-admin/admin-ajax.php', 'post', 'admin-ajax.php', false, false, true ) );
 		self::assertSame( 'page', self::kind( '/wp-admin/admin-ajax.php', 'GET', 'admin-ajax.php', false, false, true ) );
+		// The entry script wins over a REST marker, so sign-in posts can't skip their own limit.
+		self::assertSame( 'login', self::kind( '/wp-login.php', 'POST', 'wp-login.php', true ) );
+		self::assertSame( 'login', self::kind( '/wp-admin/admin-ajax.php', 'POST', 'admin-ajax.php', true, false, true ) );
+		self::assertSame( 'page', self::kind( '/wp-login.php', 'GET', 'wp-login.php', true ) );
 	}
 
 	public function test_limits_map_xmlrpc_to_rest(): void {

@@ -60,7 +60,7 @@ final class BotCounterStore {
 		}
 	}
 
-	public function record( string $key, int $window, int $now ): ?int {
+	public function record( string $key, int $window, int $now, int $cap = 10000 ): ?int {
 		if ( ! preg_match( '/^[a-f0-9]{64}$/D', $key ) || ! in_array( $window, array( 60, 300, 600, 900 ), true ) || $now < 1 ) {
 			return null;
 		}
@@ -87,7 +87,7 @@ final class BotCounterStore {
 				if ( null === $exists ) {
 					// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- At most ten thousand opaque counter keys.
 					$count = $this->db->get_var( "SELECT COUNT(*) FROM {$this->table}" );
-					if ( null === $count || '' !== $this->db->last_error || (int) $count >= 10000 ) {
+					if ( null === $count || '' !== $this->db->last_error || (int) $count >= min( $cap, 10000 ) ) {
 						return null;
 					}
 				}

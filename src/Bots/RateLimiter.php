@@ -71,7 +71,7 @@ final class RateLimiter {
 		}
 		$store = new BotCounterStore( $GLOBALS['wpdb'] );
 		$now   = time();
-		$block = $client->key( wp_salt( 'auth' ) . self::BLOCK_SALT )->fromServer( $_SERVER );
+		$block = $client->key( wp_salt( 'auth' ) . self::BLOCK_SALT, true )->fromServer( $_SERVER );
 		if ( null === $block ) {
 			return;
 		}
@@ -81,7 +81,7 @@ final class RateLimiter {
 				self::deny( $until - $now );
 			}
 		}
-		$key = $client->key( wp_salt( 'auth' ) . ':bot:rate:' . ( 'xmlrpc' === $kind ? 'rest' : $kind ) )->fromServer( $_SERVER );
+		$key = $client->key( wp_salt( 'auth' ) . ':bot:rate:' . ( 'xmlrpc' === $kind ? 'rest' : $kind ), true )->fromServer( $_SERVER );
 		if ( null === $key ) {
 			return;
 		}
@@ -106,7 +106,8 @@ final class RateLimiter {
 	/** One counter write per request: the object cache when there is one, otherwise the shared table. */
 	private static function count( BotCounterStore $store, string $key, int $now ): ?int {
 		if ( ! wp_using_ext_object_cache() ) {
-			return $store->record( $key, self::WINDOW, $now );
+			// Leaves room in the shared table so a flood of page counters can't switch off the form and scanner counters.
+			return $store->record( $key, self::WINDOW, $now, 7000 );
 		}
 		$bucket = $key . ':' . intdiv( $now, self::WINDOW );
 		wp_cache_add( $bucket, 0, 'amsec_rate', 2 * self::WINDOW );
