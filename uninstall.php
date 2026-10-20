@@ -48,6 +48,7 @@ delete_option( 'amsec_required_totp_policy' );
 delete_option( 'amsec_custom_baseline_state' );
 
 delete_option( 'amsec_bot_mode' );
+delete_option( 'amsec_scanner_mode' );
 delete_option( 'amsec_bot_schema_version' );
 wp_clear_scheduled_hook( 'amsec_bot_cleanup' );
 // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Explicit erase preference removes only plugin-owned opaque counters.

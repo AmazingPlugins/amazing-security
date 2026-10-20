@@ -276,7 +276,7 @@ add_action( 'init', array( AmazingPlugins\Security\Bots\BotCounterStore::class, 
 add_action(
 	'admin_init',
 	static function (): void {
-		if ( '1' !== get_option( 'amsec_bot_schema_version' ) ) {
+		if ( AmazingPlugins\Security\Bots\BotCounterStore::SCHEMA !== get_option( 'amsec_bot_schema_version' ) ) {
 			AmazingPlugins\Security\Bots\BotCounterStore::install(); }
 	}
 );
@@ -292,6 +292,9 @@ add_action( 'register_form', array( $amsec_bots, 'fields' ) );
 add_filter( 'preprocess_comment', array( $amsec_bots, 'comment' ) );
 add_filter( 'registration_errors', array( $amsec_bots, 'registration' ), 20, 1 );
 add_action( 'admin_menu', array( new AmazingPlugins\Security\Bots\BotSettings(), 'register' ) );
+$amsec_scanner = new AmazingPlugins\Security\Bots\ScannerGuard();
+add_action( 'template_redirect', array( $amsec_scanner, 'check' ), 0 );
+add_action( 'admin_post_amsec_scanner_guard', array( $amsec_scanner, 'handle' ) );
 add_action( 'admin_post_amsec_bot_settings', array( new AmazingPlugins\Security\Bots\BotSettings(), 'handle' ) );
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
 	\WP_CLI::add_command( 'amazing-security bots disable', array( new AmazingPlugins\Security\Bots\BotSettings(), 'recovery' ) );

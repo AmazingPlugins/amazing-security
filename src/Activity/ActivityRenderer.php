@@ -47,6 +47,8 @@ final class ActivityRenderer {
 			'totp_grace_granted'       => __( 'Verification grace granted', 'amazing-security' ),
 			'baseline_approved'        => __( 'Code reference approved', 'amazing-security' ),
 			'bot_policy_changed'       => __( 'Comment check changed', 'amazing-security' ),
+			'scanner_flagged'          => __( 'Scanner spotted', 'amazing-security' ),
+			'scanner_blocked'          => __( 'Scanner blocked for an hour', 'amazing-security' ),
 		);
 		return $names[ $event ] ?? str_replace( '_', ' ', $event );
 	}

@@ -85,6 +85,7 @@ final class Page {
 		ScreenTabs::panel( 'bots', true );
 		( new BotSettings() )->render();
 		CommentChecks::render();
+		( new \AmazingPlugins\Security\Bots\ScannerGuard() )->render();
 		ScreenTabs::close();
 		ScreenTabs::panel( 'lists', false );
 		echo '<p>' . esc_html__( 'Block lists, the live log, and the hotlink check stay off until you turn them on.', 'amazing-security' ) . '</p>';
