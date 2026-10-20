@@ -129,11 +129,6 @@ final class AdminPage {
 		if ( isset( $_GET['amazing_security_error'] ) ) {
 			echo '<div class="notice notice-error"><p>' . esc_html__( 'Scan could not be saved. The previous report is still shown.', 'amazing-security' ) . '</p></div>';
 		}
-		$options  = new WordPressOptions();
-		$packages = ( new VulnerabilityPreferences( $options ) )->enabled() ? ( new WordPressVulnerabilityReportStore( $options ) )->current()?->results : null;
-		// SiteRiskCard escapes all dynamic values.
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		echo SiteRiskCard::render( SiteRisk::rows( $run->results, $packages, SiteRiskCard::botModes(), time() - $run->finishedAt->getTimestamp() ) );
 		$category = $this->requestedCategory( $run->results );
 		$this->categoryNav( $category, $this->scanCounts( $run->results ) );
 		$this->statusList( $category, $run->results, $integrityScanId, $contentScanId, $fileScanId );
@@ -154,7 +149,7 @@ final class AdminPage {
 		$groups = array(
 			'fix'    => array( __( 'Fix first', 'amazing-security' ), array( 'critical', 'error' ) ),
 			'review' => array( __( 'Review', 'amazing-security' ), array( 'warning' ) ),
-			'worth'  => array( __( 'Worth doing', 'amazing-security' ), array( 'recommended' ) ),
+			'worth'  => array( __( 'Recommended', 'amazing-security' ), array( 'recommended' ) ),
 		);
 		$total  = 0;
 		$byKey  = array();
@@ -176,6 +171,11 @@ final class AdminPage {
 				wp_date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $run->finishedAt->getTimestamp() )
 			)
 		) . ' <a class="button" href="' . esc_url( admin_url( 'admin.php?page=amazing-security' ) ) . '">' . esc_html__( 'Scan again', 'amazing-security' ) . '</a></p>';
+		$options  = new WordPressOptions();
+		$packages = ( new VulnerabilityPreferences( $options ) )->enabled() ? ( new WordPressVulnerabilityReportStore( $options ) )->current()?->results : null;
+		// SiteRiskCard escapes all dynamic values.
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo SiteRiskCard::render( SiteRisk::rows( $run->results, $packages, SiteRiskCard::botModes(), time() - $run->finishedAt->getTimestamp() ) );
 		if ( 0 === $total ) {
 			echo '<p>' . esc_html__( 'Nothing from the last scan needs attention. That does not prove the site is clean.', 'amazing-security' ) . '</p>';
 			return;
@@ -420,10 +420,8 @@ final class AdminPage {
 	 */
 	private function requestedCategory( array $results ): string {
 		$raw = isset( $_GET['amsec_cat'] ) ? sanitize_key( wp_unslash( $_GET['amsec_cat'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized,WordPress.Security.ValidatedSanitizedInput.MissingUnslash -- Read-only view switch.
-		if ( 'info' === $raw ) {
-			$raw = 'recommended';
-		}
-		$allowed = array( 'success', 'error', 'critical', 'warning', 'recommended' );
+		// Recommended items live on the Recommendations page now.
+		$allowed = array( 'success', 'error', 'critical', 'warning' );
 		if ( in_array( $raw, $allowed, true ) ) {
 			return $raw;
 		}
@@ -436,9 +434,6 @@ final class AdminPage {
 		}
 		if ( $counts['warn'] > 0 ) {
 			return 'warning';
-		}
-		if ( $counts['recommended'] > 0 ) {
-			return 'recommended';
 		}
 		return 'success';
 	}
@@ -464,11 +459,10 @@ final class AdminPage {
 	 */
 	private function categoryNav( string $current, array $counts ): void {
 		$items = array(
-			'success'     => array( __( 'Success', 'amazing-security' ), $counts['success'] ),
-			'error'       => array( __( 'Error', 'amazing-security' ), $counts['fail'] ),
-			'critical'    => array( __( 'Critical', 'amazing-security' ), $counts['critical'] ),
-			'warning'     => array( __( 'Warning', 'amazing-security' ), $counts['warn'] ),
-			'recommended' => array( __( 'Recommended', 'amazing-security' ), $counts['recommended'] ),
+			'success'  => array( __( 'Success', 'amazing-security' ), $counts['success'] ),
+			'error'    => array( __( 'Error', 'amazing-security' ), $counts['fail'] ),
+			'critical' => array( __( 'Critical', 'amazing-security' ), $counts['critical'] ),
+			'warning'  => array( __( 'Warning', 'amazing-security' ), $counts['warn'] ),
 		);
 		echo '<nav class="amsec-cats" aria-label="' . esc_attr__( 'Report categories', 'amazing-security' ) . '">';
 		foreach ( $items as $slug => $item ) {
