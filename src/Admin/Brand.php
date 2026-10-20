@@ -49,7 +49,7 @@ final class Brand {
 		if ( ! self::onScreen() ) {
 			return;
 		}
-		wp_enqueue_style( 'amazing-security-admin', plugins_url( 'assets/admin.css', AMAZING_SECURITY_FILE ), array(), '0.1.59' );
+		wp_enqueue_style( 'amazing-security-admin', plugins_url( 'assets/admin.css', AMAZING_SECURITY_FILE ), array(), '0.1.60' );
 		$page = self::page();
 		if ( in_array( $page, array( 'amsec-accounts', 'amsec-traffic-guard' ), true ) ) {
 			wp_enqueue_script( 'amazing-security-tabs', plugins_url( 'assets/admin-tabs.js', AMAZING_SECURITY_FILE ), array(), '0.1.1', true );
@@ -57,8 +57,30 @@ final class Brand {
 		if ( 'amazing-security' !== $page ) {
 			return;
 		}
-		wp_enqueue_script( 'amazing-security-scan', plugins_url( 'assets/admin-scan.js', AMAZING_SECURITY_FILE ), array(), '0.1.13', true );
-		wp_localize_script( 'amazing-security-scan', 'amsecScan', array( 'error' => __( 'Scan could not be saved.', 'amazing-security' ) ) );
+		wp_enqueue_script( 'amazing-security-scan', plugins_url( 'assets/admin-scan.js', AMAZING_SECURITY_FILE ), array(), '0.1.14', true );
+		wp_localize_script(
+			'amazing-security-scan',
+			'amsecScan',
+			array(
+				'error'  => __( 'Scan could not be saved.', 'amazing-security' ),
+				// Real check areas in the order the scan covers them; the progress bar names each one.
+				'stages' => array(
+					__( 'Checking file and folder permissions', 'amazing-security' ),
+					__( 'Looking for PHP in the uploads folder', 'amazing-security' ),
+					__( 'Checking sign-in protection', 'amazing-security' ),
+					__( 'Checking what the site shows about its users', 'amazing-security' ),
+					__( 'Looking for leftover and backup files', 'amazing-security' ),
+					__( 'Looking for debug and error logs', 'amazing-security' ),
+					__( 'Checking PHP and WordPress updates', 'amazing-security' ),
+					__( 'Checking plugins and themes', 'amazing-security' ),
+					__( 'Checking bot and REST limits', 'amazing-security' ),
+					__( 'Checking monitoring settings', 'amazing-security' ),
+					__( 'Reviewing plugin code results', 'amazing-security' ),
+					__( 'Saving the results', 'amazing-security' ),
+				),
+				'minMs'  => 20000,
+			)
+		);
 	}
 
 	public static function bar(): void {

@@ -2030,3 +2030,26 @@ body.amsec-app .amazing-security-admin .widefat td {
 .amazing-security-admin caption {
   text-align: left;
 }
+
+/* Determinate scan bar: the script sets the width and the percentage. */
+.amsec-scan-fill.is-determinate {
+  width: 0;
+  animation: none;
+  transform: none;
+  transition: width 0.12s linear;
+}
+
+.amsec-scan-percent {
+  font-variant-numeric: tabular-nums;
+}
+
+.amsec-scan-stage {
+  min-height: 1.5em;
+  margin: 12px 0 0;
+  color: #6b5c4f;
+}
+
+/* Outranks the wrapped-checkbox label rule, which would otherwise keep the consent box on screen. */
+body.amsec-app .amazing-security-admin .amsec-scan-form.is-scanning label.amsec-header-consent {
+  display: none;
+}
