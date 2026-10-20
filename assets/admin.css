@@ -1644,6 +1644,11 @@ body.amsec-app .amazing-security-admin code,
   color: #1e7a46;
 }
 
+.amsec-pill.is-risk {
+  background: #fde8e4;
+  color: #a63617;
+}
+
 .amsec-facts {
   display: flex;
   flex-wrap: wrap;

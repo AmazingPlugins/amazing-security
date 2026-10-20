@@ -29,6 +29,14 @@ final class McpGatewayTest extends TestCase {
 		self::assertNotFalse( json_encode( $projected ) );
 	}
 
+	public function test_vulnerability_finding_carries_risk_history_only_for_that_module(): void {
+		$result    = new CheckResult( 'vulnerability', 'pass', 'Had 3 security holes before.', 'https://www.wpvulnerability.com/', new DateTimeImmutable( '2026-01-01T00:00:00Z' ), 'medium', 'complete', array( 'slug' => 'cf7', 'risk' => 'watch', 'past_total' => 3, 'past_high' => 2 ) );
+		$projector = new OutputProjector();
+		$projected = $projector->check( 'vulnerability', $result );
+		self::assertSame( array( 'watch', 3, 2, false ), array( $projected['risk'], $projected['past_total'], $projected['past_high'], $projected['exploited'] ) );
+		self::assertArrayNotHasKey( 'risk', $projector->check( 'hardening', $result ) );
+	}
+
 	public function test_source_url_does_not_expose_credentials_or_query_tokens(): void {
 		$result = new CheckResult( 'debug-display', 'warn', 'Finding', 'https://user:secret@example.org/path?token=abc#private', new DateTimeImmutable( '2026-01-01T00:00:00Z' ), 'high', 'complete', array() );
 		$projected = ( new OutputProjector() )->check( 'hardening', $result );

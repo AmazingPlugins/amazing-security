@@ -48,6 +48,7 @@ final class ReportCollector {
 						'id'       => $id,
 						'state'    => $row['state'] ?? 'unknown',
 						'coverage' => $row['coverage'] ?? 'complete',
+						'risk'     => $row['evidence']['risk'] ?? null,
 					);
 					if ( 'vulnerabilities' === $kind ) {
 						$checked = is_string( $row['tested_at'] ?? null ) ? strtotime( $row['tested_at'] ) : false;

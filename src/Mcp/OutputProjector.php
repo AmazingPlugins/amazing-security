@@ -11,7 +11,7 @@ use AmazingPlugins\Security\Findings\CheckResult;
 final class OutputProjector {
 	public function check( string $module, CheckResult $result ): array {
 		$key = $result->findingId ?? ( 'hardening' === $module ? $result->checkId : hash( 'sha256', $result->checkId . ':' . $result->sourceUrl . ':' . (string) ( $result->evidence['path'] ?? $result->evidence['slug'] ?? $result->evidence['package'] ?? '' ) ) );
-		return array(
+		$out = array(
 			'id'         => substr( hash( 'sha256', $module . ':' . $key ), 0, 32 ),
 			'module'     => $module,
 			'state'      => $result->state,
@@ -21,6 +21,13 @@ final class OutputProjector {
 			'confidence' => $result->confidence,
 			'coverage'   => $result->coverage,
 		);
+		if ( 'vulnerability' === $module && in_array( $result->evidence['risk'] ?? null, array( 'high', 'watch', 'low' ), true ) ) {
+			$out['risk']       = $result->evidence['risk'];
+			$out['past_total'] = max( 0, (int) ( $result->evidence['past_total'] ?? 0 ) );
+			$out['past_high']  = max( 0, (int) ( $result->evidence['past_high'] ?? 0 ) );
+			$out['exploited']  = true === ( $result->evidence['exploited'] ?? false );
+		}
+		return $out;
 	}
 
 	public function file( array $result, bool $partial = false, bool $historical = false ): ?array {

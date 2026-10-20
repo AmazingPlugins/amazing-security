@@ -59,6 +59,10 @@ final class DigestSummary {
 			$coverage                        = $missing ? 'missing' : ( $stale ? 'stale' : ( $partial ? 'partial' : 'latest stored report' ) );
 			$newText                         = null === $previous ? 'initial' : ( $capped ? 'new comparison unavailable: retained identity budget reached' : $new . ' newly observed' );
 			$lines[]                         = ucfirst( $kind ) . ': ' . count( $ids ) . ' findings requiring review; ' . $newText . '; coverage ' . $coverage . '; ' . $unknown . ' unknown checks/items' . ( ! empty( $source['running'] ) ? '; unfinished scan' : '' ) . '.';
+			if ( 'vulnerabilities' === $kind ) {
+				$risk    = array_count_values( array_filter( array_map( static fn ( $row ): string => is_array( $row ) && is_string( $row['risk'] ?? null ) ? $row['risk'] : '', array_slice( $rows, 0, 250 ) ) ) );
+				$lines[] = 'Package risk: ' . ( $risk['high'] ?? 0 ) . ' findings on high-risk packages; ' . ( $risk['watch'] ?? 0 ) . ' packages to watch (3 or more high-severity holes in 2 years).';
+			}
 		}
 		$lines[] = '';
 		$lines[] = ! empty( $activity['available'] ) ? 'Last seven days: ' . max( 0, min( 10000, (int) ( $activity['changes'] ?? 0 ) ) ) . ' recorded account/role change events; ' . max( 0, min( 10000, (int) ( $activity['blocked'] ?? 0 ) ) ) . ' recorded blocked login requests.' : 'Last seven days: activity counts unavailable.';
