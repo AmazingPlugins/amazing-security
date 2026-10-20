@@ -211,6 +211,7 @@ add_action( 'admin_post_amazing_security_vulnerability_scan', array( new Amazing
 add_action( 'admin_post_amazing_security_vulnerability_enable', array( new AmazingPlugins\Security\Admin\VulnerabilityConsentAction(), 'enable' ) );
 add_action( 'admin_post_amazing_security_vulnerability_disable', array( new AmazingPlugins\Security\Admin\VulnerabilityConsentAction(), 'disable' ) );
 add_action( 'admin_post_amazing_security_vulnerability_clear', array( new AmazingPlugins\Security\Admin\VulnerabilityConsentAction(), 'clearReports' ) );
+add_action( 'admin_post_amazing_security_kev_toggle', array( new AmazingPlugins\Security\Admin\VulnerabilityConsentAction(), 'exploited' ) );
 add_action( 'admin_post_amsec_login_settings', array( new AmazingPlugins\Security\Admin\LoginSettingsAction(), 'save' ) );
 add_action( 'admin_post_amsec_mcp_settings', array( new AmazingPlugins\Security\Admin\McpSettingsAction(), 'save' ) );
 add_action( 'admin_post_amsec_alert_settings', array( new AmazingPlugins\Security\Admin\AlertSettingsAction(), 'save' ) );

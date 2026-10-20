@@ -9,8 +9,9 @@ defined( 'ABSPATH' ) || exit;
 final class DirectScanRunner {
 	/** @param null|callable(InstalledSoftware):?string $provenance
 	 *  @param null|callable(InstalledSoftware,string):bool $stateStillMatches
+	 *  @param null|callable():string[] $exploited CVE IDs attackers are known to use; read only when the report is built.
 	 */
-	public function __construct( private readonly DirectFeedClient $client, private readonly DirectVulnerabilityMatcher $matcher = new DirectVulnerabilityMatcher(), private readonly mixed $provenance = null, private readonly mixed $stateStillMatches = null, private readonly mixed $shouldContinue = null ) {}
+	public function __construct( private readonly DirectFeedClient $client, private readonly DirectVulnerabilityMatcher $matcher = new DirectVulnerabilityMatcher(), private readonly mixed $provenance = null, private readonly mixed $stateStillMatches = null, private readonly mixed $shouldContinue = null, private readonly mixed $exploited = null ) {}
 
 	/** @param InstalledSoftware[] $inventory */
 	public function step( array $inventory, int $offset, int $now, string $phase = 'feed', array $verified = array() ): DirectScanStep {
@@ -77,7 +78,7 @@ final class DirectScanRunner {
 			$proofAt                               = $eligible && preg_match( '/^([0-9]{10}):/', $proof, $matches ) ? (int) $matches[1] : null;
 			$matchedInventory[]                    = new InstalledSoftware( $item->type, $item->slug, $item->version, $eligible, $proofAt );
 		}
-		$report = $this->matcher->evaluate( $matchedInventory, $responses, $now );
+		$report = $this->matcher->evaluate( $matchedInventory, $responses, $now, is_callable( $this->exploited ) ? ( $this->exploited )() : array() );
 		if ( count( $inventory ) > $total ) {
 			$report = new VulnerabilityReport( $report->results, true, __( 'Inventory exceeded direct-check limit.', 'amazing-security' ), $report->snapshotGeneratedAt, null );
 		}

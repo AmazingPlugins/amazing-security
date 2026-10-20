@@ -8,10 +8,18 @@ use AmazingPlugins\Security\Alerts\AlertPolicy;
 use AmazingPlugins\Security\FileScan\FileScanReport;
 use AmazingPlugins\Security\Findings\CheckResult;
 use AmazingPlugins\Security\Scan\ScanRun;
+use AmazingPlugins\Security\Vulnerabilities\VulnerabilityReport;
 use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 
 final class AlertPolicyTest extends TestCase {
+	public function test_exploited_hole_alerts_even_below_high_severity(): void {
+		$now       = new DateTimeImmutable( '@1000' );
+		$medium    = new CheckResult( 'vulnerability', 'warn', 'Medium.', 'https://example.org/', $now, 'medium', 'complete', array( 'severity' => 'medium' ), 'medium-id' );
+		$exploited = new CheckResult( 'vulnerability', 'warn', 'Used.', 'https://example.org/', $now, 'medium', 'complete', array( 'severity' => 'medium', 'exploited' => true ), 'used-id' );
+		self::assertSame( array( 'used-id' ), ( new AlertPolicy() )->fromVulnerabilities( new VulnerabilityReport( array( $medium, $exploited ), false, 'ok' ) ) );
+	}
+
 	public function test_only_complete_eligible_integrity_findings_alert(): void {
 		$policy = new AlertPolicy();
 		$now = new DateTimeImmutable( '@1000' );
