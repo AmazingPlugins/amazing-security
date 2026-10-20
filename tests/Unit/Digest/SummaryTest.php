@@ -18,4 +18,8 @@ final class SummaryTest extends TestCase {
   $rows=array_map(static fn($n)=>['state'=>'warn','id'=>(string)$n],range(1,251));$summary=DigestSummary::build(['files'=>['at'=>1000,'rows'=>$rows]],[],null,1000);
   self::assertStringContainsString('partial',$summary['body']);self::assertCount(250,$summary['snapshot']['identities']['files']);
  }
+ public function test_vulnerability_risk_counts_appear_without_package_names(): void {
+  $summary=DigestSummary::build(['vulnerabilities'=>['at'=>1000,'rows'=>[['state'=>'warn','id'=>'a','risk'=>'high'],['state'=>'pass','id'=>'b','risk'=>'watch'],['state'=>'pass','id'=>'c','risk'=>'low']]]],[],null,1000);
+  self::assertStringContainsString('Package risk: 1 findings on high-risk packages; 1 packages to watch',$summary['body']);
+ }
 }
