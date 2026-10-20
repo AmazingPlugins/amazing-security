@@ -8,5 +8,5 @@ defined( 'ABSPATH' ) || exit;
 use AmazingPlugins\Security\Integrity\WordPressOptions;
 final class WordPressHeaderService {
 	public function create(): HeaderService {
-		return new HeaderService( new WordPressOptions(), new CurlHeaderClient(), static fn()=>get_option( 'home' ) );}
+		return new HeaderService( new WordPressOptions(), new HttpHeaderClient(), static fn()=>get_option( 'home' ) );}
 }
