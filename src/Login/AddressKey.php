@@ -8,7 +8,8 @@ defined( 'ABSPATH' ) || exit;
 
 final class AddressKey {
 	private readonly ?\Closure $resolver;
-	public function __construct( private string $salt, ?callable $resolver = null ) {
+	/** $prefix64 groups IPv6 clients by their /64, so rotating addresses inside one allocation counts as one. */
+	public function __construct( private string $salt, ?callable $resolver = null, private bool $prefix64 = false ) {
 		$this->resolver = null === $resolver ? null : \Closure::fromCallable( $resolver ); }
 
 	public function fromServer( array $server ): ?string {
@@ -20,6 +21,9 @@ final class AddressKey {
 			return null;
 		}
 		$bytes = inet_pton( $address );
-		return false === $bytes ? null : hash_hmac( 'sha256', $bytes, $this->salt );
+		if ( false === $bytes ) {
+			return null;
+		}
+		return hash_hmac( 'sha256', $this->prefix64 && 16 === strlen( $bytes ) ? substr( $bytes, 0, 8 ) : $bytes, $this->salt );
 	}
 }

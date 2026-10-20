@@ -20,12 +20,12 @@ final class WordPressClientAddress {
 	}
 	public function address( array $server, ?OptionGateway $options = null ): ?string {
 		return ( new ProxyResolver() )->resolve( $this->policy( $options ), $server, self::peerConfirmed() ); }
-	public function key( string $salt ): AddressKey {
+	public function key( string $salt, bool $prefix64 = false ): AddressKey {
 		$policy    = $this->policy();
 		$confirmed = self::peerConfirmed();
 		if ( null !== $policy && 'off' === $policy['mode'] ) {
-			return new AddressKey( ProxyNamespace::salt( $salt, $policy ) ); }
-		return new AddressKey( ProxyNamespace::salt( $salt, $policy ), static fn( array $server ): ?string=>( new ProxyResolver() )->resolve( $policy, $server, $confirmed ) );
+			return new AddressKey( ProxyNamespace::salt( $salt, $policy ), null, $prefix64 ); }
+		return new AddressKey( ProxyNamespace::salt( $salt, $policy ), static fn( array $server ): ?string=>( new ProxyResolver() )->resolve( $policy, $server, $confirmed ), $prefix64 );
 	}
 	public function salt( string $salt ): string {
 		return ProxyNamespace::salt( $salt, $this->policy() ); }

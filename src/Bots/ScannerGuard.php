@@ -25,8 +25,8 @@ final class ScannerGuard {
 		if ( 'off' === $mode || is_user_logged_in() || is_admin() || wp_doing_cron() || wp_doing_ajax() || ( defined( 'WP_CLI' ) && WP_CLI ) ) {
 			return;
 		}
-		$key   = ( new WordPressClientAddress() )->key( wp_salt( 'auth' ) . ':bot:scanner' )->fromServer( $_SERVER );
-		$block = ( new WordPressClientAddress() )->key( wp_salt( 'auth' ) . RateLimiter::BLOCK_SALT )->fromServer( $_SERVER );
+		$key   = ( new WordPressClientAddress() )->key( wp_salt( 'auth' ) . ':bot:scanner', true )->fromServer( $_SERVER );
+		$block = ( new WordPressClientAddress() )->key( wp_salt( 'auth' ) . RateLimiter::BLOCK_SALT, true )->fromServer( $_SERVER );
 		if ( null === $key || null === $block ) {
 			return;
 		}
