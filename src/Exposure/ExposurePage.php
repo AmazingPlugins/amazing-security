@@ -38,7 +38,7 @@ final class ExposurePage {
 				echo '<p>' . esc_html__( 'No local inventory captured.', 'amazing-security' ) . '</p></section>';
 					continue;}
 			/* translators: 1: entry count; 2: directory count; 3: unknown item count; 4: excluded directory count. */
-			echo '<div class="amsec-file-status"><strong>' . esc_html( $report['partial'] ? __( 'Partial or unknown inventory', 'amazing-security' ) : __( 'Selected local filename inventory finished', 'amazing-security' ) ) . '</strong><span>' . sprintf( esc_html__( '%1$s entries; %2$s directories; %3$s unknown; %4$s directories excluded.', 'amazing-security' ), esc_html( (string) $report['entries'] ), esc_html( (string) $report['directories'] ), esc_html( (string) $report['unknown'] ), esc_html( (string) $report['excluded'] ) ) . '</span></div><p>' .
+			echo '<div class="amsec-file-status"><strong>' . esc_html( $report['partial'] ? __( 'Partial or unknown inventory', 'amazing-security' ) : __( 'Selected local filename inventory finished', 'amazing-security' ) ) . '</strong><span>' . sprintf( /* translators: 1: entries seen, 2: directories read, 3: unknown entries, 4: directories skipped. */ esc_html__( 'Entries: %1$s. Directories: %2$s. Unknown: %3$s. Directories skipped: %4$s.', 'amazing-security' ), esc_html( (string) $report['entries'] ), esc_html( (string) $report['directories'] ), esc_html( (string) $report['unknown'] ), esc_html( (string) $report['excluded'] ) ) . '</span></div><p>' .
 			/* translators: %s: UTC timestamp when the local inventory was captured. */
 			sprintf( esc_html__( 'Captured UTC: %s. No public reachability or contents verdict.', 'amazing-security' ), esc_html( gmdate( 'Y-m-d H:i:s', $report['captured_at'] ) ) ) . '</p>';
 			foreach ( $report['reasons'] as $reason ) {
