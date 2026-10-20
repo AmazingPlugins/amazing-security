@@ -67,7 +67,7 @@ final class Brand {
 		}
 		// WordPress moves notices to just after this marker, which keeps them above the plugin header.
 		echo '<hr class="wp-header-end">';
-		$logo    = plugins_url( 'assets/logo.jpg', AMAZING_SECURITY_FILE );
+		$logo    = plugins_url( 'assets/logo.png', AMAZING_SECURITY_FILE );
 		$docs    = plugins_url( 'assets/icon-docs.svg', AMAZING_SECURITY_FILE );
 		$guide   = plugins_url( 'assets/icon-guide.svg', AMAZING_SECURITY_FILE );
 		$headers = get_file_data( AMAZING_SECURITY_FILE, array( 'Version' => 'Version' ) );
