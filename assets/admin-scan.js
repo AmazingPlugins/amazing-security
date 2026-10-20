@@ -10,14 +10,21 @@
 		}
 		items.push(settings.saving || 'Saving the results');
 		list.textContent = '';
-		return items.map(function (label) {
+		return items.map(function (label, index) {
 			var row = document.createElement('li');
 			var dot = document.createElement('span');
+			var number = document.createElement('span');
+			var name = document.createElement('span');
 			dot.className = 'amsec-scan-dot';
 			dot.setAttribute('aria-hidden', 'true');
+			number.className = 'amsec-scan-num';
+			number.textContent = String(index + 1);
+			name.className = 'amsec-scan-name';
+			name.textContent = label;
 			row.setAttribute('data-state', 'pending');
 			row.appendChild(dot);
-			row.appendChild(document.createTextNode(label));
+			row.appendChild(number);
+			row.appendChild(name);
 			list.appendChild(row);
 			return row;
 		});
@@ -35,6 +42,7 @@
 			var percent = form.querySelector('.amsec-scan-percent');
 			var track = form.querySelector('.amsec-scan-track');
 			var list = form.querySelector('.amsec-scan-list');
+			var step = form.querySelector('.amsec-scan-step');
 			var stop = form.querySelector('.amsec-scan-stop');
 			var stage = form.closest('.amsec-scan-first');
 			// While a scan runs, only its progress shows. The new results appear when the page reloads with them.
@@ -88,6 +96,9 @@
 				var active = value >= 100 ? rows.length : Math.min(rows.length - 1, Math.floor(value / 100 * rows.length));
 				rows.forEach(function (row, index) {
 					var state = index < active ? 'done' : (index === active ? 'active' : 'pending');
+					if ('active' === state && step) {
+						step.textContent = (settings.step || 'Step %1$s of %2$s').replace('%1$s', String(index + 1)).replace('%2$s', String(rows.length)) + ': ' + row.lastChild.textContent;
+					}
 					if (row.getAttribute('data-state') !== state) {
 						row.setAttribute('data-state', state);
 						if ('active' === state && list) {
@@ -104,6 +115,9 @@
 				if (finished && elapsed >= minMs) {
 					window.clearInterval(timer);
 					draw(100);
+					if (step) {
+						step.textContent = (settings.step || 'Step %1$s of %2$s').replace('%1$s', String(rows.length)).replace('%2$s', String(rows.length));
+					}
 					finished();
 					return;
 				}

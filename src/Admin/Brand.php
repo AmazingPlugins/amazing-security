@@ -49,7 +49,7 @@ final class Brand {
 		if ( ! self::onScreen() ) {
 			return;
 		}
-		wp_enqueue_style( 'amazing-security-admin', plugins_url( 'assets/admin.css', AMAZING_SECURITY_FILE ), array(), '0.1.61' );
+		wp_enqueue_style( 'amazing-security-admin', plugins_url( 'assets/admin.css', AMAZING_SECURITY_FILE ), array(), '0.1.62' );
 		$page = self::page();
 		if ( in_array( $page, array( 'amsec-accounts', 'amsec-traffic-guard' ), true ) ) {
 			wp_enqueue_script( 'amazing-security-tabs', plugins_url( 'assets/admin-tabs.js', AMAZING_SECURITY_FILE ), array(), '0.1.1', true );
@@ -57,7 +57,7 @@ final class Brand {
 		if ( 'amazing-security' !== $page ) {
 			return;
 		}
-		wp_enqueue_script( 'amazing-security-scan', plugins_url( 'assets/admin-scan.js', AMAZING_SECURITY_FILE ), array(), '0.1.15', true );
+		wp_enqueue_script( 'amazing-security-scan', plugins_url( 'assets/admin-scan.js', AMAZING_SECURITY_FILE ), array(), '0.1.16', true );
 		wp_localize_script(
 			'amazing-security-scan',
 			'amsecScan',
@@ -126,6 +126,8 @@ final class Brand {
 				),
 				'headers' => __( 'Homepage response headers', 'amazing-security' ),
 				'saving'  => __( 'Saving the results', 'amazing-security' ),
+				/* translators: 1: current step number, 2: total number of steps. */
+				'step'    => __( 'Step %1$s of %2$s', 'amazing-security' ),
 				'minMs'   => 36000,
 			)
 		);

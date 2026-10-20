@@ -289,7 +289,7 @@
 }
 
 .amsec-scan-progress {
-  width: min(520px, 86vw);
+  width: min(760px, 92vw);
   text-align: center;
 }
 
@@ -2043,15 +2043,24 @@ body.amsec-app .amazing-security-admin .widefat td {
   font-variant-numeric: tabular-nums;
 }
 
+.amsec-scan-step {
+  min-height: 1.4em;
+  margin: -6px 0 16px;
+  color: #1a1410;
+  font-size: 20px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
 /* Scan checklist: gray dot waiting, spinning ring while active, green tick when done. */
 .amsec-scan-progress .amsec-scan-stop {
   margin-top: 16px;
 }
 
 .amsec-scan-list {
-  max-height: 380px;
+  max-height: 480px;
   margin: 8px 0 0;
-  padding: 8px;
+  padding: 10px;
   overflow-y: auto;
   border: 1px solid rgba(26, 20, 16, 0.1);
   border-radius: 14px;
@@ -2063,11 +2072,20 @@ body.amsec-app .amazing-security-admin .widefat td {
 .amsec-scan-list li {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 14px;
   margin: 0;
-  padding: 6px 10px;
-  border-radius: 8px;
+  padding: 10px 14px;
+  border-radius: 10px;
   color: #8a7b6e;
+  font-size: 18px;
+  line-height: 1.4;
+}
+
+.amsec-scan-num {
+  flex: none;
+  min-width: 2ch;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
 }
 
 .amsec-scan-list li[data-state="active"] {
@@ -2084,14 +2102,14 @@ body.amsec-app .amazing-security-admin .widefat td {
   position: relative;
   flex: none;
   box-sizing: border-box;
-  width: 16px;
-  height: 16px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
   background: #d9d2ca;
 }
 
 li[data-state="active"] > .amsec-scan-dot {
-  border: 2px solid rgba(166, 54, 23, 0.25);
+  border: 3px solid rgba(166, 54, 23, 0.25);
   border-top-color: #a63617;
   background: transparent;
   animation: amsec-scan-spin 0.8s linear infinite;
@@ -2104,18 +2122,28 @@ li[data-state="done"] > .amsec-scan-dot {
 li[data-state="done"] > .amsec-scan-dot::after {
   content: "";
   position: absolute;
-  top: 3px;
-  left: 5px;
-  width: 4px;
-  height: 7px;
+  top: 4px;
+  left: 8px;
+  width: 5px;
+  height: 10px;
   border: solid #fff;
-  border-width: 0 2px 2px 0;
+  border-width: 0 2.5px 2.5px 0;
   transform: rotate(45deg);
 }
 
 @keyframes amsec-scan-spin {
   to {
     transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 600px) {
+  .amsec-scan-step {
+    font-size: 17px;
+  }
+
+  .amsec-scan-list li {
+    font-size: 16px;
   }
 }
 
