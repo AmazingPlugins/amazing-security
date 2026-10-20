@@ -289,7 +289,7 @@
 }
 
 .amsec-scan-progress {
-  width: min(420px, 86vw);
+  width: min(520px, 86vw);
   text-align: center;
 }
 
@@ -2043,10 +2043,87 @@ body.amsec-app .amazing-security-admin .widefat td {
   font-variant-numeric: tabular-nums;
 }
 
-.amsec-scan-stage {
-  min-height: 1.5em;
-  margin: 12px 0 0;
-  color: #6b5c4f;
+/* Scan checklist: gray dot waiting, spinning ring while active, green tick when done. */
+.amsec-scan-progress .amsec-scan-stop {
+  margin-top: 16px;
+}
+
+.amsec-scan-list {
+  max-height: 380px;
+  margin: 8px 0 0;
+  padding: 8px;
+  overflow-y: auto;
+  border: 1px solid rgba(26, 20, 16, 0.1);
+  border-radius: 14px;
+  background: #fff;
+  list-style: none;
+  text-align: left;
+}
+
+.amsec-scan-list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 6px 10px;
+  border-radius: 8px;
+  color: #8a7b6e;
+}
+
+.amsec-scan-list li[data-state="active"] {
+  background: #faf5ec;
+  color: #1a1410;
+  font-weight: 600;
+}
+
+.amsec-scan-list li[data-state="done"] {
+  color: #1a1410;
+}
+
+.amsec-scan-dot {
+  position: relative;
+  flex: none;
+  box-sizing: border-box;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #d9d2ca;
+}
+
+li[data-state="active"] > .amsec-scan-dot {
+  border: 2px solid rgba(166, 54, 23, 0.25);
+  border-top-color: #a63617;
+  background: transparent;
+  animation: amsec-scan-spin 0.8s linear infinite;
+}
+
+li[data-state="done"] > .amsec-scan-dot {
+  background: #1e7a46;
+}
+
+li[data-state="done"] > .amsec-scan-dot::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 5px;
+  width: 4px;
+  height: 7px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+@keyframes amsec-scan-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  li[data-state="active"] > .amsec-scan-dot {
+    border-color: #a63617;
+    animation: none;
+  }
 }
 
 /* Outranks the wrapped-checkbox label rule, which would otherwise keep the consent box on screen. */

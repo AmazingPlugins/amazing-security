@@ -62,7 +62,8 @@ final class AdminPage {
 		}
 		echo '<div class="amsec-scan-progress" hidden><p class="amsec-scan-status">' . esc_html__( 'Scanning', 'amazing-security' ) . ' <span class="amsec-scan-percent" aria-hidden="true"></span></p>';
 		echo '<div class="amsec-scan-track" role="progressbar" aria-label="' . esc_attr__( 'Scan progress', 'amazing-security' ) . '" aria-valuemin="0" aria-valuemax="100"><span class="amsec-scan-fill"></span></div>';
-		echo '<p class="amsec-scan-stage" role="status"></p></div>';
+		echo '<p><button type="button" class="button amsec-scan-stop">' . esc_html__( 'Stop', 'amazing-security' ) . '</button></p>';
+		echo '<ol class="amsec-scan-list" aria-label="' . esc_attr__( 'Checks in this scan', 'amazing-security' ) . '"></ol></div>';
 		echo '</form>';
 	}
 
