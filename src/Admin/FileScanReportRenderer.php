@@ -19,9 +19,13 @@ final class FileScanReportRenderer {
 		$version  = ( new BundledRulePack() )->version();
 		$released = DateTimeImmutable::createFromFormat( '!Y.m.d', substr( $version, 0, 10 ) );
 		$age      = false === $released ? 0 : max( 0, (int) floor( ( time() - $released->getTimestamp() ) / 86400 ) );
-		$html     = '<section class="amsec-file-scan" aria-labelledby="' . esc_attr( $this->anchor ) . '"><div class="amsec-file-heading"><div><h2 id="' . esc_attr( $this->anchor ) . '">' . esc_html( '' !== $this->title ? $this->title : __( 'Suspicious files', 'amazing-security' ) ) . '</h2><p>' . esc_html__( 'Checks unfamiliar PHP files on this site. A match needs review; no match does not prove the site is clean.', 'amazing-security' ) . '</p></div><span class="amsec-file-rule-age">' . sprintf(
+		$html     = '<section class="amsec-file-scan" aria-labelledby="' . esc_attr( $this->anchor ) . '"><div class="amsec-file-heading"><div><h2 id="' . esc_attr( $this->anchor ) . '">' . esc_html( '' !== $this->title ? $this->title : __( 'Suspicious files', 'amazing-security' ) ) . '</h2><p>' . esc_html(
+			'' !== $this->title
+				? __( 'Runs with every Scan. Reads plugins, themes, uploads, mu-plugins and loose PHP files. A match needs review; no match does not prove the site is clean.', 'amazing-security' )
+				: __( 'Looks for extra files in plugins, themes and uploads that a release does not contain. A match needs review; no match does not prove the site is clean.', 'amazing-security' )
+		) . '</p></div><span class="amsec-file-rule-age">' . sprintf(
 				/* translators: 1: version of the bundled rule pack, 2: age of the rule pack in days. */
-			esc_html__( 'Bundled rules %1$s (%2$s days old)', 'amazing-security' ),
+			esc_html( _n( 'Bundled rules %1$s (%2$s day old)', 'Bundled rules %1$s (%2$s days old)', $age, 'amazing-security' ) ),
 			esc_html( $version ),
 			esc_html( (string) $age )
 		) . '</span></div>';
@@ -88,9 +92,10 @@ final class FileScanReportRenderer {
 			$kind  = (string) ( $finding['kind'] ?? '' );
 			$title = 'suspected' === $kind ? __( 'Suspected code', 'amazing-security' ) : ( 'extra' === $kind ? __( 'Review file', 'amazing-security' ) : ( 'package' === $kind ? __( 'Release unavailable', 'amazing-security' ) : __( 'Could not check file', 'amazing-security' ) ) );
 			$html .= '<li class="amsec-file-finding"><div class="amsec-file-finding-top"><strong>' . esc_html( $title ) . '</strong><span>' . esc_html( (string) ( $finding['rule_id'] ?? '' ) ) . '</span></div>';
-			$html .= '<span class="amsec-file-package">' . esc_html( (string) ( $finding['package'] ?? '' ) ) . '</span>';
+			$html .= '<span class="amsec-file-package">' . esc_html( self::packageName( (string) ( $finding['package'] ?? '' ) ) ) . '</span>';
 			if ( 'package' === $kind ) {
-				$html .= '<span class="amsec-file-reason">' . esc_html( (string) ( $finding['reason'] ?? '' ) ) . '</span>';
+				$reason = self::reason( (string) ( $finding['reason'] ?? '' ) );
+				$html  .= '' !== $reason ? '<span class="amsec-file-reason">' . esc_html( $reason ) . '</span>' : '';
 			} else {
 				$html .= '<code>' . esc_html( (string) ( $finding['path'] ?? '' ) ) . '</code>';
 			}
@@ -113,11 +118,36 @@ final class FileScanReportRenderer {
 			if ( isset( $this->notes[ $id ] ) ) {
 				$html .= '<p class="amsec-file-note"><strong>' . esc_html__( 'Review note:', 'amazing-security' ) . '</strong> ' . esc_html( (string) $this->notes[ $id ] ) . '</p>';
 			}
-			if ( $allowNotes && '' !== $this->actionUrl && '' !== $this->noteNonce && preg_match( '/^[a-f0-9]{32}$/D', $id ) ) {
+			if ( $allowNotes && 'package' !== $kind && '' !== $this->actionUrl && '' !== $this->noteNonce && preg_match( '/^[a-f0-9]{32}$/D', $id ) ) {
 				$html .= '<form action="' . esc_url( $this->actionUrl ) . '" method="post" class="amsec-file-note-form"><input type="hidden" name="action" value="amazing_security_file_scan_note"><input type="hidden" name="finding_id" value="' . esc_attr( $id ) . '"><input type="hidden" name="_wpnonce" value="' . esc_attr( $this->noteNonce ) . '"><label for="' . esc_attr( $formId ) . '">' . esc_html__( 'False-positive review note', 'amazing-security' ) . '</label><textarea id="' . esc_attr( $formId ) . '" name="note" maxlength="500" rows="2"></textarea><button type="submit" class="button button-secondary">' . esc_html__( 'Save review note', 'amazing-security' ) . '</button></form>';
 			}
 			$html .= '</li>';
 		}
 		return $html . '</ol></div>';
+	}
+
+	/** Turns "theme:twentytwentyfive:1.4" into "Theme twentytwentyfive 1.4". */
+	public static function packageName( string $package ): string {
+		if ( 1 !== preg_match( '/^(plugin|theme|core):([^:]*):(.*)$/D', $package, $m ) ) {
+			return $package;
+		}
+		$type = match ( $m[1] ) {
+			'plugin' => __( 'Plugin', 'amazing-security' ),
+			'theme'  => __( 'Theme', 'amazing-security' ),
+			default  => __( 'WordPress core', 'amazing-security' ),
+		};
+		return trim( $type . ' ' . $m[2] . ' ' . $m[3] );
+	}
+
+	public static function reason( string $code ): string {
+		return match ( $code ) {
+			'package_limit'              => __( 'Each scan compares at most three themes with their release.', 'amazing-security' ),
+			'non_wordpress_org_origin'   => __( 'Not from WordPress.org, so there is no published release to compare.', 'amazing-security' ),
+			'unsupported_child_theme'    => __( 'Child themes have no published release to compare.', 'amazing-security' ),
+			'unsupported_local_path'     => __( 'Installed from a local path, so there is no published release to compare.', 'amazing-security' ),
+			'theme_provider_unavailable' => __( 'WordPress.org could not be reached for this theme.', 'amazing-security' ),
+			''                           => '',
+			default                      => __( 'WordPress.org did not return a release this scan could use.', 'amazing-security' ),
+		};
 	}
 }

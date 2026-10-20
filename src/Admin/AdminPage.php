@@ -247,20 +247,23 @@ final class AdminPage {
 				echo ( new FileScanReportRenderer( '', '', array(), __( 'Malware scan', 'amazing-security' ), 'amsec-malware' ) )->render( null, new FileScanStep( $malware, $malware->finished ), array() );
 				echo '<p><a class="button" href="' . esc_url( admin_url( 'admin.php?page=amazing-security' ) ) . '">' . esc_html__( 'Scan again', 'amazing-security' ) . '</a></p>';
 			}
+			// IntegrityReportRenderer escapes all dynamic values.
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			echo ( new IntegrityReportRenderer() )->render( $integrity, $progress );
 			if ( null === $progress || $progress->finished ) {
 				echo '<form action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" method="post"><input type="hidden" name="action" value="amazing_security_integrity_start">';
 				wp_nonce_field( 'amazing_security_integrity_start' );
-				submit_button( __( 'Run integrity scan', 'amazing-security' ) );
+				submit_button( __( 'Run integrity scan', 'amazing-security' ), 'secondary' );
 				echo '</form>';
 			} else {
 				echo '<form action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" method="post"><input type="hidden" name="action" value="amazing_security_integrity_resume"><input type="hidden" name="scan_id" value="' . esc_attr( $progress->cursor->scanId ) . '">';
 				wp_nonce_field( 'amazing_security_integrity_resume' );
-				submit_button( __( 'Continue integrity scan', 'amazing-security' ) );
+				submit_button( __( 'Continue integrity scan', 'amazing-security' ), 'secondary' );
 				echo '</form>';
 			}
-			// IntegrityReportRenderer escapes all dynamic values.
+			// FileScanReportRenderer escapes dynamic values, including saved notes.
 			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-			echo ( new IntegrityReportRenderer() )->render( $integrity, $progress );
+			echo ( new FileScanReportRenderer( admin_url( 'admin-post.php' ), wp_create_nonce( 'amsec_file_scan_note' ), $fileStore->notes() ) )->render( $fileDone, $fileProgress, $fileHistory );
 			echo '<div class="amsec-file-actionbar"><form action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" method="post">';
 			if ( null === $fileProgress || $fileProgress->finished ) {
 				echo '<input type="hidden" name="action" value="amazing_security_file_scan_start">';
@@ -272,9 +275,6 @@ final class AdminPage {
 				submit_button( __( 'Continue file scan', 'amazing-security' ), 'primary', 'submit', false );
 			}
 			echo '</form></div>';
-			// FileScanReportRenderer escapes dynamic values, including saved notes.
-			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-			echo ( new FileScanReportRenderer( admin_url( 'admin-post.php' ), wp_create_nonce( 'amsec_file_scan_note' ), $fileStore->notes() ) )->render( $fileDone, $fileProgress, $fileHistory );
 			return;
 		}
 		if ( 'vulnerabilities' === $section ) {
