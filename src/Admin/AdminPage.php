@@ -14,6 +14,7 @@ use AmazingPlugins\Security\Scan\LocalCodeScan;
 use AmazingPlugins\Security\FileScan\FileScanStep;
 use AmazingPlugins\Security\Findings\CheckResult;
 use AmazingPlugins\Security\Findings\FindingsRepository;
+use AmazingPlugins\Security\Findings\SiteRisk;
 use AmazingPlugins\Security\Integrity\WordPressIntegrityStore;
 use AmazingPlugins\Security\Integrity\WordPressOptions;
 use AmazingPlugins\Security\Login\RequiredTotpPage;
@@ -128,6 +129,11 @@ final class AdminPage {
 		if ( isset( $_GET['amazing_security_error'] ) ) {
 			echo '<div class="notice notice-error"><p>' . esc_html__( 'Scan could not be saved. The previous report is still shown.', 'amazing-security' ) . '</p></div>';
 		}
+		$options  = new WordPressOptions();
+		$packages = ( new VulnerabilityPreferences( $options ) )->enabled() ? ( new WordPressVulnerabilityReportStore( $options ) )->current()?->results : null;
+		// SiteRiskCard escapes all dynamic values.
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo SiteRiskCard::render( SiteRisk::rows( $run->results, $packages, SiteRiskCard::botModes(), time() - $run->finishedAt->getTimestamp() ) );
 		$category = $this->requestedCategory( $run->results );
 		$this->categoryNav( $category, $this->scanCounts( $run->results ) );
 		$this->statusList( $category, $run->results, $integrityScanId, $contentScanId, $fileScanId );

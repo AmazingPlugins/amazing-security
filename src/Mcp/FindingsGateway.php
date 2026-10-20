@@ -6,10 +6,12 @@ namespace AmazingPlugins\Security\Mcp;
 
 defined( 'ABSPATH' ) || exit;
 
+use AmazingPlugins\Security\Admin\SiteRiskCard;
 use AmazingPlugins\Security\FileScan\FileScanReport;
 use AmazingPlugins\Security\FileScan\WordPressFileScanStore;
 use AmazingPlugins\Security\Findings\CheckResult;
 use AmazingPlugins\Security\Findings\FindingsRepository;
+use AmazingPlugins\Security\Findings\SiteRisk;
 use AmazingPlugins\Security\Integrity\WordPressIntegrityStore;
 use AmazingPlugins\Security\Integrity\WordPressOptions;
 use AmazingPlugins\Security\Scan\ScanRun;
@@ -24,8 +26,10 @@ final class FindingsGateway {
 	private readonly Closure $files;
 	private readonly Closure $vulnerabilities;
 	private readonly Closure $fileHistory;
+	private readonly Closure $botModes;
 
-	public function __construct( private readonly OutputProjector $projector = new OutputProjector(), ?callable $hardening = null, ?callable $integrity = null, ?callable $files = null, ?callable $vulnerabilities = null, ?callable $fileHistory = null ) {
+	public function __construct( private readonly OutputProjector $projector = new OutputProjector(), ?callable $hardening = null, ?callable $integrity = null, ?callable $files = null, ?callable $vulnerabilities = null, ?callable $fileHistory = null, ?callable $botModes = null ) {
+		$this->botModes        = Closure::fromCallable( $botModes ?? array( SiteRiskCard::class, 'botModes' ) );
 		$this->hardening       = Closure::fromCallable( $hardening ?? static fn(): ?ScanRun => ( new FindingsRepository() )->latest() );
 		$this->integrity       = Closure::fromCallable( $integrity ?? static fn(): ?ScanRun => ( new WordPressIntegrityStore( new WordPressOptions() ) )->latestCompleted() );
 		$this->files           = Closure::fromCallable( $files ?? static fn(): ?FileScanReport => ( new WordPressFileScanStore( new WordPressOptions() ) )->latestCompleted() );
@@ -42,14 +46,15 @@ final class FindingsGateway {
 	}
 
 	public function list( int $offset = 0, int $limit = 50 ): array {
-		$offset                     = max( 0, min( 1000, $offset ) );
-		$limit                      = max( 1, min( 100, $limit ) );
-		list( $findings, $sources ) = $this->snapshot();
-		$complete                   = ! in_array( 'partial', $sources, true ) && ! in_array( 'unavailable', $sources, true );
+		$offset                            = max( 0, min( 1000, $offset ) );
+		$limit                             = max( 1, min( 100, $limit ) );
+		list( $findings, $sources, $risk ) = $this->snapshot();
+		$complete                          = ! in_array( 'partial', $sources, true ) && ! in_array( 'unavailable', $sources, true );
 		return array(
 			'schema_version' => 1,
 			'state'          => $complete ? 'complete' : 'inconclusive',
 			'sources'        => $sources,
+			'site_risk'      => $risk,
 			'findings'       => array_slice( $findings, $offset, $limit ),
 			'has_more'       => count( $findings ) > $offset + $limit,
 			'next_offset'    => count( $findings ) > $offset + $limit ? $offset + $limit : null,
@@ -122,6 +127,12 @@ final class FindingsGateway {
 				}
 			}
 		}
-		return array( $out, $sources );
+		$risk = array();
+		if ( $hardening instanceof ScanRun ) {
+			foreach ( SiteRisk::rows( $hardening->results, array() === $groups['vulnerability'] ? null : $groups['vulnerability'], ( $this->botModes )(), time() - $hardening->finishedAt->getTimestamp() ) as $row ) {
+				$risk[] = $row + array( 'summary' => SiteRiskCard::reason( $row['area'], $row['reason'] ) );
+			}
+		}
+		return array( $out, $sources, $risk );
 	}
 }
