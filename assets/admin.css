@@ -1050,6 +1050,13 @@ body.amsec-app #wpcontent {
   background: #faf5ec;
 }
 
+/* Short pages show the page background under the footer, so it matches too. */
+html:has(> body.amsec-app),
+body.amsec-app,
+body.amsec-app #wpfooter {
+  background: #faf5ec;
+}
+
 body.amsec-app #wpbody-content .wrap,
 body.amsec-app .amazing-security-admin {
   box-sizing: border-box;
@@ -1907,6 +1914,11 @@ body.amsec-app .amsec-scan.is-scanning .amsec-scan-button {
 }
 
 /* Polish layer: one look for buttons, links, controls and notices on every screen. */
+/* WordPress fills checked boxes and radios with this variable. */
+body.amsec-app .amazing-security-admin {
+  --wp-admin-theme-color: #a63617;
+}
+
 body.amsec-app .amazing-security-admin .button:not(.button-link) {
   display: inline-flex;
   align-items: center;
@@ -1926,14 +1938,6 @@ body.amsec-app .amazing-security-admin .button:not(.button-link) {
 
 :where(body.amsec-app .amazing-security-admin) a:hover {
   color: #1a1410;
-}
-
-body.amsec-app .amazing-security-admin input[type="checkbox"]:checked::before {
-  content: url("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2020%2020%27%3E%3Cpath%20d%3D%27M14.83%204.89l1.34.94-5.81%208.38H9.02L5.78%209.67l1.34-1.25%202.57%202.4z%27%20fill%3D%27%23a63617%27%2F%3E%3C%2Fsvg%3E");
-}
-
-body.amsec-app .amazing-security-admin input[type="radio"]:checked::before {
-  background-color: #a63617;
 }
 
 body.amsec-app .amazing-security-admin :is(input[type="checkbox"], input[type="radio"], select, input[type="text"], input[type="number"], input[type="email"], input[type="url"], textarea):focus {
@@ -1957,7 +1961,7 @@ body.amsec-app .amazing-security-admin h3 {
   color: #1a1410;
 }
 
-body.amsec-app .amazing-security-admin dl:not(.amsec-file-coverage) dd {
+body.amsec-app .amazing-security-admin dl:not([class]) dd {
   margin: 0 0 12px;
 }
 
@@ -1972,7 +1976,7 @@ body.amsec-app .amazing-security-admin pre {
 
 /* A checkbox label that wraps keeps its text indented beside the box. */
 body.amsec-app .amazing-security-admin label:has(> input[type="checkbox"]:first-child) {
-  display: inline-flex;
+  display: flex;
   gap: 8px;
   align-items: flex-start;
 }
