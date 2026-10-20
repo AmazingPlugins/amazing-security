@@ -101,10 +101,11 @@ final class BotSettings {
 			\WP_CLI::error( 'This command accepts no arguments.' );
 		}
 		update_option( 'amsec_bot_mode', 'off', false );
-		if ( 'off' !== get_option( 'amsec_bot_mode', 'off' ) ) {
+		update_option( ScannerGuard::OPTION, 'off', false );
+		if ( 'off' !== get_option( 'amsec_bot_mode', 'off' ) || 'off' !== ScannerGuard::mode() ) {
 			\WP_CLI::error( 'Bot controls could not be disabled.' );
 		}
 		( new ActivityHooks( new ActivityRepository( $GLOBALS['wpdb'] ) ) )->record( 'bot_policy_changed', 0, 'off' );
-		\WP_CLI::success( 'Native bot controls are off.' );
+		\WP_CLI::success( 'Native bot controls and the scanner guard are off.' );
 	}
 }
