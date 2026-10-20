@@ -28,7 +28,7 @@ final class DirectoryPage {
 		foreach ( ( new WordPressDirectoryInventory() )->all() as $item ) {
 			$row        = $state['records'][ $item['key'] ] ?? null;
 			$historical = is_array( $row ) && ( $row['fingerprint'] !== $item['fingerprint'] || $row['checked_at'] > $now || $now - $row['checked_at'] >= 86400 );
-			echo '<section class="amsec-file-scan"><div class="amsec-file-heading"><h2>' . esc_html( $item['label'] ) . '</h2><span class="amsec-file-rule-age">Installed ' . esc_html( $item['version'] ) . '</span></div>';
+			echo '<section class="amsec-file-scan"><div class="amsec-file-heading"><h2>' . esc_html( $item['label'] ) . '</h2><span class="amsec-file-rule-age">' . sprintf( /* translators: %s: installed plugin version. */ esc_html__( 'Installed %s', 'amazing-security' ), esc_html( $item['version'] ) ) . '</span></div>';
 			if ( null === $row ) {
 				echo '<p>' . esc_html__( 'No directory observation recorded.', 'amazing-security' ) . '</p>';} else {
 							$result = $row['result'];

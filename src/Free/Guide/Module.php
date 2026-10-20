@@ -40,7 +40,7 @@ final class Module {
 				$score['total']
 			)
 		) . '</p>';
-		echo '<ul class="amsec-start">';
+		echo '<ul class="amsec-start amsec-guide">';
 		foreach ( self::rows() as $row ) {
 			$on = ! empty( $row['idle'] )
 				? in_array( (string) $options['amsec_idle_minutes'], array( '15', '30', '60' ), true )
@@ -50,14 +50,16 @@ final class Module {
 		}
 		echo '</ul>';
 		echo '<p>' . esc_html__( 'A preset turns on local checks only. It does not start a breach lookup, a vulnerability lookup, or request blocking.', 'amazing-security' ) . '</p>';
+		echo '<div class="amsec-file-actionbar">';
 		foreach ( array( 'blog', 'shop' ) as $name ) {
 			echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
 			echo '<input type="hidden" name="action" value="amsec_guide_preset">';
 			echo '<input type="hidden" name="preset" value="' . esc_attr( $name ) . '">';
 			wp_nonce_field( 'amsec_guide_preset_' . $name );
-			submit_button( 'blog' === $name ? __( 'Apply the blog preset', 'amazing-security' ) : __( 'Apply the shop preset', 'amazing-security' ) );
+			submit_button( 'blog' === $name ? __( 'Apply the blog preset', 'amazing-security' ) : __( 'Apply the shop preset', 'amazing-security' ), 'primary', 'submit', false );
 			echo '</form>';
 		}
+		echo '</div>';
 		echo '</div>';
 	}
 

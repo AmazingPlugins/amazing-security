@@ -26,7 +26,6 @@ final class Page {
 		$flag = Decision::flag( self::stored() );
 		echo '<div class="wrap amazing-security-admin">';
 		echo '<h1>' . esc_html__( 'Sign-in email', 'amazing-security' ) . '</h1>';
-		echo '<p>' . esc_html__( 'This stays off until you turn it on.', 'amazing-security' ) . '</p>';
 		echo '<p>' . esc_html( self::status( $flag ) ) . '</p>';
 		echo '<p>' . esc_html__( 'When it is on, an administrator sign-in can send one email to that account. The next email waits one hour. The message is the site name and the UTC time. If the email cannot be sent, the sign-in still finishes.', 'amazing-security' ) . '</p>';
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';

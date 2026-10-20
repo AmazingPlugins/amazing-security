@@ -62,8 +62,8 @@ final class ExposurePage {
 						'log'=>__( 'Selected debug/error log filename', 'amazing-security' ), 'database_dump'=>__( 'Database dump-like filename', 'amazing-security' ), 'configuration_leftover'=>__( 'Environment/configuration leftover-like filename', 'amazing-security' ), default=>__( 'Archive/backup-like filename', 'amazing-security' )};
 						echo '<tr><td data-label="' . esc_attr__( 'Relative path', 'amazing-security' ) . '"><code>' . esc_html( $candidate['path'] ) . '</code></td><td data-label="' . esc_attr__( 'Review', 'amazing-security' ) . '">' . esc_html( $why ) . '</td><td data-label="' . esc_attr__( 'Bytes', 'amazing-security' ) . '">' . esc_html( (string) $candidate['bytes'] ) . '</td><td data-label="' . esc_attr__( 'Metadata UTC', 'amazing-security' ) . '">' . esc_html( gmdate( 'Y-m-d H:i:s', $candidate['modified_at'] ) ) . '</td></tr>';
 				}echo '</tbody></table>';}
-			echo '<p>' . esc_html__( 'Ask the host administrator to confirm whether the captured root maps to a served path and review access rules, retention and safe backup storage. There is no public download link or automatic deletion.', 'amazing-security' ) . '</p></section>';
+			echo '</section>';
 		}
-		echo '</div>';
+		echo '<p>' . esc_html__( 'Ask the host administrator to confirm whether the captured root maps to a served path and review access rules, retention and safe backup storage. There is no public download link or automatic deletion.', 'amazing-security' ) . '</p></div>';
 	}
 }

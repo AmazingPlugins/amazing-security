@@ -29,7 +29,7 @@ final class Module {
 		echo '<p>' . esc_html__( 'These tools write only after you submit a form. A finished repair does not mean the site is clean.', 'amazing-security' ) . '</p>';
 		self::notice();
 		if ( ! $https ) {
-			echo '<div class="notice notice-error"><p>' . esc_html( ( new Approval( false, true, true ) )->denial() ?? '' ) . '</p></div>';
+			echo '<div class="notice notice-error inline"><p>' . esc_html( ( new Approval( false, true, true ) )->denial() ?? '' ) . '</p></div>';
 		}
 		self::renderModes( $https );
 		if ( $https ) {
@@ -95,10 +95,15 @@ final class Module {
 	private static function renderModes( bool $https ): void {
 		echo '<h2>' . esc_html__( 'Directory modes', 'amazing-security' ) . '</h2>';
 		echo '<p>' . esc_html__( 'These four directories can be set to 0755. Files inside them are left alone. 0777 is not used.', 'amazing-security' ) . '</p>';
-		echo '<table class="widefat striped"><thead><tr><th>' . esc_html__( 'Directory', 'amazing-security' ) . '</th><th>' . esc_html__( 'Current mode', 'amazing-security' ) . '</th><th>' . esc_html__( 'Suggested mode', 'amazing-security' ) . '</th><th>' . esc_html__( 'Change', 'amazing-security' ) . '</th></tr></thead><tbody>';
+		echo '<table class="widefat striped"><thead><tr><th>' . esc_html__( 'Directory', 'amazing-security' ) . '</th><th>' . esc_html__( 'Current mode', 'amazing-security' ) . '</th><th>' . esc_html__( 'Suggested mode', 'amazing-security' ) . '</th>' . ( $https ? '<th>' . esc_html__( 'Change', 'amazing-security' ) . '</th>' : '' ) . '</tr></thead><tbody>';
 		foreach ( ( new DirectoryModes( WP_CONTENT_DIR ) )->preview() as $row ) {
-			echo '<tr><td><code>' . esc_html( $row['path'] ) . '</code></td><td>' . esc_html( null === $row['octal'] ? __( 'Unavailable', 'amazing-security' ) : $row['octal'] ) . '</td><td><code>' . esc_html( $row['suggested'] ) . '</code></td><td>';
-			if ( $https && null !== $row['octal'] ) {
+			echo '<tr><td><code>' . esc_html( $row['path'] ) . '</code></td><td>' . esc_html( null === $row['octal'] ? __( 'Unavailable', 'amazing-security' ) : $row['octal'] ) . '</td><td><code>' . esc_html( $row['suggested'] ) . '</code></td>';
+			if ( ! $https ) {
+				echo '</tr>';
+				continue;
+			}
+			echo '<td>';
+			if ( null !== $row['octal'] ) {
 				echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
 				echo '<input type="hidden" name="action" value="amsec_recovery_permission">';
 				echo '<input type="hidden" name="path" value="' . esc_attr( $row['path'] ) . '">';
