@@ -17,9 +17,7 @@ final class ScanAction {
 		}
 		check_admin_referer( 'amazing_security_scan' );
 		try {
-			// phpcs:ignore WordPress.Security.NonceVerification.Missing -- The scan nonce was checked above. The checkbox only allows this site's homepage request.
-			$consent = isset( $_POST['amsec_header_consent'] ) && '1' === sanitize_text_field( wp_unslash( $_POST['amsec_header_consent'] ) );
-			if ( $consent ) {
+			if ( ScanOptions::headers() ) {
 				try {
 					$headers = ( new WordPressHeaderService() )->create();
 					$headers->check( $headers->fingerprint(), time() );

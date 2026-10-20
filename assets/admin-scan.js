@@ -1,11 +1,10 @@
 (function () {
 	var settings = window.amsecScan || {};
 
-	// One row per real check, in scan order. The optional homepage-headers row only appears when that box was ticked.
+	// One row per real check, in scan order. The homepage-headers row only appears when that setting is on.
 	var buildList = function (form, list) {
 		var items = (settings.checks || []).slice();
-		var consent = form.querySelector('input[name="amsec_header_consent"]');
-		if (consent && consent.checked && settings.headers) {
+		if (form.getAttribute('data-amsec-headers') === '1' && settings.headers) {
 			items.push(settings.headers);
 		}
 		items.push(settings.saving || 'Saving the results');

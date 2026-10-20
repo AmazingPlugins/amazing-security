@@ -98,6 +98,8 @@ final class NotificationSettingsPage {
 		) . '</p>';
 		echo '</section>';
 
-		echo '</section></div>';
+		echo '</section>';
+		ScanOptions::form();
+		echo '</div>';
 	}
 }

@@ -215,6 +215,7 @@ add_action( 'admin_post_amazing_security_kev_toggle', array( new AmazingPlugins\
 add_action( 'admin_post_amsec_login_settings', array( new AmazingPlugins\Security\Admin\LoginSettingsAction(), 'save' ) );
 add_action( 'admin_post_amsec_mcp_settings', array( new AmazingPlugins\Security\Admin\McpSettingsAction(), 'save' ) );
 add_action( 'admin_post_amsec_alert_settings', array( new AmazingPlugins\Security\Admin\AlertSettingsAction(), 'save' ) );
+add_action( 'admin_post_amsec_scan_options', array( AmazingPlugins\Security\Admin\ScanOptions::class, 'save' ) );
 add_action( 'admin_post_amsec_notification_test', array( new AmazingPlugins\Security\Admin\NotificationTestAction(), 'handle' ) );
 add_action( 'admin_menu', array( new AmazingPlugins\Security\Admin\NotificationSettingsPage(), 'register' ), 20 );
 add_action( 'admin_post_amsec_totp_begin', array( new AmazingPlugins\Security\Admin\TotpAction(), 'begin' ) );
