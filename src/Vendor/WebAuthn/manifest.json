@@ -9,7 +9,8 @@
     "Replace lbuchs\\WebAuthn namespace with AmazingPlugins\\Security\\Vendor\\WebAuthn",
     "Resolve require_once paths through __DIR__",
     "Add PHPCS third-party format exclusion comment",
-    "Add ABSPATH direct-access guard to WebAuthn.php before runtime requires"
+    "Add ABSPATH direct-access guard to WebAuthn.php before runtime requires",
+    "Remove the unused queryFidoMetaDataService() download helper"
   ],
   "files": [
     {
@@ -75,7 +76,7 @@
     {
       "path": "WebAuthn.php",
       "upstream_sha256": "6676f1bbdd8daf0b99a57ebd9855c92d36ddf99494106a4e35e5664e6ceb7c75",
-      "bundled_sha256": "38e91901749477c641e3d8b3ba9daf687735b80870ae360c1d4d131b117db4e4"
+      "bundled_sha256": "2bf8db8f0d28c3af89e5b28e8768a3aa0e49c35ef44ca182dd36089833948474"
     },
     {
       "path": "WebAuthnException.php",
