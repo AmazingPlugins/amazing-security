@@ -51,9 +51,9 @@ final class TrafficSettings {
 		$service = $this->service();
 		$state   = $service->status();
 		$fp      = $service->fingerprint();
-		echo '<div class="wrap amazing-security-admin"><header class="amsec-header"><div><h1>' . esc_html__( 'PHP traffic history', 'amazing-security' ) . '</h1><p>' . esc_html__( 'A small local history for troubleshooting request behavior.', 'amazing-security' ) . '</p></div></header><section class="amsec-overview"><h2>' . esc_html__( 'No visitor addresses', 'amazing-security' ) . '</h2><p>' . esc_html__( 'Off by default. Optional rows contain time, a coarse endpoint category, HTTP method, best-effort response status and fixed security decision. No visitor addresses, URLs, query strings, content, cookies, headers, usernames or user agents are stored. Administrators identified at collection, CLI and cron are skipped.', 'amazing-security' ) . '</p><p>' . esc_html__( 'This is not complete traffic history. Cached/static/CDN responses, terminated processes and dropped records are absent. Collection admits at most 100 rows per minute and 5,000 total rows, without replacing rows during requests. Busy, full or unavailable storage drops records and never changes protection. Records expire from this view after seven days; hourly cleanup deletes up to 500 expired rows. Delayed cron can retain older rows until cleanup.', 'amazing-security' ) . '</p><p>' .
+		echo '<div class="wrap amazing-security-admin"><header class="amsec-header"><div><h1>' . esc_html__( 'PHP traffic history', 'amazing-security' ) . '</h1><p>' . esc_html__( 'A small local history for troubleshooting request behavior.', 'amazing-security' ) . '</p></div></header><section class="amsec-overview"><h2>' . esc_html__( 'No visitor addresses', 'amazing-security' ) . '</h2><p>' . esc_html__( 'Off by default. Optional rows contain time, a coarse endpoint category, HTTP method, best-effort response status and fixed security decision. No visitor addresses, URLs, query strings, content, cookies, headers, usernames or user agents are stored. Administrators identified at collection, CLI and cron are skipped.', 'amazing-security' ) . '</p><details class="amsec-more"><summary>' . esc_html__( 'How it works', 'amazing-security' ) . '</summary><p>' . esc_html__( 'This is not complete traffic history. Cached/static/CDN responses, terminated processes and dropped records are absent. Collection admits at most 100 rows per minute and 5,000 total rows, without replacing rows during requests. Busy, full or unavailable storage drops records and never changes protection. Records expire from this view after seven days; hourly cleanup deletes up to 500 expired rows. Delayed cron can retain older rows until cleanup.', 'amazing-security' ) . '</p><p>' .
 			/* translators: %1$s and %2$s are inline code snippets (a WP-CLI command or a constant name); keep them unchanged. */
-			sprintf( esc_html__( 'A 200 response does not establish a safe request or successful login. Unclassified means no supported decision label was captured. This version labels network and REST-rate blocks only. Disabling stops future collection and retains existing history until expiry. Recovery: %1$s; %2$s bypasses collection.', 'amazing-security' ), '<code>wp amazing-security traffic disable</code>', '<code>AMSEC_DISABLE_TRAFFIC</code>' ) . '</p></section>';
+			sprintf( esc_html__( 'A 200 response does not establish a safe request or successful login. Unclassified means no supported decision label was captured. This version labels network and REST-rate blocks only. Disabling stops future collection and retains existing history until expiry. Recovery: %1$s; %2$s bypasses collection.', 'amazing-security' ), '<code>wp amazing-security traffic disable</code>', '<code>AMSEC_DISABLE_TRAFFIC</code>' ) . '</p></details></section>';
 		echo '<section class="amsec-file-scan"><h2>' . esc_html__( 'Collection settings', 'amazing-security' ) . '</h2>';
 		if ( ! empty( $state['invalid'] ) ) {
 			echo '<p>' . esc_html__( 'Traffic policy is invalid; collection is unavailable. Use the host recovery command.', 'amazing-security' ) . '</p>'; } else {
@@ -105,23 +105,24 @@ final class TrafficSettings {
 				}
 				echo '</tbody></table>';
 				}
+				$link   = static fn( int $target, string $label ): string => '<a class="amsec-pager-nav" href="' . esc_url(
+					add_query_arg(
+						array(
+							'page'         => 'amsec-traffic',
+							'traffic_page' => $target,
+							'category'     => $category,
+						),
+						admin_url( 'admin.php' )
+					)
+				) . '">' . esc_html( $label ) . '</a>';
+				$spacer = static fn( string $label ): string => '<span class="amsec-pager-nav is-spacer" aria-hidden="true">' . esc_html( $label ) . '</span>';
+				echo '<nav class="amsec-pager" aria-label="' . esc_attr__( 'History pages', 'amazing-security' ) . '">';
+				echo $page > 1 ? $link( $page - 1, __( 'Previous', 'amazing-security' ) ) : $spacer( __( 'Previous', 'amazing-security' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				/* translators: %s: current page number in the traffic history list. */
-				echo '<p>' . sprintf( esc_html__( 'Page %s · Up to 50 rows per page', 'amazing-security' ), esc_html( (string) $page ) ) . '</p><p>';
-				foreach ( array(
-					__( 'Previous', 'amazing-security' ) => max( 1, $page - 1 ),
-					__( 'Next', 'amazing-security' )     => min( 100, $page + 1 ),
-				) as $label => $target ) {
-					echo '<a class="button" href="' . esc_url(
-						add_query_arg(
-							array(
-								'page'         => 'amsec-traffic',
-								'traffic_page' => $target,
-								'category'     => $category,
-							),
-							admin_url( 'admin.php' )
-						)
-					) . '">' . esc_html( $label ) . '</a> '; }
-				echo '</p></section>';
+				echo '<span class="amsec-pager-label">' . sprintf( esc_html__( 'Page %s', 'amazing-security' ), esc_html( (string) $page ) ) . '</span>';
+				// A full page of 50 rows may have more after it; the list stops at page 100.
+				echo count( $rows ) >= 50 && $page < 100 ? $link( $page + 1, __( 'Next', 'amazing-security' ) ) : $spacer( __( 'Next', 'amazing-security' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				echo '</nav></section>';
 	}
 	public function recovery( array $args, array $assoc ): void {
 		if ( array() !== $args || array() !== $assoc ) {

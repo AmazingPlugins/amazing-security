@@ -37,13 +37,9 @@ final class NotificationSettingsPage {
 		$events  = '1' === Notice::flag( get_option( Notice::OPTION, '0' ) );
 		$notice  = isset( $_GET['amsec_mail'] ) ? sanitize_key( wp_unslash( $_GET['amsec_mail'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only flash after test mail.
 
-		echo '<div class="wrap amazing-security-admin amsec-settings">';
+		echo '<div class="wrap amazing-security-admin">';
 		echo '<header class="amsec-header"><div><h1>' . esc_html__( 'Settings', 'amazing-security' ) . '</h1>';
 		echo '<p>' . esc_html__( 'Administrators configure notifications here. Messages use this site’s WordPress mail and go to the WordPress admin email.', 'amazing-security' ) . '</p></div></header>';
-
-		echo '<nav class="amsec-cats" aria-label="' . esc_attr__( 'Settings sections', 'amazing-security' ) . '">';
-		echo '<a class="is-current" aria-current="page" href="' . esc_url( admin_url( 'admin.php?page=amsec-settings#amsec-notifications' ) ) . '">' . esc_html__( 'Notifications', 'amazing-security' ) . '</a>';
-		echo '</nav>';
 
 		echo '<section class="amsec-overview" id="amsec-notifications" aria-labelledby="amsec-notifications-title">';
 		echo '<h2 id="amsec-notifications-title">' . esc_html__( 'Notification settings', 'amazing-security' ) . '</h2>';

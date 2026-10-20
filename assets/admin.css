@@ -988,7 +988,7 @@ body.amsec-app .amazing-security-admin:not(.amsec-scan) :is(.amsec-overview, .am
 .amsec-login-state { padding: 5px 10px; background: #faf5ec; color: #1a1410; border-radius: 3px; white-space: nowrap; }
 .amsec-login-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
 .amsec-login-panel { min-width: 0; }
-.amsec-file-actionbar { display: flex; justify-content: flex-start; margin: 16px 0 0; }
+.amsec-file-actionbar { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-start; margin: 16px 0 0; }
 .amsec-file-actionbar form { margin: 0; }
 .amsec-file-scan { background: #fff; border: 1px solid #c9d3dc; border-radius: 6px; padding: 24px; }
 .amsec-file-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; border-bottom: 1px solid #e2e8ed; margin-bottom: 18px; }
@@ -1332,7 +1332,7 @@ body.amsec-app .amazing-security-admin code,
 
 .amsec-pager {
   display: grid;
-  grid-template-columns: 8.5rem minmax(8rem, auto) 8.5rem;
+  grid-template-columns: auto auto auto;
   align-items: center;
   justify-content: center;
   gap: 12px;
@@ -1343,13 +1343,13 @@ body.amsec-app .amazing-security-admin code,
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 40px;
-  padding: 8px 14px;
-  border: 1px solid rgba(26, 20, 16, 0.12);
+  min-height: 32px;
+  padding: 0 14px;
+  border: 1px solid #a63617;
   border-radius: 999px;
   background: #fff;
-  color: #1a1410;
-  font-weight: 650;
+  color: #a63617;
+  font-weight: 500;
   text-align: center;
   text-decoration: none;
 }
@@ -1887,7 +1887,7 @@ body.amsec-app .amazing-security-admin fieldset > label.amsec-check {
 /* Standalone links and disclosure toggles need a 24px tap target on phones (WCAG 2.2 target size). */
 @media screen and (max-width: 782px) {
   body.amsec-app .amazing-security-admin .amsec-tip-button,
-  body.amsec-app .amazing-security-admin li > a:not(.button),
+  body.amsec-app .amazing-security-admin li > a:not(.button, .amsec-settings a),
   body.amsec-app .amazing-security-admin td > a:not(.button),
   body.amsec-app .amazing-security-admin p > a:not(.button):only-child,
   body.amsec-app .amazing-security-admin p > a:not(.button):last-child {
@@ -1995,4 +1995,38 @@ body.amsec-app .amazing-security-admin .widefat td {
   body.amsec-app .amazing-security-admin .button:not(.button-link) {
     min-height: 40px;
   }
+}
+
+@media (max-width: 782px) {
+  /* Guide rows: badge on top, name and a small Open button side by side. */
+  .amsec-guide .amsec-start-item {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .amsec-guide .amsec-start-badge {
+    grid-column: 1 / -1;
+  }
+
+  body.amsec-app .amsec-guide .amsec-start-item .button {
+    width: auto;
+  }
+
+  /* Session lines wrap instead of cutting the browser name. */
+  .amsec-session-summary {
+    white-space: normal;
+  }
+}
+
+.amsec-session-lines a,
+.amsec-settings-go {
+  color: #a63617;
+}
+
+/* Stacked sections (one per plugin, root or rule) need air above each heading. */
+.amsec-file-scan + .amsec-file-scan {
+  margin-top: 28px;
+}
+
+.amazing-security-admin caption {
+  text-align: left;
 }

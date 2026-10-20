@@ -318,18 +318,24 @@ final class AdminPage {
 			}
 			echo '<form action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" method="post"><input type="hidden" name="action" value="amazing_security_vulnerability_disable">';
 			wp_nonce_field( 'amazing_security_vulnerability_disable' );
-			submit_button( __( 'Turn off vulnerability checks', 'amazing-security' ), 'secondary' );
+			echo '<p>';
+			submit_button( __( 'Turn off vulnerability checks', 'amazing-security' ), 'secondary', 'submit', false );
+			echo '</p>';
 			echo '</form>';
 		} else {
 			echo '<section class="amsec-consent" aria-labelledby="amsec-consent-title"><h3 id="amsec-consent-title">' . esc_html__( 'Enable vulnerability checks', 'amazing-security' ) . '</h3><p>' . esc_html__( 'This WordPress site will contact WPVulnerability directly for its core version and installed plugin and theme slugs. The provider can see this site’s request IP address and requested components. AmazingPlugins receives no inventory. Results are stored on this site. Read the', 'amazing-security' ) . ' <a href="https://www.wpvulnerability.com/privacy/" target="_blank" rel="noopener noreferrer">' . esc_html__( 'provider privacy policy', 'amazing-security' ) . '</a> ' . esc_html__( 'and', 'amazing-security' ) . ' <a href="https://www.wpvulnerability.com/license/" target="_blank" rel="noopener noreferrer">' . esc_html__( 'data license', 'amazing-security' ) . '</a>.</p>';
 			echo '<form action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" method="post"><input type="hidden" name="action" value="amazing_security_vulnerability_enable">';
 			wp_nonce_field( 'amazing_security_vulnerability_enable' );
-			submit_button( __( 'Enable vulnerability checks', 'amazing-security' ) );
+			echo '<p>';
+			submit_button( __( 'Enable vulnerability checks', 'amazing-security' ), 'primary', 'submit', false );
+			echo '</p>';
 			echo '</form></section>';
 		}
 		echo '<form action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" method="post"><input type="hidden" name="action" value="amazing_security_vulnerability_clear">';
 		wp_nonce_field( 'amazing_security_vulnerability_clear' );
-		submit_button( __( 'Clear local vulnerability data', 'amazing-security' ), 'secondary' );
+		echo '<p>';
+		submit_button( __( 'Clear local vulnerability data', 'amazing-security' ), 'secondary', 'submit', false );
+		echo '</p>';
 		echo '</form>';
 		// VulnerabilityReportRenderer escapes every dynamic value before constructing markup.
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
