@@ -76,6 +76,21 @@ final class AuthFactorStatusTest extends TestCase {
 		self::assertStringContainsString( 'Install Now and Activate', $html );
 	}
 
+	public function test_panel_missing_but_installed_links_to_activate(): void {
+		$html = AuthFactorPanel::html(
+			'Authenticator app',
+			array(
+				'state'        => AuthFactorStatus::MISSING,
+				'provider'     => '',
+				'suggest_slug' => 'two-factor',
+				'suggest_name' => 'Two Factor',
+			),
+			'https://example.test/wp-admin/plugins.php?plugin_status=inactive&s=two%20factor'
+		);
+		self::assertStringContainsString( '>Activate Two Factor</a>', $html );
+		self::assertStringContainsString( 'Two Factor is installed but not active', $html );
+	}
+
 	public function test_panel_escapes_provider_label(): void {
 		$html = AuthFactorPanel::html(
 			'Passkeys',

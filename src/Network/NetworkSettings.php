@@ -78,7 +78,7 @@ final class NetworkSettings {
 				sprintf( esc_html__( 'Approximate matches for this policy revision: %s.', 'amazing-security' ), esc_html( (string) $metric['count'] ) ) . '</p>';
 		} else {
 			echo '<p>' . esc_html__( 'No advisory count for this policy revision; earlier counts are historical.', 'amazing-security' ) . '</p>';}
-		echo '<p>' . esc_html__( 'Configured networks:', 'amazing-security' ) . '</p><pre>' . esc_html( implode( "\n", $state['cidrs'] ) ) . '</pre>';
+		echo array() === $state['cidrs'] ? '<p>' . esc_html__( 'Configured networks: none.', 'amazing-security' ) . '</p>' : '<p>' . esc_html__( 'Configured networks:', 'amazing-security' ) . '</p><pre>' . esc_html( implode( "\n", $state['cidrs'] ) ) . '</pre>';
 		if ( ! is_ssl() ) {
 			echo '<p>' . esc_html__( 'Use HTTPS to approve changes.', 'amazing-security' ) . '</p></section></div>';
 			return;}

@@ -61,8 +61,7 @@ final class BotSettings {
 		self::tip( __( 'Counts comments from people who are not signed in, on the WordPress comment form.', 'amazing-security' ) );
 		echo '</li><li><strong>5</strong> ' . esc_html__( 'registrations in 15 minutes', 'amazing-security' ) . ' ';
 		self::tip( __( 'Counts new accounts on the WordPress registration form.', 'amazing-security' ) );
-		echo '</li><li><strong>' . esc_html( $available ? __( 'Ready', 'amazing-security' ) : __( 'Unavailable', 'amazing-security' ) ) . '</strong> ';
-		echo esc_html__( 'rate storage', 'amazing-security' ) . ' ';
+		echo '</li><li>' . esc_html__( 'Count storage:', 'amazing-security' ) . ' <strong>' . esc_html( $available ? __( 'Ready', 'amazing-security' ) : __( 'Unavailable', 'amazing-security' ) ) . '</strong> ';
 		self::tip( __( 'Ready means a count can be stored. Unavailable means the count is skipped and the hidden-field check still runs.', 'amazing-security' ) );
 		echo '</li></ul>';
 		echo '<details class="amsec-more"><summary>' . esc_html__( 'See more', 'amazing-security' ) . '</summary>';

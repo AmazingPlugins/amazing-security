@@ -26,7 +26,7 @@ final class FileScanReportRendererTest extends TestCase {
 	public function test_empty_state_invites_manual_scan_without_all_clear(): void {
 		$html = ( new FileScanReportRenderer() )->render( null, null, array() );
 		self::assertStringContainsString( 'No file scan has run', $html );
-		self::assertStringContainsString( 'days old', $html );
+		self::assertMatchesRegularExpression( '/\(\d+ days? old\)/', $html );
 		self::assertStringNotContainsString( 'malware-free', $html );
 	}
 
@@ -43,11 +43,13 @@ final class FileScanReportRendererTest extends TestCase {
 
 	public function test_package_gap_names_the_package_and_reason(): void {
 		$cursor = new FileScanCursor( 'scan-3' );
-		$cursor->findings[] = array( 'id' => str_repeat( 'c', 32 ), 'kind' => 'package', 'package' => 'example:1.2', 'path' => '', 'reason' => 'custom_theme', 'summary' => 'Published release could not be verified.' );
+		$cursor->findings[] = array( 'id' => str_repeat( 'c', 32 ), 'kind' => 'package', 'package' => 'theme:example:1.2', 'path' => '', 'reason' => 'package_limit', 'summary' => 'Published release could not be verified.' );
 		$html = ( new FileScanReportRenderer() )->render( null, new FileScanStep( $cursor, true ), array() );
 		self::assertStringContainsString( 'Release unavailable', $html );
-		self::assertStringContainsString( 'example:1.2', $html );
-		self::assertStringContainsString( 'custom_theme', $html );
+		self::assertStringContainsString( 'Theme example 1.2', $html );
+		self::assertStringContainsString( 'at most three themes', $html );
+		self::assertStringNotContainsString( 'package_limit', $html );
+		self::assertStringNotContainsString( 'amsec-file-note-form', $html );
 		self::assertStringNotContainsString( '<code></code>', $html );
 	}
 

@@ -49,7 +49,7 @@ final class Brand {
 		if ( ! self::onScreen() ) {
 			return;
 		}
-		wp_enqueue_style( 'amazing-security-admin', plugins_url( 'assets/admin.css', AMAZING_SECURITY_FILE ), array(), '0.1.57' );
+		wp_enqueue_style( 'amazing-security-admin', plugins_url( 'assets/admin.css', AMAZING_SECURITY_FILE ), array(), '0.1.58' );
 		$page = self::page();
 		if ( in_array( $page, array( 'amsec-accounts', 'amsec-traffic-guard' ), true ) ) {
 			wp_enqueue_script( 'amazing-security-tabs', plugins_url( 'assets/admin-tabs.js', AMAZING_SECURITY_FILE ), array(), '0.1.1', true );
@@ -67,7 +67,7 @@ final class Brand {
 		}
 		// WordPress moves notices to just after this marker, which keeps them above the plugin header.
 		echo '<hr class="wp-header-end">';
-		$logo    = plugins_url( 'assets/logo.jpg', AMAZING_SECURITY_FILE );
+		$logo    = plugins_url( 'assets/logo.png', AMAZING_SECURITY_FILE );
 		$docs    = plugins_url( 'assets/icon-docs.svg', AMAZING_SECURITY_FILE );
 		$guide   = plugins_url( 'assets/icon-guide.svg', AMAZING_SECURITY_FILE );
 		$headers = get_file_data( AMAZING_SECURITY_FILE, array( 'Version' => 'Version' ) );

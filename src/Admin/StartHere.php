@@ -8,6 +8,7 @@ defined( 'ABSPATH' ) || exit;
 
 use AmazingPlugins\Security\Findings\CheckResult;
 use AmazingPlugins\Security\Findings\State;
+use AmazingPlugins\Security\Login\RequiredTotpPage;
 
 /** Fixed first suggestions from a completed local scan. */
 final class StartHere {
@@ -129,7 +130,7 @@ final class StartHere {
 			'authenticator-app', 'passkeys-status' => match ( true ) {
 				State::PASS === $result->state => null,
 				'missing' === $status => array(
-					'label'   => __( 'Find Two Factor', 'amazing-security' ),
+					'label'   => RequiredTotpPage::installed( 'two-factor' ) && current_user_can( 'activate_plugins' ) ? __( 'Activate Two Factor', 'amazing-security' ) : __( 'Find Two Factor', 'amazing-security' ),
 					'install' => 'two-factor',
 				),
 				'passkeys-status' === $result->checkId => array(
