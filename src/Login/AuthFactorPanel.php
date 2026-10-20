@@ -24,21 +24,28 @@ final class AuthFactorPanel {
 		$html .= '<h2 id="amsec-auth-factor-' . esc_attr( $id ) . '">' . esc_html( $title ) . '</h2>';
 		$html .= '<p><strong class="amsec-auth-factor-state">' . esc_html( $label ) . '</strong></p>';
 		if ( AuthFactorStatus::MISSING === $state ) {
-			$name    = (string) ( $factor['suggest_name'] ?? 'Two Factor' );
-			$install = str_contains( $directoryUrl, 'plugin-install.php' );
-			$html   .= '<p>' . esc_html(
-				$install
+			$name     = (string) ( $factor['suggest_name'] ?? 'Two Factor' );
+			$install  = str_contains( $directoryUrl, 'plugin-install.php' );
+			$activate = str_contains( $directoryUrl, '/plugins.php?' );
+			$html    .= '<p>' . esc_html(
+				$activate
+					? sprintf(
+						/* translators: %s: suggested plugin name */
+						__( 'Amazing Security does not provide this itself. %1$s is installed but not active. Click Activate %1$s, then Activate on the Plugins screen. Set it up under Users > Profile, then come back here to check the status.', 'amazing-security' ),
+						$name
+					)
+					: ( $install
 					? sprintf(
 						/* translators: %s: suggested plugin name */
 						__( 'Amazing Security does not provide this itself. Click Find %s, then Install Now and Activate on the search page. Set it up under Users > Profile, then come back here to check the status.', 'amazing-security' ),
 						$name
 					)
-					: __( 'Amazing Security does not provide this itself. Ask a network administrator to install a dedicated plugin, then set it up under Users > Profile.', 'amazing-security' )
+					: __( 'Amazing Security does not provide this itself. Ask a network administrator to install a dedicated plugin, then set it up under Users > Profile.', 'amazing-security' ) )
 			) . '</p>';
 			$html .= '<p><a class="button" href="' . esc_url( $directoryUrl ) . '">' . esc_html(
 				sprintf(
 					/* translators: %s: suggested plugin name */
-					$install ? __( 'Find %s', 'amazing-security' ) : __( 'View %s on WordPress.org', 'amazing-security' ),
+					$activate ? __( 'Activate %s', 'amazing-security' ) : ( $install ? __( 'Find %s', 'amazing-security' ) : __( 'View %s on WordPress.org', 'amazing-security' ) ),
 					$name
 				)
 			) . '</a></p>';
