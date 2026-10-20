@@ -61,7 +61,7 @@ final class BotCounterStore {
 	}
 
 	public function record( string $key, int $window, int $now ): ?int {
-		if ( ! preg_match( '/^[a-f0-9]{64}$/D', $key ) || ! in_array( $window, array( 300, 600, 900 ), true ) || $now < 1 ) {
+		if ( ! preg_match( '/^[a-f0-9]{64}$/D', $key ) || ! in_array( $window, array( 60, 300, 600, 900 ), true ) || $now < 1 ) {
 			return null;
 		}
 		$priorErrors = $this->db->suppress_errors( true );
@@ -117,12 +117,18 @@ final class BotCounterStore {
 	}
 
 	public function blocked( string $key, int $now ): bool {
+		return $this->blockedUntil( $key, $now ) > 0;
+	}
+
+	/** The block end time for a key, or 0 when it is not blocked. */
+	public function blockedUntil( string $key, int $now ): int {
 		$prior = $this->db->suppress_errors( true );
 		try {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Primary-key lookup on every guarded request.
-			return null !== $this->db->get_var( $this->db->prepare( "SELECT 1 FROM {$this->table} WHERE address_key=%s AND blocked_until>%d", $key, $now ) ) && '' === $this->db->last_error;
+			$until = $this->db->get_var( $this->db->prepare( "SELECT blocked_until FROM {$this->table} WHERE address_key=%s AND blocked_until>%d", $key, $now ) );
+			return null === $until || '' !== $this->db->last_error ? 0 : (int) $until;
 		} catch ( \Throwable ) {
-			return false;
+			return 0;
 		} finally {
 			$this->db->suppress_errors( $prior );
 		}
@@ -166,8 +172,9 @@ final class BotCounterStore {
 	public function cleanup( int $now ): void {
 		$prior = $this->db->suppress_errors( true );
 		try {
+			// Every counter window is 15 minutes or less, so idle rows can go after an hour. Flagged rows stay a day for the 24-hour counts.
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Bounded retention removes only this plugin's old opaque counters.
-			$this->db->query( $this->db->prepare( "DELETE FROM {$this->table} WHERE updated_at<%d AND blocked_until<%d ORDER BY updated_at LIMIT 1000", $now - DAY_IN_SECONDS, $now ) );
+			$this->db->query( $this->db->prepare( "DELETE FROM {$this->table} WHERE updated_at<%d AND blocked_until<%d AND flagged_at<%d ORDER BY updated_at LIMIT 5000", $now - HOUR_IN_SECONDS, $now, $now - DAY_IN_SECONDS ) );
 		} finally {
 			$this->db->suppress_errors( $prior );
 		}

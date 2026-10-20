@@ -25,13 +25,14 @@ final class ScannerGuard {
 		if ( 'off' === $mode || is_user_logged_in() || is_admin() || wp_doing_cron() || wp_doing_ajax() || ( defined( 'WP_CLI' ) && WP_CLI ) ) {
 			return;
 		}
-		$key = ( new WordPressClientAddress() )->key( wp_salt( 'auth' ) . ':bot:scanner' )->fromServer( $_SERVER );
-		if ( null === $key ) {
+		$key   = ( new WordPressClientAddress() )->key( wp_salt( 'auth' ) . ':bot:scanner' )->fromServer( $_SERVER );
+		$block = ( new WordPressClientAddress() )->key( wp_salt( 'auth' ) . RateLimiter::BLOCK_SALT )->fromServer( $_SERVER );
+		if ( null === $key || null === $block ) {
 			return;
 		}
 		$store = new BotCounterStore( $GLOBALS['wpdb'] );
 		$now   = time();
-		if ( 'block' === $mode && $store->blocked( $key, $now ) ) {
+		if ( 'block' === $mode && $store->blocked( $block, $now ) ) {
 			self::deny();
 		}
 		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Only compared against fixed strings; never stored or printed.
@@ -51,7 +52,7 @@ final class ScannerGuard {
 			( new ActivityHooks( new ActivityRepository( $GLOBALS['wpdb'] ) ) )->record( 'block' === $decision ? 'scanner_blocked' : 'scanner_flagged' );
 		}
 		if ( 'block' === $decision ) {
-			$store->block( $key, $now + ProbePolicy::BLOCK, $now );
+			$store->block( $block, $now + ProbePolicy::BLOCK, $now );
 			self::deny();
 		}
 	}

@@ -49,6 +49,8 @@ final class ActivityRenderer {
 			'bot_policy_changed'       => __( 'Comment check changed', 'amazing-security' ),
 			'scanner_flagged'          => __( 'Scanner spotted', 'amazing-security' ),
 			'scanner_blocked'          => __( 'Scanner blocked for an hour', 'amazing-security' ),
+			'rate_limited'             => __( 'Rate limit reached', 'amazing-security' ),
+			'rate_blocked'             => __( 'Rate limit block', 'amazing-security' ),
 		);
 		return $names[ $event ] ?? str_replace( '_', ' ', $event );
 	}
