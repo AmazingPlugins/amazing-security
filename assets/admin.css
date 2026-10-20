@@ -2163,3 +2163,43 @@ li[data-state="done"] > .amsec-scan-dot::after {
 body.amsec-app .amazing-security-admin .amsec-scan-form.is-scanning label.amsec-header-consent {
   display: none;
 }
+
+.amsec-risk-list {
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+}
+
+.amsec-risk-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 12px;
+  margin: 0;
+  padding: 10px 0;
+  border-top: 1px solid rgba(26, 20, 16, 0.08);
+}
+
+.amsec-risk-row:first-child {
+  border-top: 0;
+}
+
+.amsec-risk-row .amsec-pill {
+  min-width: 44px;
+  text-align: center;
+}
+
+.amsec-risk-text {
+  flex: 1 1 260px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.amsec-risk-text strong {
+  display: block;
+}
+
+.amsec-risk-row a {
+  color: #a63617;
+  font-weight: 600;
+}
