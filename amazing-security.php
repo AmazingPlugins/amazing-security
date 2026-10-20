@@ -295,6 +295,9 @@ add_action( 'admin_menu', array( new AmazingPlugins\Security\Bots\BotSettings(),
 $amsec_scanner = new AmazingPlugins\Security\Bots\ScannerGuard();
 add_action( 'template_redirect', array( $amsec_scanner, 'check' ), 0 );
 add_action( 'admin_post_amsec_scanner_guard', array( $amsec_scanner, 'handle' ) );
+$amsec_rate = new AmazingPlugins\Security\Bots\RateLimiter();
+add_action( 'init', array( $amsec_rate, 'check' ), 0 );
+add_action( 'admin_post_amsec_rate_limits', array( $amsec_rate, 'handle' ) );
 add_action( 'admin_post_amsec_bot_settings', array( new AmazingPlugins\Security\Bots\BotSettings(), 'handle' ) );
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
 	\WP_CLI::add_command( 'amazing-security bots disable', array( new AmazingPlugins\Security\Bots\BotSettings(), 'recovery' ) );

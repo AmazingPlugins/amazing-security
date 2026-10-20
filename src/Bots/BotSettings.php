@@ -102,10 +102,11 @@ final class BotSettings {
 		}
 		update_option( 'amsec_bot_mode', 'off', false );
 		update_option( ScannerGuard::OPTION, 'off', false );
-		if ( 'off' !== get_option( 'amsec_bot_mode', 'off' ) || 'off' !== ScannerGuard::mode() ) {
+		update_option( RateLimiter::OPTION, array( 'mode' => 'off' ) + RateLimiter::settings(), true );
+		if ( 'off' !== get_option( 'amsec_bot_mode', 'off' ) || 'off' !== ScannerGuard::mode() || 'off' !== RateLimiter::settings()['mode'] ) {
 			\WP_CLI::error( 'Bot controls could not be disabled.' );
 		}
 		( new ActivityHooks( new ActivityRepository( $GLOBALS['wpdb'] ) ) )->record( 'bot_policy_changed', 0, 'off' );
-		\WP_CLI::success( 'Native bot controls and the scanner guard are off.' );
+		\WP_CLI::success( 'Native bot controls, the scanner guard and rate limiting are off.' );
 	}
 }
