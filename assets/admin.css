@@ -398,14 +398,6 @@ body.amsec-app #wpbody-content > .wrap.amazing-security-admin:not(.amsec-scan) >
   box-shadow: none;
 }
 
-.amsec-header-consent {
-  max-width: 36ch;
-  color: var(--amsec-muted);
-  font-size: 13px;
-  line-height: 1.45;
-  text-align: center;
-}
-
 .amazing-security-admin .amsec-overview {
   margin: 12px auto 28px;
   padding: 22px 22px 8px;
@@ -1913,7 +1905,6 @@ body.amsec-app .amazing-security-admin fieldset > label.amsec-check {
 
 /* A running scan hides the previous results; only the progress shows until the new report loads. */
 body.amsec-app .amsec-scan.is-scanning > :not(.amsec-scan-form),
-body.amsec-app .amsec-scan.is-scanning .amsec-header-consent,
 body.amsec-app .amsec-scan.is-scanning .amsec-scan-button {
   display: none;
 }
@@ -2157,11 +2148,6 @@ li[data-state="done"] > .amsec-scan-dot::after {
     border-color: #a63617;
     animation: none;
   }
-}
-
-/* Outranks the wrapped-checkbox label rule, which would otherwise keep the consent box on screen. */
-body.amsec-app .amazing-security-admin .amsec-scan-form.is-scanning label.amsec-header-consent {
-  display: none;
 }
 
 .amsec-risk-list {

@@ -55,13 +55,10 @@ final class AdminPage {
 	 * @param array<int, mixed>|null $results
 	 */
 	private function scanForm( bool $withConsent, string $label, bool $rescan = false ): void {
-		echo '<form class="amsec-scan-form' . ( $rescan ? ' amsec-rescan-center' : '' ) . '" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" method="post">';
+		echo '<form class="amsec-scan-form' . ( $rescan ? ' amsec-rescan-center' : '' ) . '"' . ( $withConsent && ScanOptions::headers() ? ' data-amsec-headers="1"' : '' ) . ' action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" method="post">';
 		echo '<input type="hidden" name="action" value="amazing_security_scan">';
 		wp_nonce_field( 'amazing_security_scan' );
 		echo '<button type="submit" class="amsec-scan-button' . ( $rescan ? ' amsec-rescan-button' : '' ) . '">' . esc_html( $label ) . '</button>';
-		if ( $withConsent ) {
-			echo '<label class="amsec-header-consent"><input type="checkbox" name="amsec_header_consent" value="1"> ' . esc_html__( "Request this site's homepage and read its response headers.", 'amazing-security' ) . '</label>';
-		}
 		echo '<div class="amsec-scan-progress" hidden><p class="amsec-scan-status">' . esc_html__( 'Scanning', 'amazing-security' ) . ' <span class="amsec-scan-percent" aria-hidden="true"></span></p>';
 		echo '<p class="amsec-scan-step"></p>';
 		echo '<div class="amsec-scan-track" role="progressbar" aria-label="' . esc_attr__( 'Scan progress', 'amazing-security' ) . '" aria-valuemin="0" aria-valuemax="100"><span class="amsec-scan-fill"></span></div>';

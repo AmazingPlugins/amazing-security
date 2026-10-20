@@ -73,6 +73,7 @@ delete_option( 'amsec_content_state' );
 delete_option( 'amsec_content_lock' );
 
 delete_option( 'amsec_headers_state' );
+delete_option( 'amsec_scan_headers' );
 delete_option( 'amsec_headers_lock' );
 
 delete_option( 'amsec_rest_rate_policy' );

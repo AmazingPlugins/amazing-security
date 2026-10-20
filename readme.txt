@@ -89,7 +89,7 @@ Used only after an administrator turns on breached-password checks. It runs when
 [Terms](https://haveibeenpwned.com/API/v3#AcceptableUse) · [Privacy policy](https://haveibeenpwned.com/Privacy)
 
 **Your own site**
-The security headers check requests your own homepage to read its response headers, only when you tick that option.
+Each scan requests your own homepage once to read its response headers, the same way WordPress Site Health checks your site. The request stays on your site and no other service gets it. You can turn it off under Settings → Scan options.
 
 == Installation ==
 
