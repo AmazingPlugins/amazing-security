@@ -139,6 +139,7 @@ final class ActivityRenderer {
 			'amsec_digest_enabled'         => __( 'Weekly digest', 'amazing-security' ),
 			'amazing_security_mcp_enabled' => __( 'Assistant connection', 'amazing-security' ),
 			'amazing_security_vulnerability_direct_enabled' => __( 'Direct vulnerability lookup', 'amazing-security' ),
+			'amazing_security_kev_enabled' => __( 'CISA list of exploited holes', 'amazing-security' ),
 		);
 		if ( isset( $names[ $target ] ) ) {
 			return $names[ $target ];

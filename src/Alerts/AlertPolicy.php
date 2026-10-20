@@ -14,7 +14,7 @@ final class AlertPolicy {
 	public function fromVulnerabilities( VulnerabilityReport $report ): array {
 		$ids = array();
 		foreach ( $report->results as $finding ) {
-			if ( 'vulnerability' === $finding->checkId && 'warn' === $finding->state && 'complete' === $finding->coverage && in_array( $finding->evidence['severity'] ?? null, array( 'high', 'critical' ), true ) && null !== $finding->findingId ) {
+			if ( 'vulnerability' === $finding->checkId && 'warn' === $finding->state && 'complete' === $finding->coverage && ( in_array( $finding->evidence['severity'] ?? null, array( 'high', 'critical' ), true ) || true === ( $finding->evidence['exploited'] ?? null ) ) && null !== $finding->findingId ) {
 				$ids[] = $finding->findingId;
 			}
 		}

@@ -21,6 +21,7 @@ use AmazingPlugins\Security\Free\Guide\Score;
 use AmazingPlugins\Security\Schedule\LocalSchedule;
 use AmazingPlugins\Security\Schedule\ScheduleStatusRenderer;
 use AmazingPlugins\Security\Schedule\SuiteCycle;
+use AmazingPlugins\Security\Vulnerabilities\ExploitedList;
 use AmazingPlugins\Security\Vulnerabilities\VulnerabilityPreferences;
 use AmazingPlugins\Security\Vulnerabilities\WordPressVulnerabilityReportStore;
 
@@ -319,6 +320,13 @@ final class AdminPage {
 					)
 				) . '</p>';
 			}
+			$kev = '1' === get_option( ExploitedList::ENABLED );
+			echo '<section class="amsec-consent" aria-labelledby="amsec-kev-title"><h3 id="amsec-kev-title">' . esc_html__( 'Holes attackers are using right now', 'amazing-security' ) . '</h3><p>' . esc_html__( 'Also check the US CISA list of security holes that attackers are using right now. Once a week this site downloads the public list. Nothing about your site is sent, but CISA can see your server’s IP address. A match is marked “Attackers are using this hole.”', 'amazing-security' ) . ' <a href="https://www.cisa.gov/known-exploited-vulnerabilities-catalog" target="_blank" rel="noopener noreferrer">' . esc_html__( 'About the list', 'amazing-security' ) . '</a> · <a href="https://www.cisa.gov/privacy-policy" target="_blank" rel="noopener noreferrer">' . esc_html__( 'CISA privacy policy', 'amazing-security' ) . '</a></p>';
+			echo '<form action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" method="post"><input type="hidden" name="action" value="amazing_security_kev_toggle"><input type="hidden" name="amsec_kev" value="' . ( $kev ? '0' : '1' ) . '">';
+			wp_nonce_field( 'amazing_security_kev_toggle' );
+			echo '<p>';
+			submit_button( $kev ? __( 'Turn off the CISA list', 'amazing-security' ) : __( 'Turn on the CISA list', 'amazing-security' ), $kev ? 'secondary' : 'primary', 'submit', false );
+			echo '</p></form></section>';
 			echo '<form action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" method="post"><input type="hidden" name="action" value="amazing_security_vulnerability_disable">';
 			wp_nonce_field( 'amazing_security_vulnerability_disable' );
 			echo '<p>';

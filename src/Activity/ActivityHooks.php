@@ -110,7 +110,7 @@ final class ActivityHooks {
 	}
 
 	public function optionChanged( string $name ): void {
-		if ( in_array( $name, array( 'amsec_login_rate_mode', 'amsec_login_xmlrpc_disabled', 'amsec_alerts_enabled', 'amsec_digest_enabled', 'amazing_security_mcp_enabled', 'amazing_security_vulnerability_direct_enabled' ), true ) ) {
+		if ( in_array( $name, array( 'amsec_login_rate_mode', 'amsec_login_xmlrpc_disabled', 'amsec_alerts_enabled', 'amsec_digest_enabled', 'amazing_security_mcp_enabled', 'amazing_security_vulnerability_direct_enabled', 'amazing_security_kev_enabled' ), true ) ) {
 			$this->record( 'security_setting_changed', 0, $name );
 		}
 	}

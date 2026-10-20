@@ -80,6 +80,10 @@ Used by the integrity scan, which runs when you press Scan and then once a day o
 Used only after an administrator turns on vulnerability checks. It sends the WordPress core version and installed plugin and theme slugs. The provider can see your server's IP address. You can turn lookups off at any time.
 [License and terms](https://www.wpvulnerability.com/license/) · [Privacy policy](https://www.wpvulnerability.com/privacy/)
 
+**CISA Known Exploited Vulnerabilities catalog (www.cisa.gov)**
+Used only after an administrator turns on vulnerability checks and then the CISA list. During a vulnerability check, at most once a week, the site downloads the public list of security holes attackers are using. Nothing about your site is sent. CISA can see your server's IP address. Only the CVE IDs are kept, and turning the list off deletes them.
+[About the catalog](https://www.cisa.gov/known-exploited-vulnerabilities-catalog) · [Privacy policy](https://www.cisa.gov/privacy-policy)
+
 **Have I Been Pwned, Pwned Passwords (api.pwnedpasswords.com)**
 Used only after an administrator turns on breached-password checks. It runs when an administrator signs in and when anyone sets or resets a password. It sends the first 5 characters of the password's SHA-1 hash, never the password or the full hash. The match is checked on your server.
 [Terms](https://haveibeenpwned.com/API/v3#AcceptableUse) · [Privacy policy](https://haveibeenpwned.com/Privacy)
