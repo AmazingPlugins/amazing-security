@@ -90,14 +90,53 @@ final class ScanStepAction {
 		);
 	}
 
-	/** @return list<string> Step ids in order: the three background file passes, every check, the optional header request, then save. */
-	public static function steps(): array {
-		$steps = array( 'file-code', 'file-inventory', 'file-content' );
+	/** @return array<string, array{0: string, 1: list<string>}> Scan categories in run order. File passes run before the checks that read them, and the header request before its follow-up. */
+	private static function groups(): array {
+		return array(
+			'code'     => array( __( 'Malware and code', 'amazing-security' ), array( 'file-code', 'file-inventory', 'file-content', 'local-code', 'suspicious-files', 'local-inventory', 'release-files', 'public-content' ) ),
+			'files'    => array( __( 'Files and folders', 'amazing-security' ), array( 'filesystem-permissions', 'file-modes', 'uploads-php-execution', 'uploads-php-files', 'root-exposure', 'readme-file', 'license-file', 'debug-log', 'sample-config', 'error-log', 'config-backup' ) ),
+			'sign-in'  => array( __( 'Sign-in and accounts', 'amazing-security' ), array( 'https-admin', 'default-admin-login', 'login-rate-mode', 'xmlrpc-auth', 'authenticator-app', 'passkeys-status', 'captcha-login', 'compromised-passwords', 'login-hints', 'account-sessions' ) ),
+			'updates'  => array( __( 'Updates and versions', 'amazing-security' ), array( 'core-updates', 'php-version', 'background-updates', 'plugin-updates', 'theme-updates', 'inactive-plugins', 'inactive-themes', 'known-holes', 'closed-plugins' ) ),
+			'settings' => array( __( 'Site settings', 'amazing-security' ), array( 'debug-display', 'file-editor', 'pingbacks', 'author-archives', 'rest-user-list', 'version-tag', 'discovery-links' ) ),
+			'traffic'  => array( __( 'Bots and traffic', 'amazing-security' ), array( 'bot-controls', 'rest-rates', 'rest-request-watch', 'network-controls', 'trusted-proxies', 'traffic-history', 'header-request', 'security-headers' ) ),
+			'watch'    => array( __( 'Monitoring and alerts', 'amazing-security' ), array( 'finding-emails', 'weekly-digest', 'security-activity', 'code-baselines', 'daily-checks', 'daily-file-checks', 'rule-review' ) ),
+			'ai'       => array( __( 'AI', 'amazing-security' ), array( 'ai-readers', 'ai-readiness' ) ),
+		);
+	}
+
+	/**
+	 * Categories with the step ids that will really run, in order. A check missing from every category still runs, under "Other".
+	 *
+	 * @return list<array{0: string, 1: list<string>}>
+	 */
+	public static function plan(): array {
+		$checks = array();
 		foreach ( LocalHardeningScanService::all() as $check ) {
-			if ( 'security-headers' === $check->id() && ScanOptions::headers() ) {
-				$steps[] = 'header-request';
+			$checks[ $check->id() ] = true;
+		}
+		$extra  = array( 'file-code', 'file-inventory', 'file-content' );
+		$extra  = array_merge( $extra, ScanOptions::headers() ? array( 'header-request' ) : array() );
+		$plan   = array();
+		$placed = array();
+		foreach ( self::groups() as $group ) {
+			$ids = array_values( array_filter( $group[1], static fn( string $id ): bool => isset( $checks[ $id ] ) || in_array( $id, $extra, true ) ) );
+			if ( array() !== $ids ) {
+				$plan[] = array( $group[0], $ids );
+				$placed = array_merge( $placed, $ids );
 			}
-			$steps[] = $check->id();
+		}
+		$other = array_values( array_diff( array_keys( $checks ), $placed ) );
+		if ( array() !== $other ) {
+			$plan[] = array( __( 'Other', 'amazing-security' ), $other );
+		}
+		return $plan;
+	}
+
+	/** @return list<string> Every step id in run order, ending with save. */
+	public static function steps(): array {
+		$steps = array();
+		foreach ( self::plan() as $group ) {
+			array_push( $steps, ...$group[1] );
 		}
 		$steps[] = 'save';
 		return $steps;
@@ -133,10 +172,18 @@ final class ScanStepAction {
 				'header-request' => __( 'Homepage response headers', 'amazing-security' ),
 				'save'           => __( 'Saving the results', 'amazing-security' ),
 			);
+			$groups = array();
+			foreach ( self::plan() as $group ) {
+				$groups[] = array(
+					'name'  => $group[0],
+					'steps' => array_map( static fn( string $id ): string => $labels[ $id ] ?? $id, $group[1] ),
+				);
+			}
 			wp_send_json_success(
 				array(
-					'token' => $token,
-					'steps' => array_map( static fn( string $id ): string => $labels[ $id ] ?? $id, $steps ),
+					'token'  => $token,
+					'groups' => $groups,
+					'save'   => $labels['save'],
 				)
 			);
 		}

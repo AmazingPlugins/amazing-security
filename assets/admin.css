@@ -2195,3 +2195,33 @@ li[data-state="done"] > .amsec-scan-dot::after {
   font-size: 15px;
   font-weight: 400;
 }
+
+/* Scan progress folds its steps into categories; only the running one opens. */
+.amsec-scan-list li.amsec-scan-group {
+  flex-wrap: wrap;
+  font-weight: 650;
+}
+
+.amsec-scan-list li.amsec-scan-group[data-state="active"] {
+  background: transparent;
+}
+
+.amsec-scan-count {
+  margin-left: auto;
+  color: #6b5c4f;
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 400;
+}
+
+.amsec-scan-items {
+  flex-basis: 100%;
+  margin: 4px 0 0 36px;
+  padding: 0;
+  list-style: none;
+}
+
+.amsec-scan-items li {
+  font-size: 16px;
+  font-weight: 400;
+}
