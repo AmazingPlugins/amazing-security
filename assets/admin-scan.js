@@ -122,7 +122,15 @@
 				rows = list ? buildList(list, data.steps) : [];
 				draw(0);
 				var run = function (index) {
+					var began = Date.now();
 					return post(form, { step: String(index), token: data.token }, signal).then(function (result) {
+						// Each step stays on screen for at least a second so people can read what is being checked.
+						return new Promise(function (resolve) {
+							window.setTimeout(function () {
+								resolve(result);
+							}, Math.max(0, 1000 - (Date.now() - began)));
+						});
+					}).then(function (result) {
 						if (result.note && rows[index]) {
 							var note = document.createElement('span');
 							note.className = 'amsec-scan-note';
