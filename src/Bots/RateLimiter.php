@@ -37,7 +37,7 @@ final class RateLimiter {
 		$uri  = is_string( $_SERVER['REQUEST_URI'] ?? null ) ? wp_unslash( $_SERVER['REQUEST_URI'] ) : '';
 		$kind = RatePolicy::classify(
 			(string) wp_parse_url( $uri, PHP_URL_PATH ),
-			'' !== (string) ( $_GET['rest_route'] ?? '' ), // phpcs:ignore WordPress.Security.NonceVerification.Recommended,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Only tested for being empty.
+			isset( $_GET['rest_route'] ) && '' !== sanitize_text_field( wp_unslash( $_GET['rest_route'] ) ), // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Only tested for being empty.
 			(string) wp_parse_url( home_url( rest_get_url_prefix() . '/' ), PHP_URL_PATH ),
 			(string) ( $GLOBALS['pagenow'] ?? '' ),
 			is_string( $_SERVER['REQUEST_METHOD'] ?? null ) ? sanitize_key( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) : '',
