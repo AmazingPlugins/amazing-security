@@ -100,7 +100,8 @@ final class ScannerGuard {
 		$count   = ( new BotCounterStore( $GLOBALS['wpdb'] ) )->flaggedSince( time() - DAY_IN_SECONDS );
 		echo '<div class="wrap amazing-security-admin amsec-brief">';
 		echo '<h2>' . esc_html__( 'Scanner guard', 'amazing-security' ) . '</h2>';
-		if ( 'proxy' === ( $_GET['amsec_scanner_error'] ?? '' ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only flash after saving.
+		$flash = isset( $_GET['amsec_scanner_error'] ) ? sanitize_key( wp_unslash( $_GET['amsec_scanner_error'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only flash after saving.
+		if ( 'proxy' === $flash ) {
 			echo '<div class="notice notice-error inline"><p>' . esc_html__( 'Block is off because requests arrive through a proxy this site does not trust yet. Every visitor would share one address. Add the proxy under Trusted proxies first, or choose Watch.', 'amazing-security' ) . '</p></div>';
 		}
 		echo '<p class="amsec-brief-status"><span class="amsec-pill' . ( 'off' === $mode ? ' is-off' : ' is-on' ) . '">' . esc_html( $choices[ $mode ] ) . '</span>';
