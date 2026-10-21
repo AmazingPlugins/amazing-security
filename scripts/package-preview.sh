@@ -3,7 +3,6 @@ set -euo pipefail
 
 plugin_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 php "${plugin_dir}/scripts/rule-manifest.php" --check
-php "${plugin_dir}/scripts/passkey-vendor-manifest.php"
 version="$(sed -n 's/^ \* Version: *//p' "${plugin_dir}/amazing-security.php" | head -1)"
 stable="$(sed -n 's/^Stable tag: *//p' "${plugin_dir}/readme.txt" | head -1)"
 [[ -n "${version}" && "${version}" == "${stable}" ]] || { echo "Header version '${version}' and readme Stable tag '${stable}' differ." >&2; exit 1; }
