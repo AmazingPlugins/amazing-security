@@ -25,24 +25,35 @@
 		var groups = [];
 		list.textContent = '';
 		data.groups.forEach(function (group, g) {
-			var head = row('li', String.fromCharCode(65 + g), group.name);
+			var head = document.createElement('li');
+			var toggle = row('button', String.fromCharCode(65 + g) + '.', group.name);
 			var count = document.createElement('span');
 			var items = document.createElement('ol');
 			head.className = 'amsec-scan-group';
+			head.setAttribute('data-state', 'pending');
+			toggle.className = 'amsec-scan-toggle';
+			toggle.type = 'button';
+			toggle.setAttribute('aria-expanded', 'false');
 			count.className = 'amsec-scan-count';
 			items.className = 'amsec-scan-items';
 			items.hidden = true;
-			head.appendChild(count);
+			toggle.appendChild(count);
+			head.appendChild(toggle);
 			head.appendChild(items);
 			list.appendChild(head);
+			// Anyone can open a folded category to see its steps, or fold the running one.
+			toggle.addEventListener('click', function () {
+				items.hidden = !items.hidden;
+				toggle.setAttribute('aria-expanded', items.hidden ? 'false' : 'true');
+			});
 			var first = rows.length;
 			group.steps.forEach(function (label, i) {
-				var item = row('li', String(i + 1), label);
+				var item = row('li', String(i + 1) + '.', label);
 				item.setAttribute('data-group', String(g));
 				items.appendChild(item);
 				rows.push(item);
 			});
-			groups.push({ head: head, items: items, count: count, first: first, size: group.steps.length });
+			groups.push({ head: head, toggle: toggle, items: items, count: count, first: first, size: group.steps.length, state: 'pending' });
 		});
 		var save = row('li', '', data.save);
 		save.className = 'amsec-scan-group';
@@ -121,8 +132,14 @@
 				groups.forEach(function (group, g) {
 					var finished = Math.max(0, Math.min(group.size, done - group.first));
 					var state = finished === group.size ? 'done' : (done >= group.first ? 'active' : 'pending');
-					group.head.setAttribute('data-state', state);
-					group.items.hidden = 'active' !== state;
+					if (state !== group.state) {
+						// Only a change of state opens or folds a category, so a manual click sticks until then.
+						group.state = state;
+						group.head.setAttribute('data-state', state);
+						group.toggle.setAttribute('data-state', state);
+						group.items.hidden = 'active' !== state;
+						group.toggle.setAttribute('aria-expanded', group.items.hidden ? 'false' : 'true');
+					}
 					group.count.textContent = finished + '/' + group.size;
 					if ('active' === state) {
 						activeGroup = g;
