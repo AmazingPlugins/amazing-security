@@ -145,6 +145,20 @@
 						activeGroup = g;
 					}
 				});
+				if (list && activeGroup >= 0 && rows[done]) {
+					// Hold the running category at the top of the box, and shift down only if its running step would be out of view.
+					var box = list.getBoundingClientRect();
+					var top = groups[activeGroup].head.getBoundingClientRect().top - box.top + list.scrollTop;
+					var bottom = rows[done].getBoundingClientRect().bottom - box.top + list.scrollTop + 10;
+					if (bottom - top > list.clientHeight) {
+						top = bottom - list.clientHeight;
+					}
+					if (list.scrollTo) {
+						list.scrollTo({ top: top, behavior: 'smooth' });
+					} else {
+						list.scrollTop = top;
+					}
+				}
 				if (step && rows.length) {
 					var current = rows[Math.min(done, rows.length - 1)];
 					var group = groups[activeGroup];
