@@ -22,7 +22,6 @@ final class SubmenuTest extends TestCase {
 		$registered = array(
 			'amazing-security',
 			'amsec-accounts',
-			'amsec-passkeys',
 			'amsec-traffic-guard',
 			'amsec-tools',
 			'amsec-fix-review',
@@ -32,7 +31,7 @@ final class SubmenuTest extends TestCase {
 			'amsec-review',
 		);
 		self::assertSame(
-			array( 'amsec-passkeys', 'amsec-tools', 'amsec-fix-review', 'amsec-activity', 'amsec-repair', 'amsec-guide', 'amsec-review' ),
+			array( 'amsec-tools', 'amsec-fix-review', 'amsec-activity', 'amsec-repair', 'amsec-guide', 'amsec-review' ),
 			Submenu::hidden( $registered )
 		);
 	}

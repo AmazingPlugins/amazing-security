@@ -3,7 +3,7 @@
  * Plugin Name: Amazing Security
  * Plugin URI: https://amazingplugins.com/plugins/amazing-security/
  * Description: Local WordPress security checks and optional login protection.
- * Version: 0.1.0
+ * Version: 0.1.1
  * Requires at least: 6.6
  * Requires PHP: 8.1
  * Author: Amazing Plugins
@@ -369,77 +369,3 @@ add_action( 'admin_menu', array( new AmazingPlugins\Security\Proxy\ProxySettings
 add_action( 'admin_post_amsec_proxy_settings', array( new AmazingPlugins\Security\Proxy\ProxySettings(), 'handle' ) );
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
 	WP_CLI::add_command( 'amazing-security proxies disable', array( new AmazingPlugins\Security\Proxy\ProxySettings(), 'recovery' ) ); }
-
-register_activation_hook( __FILE__, array( AmazingPlugins\Security\Passkeys\PasskeyTables::class, 'install' ) );
-add_action(
-	'admin_init',
-	static function (): void {
-		if ( current_user_can( 'manage_options' ) && '1' !== get_option( 'amsec_passkey_schema_version' ) ) {
-			AmazingPlugins\Security\Passkeys\PasskeyTables::install();
-		}
-	}
-);
-add_action(
-	'init',
-	static function (): void {
-		if ( '1' === get_option( 'amsec_passkey_schema_version' ) ) {
-			AmazingPlugins\Security\Passkeys\PasskeyTables::ensureScheduled();
-		}
-	}
-);
-add_action(
-	'amsec_passkey_cleanup',
-	static function (): void {
-		( new AmazingPlugins\Security\Passkeys\PasskeyRepository( $GLOBALS['wpdb'] ) )->cleanup( time() );
-	}
-);
-register_deactivation_hook(
-	__FILE__,
-	static function (): void {
-		wp_clear_scheduled_hook( 'amsec_passkey_cleanup' );
-	}
-);
-add_action(
-	'delete_user',
-	static function ( int $id ): void {
-		( new AmazingPlugins\Security\Passkeys\PasskeyRepository( $GLOBALS['wpdb'] ) )->revokeUser( $id );
-	}
-);
-$amsec_passkey_settings = new AmazingPlugins\Security\Passkeys\PasskeySettings();
-add_action( 'admin_menu', array( $amsec_passkey_settings, 'register' ) );
-add_action( 'admin_post_amsec_passkey_settings', array( $amsec_passkey_settings, 'handle' ) );
-// Own passkey enroll/login UI retired; status card is on Log In & Register. Cleanup CLI remains.
-if ( defined( 'WP_CLI' ) && WP_CLI ) {
-	WP_CLI::add_command( 'amazing-security passkeys disable', array( $amsec_passkey_settings, 'recoveryDisable' ) );
-	WP_CLI::add_command( 'amazing-security passkeys revoke', array( $amsec_passkey_settings, 'recoveryRevoke' ) );
-}
-add_action(
-	'admin_post_amsec_passkey_enroll_begin',
-	static function (): void {
-		wp_die( esc_html__( 'Amazing Security no longer enrolls passkeys.', 'amazing-security' ), '', array( 'response' => 410 ) );
-	}
-);
-add_action(
-	'admin_post_amsec_passkey_enroll_finish',
-	static function (): void {
-		wp_die( esc_html__( 'Amazing Security no longer enrolls passkeys.', 'amazing-security' ), '', array( 'response' => 410 ) );
-	}
-);
-add_action(
-	'admin_post_amsec_passkey_remove',
-	static function (): void {
-		wp_die( esc_html__( 'Amazing Security no longer manages passkeys.', 'amazing-security' ), '', array( 'response' => 410 ) );
-	}
-);
-add_action(
-	'admin_post_nopriv_amsec_passkey_login_begin',
-	static function (): void {
-		wp_die( esc_html__( 'Amazing Security no longer provides passkey sign-in.', 'amazing-security' ), '', array( 'response' => 410 ) );
-	}
-);
-add_action(
-	'admin_post_nopriv_amsec_passkey_login_finish',
-	static function (): void {
-		wp_die( esc_html__( 'Amazing Security no longer provides passkey sign-in.', 'amazing-security' ), '', array( 'response' => 410 ) );
-	}
-);

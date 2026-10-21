@@ -4,7 +4,7 @@ Tags: security, hardening, malware scan, login security, file integrity
 Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 0.1.0
+Stable tag: 0.1.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -118,10 +118,12 @@ Run `wp amazing-security login disable` on the server. Other controls have their
 == Credits ==
 
 * Fraunces and Inter fonts, bundled under the SIL Open Font License 1.1 (see assets/fonts/).
-* WebAuthn library by Lukas Buchs (lbuchs/WebAuthn 2.2.0), MIT license, bundled in src/Vendor/WebAuthn.
 * Vulnerability data from WPVulnerability, credited to its original sources.
 
 == Changelog ==
+
+= 0.1.1 =
+* Removed the unused passkey code and the bundled WebAuthn library. Passkey status for other plugins is still reported.
 
 = 0.1.0 =
 * First release: local hardening scan, file integrity and pattern scans, reviewed file repair, opt-in vulnerability lookups, login and traffic protection, and email notifications.
