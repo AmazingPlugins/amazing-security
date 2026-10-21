@@ -56,62 +56,7 @@ final class LocalHardeningScanService {
 				if ( function_exists( 'get_option' ) ) {
 					( new LocalPass() )->advance();
 				}
-				$values   = new WordPressValues();
-				$checks   = self::checks( $values, static fn(): mixed => get_option( 'amsec_login_rate_mode', null ) );
-				$paths    = FilesystemPermissionsCheck::wordpressPaths();
-				$checks[] = new FilesystemPermissionsCheck( $paths );
-				$checks[] = new FileModesCheck( $paths );
-				$checks[] = new UploadsExecutionCheck();
-				$checks[] = new PingbackCheck( static fn(): mixed => get_option( 'default_ping_status', null ) );
-				$checks[] = new XmlRpcAuthCheck( static fn(): mixed => get_option( 'amsec_login_xmlrpc_disabled', null ) );
-				$checks[] = new AuthFactorCheck( 'authenticator-app' );
-				$checks[] = new AuthFactorCheck( 'passkeys-status' );
-				$checks[] = new GapCheck( 'captcha-login', static fn(): string => self::gateOption( 'amsec_login_confirm' ) );
-				$checks[] = new GapCheck( 'compromised-passwords', static fn(): string => self::gateOption( 'amsec_common_passwords' ) );
-				$checks[] = new GapCheck( 'login-hints', static fn(): string => self::gateOption( 'amsec_generic_login_errors' ) );
-				$checks[] = new GapCheck( 'author-archives', static fn(): string => self::gateOption( 'amsec_hide_author_archives' ) );
-				$checks[] = new GapCheck( 'rest-user-list', static fn(): string => self::gateOption( 'amsec_hide_rest_users' ) );
-				$checks[] = new GapCheck( 'version-tag', static fn(): string => self::gateOption( 'amsec_hide_generator' ) );
-				$checks[] = new GapCheck( 'discovery-links', static fn(): string => self::gateOption( 'amsec_hide_discovery_links' ) );
-				$checks[] = new ReadmeFileCheck();
-				$checks[] = new LicenseFileCheck();
-				$checks[] = new DebugLogCheck();
-				$checks[] = new SampleConfigCheck();
-				$checks[] = new ErrorLogCheck();
-				$checks[] = new ConfigBackupCheck();
-				$checks[] = new PhpVersionCheck();
-				$checks[] = new BackgroundUpdatesCheck();
-				$checks[] = new PackageUpdateCheck( 'plugin-updates' );
-				$checks[] = new PackageUpdateCheck( 'theme-updates' );
-				$checks[] = new InactivePluginsCheck();
-				$checks[] = new InactiveThemesCheck();
-				$checks[] = new UploadsPhpFilesCheck();
-				$checks[] = new RootExposureCheck();
-				$checks[] = new BotModeCheck( static fn(): mixed => get_option( 'amsec_bot_mode', 'off' ) );
-				$checks[] = new RestRateCheck( static fn(): mixed => get_option( 'amsec_rest_rate_policy', null ) );
-				$checks[] = new RestWatchCheck();
-				$checks[] = new SiteWatchCheck( 'finding-emails', array( SiteWatchCheck::class, 'findingEmails' ) );
-				$checks[] = new SiteWatchCheck( 'weekly-digest', array( SiteWatchCheck::class, 'weeklyDigest' ) );
-				$checks[] = new SiteWatchCheck( 'traffic-history', array( SiteWatchCheck::class, 'trafficHistory' ) );
-				$checks[] = new SiteWatchCheck( 'network-controls', array( SiteWatchCheck::class, 'networkControls' ) );
-				$checks[] = new SiteWatchCheck( 'trusted-proxies', array( SiteWatchCheck::class, 'trustedProxies' ) );
-				$checks[] = new SiteWatchCheck( 'security-activity', array( SiteWatchCheck::class, 'securityActivity' ) );
-				$checks[] = new SiteWatchCheck( 'account-sessions', array( SiteWatchCheck::class, 'accountSessions' ) );
-				$checks[] = new SiteWatchCheck( 'code-baselines', array( SiteWatchCheck::class, 'codeBaselines' ) );
-				$checks[] = new SiteWatchCheck( 'daily-checks', array( SiteWatchCheck::class, 'dailyChecks' ) );
-				$checks[] = new SiteWatchCheck( 'daily-file-checks', array( SiteWatchCheck::class, 'dailyFileChecks' ) );
-				$checks[] = new SiteWatchCheck( 'rule-review', array( SiteWatchCheck::class, 'ruleReview' ) );
-				$checks[] = new AiReadersCheck( array( AiReadersCheck::class, 'wordpressSnapshot' ) );
-				$checks[] = new AiReadinessCheck( array( AiReadinessCheck::class, 'wordpressSnapshot' ) );
-				$checks[] = new KnownHolesCheck( array( KnownHolesCheck::class, 'wordpressSnapshot' ) );
-				$checks[] = new FollowUpCheck( 'release-files', array( FollowUpCheck::class, 'releaseFiles' ) );
-				$checks[] = new FollowUpCheck( 'closed-plugins', array( FollowUpCheck::class, 'closedPlugins' ) );
-				$checks[] = new FollowUpCheck( 'public-content', array( FollowUpCheck::class, 'publicContent' ) );
-				$checks[] = new LocalCodeCheck();
-				$checks[] = new FollowUpCheck( 'suspicious-files', array( FollowUpCheck::class, 'suspiciousFiles' ) );
-				$checks[] = new FollowUpCheck( 'local-inventory', array( FollowUpCheck::class, 'localInventory' ) );
-				$checks[] = new FollowUpCheck( 'security-headers', array( FollowUpCheck::class, 'securityHeaders' ) );
-				return ( new ScanCoordinator() )->run( $checks, new ScanContext() );
+				return ( new ScanCoordinator() )->run( self::all(), new ScanContext() );
 			}
 		);
 		$this->save    = Closure::fromCallable( $save ?? static fn( ScanRun $run ) => ( new FindingsRepository() )->save( $run ) );
@@ -121,6 +66,70 @@ final class LocalHardeningScanService {
 		$run = ( $this->execute )();
 		( $this->save )( $run );
 		return $run;
+	}
+
+	/**
+	 * Every check the scan runs, in order.
+	 *
+	 * @return SecurityCheck[]
+	 */
+	public static function all(): array {
+		$values   = new WordPressValues();
+		$checks   = self::checks( $values, static fn(): mixed => get_option( 'amsec_login_rate_mode', null ) );
+		$paths    = FilesystemPermissionsCheck::wordpressPaths();
+		$checks[] = new FilesystemPermissionsCheck( $paths );
+		$checks[] = new FileModesCheck( $paths );
+		$checks[] = new UploadsExecutionCheck();
+		$checks[] = new PingbackCheck( static fn(): mixed => get_option( 'default_ping_status', null ) );
+		$checks[] = new XmlRpcAuthCheck( static fn(): mixed => get_option( 'amsec_login_xmlrpc_disabled', null ) );
+		$checks[] = new AuthFactorCheck( 'authenticator-app' );
+		$checks[] = new AuthFactorCheck( 'passkeys-status' );
+		$checks[] = new GapCheck( 'captcha-login', static fn(): string => self::gateOption( 'amsec_login_confirm' ) );
+		$checks[] = new GapCheck( 'compromised-passwords', static fn(): string => self::gateOption( 'amsec_common_passwords' ) );
+		$checks[] = new GapCheck( 'login-hints', static fn(): string => self::gateOption( 'amsec_generic_login_errors' ) );
+		$checks[] = new GapCheck( 'author-archives', static fn(): string => self::gateOption( 'amsec_hide_author_archives' ) );
+		$checks[] = new GapCheck( 'rest-user-list', static fn(): string => self::gateOption( 'amsec_hide_rest_users' ) );
+		$checks[] = new GapCheck( 'version-tag', static fn(): string => self::gateOption( 'amsec_hide_generator' ) );
+		$checks[] = new GapCheck( 'discovery-links', static fn(): string => self::gateOption( 'amsec_hide_discovery_links' ) );
+		$checks[] = new ReadmeFileCheck();
+		$checks[] = new LicenseFileCheck();
+		$checks[] = new DebugLogCheck();
+		$checks[] = new SampleConfigCheck();
+		$checks[] = new ErrorLogCheck();
+		$checks[] = new ConfigBackupCheck();
+		$checks[] = new PhpVersionCheck();
+		$checks[] = new BackgroundUpdatesCheck();
+		$checks[] = new PackageUpdateCheck( 'plugin-updates' );
+		$checks[] = new PackageUpdateCheck( 'theme-updates' );
+		$checks[] = new InactivePluginsCheck();
+		$checks[] = new InactiveThemesCheck();
+		$checks[] = new UploadsPhpFilesCheck();
+		$checks[] = new RootExposureCheck();
+		$checks[] = new BotModeCheck( static fn(): mixed => get_option( 'amsec_bot_mode', 'off' ) );
+		$checks[] = new RestRateCheck( static fn(): mixed => get_option( 'amsec_rest_rate_policy', null ) );
+		$checks[] = new RestWatchCheck();
+		$checks[] = new SiteWatchCheck( 'finding-emails', array( SiteWatchCheck::class, 'findingEmails' ) );
+		$checks[] = new SiteWatchCheck( 'weekly-digest', array( SiteWatchCheck::class, 'weeklyDigest' ) );
+		$checks[] = new SiteWatchCheck( 'traffic-history', array( SiteWatchCheck::class, 'trafficHistory' ) );
+		$checks[] = new SiteWatchCheck( 'network-controls', array( SiteWatchCheck::class, 'networkControls' ) );
+		$checks[] = new SiteWatchCheck( 'trusted-proxies', array( SiteWatchCheck::class, 'trustedProxies' ) );
+		$checks[] = new SiteWatchCheck( 'security-activity', array( SiteWatchCheck::class, 'securityActivity' ) );
+		$checks[] = new SiteWatchCheck( 'account-sessions', array( SiteWatchCheck::class, 'accountSessions' ) );
+		$checks[] = new SiteWatchCheck( 'code-baselines', array( SiteWatchCheck::class, 'codeBaselines' ) );
+		$checks[] = new SiteWatchCheck( 'daily-checks', array( SiteWatchCheck::class, 'dailyChecks' ) );
+		$checks[] = new SiteWatchCheck( 'daily-file-checks', array( SiteWatchCheck::class, 'dailyFileChecks' ) );
+		$checks[] = new SiteWatchCheck( 'rule-review', array( SiteWatchCheck::class, 'ruleReview' ) );
+		$checks[] = new AiReadersCheck( array( AiReadersCheck::class, 'wordpressSnapshot' ) );
+		$checks[] = new AiReadinessCheck( array( AiReadinessCheck::class, 'wordpressSnapshot' ) );
+		$checks[] = new KnownHolesCheck( array( KnownHolesCheck::class, 'wordpressSnapshot' ) );
+		$checks[] = new FollowUpCheck( 'release-files', array( FollowUpCheck::class, 'releaseFiles' ) );
+		$checks[] = new FollowUpCheck( 'closed-plugins', array( FollowUpCheck::class, 'closedPlugins' ) );
+		$checks[] = new FollowUpCheck( 'public-content', array( FollowUpCheck::class, 'publicContent' ) );
+		$checks[] = new LocalCodeCheck();
+		$checks[] = new FollowUpCheck( 'suspicious-files', array( FollowUpCheck::class, 'suspiciousFiles' ) );
+		$checks[] = new FollowUpCheck( 'local-inventory', array( FollowUpCheck::class, 'localInventory' ) );
+		$checks[] = new FollowUpCheck( 'security-headers', array( FollowUpCheck::class, 'securityHeaders' ) );
+		return $checks;
 	}
 
 	/** @return SecurityCheck[] */

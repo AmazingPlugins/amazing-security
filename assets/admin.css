@@ -2189,3 +2189,9 @@ li[data-state="done"] > .amsec-scan-dot::after {
   color: #a63617;
   font-weight: 600;
 }
+
+.amsec-scan-note {
+  color: #6b5c4f;
+  font-size: 15px;
+  font-weight: 400;
+}
