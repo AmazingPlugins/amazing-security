@@ -2104,18 +2104,18 @@ body.amsec-app .amazing-security-admin .widefat td {
   background: #d9d2ca;
 }
 
-li[data-state="active"] > .amsec-scan-dot {
+[data-state="active"] > .amsec-scan-dot {
   border: 3px solid rgba(166, 54, 23, 0.25);
   border-top-color: #a63617;
   background: transparent;
   animation: amsec-scan-spin 0.8s linear infinite;
 }
 
-li[data-state="done"] > .amsec-scan-dot {
+[data-state="done"] > .amsec-scan-dot {
   background: #1e7a46;
 }
 
-li[data-state="done"] > .amsec-scan-dot::after {
+[data-state="done"] > .amsec-scan-dot::after {
   content: "";
   position: absolute;
   top: 4px;
@@ -2144,7 +2144,7 @@ li[data-state="done"] > .amsec-scan-dot::after {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  li[data-state="active"] > .amsec-scan-dot {
+  [data-state="active"] > .amsec-scan-dot {
     border-color: #a63617;
     animation: none;
   }
@@ -2196,10 +2196,51 @@ li[data-state="done"] > .amsec-scan-dot::after {
   font-weight: 400;
 }
 
-/* Scan progress folds its steps into categories; only the running one opens. */
+/* Scan progress folds its steps into categories; only the running one opens, and a click opens or folds any of them. */
 .amsec-scan-list li.amsec-scan-group {
   flex-wrap: wrap;
+  padding: 0;
   font-weight: 650;
+}
+
+.amsec-scan-toggle {
+  display: flex;
+  flex: 1 1 100%;
+  align-items: center;
+  gap: 14px;
+  margin: 0;
+  padding: 10px 14px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.amsec-scan-toggle:hover {
+  background: #faf5ec;
+}
+
+.amsec-scan-toggle:focus-visible {
+  outline: 2px solid #c8401b;
+  outline-offset: 2px;
+}
+
+.amsec-scan-toggle::after {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  margin-left: 6px;
+  border: solid #8a7b6e;
+  border-width: 0 2px 2px 0;
+  content: "";
+  transform: rotate(45deg) translateY(-3px);
+}
+
+.amsec-scan-toggle[aria-expanded="true"]::after {
+  transform: rotate(-135deg) translateY(-3px);
 }
 
 .amsec-scan-list li.amsec-scan-group[data-state="active"] {
@@ -2216,7 +2257,7 @@ li[data-state="done"] > .amsec-scan-dot::after {
 
 .amsec-scan-items {
   flex-basis: 100%;
-  margin: 4px 0 0 36px;
+  margin: 0 0 6px 36px;
   padding: 0;
   list-style: none;
 }
