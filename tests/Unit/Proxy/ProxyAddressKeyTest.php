@@ -20,4 +20,10 @@ final class ProxyAddressKeyTest extends TestCase {
 		self::assertSame( $plain->fromServer( array( 'REMOTE_ADDR' => '192.0.2.4' ) ), $grouped->fromServer( array( 'REMOTE_ADDR' => '192.0.2.4' ) ) );
 	}
 
+
+	public function test_ipv4_inside_ipv6_keeps_its_own_address_under_prefix64(): void {
+		$grouped = new AddressKey( 'salt', null, true );
+		self::assertSame( $grouped->fromServer( array( 'REMOTE_ADDR' => '203.0.113.5' ) ), $grouped->fromServer( array( 'REMOTE_ADDR' => '::ffff:203.0.113.5' ) ) );
+		self::assertNotSame( $grouped->fromServer( array( 'REMOTE_ADDR' => '::ffff:203.0.113.5' ) ), $grouped->fromServer( array( 'REMOTE_ADDR' => '::ffff:203.0.113.6' ) ) );
+	}
 }

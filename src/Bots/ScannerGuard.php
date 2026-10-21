@@ -22,11 +22,16 @@ final class ScannerGuard {
 
 	public function check(): void {
 		$mode = self::mode();
-		if ( 'off' === $mode || is_user_logged_in() || is_admin() || wp_doing_cron() || wp_doing_ajax() || ( defined( 'WP_CLI' ) && WP_CLI ) ) {
+		if ( 'off' === $mode || is_user_logged_in() || is_admin() || wp_doing_cron() || wp_doing_ajax() || ( defined( 'WP_CLI' ) && WP_CLI ) || ( defined( 'AMSEC_DISABLE_FIREWALL' ) && AMSEC_DISABLE_FIREWALL ) ) {
 			return;
 		}
-		$key   = ( new WordPressClientAddress() )->key( wp_salt( 'auth' ) . ':bot:scanner', true )->fromServer( $_SERVER );
-		$block = ( new WordPressClientAddress() )->key( wp_salt( 'auth' ) . RateLimiter::BLOCK_SALT, true )->fromServer( $_SERVER );
+		$client = new WordPressClientAddress();
+		// The never-limit list and the site's own requests are shared with the rate limiter, because the block key is shared too.
+		if ( RateLimiter::exempt( $client, RateLimiter::settings()['allow'] ) ) {
+			return;
+		}
+		$key   = $client->key( wp_salt( 'auth' ) . ':bot:scanner', true )->fromServer( $_SERVER );
+		$block = $client->key( wp_salt( 'auth' ) . RateLimiter::BLOCK_SALT, true )->fromServer( $_SERVER );
 		if ( null === $key || null === $block ) {
 			return;
 		}
@@ -75,6 +80,10 @@ final class ScannerGuard {
 		if ( ! in_array( $mode, self::MODES, true ) ) {
 			wp_die( esc_html__( 'Choose Off, Watch or Block.', 'amazing-security' ), '', array( 'response' => 400 ) );
 		}
+		if ( 'block' === $mode && RateLimiter::proxyUnresolved() ) {
+			wp_safe_redirect( add_query_arg( 'amsec_scanner_error', 'proxy', admin_url( 'admin.php?page=amsec-traffic-guard' ) ) . '#bots' );
+			exit;
+		}
 		update_option( self::OPTION, $mode, false );
 		( new ActivityHooks( new ActivityRepository( $GLOBALS['wpdb'] ) ) )->record( 'security_setting_changed', 0, 'scanner-guard-' . $mode );
 		wp_safe_redirect( \AmazingPlugins\Security\Admin\Brand::saved( admin_url( 'admin.php?page=amsec-traffic-guard#bots' ) ) );
@@ -91,6 +100,9 @@ final class ScannerGuard {
 		$count   = ( new BotCounterStore( $GLOBALS['wpdb'] ) )->flaggedSince( time() - DAY_IN_SECONDS );
 		echo '<div class="wrap amazing-security-admin amsec-brief">';
 		echo '<h2>' . esc_html__( 'Scanner guard', 'amazing-security' ) . '</h2>';
+		if ( 'proxy' === ( $_GET['amsec_scanner_error'] ?? '' ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only flash after saving.
+			echo '<div class="notice notice-error inline"><p>' . esc_html__( 'Block is off because requests arrive through a proxy this site does not trust yet. Every visitor would share one address. Add the proxy under Trusted proxies first, or choose Watch.', 'amazing-security' ) . '</p></div>';
+		}
 		echo '<p class="amsec-brief-status"><span class="amsec-pill' . ( 'off' === $mode ? ' is-off' : ' is-on' ) . '">' . esc_html( $choices[ $mode ] ) . '</span>';
 		echo esc_html__( 'Catches tools that hunt for weak spots on your site.', 'amazing-security' ) . '</p>';
 		echo '<ul class="amsec-facts"><li><strong>' . esc_html( null === $count ? '-' : number_format_i18n( $count ) ) . '</strong> ';

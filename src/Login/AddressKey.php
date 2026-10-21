@@ -24,6 +24,10 @@ final class AddressKey {
 		if ( false === $bytes ) {
 			return null;
 		}
+		// An IPv4 address carried inside IPv6 (::ffff:a.b.c.d) is still that IPv4 address, so it must not share one /64 with every other.
+		if ( 16 === strlen( $bytes ) && "\0\0\0\0\0\0\0\0\0\0\xff\xff" === substr( $bytes, 0, 12 ) ) {
+			$bytes = substr( $bytes, 12 );
+		}
 		return hash_hmac( 'sha256', $this->prefix64 && 16 === strlen( $bytes ) ? substr( $bytes, 0, 8 ) : $bytes, $this->salt );
 	}
 }

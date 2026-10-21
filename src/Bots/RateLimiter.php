@@ -18,6 +18,7 @@ final class RateLimiter {
 	/** Block key shared with the scanner guard, so both features give one answer for an address. */
 	public const BLOCK_SALT = ':bot:block';
 	private const WINDOW    = 60;
+	private bool $counted   = false;
 
 	public static function settings(): array {
 		return RatePolicy::read( get_option( self::OPTION, null ) );
@@ -36,7 +37,7 @@ final class RateLimiter {
 		$uri  = is_string( $_SERVER['REQUEST_URI'] ?? null ) ? wp_unslash( $_SERVER['REQUEST_URI'] ) : '';
 		$kind = RatePolicy::classify(
 			(string) wp_parse_url( $uri, PHP_URL_PATH ),
-			isset( $_GET['rest_route'] ), // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Presence only.
+			'' !== (string) ( $_GET['rest_route'] ?? '' ), // phpcs:ignore WordPress.Security.NonceVerification.Recommended,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Only tested for being empty.
 			(string) wp_parse_url( home_url( rest_get_url_prefix() . '/' ), PHP_URL_PATH ),
 			(string) ( $GLOBALS['pagenow'] ?? '' ),
 			is_string( $_SERVER['REQUEST_METHOD'] ?? null ) ? sanitize_key( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) : '',
@@ -44,7 +45,10 @@ final class RateLimiter {
 			wp_doing_ajax()
 		);
 		if ( 'rest' === $kind ) {
+			// A blocked address is refused right away. The count waits for REST authentication, or runs on `wp` when REST never answers.
+			$this->gate( 'rest', false );
 			add_filter( 'rest_authentication_errors', array( $this, 'rest' ), 101 );
+			add_action( 'wp', fn() => $this->gate( 'page' ) );
 			return;
 		}
 		$this->gate( $kind );
@@ -57,16 +61,21 @@ final class RateLimiter {
 		return $errors;
 	}
 
-	private function gate( string $kind ): void {
-		$settings = self::settings();
-		$client   = new WordPressClientAddress();
-		$address  = $client->address( $_SERVER );
-		if ( null === $address || RatePolicy::listed( $address, $settings['allow'] ) ) {
-			return;
+	/** True for addresses that are never counted or blocked: unknown, on the never-limit list, or the site calling itself. */
+	public static function exempt( WordPressClientAddress $client, array $allow ): bool {
+		$address = $client->address( $_SERVER );
+		if ( null === $address || RatePolicy::listed( $address, $allow ) ) {
+			return true;
 		}
 		$peer   = is_string( $_SERVER['REMOTE_ADDR'] ?? null ) ? (string) Cidr::canonical( sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) ) : '';
 		$server = is_string( $_SERVER['SERVER_ADDR'] ?? null ) ? (string) Cidr::canonical( sanitize_text_field( wp_unslash( $_SERVER['SERVER_ADDR'] ) ) ) : '';
-		if ( RatePolicy::fromServer( explode( '/', $peer )[0], $address, explode( '/', $server )[0] ) ) {
+		return RatePolicy::fromServer( explode( '/', $peer )[0], $address, explode( '/', $server )[0] );
+	}
+
+	private function gate( string $kind, bool $count = true ): void {
+		$settings = self::settings();
+		$client   = new WordPressClientAddress();
+		if ( $this->counted || self::exempt( $client, $settings['allow'] ) ) {
 			return;
 		}
 		$store = new BotCounterStore( $GLOBALS['wpdb'] );
@@ -81,7 +90,11 @@ final class RateLimiter {
 				self::deny( $until - $now );
 			}
 		}
-		$key = $client->key( wp_salt( 'auth' ) . ':bot:rate:' . ( 'xmlrpc' === $kind ? 'rest' : $kind ), true )->fromServer( $_SERVER );
+		if ( ! $count ) {
+			return;
+		}
+		$this->counted = true;
+		$key           = $client->key( wp_salt( 'auth' ) . ':bot:rate:' . ( 'xmlrpc' === $kind ? 'rest' : $kind ), true )->fromServer( $_SERVER );
 		if ( null === $key ) {
 			return;
 		}
