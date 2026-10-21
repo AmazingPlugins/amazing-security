@@ -1,27 +1,54 @@
 (function () {
 	var settings = window.amsecScan || {};
 
-	// One row per step the server reported, in the order it runs them.
-	var buildList = function (list, labels) {
+	var row = function (tag, number, label) {
+		var item = document.createElement(tag);
+		var dot = document.createElement('span');
+		var num = document.createElement('span');
+		var name = document.createElement('span');
+		dot.className = 'amsec-scan-dot';
+		dot.setAttribute('aria-hidden', 'true');
+		num.className = 'amsec-scan-num';
+		num.textContent = number;
+		name.className = 'amsec-scan-name';
+		name.textContent = label;
+		item.setAttribute('data-state', 'pending');
+		item.appendChild(dot);
+		item.appendChild(num);
+		item.appendChild(name);
+		return item;
+	};
+
+	// Categories A, B, C... each fold their steps 1, 2, 3; only the running category opens. Saving is the last row.
+	var buildList = function (list, data) {
+		var rows = [];
+		var groups = [];
 		list.textContent = '';
-		return labels.map(function (label, index) {
-			var row = document.createElement('li');
-			var dot = document.createElement('span');
-			var number = document.createElement('span');
-			var name = document.createElement('span');
-			dot.className = 'amsec-scan-dot';
-			dot.setAttribute('aria-hidden', 'true');
-			number.className = 'amsec-scan-num';
-			number.textContent = String(index + 1);
-			name.className = 'amsec-scan-name';
-			name.textContent = label;
-			row.setAttribute('data-state', 'pending');
-			row.appendChild(dot);
-			row.appendChild(number);
-			row.appendChild(name);
-			list.appendChild(row);
-			return row;
+		data.groups.forEach(function (group, g) {
+			var head = row('li', String.fromCharCode(65 + g), group.name);
+			var count = document.createElement('span');
+			var items = document.createElement('ol');
+			head.className = 'amsec-scan-group';
+			count.className = 'amsec-scan-count';
+			items.className = 'amsec-scan-items';
+			items.hidden = true;
+			head.appendChild(count);
+			head.appendChild(items);
+			list.appendChild(head);
+			var first = rows.length;
+			group.steps.forEach(function (label, i) {
+				var item = row('li', String(i + 1), label);
+				item.setAttribute('data-group', String(g));
+				items.appendChild(item);
+				rows.push(item);
+			});
+			groups.push({ head: head, items: items, count: count, first: first, size: group.steps.length });
 		});
+		var save = row('li', '', data.save);
+		save.className = 'amsec-scan-group';
+		list.appendChild(save);
+		rows.push(save);
+		return { rows: rows, groups: groups };
 	};
 
 	var post = function (form, fields, signal) {
@@ -60,6 +87,7 @@
 			var controller = window.AbortController ? new AbortController() : null;
 			var signal = controller ? controller.signal : undefined;
 			var rows = [];
+			var groups = [];
 			form.classList.add('is-scanning');
 			if (screen) {
 				screen.classList.add('is-scanning');
@@ -86,19 +114,26 @@
 				if (track) {
 					track.setAttribute('aria-valuenow', String(value));
 				}
-				rows.forEach(function (row, index) {
-					var state = index < done ? 'done' : (index === done ? 'active' : 'pending');
-					if (row.getAttribute('data-state') !== state) {
-						row.setAttribute('data-state', state);
-						if ('active' === state && list) {
-							// Keep the active row in view inside the list without moving the page.
-							list.scrollTop = Math.max(0, row.offsetTop - list.offsetTop - list.clientHeight / 2);
-						}
+				rows.forEach(function (item, index) {
+					item.setAttribute('data-state', index < done ? 'done' : (index === done ? 'active' : 'pending'));
+				});
+				var activeGroup = -1;
+				groups.forEach(function (group, g) {
+					var finished = Math.max(0, Math.min(group.size, done - group.first));
+					var state = finished === group.size ? 'done' : (done >= group.first ? 'active' : 'pending');
+					group.head.setAttribute('data-state', state);
+					group.items.hidden = 'active' !== state;
+					group.count.textContent = finished + '/' + group.size;
+					if ('active' === state) {
+						activeGroup = g;
 					}
 				});
 				if (step && rows.length) {
-					var current = Math.min(done + 1, rows.length);
-					step.textContent = (settings.step || 'Step %1$s of %2$s').replace('%1$s', String(current)).replace('%2$s', String(rows.length)) + ': ' + rows[current - 1].querySelector('.amsec-scan-name').textContent;
+					var current = rows[Math.min(done, rows.length - 1)];
+					var group = groups[activeGroup];
+					step.textContent = group
+						? (settings.group || 'Category %1$s of %2$s').replace('%1$s', String.fromCharCode(65 + activeGroup)).replace('%2$s', String(groups.length)) + ' · ' + (settings.step || 'Step %1$s of %2$s').replace('%1$s', String(done - group.first + 1)).replace('%2$s', String(group.size)) + ': ' + current.querySelector('.amsec-scan-name').textContent
+						: current.querySelector('.amsec-scan-name').textContent;
 				}
 			};
 			// Any failure falls back to the plain form post, which runs the whole scan in one request.
@@ -119,7 +154,9 @@
 				};
 			}
 			post(form, { step: 'start' }, signal).then(function (data) {
-				rows = list ? buildList(list, data.steps) : [];
+				var built = list ? buildList(list, data) : { rows: [], groups: [] };
+				rows = built.rows;
+				groups = built.groups;
 				draw(0);
 				var run = function (index) {
 					var began = Date.now();

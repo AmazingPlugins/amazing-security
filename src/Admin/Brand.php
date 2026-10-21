@@ -49,7 +49,7 @@ final class Brand {
 		if ( ! self::onScreen() ) {
 			return;
 		}
-		wp_enqueue_style( 'amazing-security-admin', plugins_url( 'assets/admin.css', AMAZING_SECURITY_FILE ), array(), '0.1.66' );
+		wp_enqueue_style( 'amazing-security-admin', plugins_url( 'assets/admin.css', AMAZING_SECURITY_FILE ), array(), '0.1.67' );
 		$page = self::page();
 		if ( in_array( $page, array( 'amsec-accounts', 'amsec-traffic-guard' ), true ) ) {
 			wp_enqueue_script( 'amazing-security-tabs', plugins_url( 'assets/admin-tabs.js', AMAZING_SECURITY_FILE ), array(), '0.1.1', true );
@@ -57,7 +57,7 @@ final class Brand {
 		if ( 'amazing-security' !== $page ) {
 			return;
 		}
-		wp_enqueue_script( 'amazing-security-scan', plugins_url( 'assets/admin-scan.js', AMAZING_SECURITY_FILE ), array(), '0.1.19', true );
+		wp_enqueue_script( 'amazing-security-scan', plugins_url( 'assets/admin-scan.js', AMAZING_SECURITY_FILE ), array(), '0.1.20', true );
 		wp_localize_script(
 			'amazing-security-scan',
 			'amsecScan',
@@ -65,6 +65,8 @@ final class Brand {
 				'error'  => __( 'Scan could not be saved.', 'amazing-security' ),
 				'ajax'   => admin_url( 'admin-ajax.php' ),
 				'saving' => __( 'Saving the results', 'amazing-security' ),
+				/* translators: 1: current category letter, 2: number of categories. */
+				'group'  => __( 'Category %1$s of %2$s', 'amazing-security' ),
 				/* translators: 1: current step number, 2: total number of steps. */
 				'step'   => __( 'Step %1$s of %2$s', 'amazing-security' ),
 			)
