@@ -49,7 +49,7 @@ final class Brand {
 		if ( ! self::onScreen() ) {
 			return;
 		}
-		wp_enqueue_style( 'amazing-security-admin', plugins_url( 'assets/admin.css', AMAZING_SECURITY_FILE ), array(), '0.1.65' );
+		wp_enqueue_style( 'amazing-security-admin', plugins_url( 'assets/admin.css', AMAZING_SECURITY_FILE ), array(), '0.1.66' );
 		$page = self::page();
 		if ( in_array( $page, array( 'amsec-accounts', 'amsec-traffic-guard' ), true ) ) {
 			wp_enqueue_script( 'amazing-security-tabs', plugins_url( 'assets/admin-tabs.js', AMAZING_SECURITY_FILE ), array(), '0.1.1', true );
@@ -57,78 +57,16 @@ final class Brand {
 		if ( 'amazing-security' !== $page ) {
 			return;
 		}
-		wp_enqueue_script( 'amazing-security-scan', plugins_url( 'assets/admin-scan.js', AMAZING_SECURITY_FILE ), array(), '0.1.17', true );
+		wp_enqueue_script( 'amazing-security-scan', plugins_url( 'assets/admin-scan.js', AMAZING_SECURITY_FILE ), array(), '0.1.18', true );
 		wp_localize_script(
 			'amazing-security-scan',
 			'amsecScan',
 			array(
-				'error'   => __( 'Scan could not be saved.', 'amazing-security' ),
-				// Every check the scan runs, in order; the progress list ticks each one off.
-				'checks'  => array(
-					__( 'Admin pages use HTTPS', 'amazing-security' ),
-					__( 'Update settings', 'amazing-security' ),
-					__( 'Administrator accounts', 'amazing-security' ),
-					__( 'Errors shown to visitors', 'amazing-security' ),
-					__( 'Built-in file editor', 'amazing-security' ),
-					__( 'Sign-in attempt limits', 'amazing-security' ),
-					__( 'Folder permissions', 'amazing-security' ),
-					__( 'File modes on key files', 'amazing-security' ),
-					__( 'PHP running in uploads', 'amazing-security' ),
-					__( 'Pingbacks', 'amazing-security' ),
-					__( 'XML-RPC sign-in', 'amazing-security' ),
-					__( 'Authenticator app sign-in', 'amazing-security' ),
-					__( 'Passkeys', 'amazing-security' ),
-					__( 'Login bot trap', 'amazing-security' ),
-					__( 'Breached password check', 'amazing-security' ),
-					__( 'Sign-in error hints', 'amazing-security' ),
-					__( 'Author archive pages', 'amazing-security' ),
-					__( 'Public REST user list', 'amazing-security' ),
-					__( 'WordPress version tag', 'amazing-security' ),
-					__( 'Discovery links in the page head', 'amazing-security' ),
-					__( 'readme.html', 'amazing-security' ),
-					__( 'license.txt', 'amazing-security' ),
-					__( 'debug.log', 'amazing-security' ),
-					__( 'wp-config-sample.php', 'amazing-security' ),
-					__( 'error_log files', 'amazing-security' ),
-					__( 'Backup copies of wp-config.php', 'amazing-security' ),
-					__( 'PHP version', 'amazing-security' ),
-					__( 'Background updates', 'amazing-security' ),
-					__( 'Plugin updates', 'amazing-security' ),
-					__( 'Theme updates', 'amazing-security' ),
-					__( 'Inactive plugins', 'amazing-security' ),
-					__( 'Inactive themes', 'amazing-security' ),
-					__( 'PHP files in uploads', 'amazing-security' ),
-					__( 'Files exposed in the site root', 'amazing-security' ),
-					__( 'Bot protection mode', 'amazing-security' ),
-					__( 'REST rate limits', 'amazing-security' ),
-					__( 'REST request watch', 'amazing-security' ),
-					__( 'Finding emails', 'amazing-security' ),
-					__( 'Weekly digest', 'amazing-security' ),
-					__( 'Traffic history', 'amazing-security' ),
-					__( 'Network controls', 'amazing-security' ),
-					__( 'Trusted proxies', 'amazing-security' ),
-					__( 'Security activity log', 'amazing-security' ),
-					__( 'Account sessions', 'amazing-security' ),
-					__( 'Code baselines', 'amazing-security' ),
-					__( 'Daily checks', 'amazing-security' ),
-					__( 'Daily file checks', 'amazing-security' ),
-					__( 'Rule review', 'amazing-security' ),
-					__( 'AI crawler access', 'amazing-security' ),
-					__( 'AI readiness', 'amazing-security' ),
-					__( 'Known security holes', 'amazing-security' ),
-					__( 'Release file integrity', 'amazing-security' ),
-					__( 'Closed plugins', 'amazing-security' ),
-					__( 'Public content', 'amazing-security' ),
-					__( 'Local plugin code', 'amazing-security' ),
-					__( 'Suspicious files', 'amazing-security' ),
-					__( 'Local file inventory', 'amazing-security' ),
-					__( 'Security headers follow-up', 'amazing-security' ),
-				),
-				'headers' => __( 'Homepage response headers', 'amazing-security' ),
-				'saving'  => __( 'Saving the results', 'amazing-security' ),
+				'error'  => __( 'Scan could not be saved.', 'amazing-security' ),
+				'ajax'   => admin_url( 'admin-ajax.php' ),
+				'saving' => __( 'Saving the results', 'amazing-security' ),
 				/* translators: 1: current step number, 2: total number of steps. */
-				'step'    => __( 'Step %1$s of %2$s', 'amazing-security' ),
-				'minMs'   => 36000,
+				'step'   => __( 'Step %1$s of %2$s', 'amazing-security' ),
 			)
 		);
 	}

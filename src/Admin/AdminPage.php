@@ -47,15 +47,15 @@ final class AdminPage {
 		if ( isset( $_GET['amazing_security_error'] ) ) {
 			echo '<div class="notice notice-error" data-amsec-scan-error><p>' . esc_html__( 'Scan could not be saved.', 'amazing-security' ) . '</p></div>';
 		}
-		$this->scanForm( false, __( 'Scan', 'amazing-security' ) );
+		$this->scanForm( __( 'Scan', 'amazing-security' ) );
 		echo '</div></div>';
 	}
 
 	/**
 	 * @param array<int, mixed>|null $results
 	 */
-	private function scanForm( bool $withConsent, string $label, bool $rescan = false ): void {
-		echo '<form class="amsec-scan-form' . ( $rescan ? ' amsec-rescan-center' : '' ) . '"' . ( $withConsent && ScanOptions::headers() ? ' data-amsec-headers="1"' : '' ) . ' action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" method="post">';
+	private function scanForm( string $label, bool $rescan = false ): void {
+		echo '<form class="amsec-scan-form' . ( $rescan ? ' amsec-rescan-center' : '' ) . '" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" method="post">';
 		echo '<input type="hidden" name="action" value="amazing_security_scan">';
 		wp_nonce_field( 'amazing_security_scan' );
 		echo '<button type="submit" class="amsec-scan-button' . ( $rescan ? ' amsec-rescan-button' : '' ) . '">' . esc_html( $label ) . '</button>';
@@ -119,7 +119,7 @@ final class AdminPage {
 			return;
 		}
 		echo '<div class="wrap amazing-security-admin amsec-scan"><h1 class="screen-reader-text">' . esc_html__( 'Scan', 'amazing-security' ) . '</h1>';
-		$this->scanForm( true, __( 'Rescan', 'amazing-security' ), true );
+		$this->scanForm( __( 'Rescan', 'amazing-security' ), true );
 		list( $integrityScanId, $contentScanId, $fileScanId ) = $this->scanIds();
 		// These flags select a static message only.
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
@@ -140,7 +140,7 @@ final class AdminPage {
 		$run = ( new FindingsRepository() )->latest();
 		if ( null === $run ) {
 			echo '<p>' . esc_html__( 'Recommendations come from the scan. Run it once and this page fills in.', 'amazing-security' ) . '</p>';
-			$this->scanForm( false, __( 'Scan', 'amazing-security' ) );
+			$this->scanForm( __( 'Scan', 'amazing-security' ) );
 			StartPanel::protections( $off );
 			StartPanel::incident();
 			return;

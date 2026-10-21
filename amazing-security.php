@@ -202,6 +202,7 @@ add_action( 'admin_post_amsec_repair_apply', array( new AmazingPlugins\Security\
 add_action( 'admin_post_amsec_repair_rollback', array( new AmazingPlugins\Security\Admin\RepairAction(), 'rollback' ) );
 add_action( 'admin_post_amsec_repair_retire', array( new AmazingPlugins\Security\Admin\RepairAction(), 'retire' ) );
 add_action( 'admin_post_amazing_security_scan', array( new AmazingPlugins\Security\Admin\ScanAction(), 'handle' ) );
+add_action( 'wp_ajax_amsec_scan_step', array( new AmazingPlugins\Security\Admin\ScanStepAction(), 'handle' ) );
 add_action( 'admin_post_amazing_security_integrity_start', array( new AmazingPlugins\Security\Admin\IntegrityScanAction(), 'start' ) );
 add_action( 'admin_post_amazing_security_integrity_resume', array( new AmazingPlugins\Security\Admin\IntegrityScanAction(), 'resume' ) );
 add_action( 'admin_post_amazing_security_file_scan_start', array( new AmazingPlugins\Security\Admin\FileScanAction(), 'start' ) );
