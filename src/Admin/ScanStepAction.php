@@ -90,9 +90,9 @@ final class ScanStepAction {
 		);
 	}
 
-	/** @return list<string> Step ids in order: the file pass, every check, the optional header request, then save. */
+	/** @return list<string> Step ids in order: the three background file passes, every check, the optional header request, then save. */
 	public static function steps(): array {
-		$steps = array( 'file-pass' );
+		$steps = array( 'file-code', 'file-inventory', 'file-content' );
 		foreach ( LocalHardeningScanService::all() as $check ) {
 			if ( 'security-headers' === $check->id() && ScanOptions::headers() ) {
 				$steps[] = 'header-request';
@@ -127,7 +127,9 @@ final class ScanStepAction {
 				15 * MINUTE_IN_SECONDS
 			);
 			$labels = self::labels() + array(
-				'file-pass'      => __( 'Moving the file scan forward', 'amazing-security' ),
+				'file-code'      => __( 'Malware scan: next batch of files', 'amazing-security' ),
+				'file-inventory' => __( 'Listing files in the site folders', 'amazing-security' ),
+				'file-content'   => __( 'Posts and comments: checking links', 'amazing-security' ),
 				'header-request' => __( 'Homepage response headers', 'amazing-security' ),
 				'save'           => __( 'Saving the results', 'amazing-security' ),
 			);
@@ -147,8 +149,13 @@ final class ScanStepAction {
 		}
 		$id   = $session['steps'][ (int) $step ] ?? '';
 		$note = '';
-		if ( 'file-pass' === $id ) {
-			( new LocalPass() )->advance();
+		if ( 'file-inventory' === $id ) {
+			( new LocalPass() )->inventory();
+		} elseif ( 'file-content' === $id ) {
+			( new LocalPass() )->content();
+		} elseif ( 'file-code' === $id ) {
+			// A short batch keeps the progress moving; the background tick reads the remaining files.
+			( new LocalPass() )->code( 1.5 );
 			$cursor = LocalCodeScan::cursor();
 			if ( null !== $cursor ) {
 				/* translators: %s: number of files. */

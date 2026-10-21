@@ -82,15 +82,15 @@ final class LocalCodeScan {
 	 * A Scan continues a pass that started within the hour, so a big site can finish and its findings stay visible.
 	 * Otherwise it starts fresh, so files changed since then are read again. The background tick only continues.
 	 */
-	public function advance( bool $fresh = true ): string {
+	public function advance( bool $fresh = true, float $seconds = 12 ): string {
 		$cursor = self::cursor();
 		if ( $fresh && ( null === $cursor || $cursor->finished || time() - self::started() > HOUR_IN_SECONDS ) ) {
 			delete_option( self::OPTION );
 		}
-		$deadline = microtime( true ) + 12;
+		$deadline = microtime( true ) + $seconds;
 		do {
 			// Findings do not end the pass; only a finished cursor or a failed step does.
-			if ( 'unknown' === $this->step() || ( self::cursor()?->finished ?? true ) ) {
+			if ( 'unknown' === $this->step( min( 6, $seconds ) ) || ( self::cursor()?->finished ?? true ) ) {
 				return self::snapshot()['stored'];
 			}
 		} while ( microtime( true ) < $deadline );
@@ -118,7 +118,7 @@ final class LocalCodeScan {
 		$repository->save( new ScanRun( $run->startedAt, $run->finishedAt, array_merge( $kept, ( new LocalCodeCheck() )->run( new ScanContext() ) ), $run->partial ) );
 	}
 
-	private function step(): string {
+	private function step( float $seconds = 6 ): string {
 		$raw    = get_option( self::OPTION, null );
 		$cursor = null;
 		if ( is_string( $raw ) && '' !== $raw ) {
@@ -134,7 +134,7 @@ final class LocalCodeScan {
 		}
 		try {
 			$targets = $this->targets();
-			$step    = ( new FileScanRunner() )->step( $targets, $cursor, new ScanContext( microtime( true ) + 6, 250 ) );
+			$step    = ( new FileScanRunner() )->step( $targets, $cursor, new ScanContext( microtime( true ) + $seconds, 250 ) );
 		} catch ( Throwable ) {
 			return 'unknown';
 		}

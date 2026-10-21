@@ -14,19 +14,37 @@ use Throwable;
 final class LocalPass {
 	public function advance(): string {
 		$status = 'ok';
-		try {
-			( new LocalCodeScan() )->advance();
-		} catch ( Throwable $error ) {
-			$status = $error::class;
+		foreach ( array( $this->code(), $this->inventory(), $this->content() ) as $part ) {
+			if ( 'ok' !== $part ) {
+				$status = $part;
+			}
 		}
+		return $status;
+	}
+
+	/** @param float $seconds How long this batch may read files; the background tick picks up the rest. */
+	public function code( float $seconds = 12 ): string {
+		try {
+			( new LocalCodeScan() )->advance( true, $seconds );
+		} catch ( Throwable $error ) {
+			return $error::class;
+		}
+		return 'ok';
+	}
+
+	public function inventory(): string {
 		try {
 			$inventory = ( new WordPressExposureService() )->create();
 			foreach ( array( 'site', 'content', 'uploads' ) as $alias ) {
 				$inventory->scan( $alias, time() );
 			}
 		} catch ( Throwable $error ) {
-			$status = $error::class;
+			return $error::class;
 		}
+		return 'ok';
+	}
+
+	public function content(): string {
 		try {
 			$content = ( new WordPressContentService() )->create();
 			$state   = $content->status();
@@ -38,8 +56,8 @@ final class LocalPass {
 				$result = $content->step( time() );
 			} while ( 'progress' === $result && microtime( true ) < $deadline );
 		} catch ( Throwable $error ) {
-			$status = $error::class;
+			return $error::class;
 		}
-		return $status;
+		return 'ok';
 	}
 }

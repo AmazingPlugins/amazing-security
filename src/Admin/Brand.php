@@ -57,7 +57,7 @@ final class Brand {
 		if ( 'amazing-security' !== $page ) {
 			return;
 		}
-		wp_enqueue_script( 'amazing-security-scan', plugins_url( 'assets/admin-scan.js', AMAZING_SECURITY_FILE ), array(), '0.1.18', true );
+		wp_enqueue_script( 'amazing-security-scan', plugins_url( 'assets/admin-scan.js', AMAZING_SECURITY_FILE ), array(), '0.1.19', true );
 		wp_localize_script(
 			'amazing-security-scan',
 			'amsecScan',
