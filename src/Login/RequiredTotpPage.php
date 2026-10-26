@@ -24,8 +24,7 @@ final class RequiredTotpPage {
 		$url    = self::directoryUrl( (string) ( $factor['suggest_slug'] ?? 'two-factor' ) );
 		echo '<div class="wrap amazing-security-admin">';
 		echo '<p>' . esc_html__( 'Amazing Security reports whether an authenticator-app plugin is present. It does not enroll devices or store backup codes.', 'amazing-security' ) . '</p>';
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- AuthFactorPanel escapes output.
-		echo AuthFactorPanel::html( __( 'Authenticator app (TOTP)', 'amazing-security' ), $factor, $url, 'totp' );
+		echo wp_kses( AuthFactorPanel::html( __( 'Authenticator app (TOTP)', 'amazing-security' ), $factor, $url, 'totp' ), \AmazingPlugins\Security\Admin\AdminHtml::allowed() );
 		echo '</div>';
 	}
 

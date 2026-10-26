@@ -39,14 +39,11 @@ final class FixReviewPage {
 		}
 		$enabled = ( new McpPreferences( new WordPressOptions() ) )->enabled();
 		$nonce   = wp_create_nonce( 'amsec_fix_approve_' . $id );
-		// All dynamic values are escaped in html().
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only notice after a completed POST redirect.
 		$verification = isset( $_GET['verification'] ) && 'pending' === $_GET['verification'] ? 'pending' : '';
 		$liveMode     = get_option( 'amsec_login_rate_mode', 'off' );
 		// html() escapes every dynamic field while preserving form markup.
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		echo $this->html( $proposal, $nonce, admin_url( 'admin-post.php' ), is_ssl(), $enabled, time(), wp_create_nonce( 'amsec_fix_rollback_' . $id ), $verification, is_string( $liveMode ) ? $liveMode : '' );
+		echo wp_kses( $this->html( $proposal, $nonce, admin_url( 'admin-post.php' ), is_ssl(), $enabled, time(), wp_create_nonce( 'amsec_fix_rollback_' . $id ), $verification, is_string( $liveMode ) ? $liveMode : '' ), AdminHtml::allowed() );
 	}
 
 	public function html( FixProposal $proposal, string $nonce, string $actionUrl, bool $secure, bool $enabled, int $now, string $rollbackNonce = '', string $verification = '', ?string $liveMode = null ): string {

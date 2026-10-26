@@ -117,11 +117,11 @@ final class TrafficSettings {
 				) . '">' . esc_html( $label ) . '</a>';
 				$spacer = static fn( string $label ): string => '<span class="amsec-pager-nav is-spacer" aria-hidden="true">' . esc_html( $label ) . '</span>';
 				echo '<nav class="amsec-pager" aria-label="' . esc_attr__( 'History pages', 'amazing-security' ) . '">';
-				echo $page > 1 ? $link( $page - 1, __( 'Previous', 'amazing-security' ) ) : $spacer( __( 'Previous', 'amazing-security' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				echo wp_kses( $page > 1 ? $link( $page - 1, __( 'Previous', 'amazing-security' ) ) : $spacer( __( 'Previous', 'amazing-security' ) ), \AmazingPlugins\Security\Admin\AdminHtml::allowed() );
 				/* translators: %s: current page number in the traffic history list. */
 				echo '<span class="amsec-pager-label">' . sprintf( esc_html__( 'Page %s', 'amazing-security' ), esc_html( (string) $page ) ) . '</span>';
 				// A full page of 50 rows may have more after it; the list stops at page 100.
-				echo count( $rows ) >= 50 && $page < 100 ? $link( $page + 1, __( 'Next', 'amazing-security' ) ) : $spacer( __( 'Next', 'amazing-security' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				echo wp_kses( count( $rows ) >= 50 && $page < 100 ? $link( $page + 1, __( 'Next', 'amazing-security' ) ) : $spacer( __( 'Next', 'amazing-security' ) ), \AmazingPlugins\Security\Admin\AdminHtml::allowed() );
 				echo '</nav></section>';
 	}
 	public function recovery( array $args, array $assoc ): void {

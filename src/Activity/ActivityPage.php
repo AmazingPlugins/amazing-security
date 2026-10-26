@@ -27,8 +27,7 @@ final class ActivityPage {
 			$rows    = $records->page( $page, $event );
 			$pages   = ActivityRepository::pageCount( $records->count( $event ) );
 			$enabled = '1' === get_option( 'amsec_activity_enabled', '0' );
-			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Renderer escapes every dynamic field.
-			echo ( new ActivityRenderer() )->render( $rows, $page, $event, $pages, $this->switchForm( $enabled ) );
+			echo wp_kses( ( new ActivityRenderer() )->render( $rows, $page, $event, $pages, $this->switchForm( $enabled ) ), \AmazingPlugins\Security\Admin\AdminHtml::allowed() );
 		} catch ( \RuntimeException ) {
 			echo '<div class="wrap amazing-security-admin"><h1>' . esc_html__( 'Security activity', 'amazing-security' ) . '</h1><div class="notice notice-error"><p>' . esc_html__( 'Activity storage is unavailable. No complete history can be shown.', 'amazing-security' ) . '</p></div></div>';
 		}

@@ -114,7 +114,7 @@ final class FileScanAction {
 			$plugins          = $this->plugins();
 			$themes           = $this->themes();
 			$client           = new WordPressHttpClient();
-			$discovery        = ( new TargetDiscovery( new WordPressOrgManifestProvider( $client ), new WordPressOrgThemeManifestProvider( $client, new ThemeArchiveParser() ) ) )->discover( $this->coreVersion(), $this->coreLocale(), ABSPATH, $this->manifestPlugins( $plugins ), $themes );
+			$discovery        = ( new TargetDiscovery( new WordPressOrgManifestProvider( $client ), new WordPressOrgThemeManifestProvider( new ThemeArchiveParser() ) ) )->discover( $this->coreVersion(), $this->coreLocale(), ABSPATH, $this->manifestPlugins( $plugins ), $themes );
 			$cursor->elapsed += microtime( true ) - $started;
 			if ( $isStart ) {
 				$cursor->partial = $discovery->partial;

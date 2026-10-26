@@ -40,8 +40,7 @@ final class ScannerGuard {
 		if ( 'block' === $mode && $store->blocked( $block, $now ) ) {
 			self::deny();
 		}
-		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Only compared against fixed strings; never stored or printed.
-		$agent = is_string( $_SERVER['HTTP_USER_AGENT'] ?? null ) ? wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) : '';
+		$agent = is_string( $_SERVER['HTTP_USER_AGENT'] ?? null ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '';
 		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Only compared against fixed patterns; never stored or printed.
 		$uri  = is_string( $_SERVER['REQUEST_URI'] ?? null ) ? wp_unslash( $_SERVER['REQUEST_URI'] ) : '';
 		$path = (string) wp_parse_url( $uri, PHP_URL_PATH );
@@ -75,8 +74,7 @@ final class ScannerGuard {
 			wp_die( esc_html__( 'Administrator access required.', 'amazing-security' ), '', array( 'response' => 403 ) );
 		}
 		check_admin_referer( 'amsec_scanner_guard' );
-		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Checked against a fixed list below.
-		$mode = is_string( $_POST['mode'] ?? null ) ? wp_unslash( $_POST['mode'] ) : '';
+		$mode = is_string( $_POST['mode'] ?? null ) ? sanitize_key( wp_unslash( $_POST['mode'] ) ) : '';
 		if ( ! in_array( $mode, self::MODES, true ) ) {
 			wp_die( esc_html__( 'Choose Off, Watch or Block.', 'amazing-security' ), '', array( 'response' => 400 ) );
 		}

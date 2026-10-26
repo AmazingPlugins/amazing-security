@@ -65,8 +65,7 @@ final class SessionPage {
 		}
 		$accounts = $this->accountOptions( $id );
 		echo '<div class="wrap amazing-security-admin"><h1>' . esc_html__( 'Account sessions', 'amazing-security' ) . '</h1><p>' . esc_html__( 'Pick an account. Ending a session signs that browser out. It cannot be undone. A new sign-in can start another session. An application password can be removed on its own.', 'amazing-security' ) . '</p><form method="get" action="#sessions"><input type="hidden" name="page" value="amsec-accounts"><label for="amsec-session-user">' . esc_html__( 'Account', 'amazing-security' ) . '</label> <select id="amsec-session-user" name="user_id">';
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- accountOptions() escapes each login and display name.
-		echo $accounts;
+		echo wp_kses( $accounts, \AmazingPlugins\Security\Admin\AdminHtml::allowed() );
 		echo '</select> <button class="button">' . esc_html__( 'View account', 'amazing-security' ) . '</button></form>';
 		$this->lines( $id, $rows );
 		$this->applicationPasswords( $id );

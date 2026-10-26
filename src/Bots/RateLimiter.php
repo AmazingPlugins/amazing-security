@@ -169,11 +169,10 @@ final class RateLimiter {
 			wp_die( esc_html__( 'Administrator access required.', 'amazing-security' ), '', array( 'response' => 403 ) );
 		}
 		check_admin_referer( 'amsec_rate_limits' );
-		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Every field is validated against fixed bounds and IP syntax in RatePolicy::validate().
-		$post = wp_unslash( $_POST );
-		$raw  = array();
+		$raw = array();
 		foreach ( array( 'mode', 'page', 'rest', 'login', 'block', 'allow' ) as $field ) {
-			$raw[ $field ] = is_string( $post[ 'amsec_rate_' . $field ] ?? null ) ? $post[ 'amsec_rate_' . $field ] : null;
+			$value         = $_POST[ 'amsec_rate_' . $field ] ?? null;
+			$raw[ $field ] = is_string( $value ) ? sanitize_textarea_field( wp_unslash( $value ) ) : null;
 		}
 		list( $settings, $errors ) = RatePolicy::validate( $raw );
 		$url                       = admin_url( 'admin.php?page=amsec-traffic-guard' );

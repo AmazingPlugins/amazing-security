@@ -194,8 +194,7 @@ final class AdminPage {
 			$options  = new WordPressOptions();
 			$packages = ( new VulnerabilityPreferences( $options ) )->enabled() ? ( new WordPressVulnerabilityReportStore( $options ) )->current()?->results : null;
 			// SiteRiskCard escapes all dynamic values.
-			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-			echo SiteRiskCard::render( SiteRisk::rows( $run->results, $packages, SiteRiskCard::botModes(), time() - $run->finishedAt->getTimestamp() ) );
+			echo wp_kses( SiteRiskCard::render( SiteRisk::rows( $run->results, $packages, SiteRiskCard::botModes(), time() - $run->finishedAt->getTimestamp() ) ), AdminHtml::allowed() );
 			if ( 0 === $total ) {
 				echo '<p>' . esc_html__( 'Nothing from the last scan needs attention. That does not prove the site is clean.', 'amazing-security' ) . '</p>';
 			}
@@ -277,13 +276,11 @@ final class AdminPage {
 				) . '</span></div></section>';
 			} elseif ( null !== $malware ) {
 				// FileScanReportRenderer escapes dynamic values.
-				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-				echo ( new FileScanReportRenderer( '', '', array(), __( 'Malware scan', 'amazing-security' ), 'amsec-malware' ) )->render( null, new FileScanStep( $malware, $malware->finished ), array() );
+				echo wp_kses( ( new FileScanReportRenderer( '', '', array(), __( 'Malware scan', 'amazing-security' ), 'amsec-malware' ) )->render( null, new FileScanStep( $malware, $malware->finished ), array() ), AdminHtml::allowed() );
 				echo '<p><a class="button" href="' . esc_url( admin_url( 'admin.php?page=amazing-security' ) ) . '">' . esc_html__( 'Scan again', 'amazing-security' ) . '</a></p>';
 			}
 			// IntegrityReportRenderer escapes all dynamic values.
-			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-			echo ( new IntegrityReportRenderer() )->render( $integrity, $progress );
+			echo wp_kses( ( new IntegrityReportRenderer() )->render( $integrity, $progress ), AdminHtml::allowed() );
 			if ( null === $progress || $progress->finished ) {
 				echo '<form action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" method="post"><input type="hidden" name="action" value="amazing_security_integrity_start">';
 				wp_nonce_field( 'amazing_security_integrity_start' );
@@ -296,8 +293,7 @@ final class AdminPage {
 				echo '</form>';
 			}
 			// FileScanReportRenderer escapes dynamic values, including saved notes.
-			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-			echo ( new FileScanReportRenderer( admin_url( 'admin-post.php' ), wp_create_nonce( 'amsec_file_scan_note' ), $fileStore->notes() ) )->render( $fileDone, $fileProgress, $fileHistory );
+			echo wp_kses( ( new FileScanReportRenderer( admin_url( 'admin-post.php' ), wp_create_nonce( 'amsec_file_scan_note' ), $fileStore->notes() ) )->render( $fileDone, $fileProgress, $fileHistory ), AdminHtml::allowed() );
 			echo '<div class="amsec-file-actionbar"><form action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" method="post">';
 			if ( null === $fileProgress || $fileProgress->finished ) {
 				echo '<input type="hidden" name="action" value="amazing_security_file_scan_start">';
@@ -317,16 +313,13 @@ final class AdminPage {
 		}
 		if ( 'schedule' === $section ) {
 			// ScheduleStatusRenderer escapes dynamic values.
-			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-			echo ( new ScheduleStatusRenderer() )->render( ( new LocalSchedule( $options ) )->status( time() ) );
-			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-			echo ( new ScheduleStatusRenderer() )->renderSuite( ( new SuiteCycle( $options ) )->status( time() ) );
+			echo wp_kses( ( new ScheduleStatusRenderer() )->render( ( new LocalSchedule( $options ) )->status( time() ) ), AdminHtml::allowed() );
+			echo wp_kses( ( new ScheduleStatusRenderer() )->renderSuite( ( new SuiteCycle( $options ) )->status( time() ) ), AdminHtml::allowed() );
 			return;
 		}
 		if ( 'alerts' === $section ) {
 			$alertState = ( new AlertDelivery( $options, static fn(): bool => false, '', '' ) )->status();
-			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-			echo ( new AlertSettingsRenderer() )->render( '1' === $options->get( 'amsec_alerts_enabled' ), $alertState, admin_url( 'admin-post.php' ), wp_create_nonce( 'amsec_alert_settings' ), \AmazingPlugins\Security\Alerts\MailStatus::assess() );
+			echo wp_kses( ( new AlertSettingsRenderer() )->render( '1' === $options->get( 'amsec_alerts_enabled' ), $alertState, admin_url( 'admin-post.php' ), wp_create_nonce( 'amsec_alert_settings' ), \AmazingPlugins\Security\Alerts\MailStatus::assess() ), AdminHtml::allowed() );
 			echo '<p><a href="' . esc_url( admin_url( 'admin.php?page=amsec-settings#amsec-notifications' ) ) . '">' . esc_html__( 'Open full notification settings', 'amazing-security' ) . '</a></p>';
 		}
 	}
@@ -379,8 +372,7 @@ final class AdminPage {
 		echo '</p>';
 		echo '</form>';
 		// VulnerabilityReportRenderer escapes every dynamic value before constructing markup.
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		echo ( new VulnerabilityReportRenderer() )->render( $vulnCurrent, $vulnStore->historical(), null, $direct );
+		echo wp_kses( ( new VulnerabilityReportRenderer() )->render( $vulnCurrent, $vulnStore->historical(), null, $direct ), AdminHtml::allowed() );
 	}
 
 	/**

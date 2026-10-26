@@ -40,8 +40,7 @@ final class Module {
 			echo '<p>' . esc_html__( 'Assistant access is already on for this site. You can turn it off here.', 'amazing-security' ) . '</p>';
 			$adapter = function_exists( 'is_plugin_active' ) && is_plugin_active( 'mcp-adapter/mcp-adapter.php' );
 			// The renderer escapes its own values.
-			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-			echo ( new McpSettingsRenderer() )->render( true, function_exists( 'wp_register_ability' ), $adapter, admin_url( 'admin-post.php' ), wp_create_nonce( 'amsec_mcp_settings' ) );
+			echo wp_kses( ( new McpSettingsRenderer() )->render( true, function_exists( 'wp_register_ability' ), $adapter, admin_url( 'admin-post.php' ), wp_create_nonce( 'amsec_mcp_settings' ) ), \AmazingPlugins\Security\Admin\AdminHtml::allowed() );
 		}
 		echo '</div>';
 	}

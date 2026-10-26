@@ -183,8 +183,6 @@ add_action(
 			$recovery = new AmazingPlugins\Security\Login\LoginRecoveryCommand();
 			\WP_CLI::add_command( 'amazing-security login disable', array( $recovery, 'disableLogin' ) );
 			\WP_CLI::add_command( 'amazing-security totp disable', array( $recovery, 'disableTotp' ) );
-			\WP_CLI::add_command( 'amazing-security repair rollback', array( new AmazingPlugins\Security\Repair\RepairRecoveryCommand(), 'rollback' ) );
-			\WP_CLI::add_command( 'amazing-security repair recover', array( new AmazingPlugins\Security\Repair\RepairRecoveryCommand(), 'recover' ) );
 		}
 	}
 );
@@ -193,14 +191,10 @@ add_action( 'plugins_loaded', array( AmazingPlugins\Security\Free\FreeSuite::cla
 add_action( 'admin_menu', array( new AmazingPlugins\Security\Admin\AdminPage(), 'register' ) );
 add_action( 'admin_post_amsec_uploads_rule', array( new AmazingPlugins\Security\Admin\UploadsRulePage(), 'save' ) );
 add_action( 'admin_menu', array( new AmazingPlugins\Security\Admin\FixReviewPage(), 'register' ) );
-add_action( 'admin_menu', array( new AmazingPlugins\Security\Admin\RepairPage(), 'register' ) );
 add_action( 'admin_post_amsec_findings_report', array( new AmazingPlugins\Security\Admin\FindingsReportAction(), 'handle' ) );
 add_action( 'admin_post_amsec_approved_setting', array( new AmazingPlugins\Security\Admin\ApprovedSettingAction(), 'handle' ) );
 add_action( 'admin_post_amsec_fix_approve', array( new AmazingPlugins\Security\Admin\FixApprovalAction(), 'handle' ) );
 add_action( 'admin_post_amsec_fix_rollback', array( new AmazingPlugins\Security\Admin\FixRollbackAction(), 'handle' ) );
-add_action( 'admin_post_amsec_repair_apply', array( new AmazingPlugins\Security\Admin\RepairAction(), 'apply' ) );
-add_action( 'admin_post_amsec_repair_rollback', array( new AmazingPlugins\Security\Admin\RepairAction(), 'rollback' ) );
-add_action( 'admin_post_amsec_repair_retire', array( new AmazingPlugins\Security\Admin\RepairAction(), 'retire' ) );
 add_action( 'admin_post_amazing_security_scan', array( new AmazingPlugins\Security\Admin\ScanAction(), 'handle' ) );
 add_action( 'wp_ajax_amsec_scan_step', array( new AmazingPlugins\Security\Admin\ScanStepAction(), 'handle' ) );
 add_action( 'admin_post_amazing_security_integrity_start', array( new AmazingPlugins\Security\Admin\IntegrityScanAction(), 'start' ) );

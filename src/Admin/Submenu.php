@@ -92,10 +92,11 @@ final class Submenu {
 			// Scan stays first so the Amazing Security menu opens it. Hidden rows stay registered.
 			$submenu[ self::PARENT ] = $ordered; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 		}
-		add_action( 'admin_head', array( self::class, 'hide' ) );
+		add_action( 'admin_enqueue_scripts', array( self::class, 'hide' ) );
 	}
 
 	public static function hide(): void {
-		echo '<style>#adminmenu .amsec-menu-hidden{display:none}</style>';
+		// Core's admin-menu stylesheet loads on every admin screen, like the menu itself.
+		wp_add_inline_style( 'admin-menu', '#adminmenu .amsec-menu-hidden{display:none}' );
 	}
 }

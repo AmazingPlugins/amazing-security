@@ -80,8 +80,7 @@ final class NotificationSettingsPage {
 			$mail
 		);
 		// AlertSettingsRenderer escapes dynamic values before constructing markup.
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		echo $alertHtml;
+		echo wp_kses( $alertHtml, AdminHtml::allowed() );
 
 		echo '<section class="amsec-alert-settings" aria-labelledby="amsec-digest-notify">';
 		echo '<h2 id="amsec-digest-notify">' . esc_html__( 'Weekly digest', 'amazing-security' ) . '</h2>';

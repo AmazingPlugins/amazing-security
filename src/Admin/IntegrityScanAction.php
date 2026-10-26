@@ -116,7 +116,7 @@ final class IntegrityScanAction {
 		try {
 			$started          = microtime( true );
 			$client           = new WordPressHttpClient();
-			$discovery        = ( new TargetDiscovery( new WordPressOrgManifestProvider( $client ), new WordPressOrgThemeManifestProvider( $client, new ThemeArchiveParser() ) ) )->discover( $this->coreVersion(), $this->coreLocale(), ABSPATH, $this->plugins(), $this->themes() );
+			$discovery        = ( new TargetDiscovery( new WordPressOrgManifestProvider( $client ), new WordPressOrgThemeManifestProvider( new ThemeArchiveParser() ) ) )->discover( $this->coreVersion(), $this->coreLocale(), ABSPATH, $this->plugins(), $this->themes() );
 			$cursor->elapsed += microtime( true ) - $started;
 			if ( $isStart ) {
 				$cursor->targetSignature = $discovery->signature;

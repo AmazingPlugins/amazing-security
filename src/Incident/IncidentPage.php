@@ -42,8 +42,7 @@ final class IncidentPage {
 			return;
 		}
 		echo '<form method="get"><input type="hidden" name="page" value="amsec-incident"><label for="amsec-incident-user">' . esc_html__( 'Other administrator', 'amazing-security' ) . '</label> <select id="amsec-incident-user" name="user_id" required>';
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- otherAdministrators() escapes each login and display name.
-		echo $options;
+		echo wp_kses( $options, \AmazingPlugins\Security\Admin\AdminHtml::allowed() );
 		echo '</select> <button class="button">' . esc_html__( 'Select account', 'amazing-security' ) . '</button></form>';
 		$target = get_userdata( $id );
 		if ( 0 < $id && get_current_user_id() !== $id && current_user_can( 'edit_user', $id ) && $target instanceof \WP_User ) {

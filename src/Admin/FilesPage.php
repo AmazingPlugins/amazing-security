@@ -45,11 +45,6 @@ final class FilesPage {
 					'url'   => SettingList::page( 'amsec-vulnerabilities' ),
 				),
 				array(
-					'label' => __( 'File repair', 'amazing-security' ),
-					'note'  => __( 'WordPress / plugin / theme files only. Replaces one supported release file after you approve the exact change.', 'amazing-security' ),
-					'url'   => SettingList::page( 'amsec-repair' ),
-				),
-				array(
 					'label' => __( 'Code baselines', 'amazing-security' ),
 					'note'  => __( 'Saves a reference for a plugin or theme you choose.', 'amazing-security' ),
 					'url'   => SettingList::page( 'amsec-baselines' ),
@@ -71,7 +66,7 @@ final class FilesPage {
 				),
 				array(
 					'label' => __( 'Recovery', 'amazing-security' ),
-					'note'  => __( 'Soft WordPress recovery tools (modes, SQL download, approved file moves). Each one waits for its own form.', 'amazing-security' ),
+					'note'  => __( 'Directory modes and a database SQL download.', 'amazing-security' ),
 					'url'   => SettingList::page( 'amsec-recovery' ),
 				),
 			)

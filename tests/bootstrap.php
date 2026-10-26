@@ -35,3 +35,7 @@ if ( ! function_exists( '__' ) ) {
 	function esc_html_e( string $text, string $domain = 'default' ): void { echo esc_html__( $text, $domain ); }
 	function esc_attr_e( string $text, string $domain = 'default' ): void { echo esc_attr__( $text, $domain ); }
 }
+
+if ( ! function_exists( 'wp_delete_file' ) ) {
+	function wp_delete_file( string $file ): void { if ( is_file( $file ) ) { unlink( $file ); } }
+}

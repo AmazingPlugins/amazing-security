@@ -82,7 +82,7 @@ final class AccountPage {
 		echo '</fieldset>';
 		echo '<fieldset class="amsec-auth-group"><legend>' . esc_html__( 'Uninstall', 'amazing-security' ) . '</legend>';
 		self::flagField( Settings::ERASE, $erase, __( 'Erase all Amazing Security settings, logs and scan results when the plugin is deleted', 'amazing-security' ) );
-		echo '<p>' . esc_html__( 'Leave this off to keep your settings if you reinstall later. Repair backups stored outside the site folder are not removed.', 'amazing-security' ) . '</p>';
+		echo '<p>' . esc_html__( 'Leave this off to keep your settings if you reinstall later.', 'amazing-security' ) . '</p>';
 		echo '</fieldset>';
 		submit_button( __( 'Save account protection', 'amazing-security' ) );
 		echo '</form>';
@@ -197,8 +197,7 @@ final class AccountPage {
 		$factor = AuthFactorDetector::fromWordPress()->passkeys( get_current_user_id() );
 		$url    = RequiredTotpPage::directoryUrl( (string) ( $factor['suggest_slug'] ?? 'two-factor' ) );
 		echo '<p>' . esc_html__( 'Amazing Security reports whether a passkey plugin is present. It does not enroll devices.', 'amazing-security' ) . '</p>';
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- AuthFactorPanel escapes output.
-		echo AuthFactorPanel::html( __( 'Passkeys', 'amazing-security' ), $factor, $url, 'passkeys' );
+		echo wp_kses( AuthFactorPanel::html( __( 'Passkeys', 'amazing-security' ), $factor, $url, 'passkeys' ), \AmazingPlugins\Security\Admin\AdminHtml::allowed() );
 	}
 
 	private static function guard( string $nonce ): void {

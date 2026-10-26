@@ -270,11 +270,9 @@ final class Page {
 	}
 
 	public function syncHotlink( string $flag ): void {
-		if ( ! defined( 'WP_CONTENT_DIR' ) ) {
-			return;
-		}
-		$dir = WP_CONTENT_DIR . '/uploads';
-		if ( ! is_dir( $dir ) ) {
+		$uploads = wp_upload_dir( null, false );
+		$dir     = empty( $uploads['error'] ) && is_string( $uploads['basedir'] ?? null ) ? $uploads['basedir'] : '';
+		if ( '' === $dir || is_link( $dir ) || ! is_dir( $dir ) ) {
 			return;
 		}
 		$path     = $dir . '/.htaccess';
