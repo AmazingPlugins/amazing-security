@@ -7,7 +7,7 @@ namespace AmazingPlugins\Security\Login;
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Detects third-party passkey / TOTP providers. AmazingPlugins Security Scanner’s own stacks do not count.
+ * Detects third-party passkey / TOTP providers. Amazing Security Scanner’s own stacks do not count.
  *
  * @phpstan-type FactorResult array{state:string,provider:string,suggest_slug:string,suggest_name:string}
  */

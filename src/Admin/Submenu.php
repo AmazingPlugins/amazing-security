@@ -58,7 +58,7 @@ final class Submenu {
 		$ordered = array();
 		if ( isset( $by_slug[ self::PARENT ] ) ) {
 			$scan      = $by_slug[ self::PARENT ];
-			$scan[0]   = __( 'Scan', 'amazingplugins-security-scanner' );
+			$scan[0]   = __( 'Scan', 'amazing-security-scanner' );
 			$ordered[] = $scan;
 		}
 		$shown = array_fill_keys( self::visible(), true );
@@ -68,13 +68,13 @@ final class Submenu {
 			}
 			$item   = $by_slug[ $slug ];
 			$labels = array(
-				'amsec-recommendations' => __( 'Recommendations', 'amazingplugins-security-scanner' ),
-				'amsec-accounts'        => __( 'Log In & Register', 'amazingplugins-security-scanner' ),
-				'amsec-traffic-guard'   => __( 'Traffic', 'amazingplugins-security-scanner' ),
-				'amsec-files'           => __( 'Files', 'amazingplugins-security-scanner' ),
-				'amsec-records'         => __( 'Records', 'amazingplugins-security-scanner' ),
-				'amsec-settings'        => __( 'Settings', 'amazingplugins-security-scanner' ),
-				'amsec-assistant'       => __( 'AI & MCP', 'amazingplugins-security-scanner' ),
+				'amsec-recommendations' => __( 'Recommendations', 'amazing-security-scanner' ),
+				'amsec-accounts'        => __( 'Log In & Register', 'amazing-security-scanner' ),
+				'amsec-traffic-guard'   => __( 'Traffic', 'amazing-security-scanner' ),
+				'amsec-files'           => __( 'Files', 'amazing-security-scanner' ),
+				'amsec-records'         => __( 'Records', 'amazing-security-scanner' ),
+				'amsec-settings'        => __( 'Settings', 'amazing-security-scanner' ),
+				'amsec-assistant'       => __( 'AI & MCP', 'amazing-security-scanner' ),
 			);
 			if ( isset( $labels[ $slug ] ) ) {
 				$item[0] = $labels[ $slug ];
@@ -89,7 +89,7 @@ final class Submenu {
 			$ordered[] = $item;
 		}
 		if ( array() !== $ordered ) {
-			// Scan stays first so the AmazingPlugins Security Scanner menu opens it. Hidden rows stay registered.
+			// Scan stays first so the Amazing Security Scanner menu opens it. Hidden rows stay registered.
 			$submenu[ self::PARENT ] = $ordered; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 		}
 		add_action( 'admin_enqueue_scripts', array( self::class, 'hide' ) );

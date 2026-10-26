@@ -1,6 +1,6 @@
 <?php
 
-// Run on a disposable site: wp eval-file wp-content/plugins/amazingplugins-security-scanner/tests/Integration/wordpress-login-rate.php.
+// Run on a disposable site: wp eval-file wp-content/plugins/amazing-security-scanner/tests/Integration/wordpress-login-rate.php.
 use AmazingPlugins\Security\Integrity\WordPressOptions;
 use AmazingPlugins\Security\Login\RateLimiter;
 use AmazingPlugins\Security\Login\WordPressLoginSettings;

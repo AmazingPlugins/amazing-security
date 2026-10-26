@@ -43,10 +43,10 @@ final class LoginRateModeCheck implements SecurityCheck {
 			default => State::UNKNOWN,
 		};
 		$summary = match ( $mode ) {
-			'off' => __( 'Login monitoring is off. Turn on observe mode so repeated failures are recorded before anyone is blocked.', 'amazingplugins-security-scanner' ),
-			'observe' => __( 'Repeated login failures are recorded and not blocked yet. Read that record before you turn blocking on.', 'amazingplugins-security-scanner' ),
-			'block' => __( 'Repeated login failures are limited. A shared network can still block a real sign-in.', 'amazingplugins-security-scanner' ),
-			default => __( 'The login monitoring setting could not be read.', 'amazingplugins-security-scanner' ),
+			'off' => __( 'Login monitoring is off. Turn on observe mode so repeated failures are recorded before anyone is blocked.', 'amazing-security-scanner' ),
+			'observe' => __( 'Repeated login failures are recorded and not blocked yet. Read that record before you turn blocking on.', 'amazing-security-scanner' ),
+			'block' => __( 'Repeated login failures are limited. A shared network can still block a real sign-in.', 'amazing-security-scanner' ),
+			default => __( 'The login monitoring setting could not be read.', 'amazing-security-scanner' ),
 		};
 		return array(
 			new CheckResult(

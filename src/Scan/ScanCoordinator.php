@@ -30,7 +30,7 @@ final class ScanCoordinator {
 			if ( microtime( true ) >= $context->deadline || count( $results ) >= $context->entryLimit ) {
 				$partial = true;
 				if ( count( $results ) < $context->entryLimit ) {
-					$results[] = self::unknown( $check->id(), __( 'Scan budget reached. This check was not completed.', 'amazingplugins-security-scanner' ) );
+					$results[] = self::unknown( $check->id(), __( 'Scan budget reached. This check was not completed.', 'amazing-security-scanner' ) );
 				}
 				continue;
 			}
@@ -48,7 +48,7 @@ final class ScanCoordinator {
 			} catch ( Throwable $error ) {
 				$partial = true;
 				if ( count( $results ) < $context->entryLimit ) {
-					$results[] = self::unknown( $check->id(), __( 'This check could not be completed.', 'amazingplugins-security-scanner' ) );
+					$results[] = self::unknown( $check->id(), __( 'This check could not be completed.', 'amazing-security-scanner' ) );
 				}
 			}
 		}
