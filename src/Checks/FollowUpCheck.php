@@ -91,7 +91,7 @@ final class FollowUpCheck implements SecurityCheck {
 			'clean' => State::PASS,
 			default => State::UNKNOWN,
 		};
-		$line = self::COPY[ $this->checkId ][ $stored ] ?? __( 'The stored result could not be read.', 'amazingplugins-security-scanner' );
+		$line = self::COPY[ $this->checkId ][ $stored ] ?? __( 'The stored result could not be read.', 'amazing-security-scanner' );
 		return array(
 			new CheckResult(
 				$this->id(),

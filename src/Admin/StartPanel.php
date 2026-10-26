@@ -14,8 +14,8 @@ final class StartPanel {
 	public static function register(): void {
 		add_submenu_page(
 			Submenu::PARENT,
-			__( 'Recommendations', 'amazingplugins-security-scanner' ),
-			__( 'Recommendations', 'amazingplugins-security-scanner' ),
+			__( 'Recommendations', 'amazing-security-scanner' ),
+			__( 'Recommendations', 'amazing-security-scanner' ),
 			'manage_options',
 			'amsec-recommendations',
 			array( self::class, 'render' )
@@ -24,16 +24,16 @@ final class StartPanel {
 
 	public static function render(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'Administrator access required.', 'amazingplugins-security-scanner' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'Administrator access required.', 'amazing-security-scanner' ), '', array( 'response' => 403 ) );
 		}
 		echo '<div class="wrap amazing-security-admin">';
-		echo '<h1>' . esc_html__( 'Recommendations', 'amazingplugins-security-scanner' ) . '</h1>';
+		echo '<h1>' . esc_html__( 'Recommendations', 'amazing-security-scanner' ) . '</h1>';
 		( new AdminPage() )->recommendations();
 		echo '</div>';
 	}
 
 	public static function incident(): void {
-		echo '<section class="amsec-overview"><h2>' . esc_html__( 'If something looks wrong', 'amazingplugins-security-scanner' ) . '</h2><p>' . esc_html__( 'Review administrators, end other sessions, require a new password, then scan again.', 'amazingplugins-security-scanner' ) . ' <a class="button" href="' . esc_url( admin_url( 'admin.php?page=amsec-incident' ) ) . '">' . esc_html__( 'Open incident steps', 'amazingplugins-security-scanner' ) . '</a></p></section>';
+		echo '<section class="amsec-overview"><h2>' . esc_html__( 'If something looks wrong', 'amazing-security-scanner' ) . '</h2><p>' . esc_html__( 'Review administrators, end other sessions, require a new password, then scan again.', 'amazing-security-scanner' ) . ' <a class="button" href="' . esc_url( admin_url( 'admin.php?page=amsec-incident' ) ) . '">' . esc_html__( 'Open incident steps', 'amazing-security-scanner' ) . '</a></p></section>';
 	}
 
 	/**
@@ -67,19 +67,19 @@ final class StartPanel {
 	/** @param list<array<string, mixed>> $off From offRows(). */
 	public static function protections( array $off ): void {
 		$score = Score::tally( self::options() );
-		echo '<section class="amsec-overview" aria-labelledby="amsec-rec-protections"><h2 id="amsec-rec-protections">' . esc_html( __( 'Protections that are off', 'amazingplugins-security-scanner' ) . ' (' . count( $off ) . ')' ) . '</h2>';
+		echo '<section class="amsec-overview" aria-labelledby="amsec-rec-protections"><h2 id="amsec-rec-protections">' . esc_html( __( 'Protections that are off', 'amazing-security-scanner' ) . ' (' . count( $off ) . ')' ) . '</h2>';
 		echo '<p>' . esc_html(
 			sprintf(
 				/* translators: 1: protections on, 2: protections counted */
-				__( '%1$d of %2$d protections are on. Each one stays off until you turn it on.', 'amazingplugins-security-scanner' ),
+				__( '%1$d of %2$d protections are on. Each one stays off until you turn it on.', 'amazing-security-scanner' ),
 				$score['on'],
 				$score['total']
 			)
-		) . ' <a href="' . esc_url( admin_url( 'admin.php?page=amsec-guide' ) ) . '">' . esc_html__( 'Apply a blog or shop preset', 'amazingplugins-security-scanner' ) . '</a></p>';
+		) . ' <a href="' . esc_url( admin_url( 'admin.php?page=amsec-guide' ) ) . '">' . esc_html__( 'Apply a blog or shop preset', 'amazing-security-scanner' ) . '</a></p>';
 		if ( array() !== $off ) {
 			echo '<ul class="amsec-start">';
 			foreach ( $off as $row ) {
-				echo '<li class="amsec-start-item" data-state="none"><span class="amsec-start-badge">' . esc_html__( 'Off', 'amazingplugins-security-scanner' ) . '</span><span class="amsec-start-copy"><strong>' . esc_html( $row['label'] ) . '</strong></span> <a class="button" href="' . esc_url( admin_url( 'admin.php?page=' . $row['page'] ) . ( isset( $row['hash'] ) ? '#' . $row['hash'] : '' ) ) . '">' . esc_html__( 'Turn on', 'amazingplugins-security-scanner' ) . '</a></li>';
+				echo '<li class="amsec-start-item" data-state="none"><span class="amsec-start-badge">' . esc_html__( 'Off', 'amazing-security-scanner' ) . '</span><span class="amsec-start-copy"><strong>' . esc_html( $row['label'] ) . '</strong></span> <a class="button" href="' . esc_url( admin_url( 'admin.php?page=' . $row['page'] ) . ( isset( $row['hash'] ) ? '#' . $row['hash'] : '' ) ) . '">' . esc_html__( 'Turn on', 'amazing-security-scanner' ) . '</a></li>';
 			}
 			echo '</ul>';
 		}

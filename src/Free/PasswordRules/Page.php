@@ -11,8 +11,8 @@ final class Page {
 	public function register(): void {
 		add_submenu_page(
 			'amazing-security',
-			__( 'Password rules', 'amazingplugins-security-scanner' ),
-			__( 'Password rules', 'amazingplugins-security-scanner' ),
+			__( 'Password rules', 'amazing-security-scanner' ),
+			__( 'Password rules', 'amazing-security-scanner' ),
 			'manage_options',
 			'amsec-password-rules',
 			array( $this, 'render' )
@@ -21,20 +21,20 @@ final class Page {
 
 	public function render(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'Administrator access required.', 'amazingplugins-security-scanner' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'Administrator access required.', 'amazing-security-scanner' ), '', array( 'response' => 403 ) );
 		}
 		$current = Module::stored();
 		$notice  = $this->notice();
 		echo '<div class="wrap amazing-security-admin">';
-		echo '<h1>' . esc_html__( 'Password rules', 'amazingplugins-security-scanner' ) . '</h1>';
+		echo '<h1>' . esc_html__( 'Password rules', 'amazing-security-scanner' ) . '</h1>';
 		if ( '' !== $notice ) {
 			echo '<div class="notice notice-info"><p>' . esc_html( $notice ) . '</p></div>';
 		}
-		echo '<p>' . esc_html__( 'These rules apply to a new password or a reset password. Off does nothing. Signing in is not checked.', 'amazingplugins-security-scanner' ) . '</p>';
+		echo '<p>' . esc_html__( 'These rules apply to a new password or a reset password. Off does nothing. Signing in is not checked.', 'amazing-security-scanner' ) . '</p>';
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
 		echo '<input type="hidden" name="action" value="amsec_password_rules">';
 		wp_nonce_field( 'amsec_password_rules_save' );
-		echo '<p><label for="' . esc_attr( Decision::OPTION ) . '">' . esc_html__( 'Minimum length', 'amazingplugins-security-scanner' ) . ' ';
+		echo '<p><label for="' . esc_attr( Decision::OPTION ) . '">' . esc_html__( 'Minimum length', 'amazing-security-scanner' ) . ' ';
 		echo '<select name="' . esc_attr( Decision::OPTION ) . '" id="' . esc_attr( Decision::OPTION ) . '">';
 		foreach ( $this->choices() as $value => $label ) {
 			echo '<option value="' . esc_attr( $value ) . '"' . selected( $current, $value, false ) . '>' . esc_html( $label ) . '</option>';
@@ -43,13 +43,13 @@ final class Page {
 		foreach ( $this->flags() as $option => $label ) {
 			echo '<p><label><input type="checkbox" name="' . esc_attr( $option ) . '" value="1"' . checked( '1', $this->flag( $option ), false ) . '> ' . esc_html( $label ) . '</label></p>';
 		}
-		submit_button( __( 'Update password rules', 'amazingplugins-security-scanner' ) );
+		submit_button( __( 'Update password rules', 'amazing-security-scanner' ) );
 		echo '</form></div>';
 	}
 
 	public function save(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'Administrator access required.', 'amazingplugins-security-scanner' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'Administrator access required.', 'amazing-security-scanner' ), '', array( 'response' => 403 ) );
 		}
 		check_admin_referer( 'amsec_password_rules_save' );
 		$posted = '0';
@@ -69,10 +69,10 @@ final class Page {
 	 */
 	private function choices(): array {
 		return array(
-			'0'  => __( 'Off', 'amazingplugins-security-scanner' ),
-			'8'  => __( '8 characters', 'amazingplugins-security-scanner' ),
-			'12' => __( '12 characters', 'amazingplugins-security-scanner' ),
-			'16' => __( '16 characters', 'amazingplugins-security-scanner' ),
+			'0'  => __( 'Off', 'amazing-security-scanner' ),
+			'8'  => __( '8 characters', 'amazing-security-scanner' ),
+			'12' => __( '12 characters', 'amazing-security-scanner' ),
+			'16' => __( '16 characters', 'amazing-security-scanner' ),
 		);
 	}
 
@@ -81,11 +81,11 @@ final class Page {
 	 */
 	private function flags(): array {
 		return array(
-			Decision::NUMBER => __( 'Require a number', 'amazingplugins-security-scanner' ),
-			Decision::MIXED  => __( 'Require an uppercase letter and a lowercase letter', 'amazingplugins-security-scanner' ),
-			Decision::SYMBOL => __( 'Require a symbol', 'amazingplugins-security-scanner' ),
-			Decision::NAME   => __( 'Reject a password that includes the account name or email name', 'amazingplugins-security-scanner' ),
-			Decision::REUSE  => __( 'Reject the current password when it is changed', 'amazingplugins-security-scanner' ),
+			Decision::NUMBER => __( 'Require a number', 'amazing-security-scanner' ),
+			Decision::MIXED  => __( 'Require an uppercase letter and a lowercase letter', 'amazing-security-scanner' ),
+			Decision::SYMBOL => __( 'Require a symbol', 'amazing-security-scanner' ),
+			Decision::NAME   => __( 'Reject a password that includes the account name or email name', 'amazing-security-scanner' ),
+			Decision::REUSE  => __( 'Reject the current password when it is changed', 'amazing-security-scanner' ),
 		);
 	}
 
@@ -105,7 +105,7 @@ final class Page {
 	private function notice(): string {
 		$status = isset( $_GET['amsec_password_rules'] ) ? sanitize_key( wp_unslash( (string) $_GET['amsec_password_rules'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only status flag after a verified update redirect.
 		if ( 'updated' === $status ) {
-			return __( 'Password rules updated.', 'amazingplugins-security-scanner' );
+			return __( 'Password rules updated.', 'amazing-security-scanner' );
 		}
 		return '';
 	}

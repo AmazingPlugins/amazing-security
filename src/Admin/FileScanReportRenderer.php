@@ -19,57 +19,57 @@ final class FileScanReportRenderer {
 		$version  = ( new BundledRulePack() )->version();
 		$released = DateTimeImmutable::createFromFormat( '!Y.m.d', substr( $version, 0, 10 ) );
 		$age      = false === $released ? 0 : max( 0, (int) floor( ( time() - $released->getTimestamp() ) / 86400 ) );
-		$html     = '<section class="amsec-file-scan" aria-labelledby="' . esc_attr( $this->anchor ) . '"><div class="amsec-file-heading"><div><h2 id="' . esc_attr( $this->anchor ) . '">' . esc_html( '' !== $this->title ? $this->title : __( 'Suspicious files', 'amazingplugins-security-scanner' ) ) . '</h2><p>' . esc_html(
+		$html     = '<section class="amsec-file-scan" aria-labelledby="' . esc_attr( $this->anchor ) . '"><div class="amsec-file-heading"><div><h2 id="' . esc_attr( $this->anchor ) . '">' . esc_html( '' !== $this->title ? $this->title : __( 'Suspicious files', 'amazing-security-scanner' ) ) . '</h2><p>' . esc_html(
 			'' !== $this->title
-				? __( 'Runs with every Scan. Reads plugins, themes, uploads, mu-plugins and loose PHP files. A match needs review; no match does not prove the site is clean.', 'amazingplugins-security-scanner' )
-				: __( 'Looks for extra files in plugins, themes and uploads that a release does not contain. A match needs review; no match does not prove the site is clean.', 'amazingplugins-security-scanner' )
+				? __( 'Runs with every Scan. Reads plugins, themes, uploads, mu-plugins and loose PHP files. A match needs review; no match does not prove the site is clean.', 'amazing-security-scanner' )
+				: __( 'Looks for extra files in plugins, themes and uploads that a release does not contain. A match needs review; no match does not prove the site is clean.', 'amazing-security-scanner' )
 		) . '</p></div><span class="amsec-file-rule-age">' . sprintf(
 				/* translators: 1: version of the bundled rule pack, 2: age of the rule pack in days. */
-			esc_html( _n( 'Bundled rules %1$s (%2$s day old)', 'Bundled rules %1$s (%2$s days old)', $age, 'amazingplugins-security-scanner' ) ),
+			esc_html( _n( 'Bundled rules %1$s (%2$s day old)', 'Bundled rules %1$s (%2$s days old)', $age, 'amazing-security-scanner' ) ),
 			esc_html( $version ),
 			esc_html( (string) $age )
 		) . '</span></div>';
 		if ( null === $completed && null === $progress ) {
-			return $html . '<p class="amsec-file-empty">' . esc_html__( 'No file scan has run. Start one to check for extra files and the bundled suspicious-code patterns.', 'amazingplugins-security-scanner' ) . '</p></section>';
+			return $html . '<p class="amsec-file-empty">' . esc_html__( 'No file scan has run. Start one to check for extra files and the bundled suspicious-code patterns.', 'amazing-security-scanner' ) . '</p></section>';
 		}
 		if ( null !== $progress ) {
 			$cursor = $progress->cursor;
-			$label  = $cursor->partial ? __( 'Partial coverage', 'amazingplugins-security-scanner' ) : ( $progress->finished ? __( 'Scan finished', 'amazingplugins-security-scanner' ) : __( 'Scan in progress', 'amazingplugins-security-scanner' ) );
-			$html  .= '<div class="amsec-file-status amsec-file-status-' . esc_attr( $cursor->partial ? 'partial' : 'progress' ) . '" role="status"><strong>' . esc_html( $label ) . '</strong><span>' . ( $progress->finished ? '' : esc_html__( 'Scan in progress.', 'amazingplugins-security-scanner' ) . ' ' ) . sprintf(
+			$label  = $cursor->partial ? __( 'Partial coverage', 'amazing-security-scanner' ) : ( $progress->finished ? __( 'Scan finished', 'amazing-security-scanner' ) : __( 'Scan in progress', 'amazing-security-scanner' ) );
+			$html  .= '<div class="amsec-file-status amsec-file-status-' . esc_attr( $cursor->partial ? 'partial' : 'progress' ) . '" role="status"><strong>' . esc_html( $label ) . '</strong><span>' . ( $progress->finished ? '' : esc_html__( 'Scan in progress.', 'amazing-security-scanner' ) . ' ' ) . sprintf(
 				/* translators: 1: number of files checked, 2: number of files that could not be checked. */
-				esc_html__( '%1$s files checked. %2$s could not be checked.', 'amazingplugins-security-scanner' ),
+				esc_html__( '%1$s files checked. %2$s could not be checked.', 'amazing-security-scanner' ),
 				esc_html( (string) $cursor->processed ),
 				esc_html( (string) $cursor->unknown )
 			) . '</span></div>';
 			$html .= $this->coverage( $cursor->processed, $cursor->verified, $cursor->scanned, $cursor->extra, $cursor->excluded, $cursor->unknown, $cursor->omitted );
-			$html .= $this->findings( $cursor->findings, __( 'Current file scan findings', 'amazingplugins-security-scanner' ) );
+			$html .= $this->findings( $cursor->findings, __( 'Current file scan findings', 'amazing-security-scanner' ) );
 		}
 		if ( null !== $completed ) {
-			$html .= '<h3>' . esc_html__( 'Last finished scan', 'amazingplugins-security-scanner' ) . '</h3><p>' . sprintf(
+			$html .= '<h3>' . esc_html__( 'Last finished scan', 'amazing-security-scanner' ) . '</h3><p>' . sprintf(
 				/* translators: 1: HTML time element with the scan finish time, 2: number of files checked. */
-				esc_html__( 'Tested %1$s. %2$s files checked.', 'amazingplugins-security-scanner' ),
+				esc_html__( 'Tested %1$s. %2$s files checked.', 'amazing-security-scanner' ),
 				'<time datetime="' . esc_attr( $completed->finishedAt->format( 'c' ) ) . '">' . esc_html( $completed->finishedAt->format( 'Y-m-d H:i:s' ) . ' UTC' ) . '</time>',
 				esc_html( (string) $completed->processed )
 			) . '</p>';
 			if ( null === $progress ) {
-				$html .= '<div class="amsec-file-status amsec-file-status-' . esc_attr( $completed->partial ? 'partial' : 'progress' ) . '" role="status"><strong>' . esc_html( $completed->partial ? __( 'Partial coverage', 'amazingplugins-security-scanner' ) : ( 'warn' === $completed->state ? __( 'Findings need review', 'amazingplugins-security-scanner' ) : __( 'Scan finished', 'amazingplugins-security-scanner' ) ) ) . '</strong></div>';
+				$html .= '<div class="amsec-file-status amsec-file-status-' . esc_attr( $completed->partial ? 'partial' : 'progress' ) . '" role="status"><strong>' . esc_html( $completed->partial ? __( 'Partial coverage', 'amazing-security-scanner' ) : ( 'warn' === $completed->state ? __( 'Findings need review', 'amazing-security-scanner' ) : __( 'Scan finished', 'amazing-security-scanner' ) ) ) . '</strong></div>';
 				$html .= $this->coverage( $completed->processed, $completed->verified, $completed->scanned, $completed->extra, $completed->excluded, $completed->unknown, $completed->omitted );
 			}
-			$html .= $this->findings( $completed->findings, __( 'Completed file scan findings', 'amazingplugins-security-scanner' ), null === $progress );
+			$html .= $this->findings( $completed->findings, __( 'Completed file scan findings', 'amazing-security-scanner' ), null === $progress );
 		}
 		$older = array_values( array_filter( $history, static fn( mixed $report ): bool => $report instanceof FileScanReport && ( null === $completed || $report->scanId !== $completed->scanId ) ) );
 		if ( array() !== $older ) {
-			$html .= '<details class="amsec-file-history"><summary>' . esc_html__( 'Earlier warnings', 'amazingplugins-security-scanner' ) . '</summary><ul>';
+			$html .= '<details class="amsec-file-history"><summary>' . esc_html__( 'Earlier warnings', 'amazing-security-scanner' ) . '</summary><ul>';
 			foreach ( $older as $report ) {
 				$count = count( $report->findings );
-				$html .= '<li><details><summary><time datetime="' . esc_attr( $report->finishedAt->format( 'c' ) ) . '">' . esc_html( $report->finishedAt->format( 'Y-m-d H:i:s' ) . ' UTC' ) . '</time>: ' . esc_html( sprintf( /* translators: %d: number of findings. */ _n( '%d finding', '%d findings', $count, 'amazingplugins-security-scanner' ), $count ) ) . '</summary><ul>';
+				$html .= '<li><details><summary><time datetime="' . esc_attr( $report->finishedAt->format( 'c' ) ) . '">' . esc_html( $report->finishedAt->format( 'Y-m-d H:i:s' ) . ' UTC' ) . '</time>: ' . esc_html( sprintf( /* translators: %d: number of findings. */ _n( '%d finding', '%d findings', $count, 'amazing-security-scanner' ), $count ) ) . '</summary><ul>';
 				foreach ( $report->findings as $finding ) {
 					$id      = (string) ( $finding['id'] ?? '' );
 					$present = false;
 					foreach ( $completed?->findings ?? array() as $current ) {
 						$present = $present || (string) ( $current['id'] ?? '' ) === $id;
 					}
-					$status = null === $completed || $completed->finishedAt <= $report->finishedAt ? __( 'No later complete comparison available', 'amazingplugins-security-scanner' ) : ( $completed->partial ? __( 'Current status unknown; latest scan was partial', 'amazingplugins-security-scanner' ) : ( $present ? __( 'Still reported in the last complete scan', 'amazingplugins-security-scanner' ) : __( 'Not reported in the last complete scan', 'amazingplugins-security-scanner' ) ) );
+					$status = null === $completed || $completed->finishedAt <= $report->finishedAt ? __( 'No later complete comparison available', 'amazing-security-scanner' ) : ( $completed->partial ? __( 'Current status unknown; latest scan was partial', 'amazing-security-scanner' ) : ( $present ? __( 'Still reported in the last complete scan', 'amazing-security-scanner' ) : __( 'Not reported in the last complete scan', 'amazing-security-scanner' ) ) );
 					$html  .= '<li><strong>' . esc_html( (string) ( $finding['package'] ?? '' ) ) . '</strong> <code>' . esc_html( (string) ( $finding['path'] ?? '' ) ) . '</code> ' . esc_html( (string) ( $finding['rule_id'] ?? '' ) ) . ' <time datetime="' . esc_attr( (string) ( $finding['tested_at'] ?? '' ) ) . '">' . esc_html( (string) ( $finding['tested_at'] ?? '' ) ) . '</time>. ' . esc_html( $status ) . '.</li>';
 				}
 				$html .= '</ul></details></li>';
@@ -80,17 +80,17 @@ final class FileScanReportRenderer {
 	}
 
 	private function coverage( int $processed, int $verified, int $scanned, int $extra, int $excluded, int $unknown, int $omitted ): string {
-		return '<dl class="amsec-file-coverage"><div><dt>' . esc_html__( 'Files seen', 'amazingplugins-security-scanner' ) . '</dt><dd>' . esc_html( (string) $processed ) . '</dd></div><div><dt>' . esc_html__( 'Release-matched PHP', 'amazingplugins-security-scanner' ) . '</dt><dd>' . esc_html( (string) $verified ) . '</dd></div><div><dt>' . esc_html__( 'Code checked', 'amazingplugins-security-scanner' ) . '</dt><dd>' . esc_html( (string) $scanned ) . '</dd></div><div><dt>' . esc_html__( 'Extra files', 'amazingplugins-security-scanner' ) . '</dt><dd>' . esc_html( (string) $extra ) . '</dd></div><div><dt>' . esc_html__( 'Excluded', 'amazingplugins-security-scanner' ) . '</dt><dd>' . esc_html( (string) $excluded ) . '</dd></div><div><dt>' . esc_html__( 'Could not check', 'amazingplugins-security-scanner' ) . '</dt><dd>' . esc_html( (string) $unknown ) . '</dd></div>' . ( $omitted > 0 ? '<div><dt>' . esc_html__( 'Findings omitted', 'amazingplugins-security-scanner' ) . '</dt><dd>' . esc_html( (string) $omitted ) . '</dd></div>' : '' ) . '</dl>';
+		return '<dl class="amsec-file-coverage"><div><dt>' . esc_html__( 'Files seen', 'amazing-security-scanner' ) . '</dt><dd>' . esc_html( (string) $processed ) . '</dd></div><div><dt>' . esc_html__( 'Release-matched PHP', 'amazing-security-scanner' ) . '</dt><dd>' . esc_html( (string) $verified ) . '</dd></div><div><dt>' . esc_html__( 'Code checked', 'amazing-security-scanner' ) . '</dt><dd>' . esc_html( (string) $scanned ) . '</dd></div><div><dt>' . esc_html__( 'Extra files', 'amazing-security-scanner' ) . '</dt><dd>' . esc_html( (string) $extra ) . '</dd></div><div><dt>' . esc_html__( 'Excluded', 'amazing-security-scanner' ) . '</dt><dd>' . esc_html( (string) $excluded ) . '</dd></div><div><dt>' . esc_html__( 'Could not check', 'amazing-security-scanner' ) . '</dt><dd>' . esc_html( (string) $unknown ) . '</dd></div>' . ( $omitted > 0 ? '<div><dt>' . esc_html__( 'Findings omitted', 'amazing-security-scanner' ) . '</dt><dd>' . esc_html( (string) $omitted ) . '</dd></div>' : '' ) . '</dl>';
 	}
 
 	private function findings( array $findings, string $label, bool $allowNotes = true ): string {
 		if ( array() === $findings ) {
-			return '<p>' . esc_html__( 'No findings in this report. Review its coverage above.', 'amazingplugins-security-scanner' ) . '</p>';
+			return '<p>' . esc_html__( 'No findings in this report. Review its coverage above.', 'amazing-security-scanner' ) . '</p>';
 		}
 		$html = '<div class="amsec-file-findings" aria-label="' . esc_attr( $label ) . '"><h3>' . esc_html( $label ) . '</h3><ol>';
 		foreach ( $findings as $finding ) {
 			$kind  = (string) ( $finding['kind'] ?? '' );
-			$title = 'suspected' === $kind ? __( 'Suspected code', 'amazingplugins-security-scanner' ) : ( 'extra' === $kind ? __( 'Review file', 'amazingplugins-security-scanner' ) : ( 'package' === $kind ? __( 'Release unavailable', 'amazingplugins-security-scanner' ) : __( 'Could not check file', 'amazingplugins-security-scanner' ) ) );
+			$title = 'suspected' === $kind ? __( 'Suspected code', 'amazing-security-scanner' ) : ( 'extra' === $kind ? __( 'Review file', 'amazing-security-scanner' ) : ( 'package' === $kind ? __( 'Release unavailable', 'amazing-security-scanner' ) : __( 'Could not check file', 'amazing-security-scanner' ) ) );
 			$html .= '<li class="amsec-file-finding"><div class="amsec-file-finding-top"><strong>' . esc_html( $title ) . '</strong><span>' . esc_html( (string) ( $finding['rule_id'] ?? '' ) ) . '</span></div>';
 			$html .= '<span class="amsec-file-package">' . esc_html( self::packageName( (string) ( $finding['package'] ?? '' ) ) ) . '</span>';
 			if ( 'package' === $kind ) {
@@ -102,24 +102,24 @@ final class FileScanReportRenderer {
 			if ( (int) ( $finding['line'] ?? 0 ) > 0 ) {
 				$html .= '<span class="amsec-file-line">' . sprintf(
 						/* translators: %s: line number in the flagged file. */
-					esc_html__( 'Line %s', 'amazingplugins-security-scanner' ),
+					esc_html__( 'Line %s', 'amazing-security-scanner' ),
 					esc_html( (string) (int) $finding['line'] )
 				) . '</span>';
 			}
 			$html .= '<p>' . esc_html( (string) ( $finding['summary'] ?? '' ) ) . '</p>';
 			if ( 'unscanned' === $kind && 'rule_memory_limit' === ( $finding['reason'] ?? '' ) ) {
-				$html .= '<p>' . esc_html__( 'This file exceeded the code check memory budget. It has not been cleared. Compare it with its trusted release or ask your developer to inspect it separately.', 'amazingplugins-security-scanner' ) . '</p>';
+				$html .= '<p>' . esc_html__( 'This file exceeded the code check memory budget. It has not been cleared. Compare it with its trusted release or ask your developer to inspect it separately.', 'amazing-security-scanner' ) . '</p>';
 			}
 			if ( 'suspected' === $kind ) {
-				$html .= '<details class="amsec-rule-guidance"><summary>' . esc_html__( 'Why this needs review and what to do', 'amazingplugins-security-scanner' ) . '</summary><p>' . esc_html( RuleGuidance::forRule( (string) ( $finding['rule_id'] ?? '' ) ) ) . '</p><p>' . esc_html__( 'Back up the site before making changes. Compare the exact installed version with its trusted release, and ask the plugin or theme developer to review differences. Do not delete a file based only on this match. Use the review note below to record your assessment.', 'amazingplugins-security-scanner' ) . '</p></details>';
+				$html .= '<details class="amsec-rule-guidance"><summary>' . esc_html__( 'Why this needs review and what to do', 'amazing-security-scanner' ) . '</summary><p>' . esc_html( RuleGuidance::forRule( (string) ( $finding['rule_id'] ?? '' ) ) ) . '</p><p>' . esc_html__( 'Back up the site before making changes. Compare the exact installed version with its trusted release, and ask the plugin or theme developer to review differences. Do not delete a file based only on this match. Use the review note below to record your assessment.', 'amazing-security-scanner' ) . '</p></details>';
 			}
 			$id     = (string) ( $finding['id'] ?? '' );
 			$formId = 'amsec-note-' . substr( hash( 'sha256', $label ), 0, 8 ) . '-' . $id;
 			if ( isset( $this->notes[ $id ] ) ) {
-				$html .= '<p class="amsec-file-note"><strong>' . esc_html__( 'Review note:', 'amazingplugins-security-scanner' ) . '</strong> ' . esc_html( (string) $this->notes[ $id ] ) . '</p>';
+				$html .= '<p class="amsec-file-note"><strong>' . esc_html__( 'Review note:', 'amazing-security-scanner' ) . '</strong> ' . esc_html( (string) $this->notes[ $id ] ) . '</p>';
 			}
 			if ( $allowNotes && 'package' !== $kind && '' !== $this->actionUrl && '' !== $this->noteNonce && preg_match( '/^[a-f0-9]{32}$/D', $id ) ) {
-				$html .= '<form action="' . esc_url( $this->actionUrl ) . '" method="post" class="amsec-file-note-form"><input type="hidden" name="action" value="amazing_security_file_scan_note"><input type="hidden" name="finding_id" value="' . esc_attr( $id ) . '"><input type="hidden" name="_wpnonce" value="' . esc_attr( $this->noteNonce ) . '"><label for="' . esc_attr( $formId ) . '">' . esc_html__( 'False-positive review note', 'amazingplugins-security-scanner' ) . '</label><textarea id="' . esc_attr( $formId ) . '" name="note" maxlength="500" rows="2"></textarea><button type="submit" class="button button-secondary">' . esc_html__( 'Save review note', 'amazingplugins-security-scanner' ) . '</button></form>';
+				$html .= '<form action="' . esc_url( $this->actionUrl ) . '" method="post" class="amsec-file-note-form"><input type="hidden" name="action" value="amazing_security_file_scan_note"><input type="hidden" name="finding_id" value="' . esc_attr( $id ) . '"><input type="hidden" name="_wpnonce" value="' . esc_attr( $this->noteNonce ) . '"><label for="' . esc_attr( $formId ) . '">' . esc_html__( 'False-positive review note', 'amazing-security-scanner' ) . '</label><textarea id="' . esc_attr( $formId ) . '" name="note" maxlength="500" rows="2"></textarea><button type="submit" class="button button-secondary">' . esc_html__( 'Save review note', 'amazing-security-scanner' ) . '</button></form>';
 			}
 			$html .= '</li>';
 		}
@@ -132,22 +132,22 @@ final class FileScanReportRenderer {
 			return $package;
 		}
 		$type = match ( $m[1] ) {
-			'plugin' => __( 'Plugin', 'amazingplugins-security-scanner' ),
-			'theme'  => __( 'Theme', 'amazingplugins-security-scanner' ),
-			default  => __( 'WordPress core', 'amazingplugins-security-scanner' ),
+			'plugin' => __( 'Plugin', 'amazing-security-scanner' ),
+			'theme'  => __( 'Theme', 'amazing-security-scanner' ),
+			default  => __( 'WordPress core', 'amazing-security-scanner' ),
 		};
 		return trim( $type . ' ' . $m[2] . ' ' . $m[3] );
 	}
 
 	public static function reason( string $code ): string {
 		return match ( $code ) {
-			'package_limit'              => __( 'Each scan compares at most three themes with their release.', 'amazingplugins-security-scanner' ),
-			'non_wordpress_org_origin'   => __( 'Not from WordPress.org, so there is no published release to compare.', 'amazingplugins-security-scanner' ),
-			'unsupported_child_theme'    => __( 'Child themes have no published release to compare.', 'amazingplugins-security-scanner' ),
-			'unsupported_local_path'     => __( 'Installed from a local path, so there is no published release to compare.', 'amazingplugins-security-scanner' ),
-			'theme_provider_unavailable' => __( 'WordPress.org could not be reached for this theme.', 'amazingplugins-security-scanner' ),
+			'package_limit'              => __( 'Each scan compares at most three themes with their release.', 'amazing-security-scanner' ),
+			'non_wordpress_org_origin'   => __( 'Not from WordPress.org, so there is no published release to compare.', 'amazing-security-scanner' ),
+			'unsupported_child_theme'    => __( 'Child themes have no published release to compare.', 'amazing-security-scanner' ),
+			'unsupported_local_path'     => __( 'Installed from a local path, so there is no published release to compare.', 'amazing-security-scanner' ),
+			'theme_provider_unavailable' => __( 'WordPress.org could not be reached for this theme.', 'amazing-security-scanner' ),
 			''                           => '',
-			default                      => __( 'WordPress.org did not return a release this scan could use.', 'amazingplugins-security-scanner' ),
+			default                      => __( 'WordPress.org did not return a release this scan could use.', 'amazing-security-scanner' ),
 		};
 	}
 }

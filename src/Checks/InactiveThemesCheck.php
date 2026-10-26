@@ -67,9 +67,9 @@ final class InactiveThemesCheck implements SecurityCheck {
 		$state   = self::decide( $kind );
 		$count   = self::count( $kind );
 		$summary = match ( $state ) {
-			'warn' => ( $count > 0 ? sprintf( /* translators: %d: number of inactive themes. */ _n( '%d inactive theme is installed.', '%d inactive themes are installed.', $count, 'amazingplugins-security-scanner' ), $count ) . ' ' : __( 'Inactive themes are installed.', 'amazingplugins-security-scanner' ) . ' ' ) . __( 'Open Appearance, then Themes, to review them. This check does not switch or delete them.', 'amazingplugins-security-scanner' ),
-			'pass' => __( 'Every installed theme is in use. This check does not switch or delete themes.', 'amazingplugins-security-scanner' ),
-			default => __( 'Inactive themes could not be listed. This check does not switch or delete themes.', 'amazingplugins-security-scanner' ),
+			'warn' => ( $count > 0 ? sprintf( /* translators: %d: number of inactive themes. */ _n( '%d inactive theme is installed.', '%d inactive themes are installed.', $count, 'amazing-security-scanner' ), $count ) . ' ' : __( 'Inactive themes are installed.', 'amazing-security-scanner' ) . ' ' ) . __( 'Open Appearance, then Themes, to review them. This check does not switch or delete them.', 'amazing-security-scanner' ),
+			'pass' => __( 'Every installed theme is in use. This check does not switch or delete themes.', 'amazing-security-scanner' ),
+			default => __( 'Inactive themes could not be listed. This check does not switch or delete themes.', 'amazing-security-scanner' ),
 		};
 		return array(
 			new CheckResult( $this->id(), 'warn' === $state ? State::WARN : ( 'pass' === $state ? State::PASS : State::UNKNOWN ), $summary, self::SOURCE, new DateTimeImmutable( 'now', new DateTimeZone( 'UTC' ) ), 'low', 'unknown' === $state ? 'unavailable' : 'complete', array( 'kind' => $kind ) ),

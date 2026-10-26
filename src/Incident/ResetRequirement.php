@@ -39,7 +39,7 @@ final class ResetRequirement {
 
 	public function authenticate( mixed $user, string $username, string $password ): mixed {
 		if ( $user instanceof \WP_User && $this->required( $user->ID ) && '' !== $password && wp_check_password( $password, $user->user_pass, $user->ID ) ) {
-			return new \WP_Error( 'amsec_reset_required', __( 'Reset your password before signing in. Use the WordPress lost-password page or contact the site administrator.', 'amazingplugins-security-scanner' ) );
+			return new \WP_Error( 'amsec_reset_required', __( 'Reset your password before signing in. Use the WordPress lost-password page or contact the site administrator.', 'amazing-security-scanner' ) );
 		}
 		return $user;
 	}

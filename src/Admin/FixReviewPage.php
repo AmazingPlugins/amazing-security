@@ -14,18 +14,18 @@ use Throwable;
 
 final class FixReviewPage {
 	public function register(): void {
-		add_submenu_page( 'amazing-security', __( 'Review security change', 'amazingplugins-security-scanner' ), __( 'Review security change', 'amazingplugins-security-scanner' ), 'manage_options', 'amsec-fix-review', array( $this, 'render' ) );
+		add_submenu_page( 'amazing-security', __( 'Review security change', 'amazing-security-scanner' ), __( 'Review security change', 'amazing-security-scanner' ), 'manage_options', 'amsec-fix-review', array( $this, 'render' ) );
 	}
 
 	public function render(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'You cannot review this change.', 'amazingplugins-security-scanner' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'You cannot review this change.', 'amazing-security-scanner' ), '', array( 'response' => 403 ) );
 		}
 		// This is a read-only page; the identifier selects one stored proposal.
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$id = isset( $_GET['proposal'] ) && is_string( $_GET['proposal'] ) ? sanitize_text_field( wp_unslash( $_GET['proposal'] ) ) : '';
 		if ( ! preg_match( '/^[a-f0-9]{32}$/D', $id ) ) {
-			echo '<div class="wrap amazing-security-admin"><h1>' . esc_html__( 'Review security change', 'amazingplugins-security-scanner' ) . '</h1><p>' . esc_html__( 'There is no saved proposal on this screen. One appears here after a scan offers a single setting change.', 'amazingplugins-security-scanner' ) . '</p><p><a class="button" href="' . esc_url( admin_url( 'admin.php?page=amsec-recommendations' ) ) . '">' . esc_html__( 'Open recommendations', 'amazingplugins-security-scanner' ) . '</a></p></div>';
+			echo '<div class="wrap amazing-security-admin"><h1>' . esc_html__( 'Review security change', 'amazing-security-scanner' ) . '</h1><p>' . esc_html__( 'There is no saved proposal on this screen. One appears here after a scan offers a single setting change.', 'amazing-security-scanner' ) . '</p><p><a class="button" href="' . esc_url( admin_url( 'admin.php?page=amsec-recommendations' ) ) . '">' . esc_html__( 'Open recommendations', 'amazing-security-scanner' ) . '</a></p></div>';
 			return;
 		}
 		try {
@@ -34,7 +34,7 @@ final class FixReviewPage {
 			$proposal = null;
 		}
 		if ( null === $proposal ) {
-			echo '<div class="wrap amazing-security-admin"><h1>' . esc_html__( 'Review security change', 'amazingplugins-security-scanner' ) . '</h1><p>' . esc_html__( 'Proposal not found.', 'amazingplugins-security-scanner' ) . '</p></div>';
+			echo '<div class="wrap amazing-security-admin"><h1>' . esc_html__( 'Review security change', 'amazing-security-scanner' ) . '</h1><p>' . esc_html__( 'Proposal not found.', 'amazing-security-scanner' ) . '</p></div>';
 			return;
 		}
 		$enabled = ( new McpPreferences( new WordPressOptions() ) )->enabled();
@@ -48,48 +48,48 @@ final class FixReviewPage {
 
 	public function html( FixProposal $proposal, string $nonce, string $actionUrl, bool $secure, bool $enabled, int $now, string $rollbackNonce = '', string $verification = '', ?string $liveMode = null ): string {
 		$labels  = array(
-			'off'     => __( 'Off', 'amazingplugins-security-scanner' ),
-			'observe' => __( 'Observe only', 'amazingplugins-security-scanner' ),
-			'block'   => __( 'Block repeated failures', 'amazingplugins-security-scanner' ),
+			'off'     => __( 'Off', 'amazing-security-scanner' ),
+			'observe' => __( 'Observe only', 'amazing-security-scanner' ),
+			'block'   => __( 'Block repeated failures', 'amazing-security-scanner' ),
 		);
 		$before  = $labels[ $proposal->beforeMode ];
 		$after   = $labels[ $proposal->afterMode ];
-		$html    = '<div class="wrap amazing-security-admin"><section class="amsec-fix-review" aria-labelledby="amsec-fix-title"><h1 id="amsec-fix-title">' . esc_html__( 'Review security change', 'amazingplugins-security-scanner' ) . '</h1><p>' . esc_html__( 'AmazingPlugins Security Scanner will change one setting on this site. Review it here before anything is applied.', 'amazingplugins-security-scanner' ) . '</p>';
+		$html    = '<div class="wrap amazing-security-admin"><section class="amsec-fix-review" aria-labelledby="amsec-fix-title"><h1 id="amsec-fix-title">' . esc_html__( 'Review security change', 'amazing-security-scanner' ) . '</h1><p>' . esc_html__( 'Amazing Security Scanner will change one setting on this site. Review it here before anything is applied.', 'amazing-security-scanner' ) . '</p>';
 		$applied = 'applied' === $proposal->status;
 		$current = null === $liveMode ? $proposal->beforeMode : $liveMode;
 		$stale   = 'pending' === $proposal->status && $current !== $proposal->beforeMode;
-		$html   .= '<dl class="amsec-fix-diff"><div><dt>' . esc_html__( 'Setting', 'amazingplugins-security-scanner' ) . '</dt><dd>' . esc_html__( 'Login attempt response', 'amazingplugins-security-scanner' ) . '</dd></div><div><dt>' . ( $applied ? esc_html__( 'Previous', 'amazingplugins-security-scanner' ) : esc_html__( 'Current', 'amazingplugins-security-scanner' ) ) . '</dt><dd>' . esc_html( $applied ? $before : ( $labels[ $current ] ?? esc_html__( 'Unknown', 'amazingplugins-security-scanner' ) ) ) . '</dd></div><div><dt>' . ( $applied ? esc_html__( 'Applied', 'amazingplugins-security-scanner' ) : esc_html__( 'Proposed', 'amazingplugins-security-scanner' ) ) . '</dt><dd>' . esc_html( $after ) . '</dd></div></dl>';
-		$html   .= '<p>' . esc_html__( 'This proposal expires at', 'amazingplugins-security-scanner' ) . ' <time datetime="' . esc_attr( gmdate( 'c', $proposal->expiresAt ) ) . '">' . esc_html( gmdate( 'Y-m-d H:i:s T', $proposal->expiresAt ) ) . '</time>.</p>';
+		$html   .= '<dl class="amsec-fix-diff"><div><dt>' . esc_html__( 'Setting', 'amazing-security-scanner' ) . '</dt><dd>' . esc_html__( 'Login attempt response', 'amazing-security-scanner' ) . '</dd></div><div><dt>' . ( $applied ? esc_html__( 'Previous', 'amazing-security-scanner' ) : esc_html__( 'Current', 'amazing-security-scanner' ) ) . '</dt><dd>' . esc_html( $applied ? $before : ( $labels[ $current ] ?? esc_html__( 'Unknown', 'amazing-security-scanner' ) ) ) . '</dd></div><div><dt>' . ( $applied ? esc_html__( 'Applied', 'amazing-security-scanner' ) : esc_html__( 'Proposed', 'amazing-security-scanner' ) ) . '</dt><dd>' . esc_html( $after ) . '</dd></div></dl>';
+		$html   .= '<p>' . esc_html__( 'This proposal expires at', 'amazing-security-scanner' ) . ' <time datetime="' . esc_attr( gmdate( 'c', $proposal->expiresAt ) ) . '">' . esc_html( gmdate( 'Y-m-d H:i:s T', $proposal->expiresAt ) ) . '</time>.</p>';
 		if ( 'block' === $proposal->afterMode ) {
 			$html .= '<p class="notice notice-warning inline">' . sprintf(
 				/* translators: %s: WP-CLI command that turns off login blocking. */
-				esc_html__( 'Blocking can affect people who share an address. If you cannot sign in, run %s through WP-CLI.', 'amazingplugins-security-scanner' ),
+				esc_html__( 'Blocking can affect people who share an address. If you cannot sign in, run %s through WP-CLI.', 'amazing-security-scanner' ),
 				'<code>wp amazing-security login disable</code>'
 			) . '</p>';
 		}
 		if ( 'pending' === $verification && 'applied' === $proposal->status ) {
-			$html .= '<p role="status">' . esc_html__( 'The change was applied but could not be verified. Run a new hardening scan.', 'amazingplugins-security-scanner' ) . '</p>';
+			$html .= '<p role="status">' . esc_html__( 'The change was applied but could not be verified. Run a new hardening scan.', 'amazing-security-scanner' ) . '</p>';
 		}
 		if ( $stale ) {
-			$html .= '<p role="status">' . esc_html__( 'The setting changed since this proposal was created. Run a new scan and request a new proposal.', 'amazingplugins-security-scanner' ) . '</p>';
+			$html .= '<p role="status">' . esc_html__( 'The setting changed since this proposal was created. Run a new scan and request a new proposal.', 'amazing-security-scanner' ) . '</p>';
 		}
 		if ( 'applied' === $proposal->status && $proposal->canRollback( $now ) ) {
-			$html .= '<p role="status">' . esc_html__( 'This change was applied. You can restore the previous mode for 24 hours.', 'amazingplugins-security-scanner' ) . '</p><form method="post" action="' . esc_url( $actionUrl ) . '"><input type="hidden" name="action" value="amsec_fix_rollback"><input type="hidden" name="proposal_id" value="' . esc_attr( $proposal->id ) . '"><input type="hidden" name="_wpnonce" value="' . esc_attr( $rollbackNonce ) . '"><input type="hidden" name="confirm" value="1"><button type="submit" class="button">' . esc_html__( 'Restore previous mode', 'amazingplugins-security-scanner' ) . '</button></form>';
+			$html .= '<p role="status">' . esc_html__( 'This change was applied. You can restore the previous mode for 24 hours.', 'amazing-security-scanner' ) . '</p><form method="post" action="' . esc_url( $actionUrl ) . '"><input type="hidden" name="action" value="amsec_fix_rollback"><input type="hidden" name="proposal_id" value="' . esc_attr( $proposal->id ) . '"><input type="hidden" name="_wpnonce" value="' . esc_attr( $rollbackNonce ) . '"><input type="hidden" name="confirm" value="1"><button type="submit" class="button">' . esc_html__( 'Restore previous mode', 'amazing-security-scanner' ) . '</button></form>';
 		} elseif ( ! $enabled ) {
-			$html .= '<p role="status">' . esc_html__( 'AI assistant access is off. This proposal cannot be approved.', 'amazingplugins-security-scanner' ) . '</p>';
+			$html .= '<p role="status">' . esc_html__( 'AI assistant access is off. This proposal cannot be approved.', 'amazing-security-scanner' ) . '</p>';
 		} elseif ( 'pending' === $proposal->status && ! $stale && ! $proposal->isExpired( $now ) && ( 'block' !== $proposal->afterMode || $secure ) ) {
 			$html .= '<form method="post" action="' . esc_url( $actionUrl ) . '"><input type="hidden" name="action" value="amsec_fix_approve"><input type="hidden" name="proposal_id" value="' . esc_attr( $proposal->id ) . '"><input type="hidden" name="_wpnonce" value="' . esc_attr( $nonce ) . '"><input type="hidden" name="confirm" value="1">';
 			if ( 'block' === $proposal->afterMode ) {
-				$html .= '<label for="amsec-fix-password">' . esc_html__( 'Current WordPress password', 'amazingplugins-security-scanner' ) . '</label><input id="amsec-fix-password" type="password" name="password" autocomplete="current-password" required>';
+				$html .= '<label for="amsec-fix-password">' . esc_html__( 'Current WordPress password', 'amazing-security-scanner' ) . '</label><input id="amsec-fix-password" type="password" name="password" autocomplete="current-password" required>';
 			}
-			$html .= '<button type="submit" class="button button-primary">' . esc_html__( 'Approve this change', 'amazingplugins-security-scanner' ) . '</button></form>';
+			$html .= '<button type="submit" class="button button-primary">' . esc_html__( 'Approve this change', 'amazing-security-scanner' ) . '</button></form>';
 		} elseif ( 'block' === $proposal->afterMode && ! $secure && 'pending' === $proposal->status ) {
-			$html .= '<p role="status">' . esc_html__( 'HTTPS is required before this change can be approved.', 'amazingplugins-security-scanner' ) . '</p>';
+			$html .= '<p role="status">' . esc_html__( 'HTTPS is required before this change can be approved.', 'amazing-security-scanner' ) . '</p>';
 		} else {
 			$html .= '<p role="status">' . sprintf(
 				/* translators: %s: status of the proposal, such as expired or applied. */
-				esc_html__( 'This proposal is %s. No change can be approved here.', 'amazingplugins-security-scanner' ),
-				esc_html( $proposal->isExpired( $now ) && 'pending' === $proposal->status ? __( 'expired', 'amazingplugins-security-scanner' ) : str_replace( '_', ' ', $proposal->status ) )
+				esc_html__( 'This proposal is %s. No change can be approved here.', 'amazing-security-scanner' ),
+				esc_html( $proposal->isExpired( $now ) && 'pending' === $proposal->status ? __( 'expired', 'amazing-security-scanner' ) : str_replace( '_', ' ', $proposal->status ) )
 			) . '</p>';
 		}
 		return $html . '</section></div>';

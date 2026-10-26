@@ -47,7 +47,7 @@ final class FilesystemPermissionsCheck implements SecurityCheck {
 				}
 			}
 			$state   = self::modeState( $mode, 'configuration' === $label );
-			$summary = State::UNKNOWN === $state ? __( 'Mode bits unavailable or target unsupported. Ask the host to review this location.', 'amazingplugins-security-scanner' ) : ( State::WARN === $state ? __( 'Review world-write permissions or world-readable configuration permissions with your host. Do not change modes blindly.', 'amazingplugins-security-scanner' ) : __( 'No selected world-write or configuration world-read mode was found.', 'amazingplugins-security-scanner' ) );
+			$summary = State::UNKNOWN === $state ? __( 'Mode bits unavailable or target unsupported. Ask the host to review this location.', 'amazing-security-scanner' ) : ( State::WARN === $state ? __( 'Review world-write permissions or world-readable configuration permissions with your host. Do not change modes blindly.', 'amazing-security-scanner' ) : __( 'No selected world-write or configuration world-read mode was found.', 'amazing-security-scanner' ) );
 			$rows[]  = new CheckResult(
 				$this->id(),
 				$state,

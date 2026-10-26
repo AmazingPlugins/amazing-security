@@ -42,7 +42,7 @@ final class ActivityRendererTest extends TestCase {
 				),
 				array(
 					'event'      => 'plugin_activated',
-					'target'     => 'amazingplugins-security-scanner/amazingplugins-security-scanner.php',
+					'target'     => 'amazing-security-scanner/amazing-security-scanner.php',
 					'actor_id'   => 0,
 					'user_id'    => 0,
 					'created_at' => 1700000000,
@@ -61,7 +61,7 @@ final class ActivityRendererTest extends TestCase {
 		self::assertStringContainsString( 'Account 4', $html );
 		self::assertStringContainsString( 'is now Editor', $html );
 		self::assertStringContainsString( 'Sign-in limit', $html );
-		self::assertStringContainsString( 'Amazingplugins Security Scanner', $html );
+		self::assertStringContainsString( 'Amazing Security Scanner', $html );
 		self::assertStringNotContainsString( 'amsec_login_rate_mode', $html );
 	}
 

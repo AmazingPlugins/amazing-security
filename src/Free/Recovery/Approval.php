@@ -16,13 +16,13 @@ final class Approval {
 
 	public function denial(): ?string {
 		if ( ! $this->https ) {
-			return __( 'Recovery tools need HTTPS. No files were changed.', 'amazingplugins-security-scanner' );
+			return __( 'Recovery tools need HTTPS. No files were changed.', 'amazing-security-scanner' );
 		}
 		if ( ! $this->canManage ) {
-			return __( 'You do not have permission to run recovery tools.', 'amazingplugins-security-scanner' );
+			return __( 'You do not have permission to run recovery tools.', 'amazing-security-scanner' );
 		}
 		if ( ! $this->nonceValid ) {
-			return __( 'The recovery form expired. Reload the page and try again.', 'amazingplugins-security-scanner' );
+			return __( 'The recovery form expired. Reload the page and try again.', 'amazing-security-scanner' );
 		}
 		return null;
 	}

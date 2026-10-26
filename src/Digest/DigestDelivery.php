@@ -106,7 +106,7 @@ final class DigestDelivery {
 			$accepted = false;
 			if ( false !== filter_var( $this->email, FILTER_VALIDATE_EMAIL ) ) {
 				try {
-					$accepted = (bool) ( $this->send )( $this->email, 'AmazingPlugins Security Scanner: weekly security digest', $pending['body'] . "\n\nOpen AmazingPlugins Security Scanner in WordPress:\n" . $this->dashboardUrl );
+					$accepted = (bool) ( $this->send )( $this->email, 'Amazing Security Scanner: weekly security digest', $pending['body'] . "\n\nOpen Amazing Security Scanner in WordPress:\n" . $this->dashboardUrl );
 				} catch ( \Throwable ) {
 					return 'uncertain';
 				}
