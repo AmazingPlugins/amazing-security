@@ -11,8 +11,8 @@ final class ReviewPage {
 	public function register(): void {
 		$hook = add_submenu_page(
 			Submenu::PARENT,
-			__( 'Review', 'amazing-security' ),
-			__( 'Review', 'amazing-security' ),
+			__( 'Review', 'amazingplugins-security-scanner' ),
+			__( 'Review', 'amazingplugins-security-scanner' ),
 			'manage_options',
 			'amsec-review',
 			array( $this, 'render' )
@@ -32,9 +32,9 @@ final class ReviewPage {
 
 	public function render(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'Administrator access required.', 'amazing-security' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'Administrator access required.', 'amazingplugins-security-scanner' ), '', array( 'response' => 403 ) );
 		}
-		echo '<div class="wrap amazing-security-admin"><h1>' . esc_html__( 'Files', 'amazing-security' ) . '</h1>';
-		echo '<p><a href="' . esc_url( admin_url( 'admin.php?page=amsec-files' ) ) . '">' . esc_html__( 'Open Files', 'amazing-security' ) . '</a></p></div>';
+		echo '<div class="wrap amazing-security-admin"><h1>' . esc_html__( 'Files', 'amazingplugins-security-scanner' ) . '</h1>';
+		echo '<p><a href="' . esc_url( admin_url( 'admin.php?page=amsec-files' ) ) . '">' . esc_html__( 'Open Files', 'amazingplugins-security-scanner' ) . '</a></p></div>';
 	}
 }

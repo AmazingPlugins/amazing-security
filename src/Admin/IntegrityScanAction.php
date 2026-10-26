@@ -102,7 +102,7 @@ final class IntegrityScanAction {
 
 	private function authorize( string $nonceAction ): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'You are not allowed to run an integrity scan.', 'amazing-security' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'You are not allowed to run an integrity scan.', 'amazingplugins-security-scanner' ), '', array( 'response' => 403 ) );
 		}
 		check_admin_referer( $nonceAction );
 	}

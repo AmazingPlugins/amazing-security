@@ -51,7 +51,7 @@ final class AccountExposure {
 		}
 		return new \WP_Error(
 			'amsec_rest_users',
-			__( 'You must be logged in to list accounts.', 'amazing-security' ),
+			__( 'You must be logged in to list accounts.', 'amazingplugins-security-scanner' ),
 			array( 'status' => 401 )
 		);
 	}

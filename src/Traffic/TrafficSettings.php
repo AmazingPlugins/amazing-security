@@ -15,7 +15,7 @@ final class TrafficSettings {
 	private function service(): TrafficSettingsService {
 		return new TrafficSettingsService( new WordPressOptions() ); }
 	public function register(): void {
-		$hook = add_submenu_page( 'amazing-security', __( 'PHP traffic history', 'amazing-security' ), __( 'Traffic history', 'amazing-security' ), 'manage_options', 'amsec-traffic', array( $this, 'render' ) );
+		$hook = add_submenu_page( 'amazing-security', __( 'PHP traffic history', 'amazingplugins-security-scanner' ), __( 'Traffic history', 'amazingplugins-security-scanner' ), 'manage_options', 'amsec-traffic', array( $this, 'render' ) );
 		add_action(
 			'admin_enqueue_scripts',
 			static function ( string $current ) use ( $hook ): void {
@@ -33,40 +33,40 @@ final class TrafficSettings {
 		$state   = $service->status();
 		$fp      = $service->fingerprint();
 		if ( ! SessionPolicy::allowed( 'post' === $method, current_user_can( 'manage_options' ), empty( $state['invalid'] ) && in_array( $post['enabled'] ?? null, array( '0', '1' ), true ) && is_string( $post['fingerprint'] ?? null ) && $post['fingerprint'] === $fp, FixApprovalAction::cookieAuthenticated() && SessionPolicy::matchingTokens( is_array( $auth ) ? (string) $auth['token'] : '', wp_get_session_token() ), is_ssl(), '1' === ( $post['confirm'] ?? null ) ) ) {
-			wp_die( esc_html__( 'Secure administrator approval of the current traffic policy is required.', 'amazing-security' ), '', array( 'response' => 403 ) ); }
+			wp_die( esc_html__( 'Secure administrator approval of the current traffic policy is required.', 'amazingplugins-security-scanner' ), '', array( 'response' => 403 ) ); }
 		check_admin_referer( 'amsec_traffic_' . $fp );
 		$password = is_string( $post['password'] ?? null ) && strlen( $post['password'] ) <= 1024 ? $post['password'] : '';
 		$user     = wp_get_current_user();
 		if ( '' === $password || ! wp_check_password( $password, $user->user_pass, $user->ID ) ) {
-			wp_die( esc_html__( 'Password confirmation failed.', 'amazing-security' ), '', array( 'response' => 403 ) ); }
+			wp_die( esc_html__( 'Password confirmation failed.', 'amazingplugins-security-scanner' ), '', array( 'response' => 403 ) ); }
 		if ( 'saved' !== $service->apply( $fp, '1' === $post['enabled'] ) ) {
-			wp_die( esc_html__( 'Traffic policy changed or could not be saved. Review it before approving again.', 'amazing-security' ), '', array( 'response' => 409 ) ); }
+			wp_die( esc_html__( 'Traffic policy changed or could not be saved. Review it before approving again.', 'amazingplugins-security-scanner' ), '', array( 'response' => 409 ) ); }
 		( new ActivityHooks( new ActivityRepository( $GLOBALS['wpdb'] ) ) )->record( 'security_setting_changed', 0, 'traffic-' . ( '1' === $post['enabled'] ? 'on' : 'off' ) );
 		wp_safe_redirect( \AmazingPlugins\Security\Admin\Brand::saved( admin_url( 'admin.php?page=amsec-traffic-guard#history' ) ) );
 		exit;
 	}
 	public function render(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'Administrator access required.', 'amazing-security' ), '', array( 'response' => 403 ) ); }
+			wp_die( esc_html__( 'Administrator access required.', 'amazingplugins-security-scanner' ), '', array( 'response' => 403 ) ); }
 		$service = $this->service();
 		$state   = $service->status();
 		$fp      = $service->fingerprint();
-		echo '<div class="wrap amazing-security-admin"><header class="amsec-header"><div><h1>' . esc_html__( 'PHP traffic history', 'amazing-security' ) . '</h1><p>' . esc_html__( 'A small local history for troubleshooting request behavior.', 'amazing-security' ) . '</p></div></header><section class="amsec-overview"><h2>' . esc_html__( 'No visitor addresses', 'amazing-security' ) . '</h2><p>' . esc_html__( 'Off by default. Optional rows contain time, a coarse endpoint category, HTTP method, best-effort response status and fixed security decision. No visitor addresses, URLs, query strings, content, cookies, headers, usernames or user agents are stored. Administrators identified at collection, CLI and cron are skipped.', 'amazing-security' ) . '</p><details class="amsec-more"><summary>' . esc_html__( 'How it works', 'amazing-security' ) . '</summary><p>' . esc_html__( 'This is not complete traffic history. Cached/static/CDN responses, terminated processes and dropped records are absent. Collection admits at most 100 rows per minute and 5,000 total rows, without replacing rows during requests. Busy, full or unavailable storage drops records and never changes protection. Records expire from this view after seven days; hourly cleanup deletes up to 500 expired rows. Delayed cron can retain older rows until cleanup.', 'amazing-security' ) . '</p><p>' .
+		echo '<div class="wrap amazing-security-admin"><header class="amsec-header"><div><h1>' . esc_html__( 'PHP traffic history', 'amazingplugins-security-scanner' ) . '</h1><p>' . esc_html__( 'A small local history for troubleshooting request behavior.', 'amazingplugins-security-scanner' ) . '</p></div></header><section class="amsec-overview"><h2>' . esc_html__( 'No visitor addresses', 'amazingplugins-security-scanner' ) . '</h2><p>' . esc_html__( 'Off by default. Optional rows contain time, a coarse endpoint category, HTTP method, best-effort response status and fixed security decision. No visitor addresses, URLs, query strings, content, cookies, headers, usernames or user agents are stored. Administrators identified at collection, CLI and cron are skipped.', 'amazingplugins-security-scanner' ) . '</p><details class="amsec-more"><summary>' . esc_html__( 'How it works', 'amazingplugins-security-scanner' ) . '</summary><p>' . esc_html__( 'This is not complete traffic history. Cached/static/CDN responses, terminated processes and dropped records are absent. Collection admits at most 100 rows per minute and 5,000 total rows, without replacing rows during requests. Busy, full or unavailable storage drops records and never changes protection. Records expire from this view after seven days; hourly cleanup deletes up to 500 expired rows. Delayed cron can retain older rows until cleanup.', 'amazingplugins-security-scanner' ) . '</p><p>' .
 			/* translators: %1$s and %2$s are inline code snippets (a WP-CLI command or a constant name); keep them unchanged. */
-			sprintf( esc_html__( 'A 200 response does not establish a safe request or successful login. Unclassified means no supported decision label was captured. This version labels network and REST-rate blocks only. Disabling stops future collection and retains existing history until expiry. Recovery: %1$s; %2$s bypasses collection.', 'amazing-security' ), '<code>wp amazing-security traffic disable</code>', '<code>AMSEC_DISABLE_TRAFFIC</code>' ) . '</p></details></section>';
-		echo '<section class="amsec-file-scan"><h2>' . esc_html__( 'Collection settings', 'amazing-security' ) . '</h2>';
+			sprintf( esc_html__( 'A 200 response does not establish a safe request or successful login. Unclassified means no supported decision label was captured. This version labels network and REST-rate blocks only. Disabling stops future collection and retains existing history until expiry. Recovery: %1$s; %2$s bypasses collection.', 'amazingplugins-security-scanner' ), '<code>wp amazing-security traffic disable</code>', '<code>AMSEC_DISABLE_TRAFFIC</code>' ) . '</p></details></section>';
+		echo '<section class="amsec-file-scan"><h2>' . esc_html__( 'Collection settings', 'amazingplugins-security-scanner' ) . '</h2>';
 		if ( ! empty( $state['invalid'] ) ) {
-			echo '<p>' . esc_html__( 'Traffic policy is invalid; collection is unavailable. Use the host recovery command.', 'amazing-security' ) . '</p>'; } else {
+			echo '<p>' . esc_html__( 'Traffic policy is invalid; collection is unavailable. Use the host recovery command.', 'amazingplugins-security-scanner' ) . '</p>'; } else {
 				/* translators: %s: collection state, "on" or "off". */
-				echo '<p>' . sprintf( esc_html__( 'Collection: %s.', 'amazing-security' ), esc_html( $state['enabled'] ? __( 'on', 'amazing-security' ) : __( 'off', 'amazing-security' ) ) ) . '</p>';
+				echo '<p>' . sprintf( esc_html__( 'Collection: %s.', 'amazingplugins-security-scanner' ), esc_html( $state['enabled'] ? __( 'on', 'amazingplugins-security-scanner' ) : __( 'off', 'amazingplugins-security-scanner' ) ) ) . '</p>';
 			if ( is_ssl() ) {
-				echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '"><input type="hidden" name="action" value="amsec_traffic_settings"><input type="hidden" name="fingerprint" value="' . esc_attr( $fp ) . '"><p><label>' . esc_html__( 'Collection', 'amazing-security' ) . ' <select name="enabled"><option value="0"' . selected( $state['enabled'], false, false ) . '>' . esc_html__( 'Off', 'amazing-security' ) . '</option><option value="1"' . selected( $state['enabled'], true, false ) . '>' . esc_html__( 'On', 'amazing-security' ) . '</option></select></label></p>';
+				echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '"><input type="hidden" name="action" value="amsec_traffic_settings"><input type="hidden" name="fingerprint" value="' . esc_attr( $fp ) . '"><p><label>' . esc_html__( 'Collection', 'amazingplugins-security-scanner' ) . ' <select name="enabled"><option value="0"' . selected( $state['enabled'], false, false ) . '>' . esc_html__( 'Off', 'amazingplugins-security-scanner' ) . '</option><option value="1"' . selected( $state['enabled'], true, false ) . '>' . esc_html__( 'On', 'amazingplugins-security-scanner' ) . '</option></select></label></p>';
 				wp_nonce_field( 'amsec_traffic_' . $fp );
-				echo '<p><label>' . esc_html__( 'Your password', 'amazing-security' ) . ' <input type="password" name="password" autocomplete="current-password" maxlength="1024" required></label></p><p><label><input type="checkbox" name="confirm" value="1" required> ' . esc_html__( 'I have reviewed the stored fields, retention and incomplete coverage.', 'amazing-security' ) . '</label></p>';
-				submit_button( __( 'Approve traffic collection', 'amazing-security' ), 'secondary' );
+				echo '<p><label>' . esc_html__( 'Your password', 'amazingplugins-security-scanner' ) . ' <input type="password" name="password" autocomplete="current-password" maxlength="1024" required></label></p><p><label><input type="checkbox" name="confirm" value="1" required> ' . esc_html__( 'I have reviewed the stored fields, retention and incomplete coverage.', 'amazingplugins-security-scanner' ) . '</label></p>';
+				submit_button( __( 'Approve traffic collection', 'amazingplugins-security-scanner' ), 'secondary' );
 				echo '</form>';
 			} else {
-				echo '<p>' . esc_html__( 'Use HTTPS to approve collection changes.', 'amazing-security' ) . '</p>'; }
+				echo '<p>' . esc_html__( 'Use HTTPS to approve collection changes.', 'amazingplugins-security-scanner' ) . '</p>'; }
 			}
 			echo '</section>';
 			$this->history();
@@ -79,29 +79,29 @@ final class TrafficSettings {
 		$category = is_string( $_GET['category'] ?? null ) ? sanitize_key( wp_unslash( $_GET['category'] ) ) : '';
 		if ( ! in_array( $category, TrafficEvent::CATEGORIES, true ) ) {
 			$category = ''; }
-		echo '<section class="amsec-file-scan"><h2>' . esc_html__( 'Recent PHP requests', 'amazing-security' ) . '</h2><form method="get"><input type="hidden" name="page" value="amsec-traffic"><label>' . esc_html__( 'Endpoint category', 'amazing-security' ) . ' <select name="category"><option value="">' . esc_html__( 'All categories', 'amazing-security' ) . '</option>';
+		echo '<section class="amsec-file-scan"><h2>' . esc_html__( 'Recent PHP requests', 'amazingplugins-security-scanner' ) . '</h2><form method="get"><input type="hidden" name="page" value="amsec-traffic"><label>' . esc_html__( 'Endpoint category', 'amazingplugins-security-scanner' ) . ' <select name="category"><option value="">' . esc_html__( 'All categories', 'amazingplugins-security-scanner' ) . '</option>';
 		foreach ( TrafficEvent::CATEGORIES as $label ) {
 			echo '<option value="' . esc_attr( $label ) . '"' . selected( $category, $label, false ) . '>' . esc_html( $label ) . '</option>'; }
 		echo '</select></label> ';
-		submit_button( __( 'Filter history', 'amazing-security' ), 'secondary', '', false );
+		submit_button( __( 'Filter history', 'amazingplugins-security-scanner' ), 'secondary', '', false );
 		echo '</form>';
 		try {
 			$rows = ( new TrafficRepository( $GLOBALS['wpdb'] ) )->page( $page, $category ); } catch ( \Throwable ) {
-					echo '<p>' . esc_html__( 'Traffic storage is unavailable. No complete history can be shown.', 'amazing-security' ) . '</p></section>';
+					echo '<p>' . esc_html__( 'Traffic storage is unavailable. No complete history can be shown.', 'amazingplugins-security-scanner' ) . '</p></section>';
 					return; }
 			if ( array() === $rows ) {
-				echo '<p>' . esc_html__( 'No retained rows on this page. Empty history does not establish complete collection or safe traffic.', 'amazing-security' ) . '</p>'; } else {
-						echo '<table class="widefat striped"><thead><tr><th scope="col">' . esc_html__( 'Time (UTC)', 'amazing-security' ) . '</th><th scope="col">' . esc_html__( 'Method', 'amazing-security' ) . '</th><th scope="col">' . esc_html__( 'Category', 'amazing-security' ) . '</th><th scope="col">' . esc_html__( 'HTTP status', 'amazing-security' ) . '</th><th scope="col">' . esc_html__( 'Decision', 'amazing-security' ) . '</th></tr></thead><tbody>';
+				echo '<p>' . esc_html__( 'No retained rows on this page. Empty history does not establish complete collection or safe traffic.', 'amazingplugins-security-scanner' ) . '</p>'; } else {
+						echo '<table class="widefat striped"><thead><tr><th scope="col">' . esc_html__( 'Time (UTC)', 'amazingplugins-security-scanner' ) . '</th><th scope="col">' . esc_html__( 'Method', 'amazingplugins-security-scanner' ) . '</th><th scope="col">' . esc_html__( 'Category', 'amazingplugins-security-scanner' ) . '</th><th scope="col">' . esc_html__( 'HTTP status', 'amazingplugins-security-scanner' ) . '</th><th scope="col">' . esc_html__( 'Decision', 'amazingplugins-security-scanner' ) . '</th></tr></thead><tbody>';
 				foreach ( $rows as $row ) {
 					$timestamp = ctype_digit( (string) ( $row['created_at'] ?? '' ) ) ? (int) $row['created_at'] : 0;
 					$status    = ctype_digit( (string) ( $row['status'] ?? '' ) ) ? (int) $row['status'] : 0;
-					echo '<tr><td>' . esc_html( $timestamp > 0 ? gmdate( 'Y-m-d H:i:s', $timestamp ) : __( 'Unknown', 'amazing-security' ) ) . '</td>';
+					echo '<tr><td>' . esc_html( $timestamp > 0 ? gmdate( 'Y-m-d H:i:s', $timestamp ) : __( 'Unknown', 'amazingplugins-security-scanner' ) ) . '</td>';
 					foreach ( array(
 						'method'   => TrafficEvent::METHODS,
 						'category' => TrafficEvent::CATEGORIES,
 					) as $key => $allowed ) {
-						echo '<td>' . esc_html( in_array( $row[ $key ] ?? null, $allowed, true ) ? $row[ $key ] : __( 'Unknown', 'amazing-security' ) ) . '</td>'; }
-					echo '<td>' . esc_html( $status >= 100 && $status <= 599 ? (string) $status : __( 'Unknown', 'amazing-security' ) ) . '</td><td>' . esc_html( in_array( $row['decision'] ?? null, TrafficEvent::DECISIONS, true ) ? $row['decision'] : __( 'Unknown', 'amazing-security' ) ) . '</td></tr>';
+						echo '<td>' . esc_html( in_array( $row[ $key ] ?? null, $allowed, true ) ? $row[ $key ] : __( 'Unknown', 'amazingplugins-security-scanner' ) ) . '</td>'; }
+					echo '<td>' . esc_html( $status >= 100 && $status <= 599 ? (string) $status : __( 'Unknown', 'amazingplugins-security-scanner' ) ) . '</td><td>' . esc_html( in_array( $row['decision'] ?? null, TrafficEvent::DECISIONS, true ) ? $row['decision'] : __( 'Unknown', 'amazingplugins-security-scanner' ) ) . '</td></tr>';
 				}
 				echo '</tbody></table>';
 				}
@@ -116,12 +116,12 @@ final class TrafficSettings {
 					)
 				) . '">' . esc_html( $label ) . '</a>';
 				$spacer = static fn( string $label ): string => '<span class="amsec-pager-nav is-spacer" aria-hidden="true">' . esc_html( $label ) . '</span>';
-				echo '<nav class="amsec-pager" aria-label="' . esc_attr__( 'History pages', 'amazing-security' ) . '">';
-				echo wp_kses( $page > 1 ? $link( $page - 1, __( 'Previous', 'amazing-security' ) ) : $spacer( __( 'Previous', 'amazing-security' ) ), \AmazingPlugins\Security\Admin\AdminHtml::allowed() );
+				echo '<nav class="amsec-pager" aria-label="' . esc_attr__( 'History pages', 'amazingplugins-security-scanner' ) . '">';
+				echo wp_kses( $page > 1 ? $link( $page - 1, __( 'Previous', 'amazingplugins-security-scanner' ) ) : $spacer( __( 'Previous', 'amazingplugins-security-scanner' ) ), \AmazingPlugins\Security\Admin\AdminHtml::allowed() );
 				/* translators: %s: current page number in the traffic history list. */
-				echo '<span class="amsec-pager-label">' . sprintf( esc_html__( 'Page %s', 'amazing-security' ), esc_html( (string) $page ) ) . '</span>';
+				echo '<span class="amsec-pager-label">' . sprintf( esc_html__( 'Page %s', 'amazingplugins-security-scanner' ), esc_html( (string) $page ) ) . '</span>';
 				// A full page of 50 rows may have more after it; the list stops at page 100.
-				echo wp_kses( count( $rows ) >= 50 && $page < 100 ? $link( $page + 1, __( 'Next', 'amazing-security' ) ) : $spacer( __( 'Next', 'amazing-security' ) ), \AmazingPlugins\Security\Admin\AdminHtml::allowed() );
+				echo wp_kses( count( $rows ) >= 50 && $page < 100 ? $link( $page + 1, __( 'Next', 'amazingplugins-security-scanner' ) ) : $spacer( __( 'Next', 'amazingplugins-security-scanner' ) ), \AmazingPlugins\Security\Admin\AdminHtml::allowed() );
 				echo '</nav></section>';
 	}
 	public function recovery( array $args, array $assoc ): void {

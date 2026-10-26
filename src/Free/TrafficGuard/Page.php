@@ -21,8 +21,8 @@ final class Page {
 	public function register(): void {
 		add_submenu_page(
 			'amazing-security',
-			__( 'Traffic', 'amazing-security' ),
-			__( 'Traffic', 'amazing-security' ),
+			__( 'Traffic', 'amazingplugins-security-scanner' ),
+			__( 'Traffic', 'amazingplugins-security-scanner' ),
 			'manage_options',
 			'amsec-traffic-guard',
 			array( $this, 'render' )
@@ -49,16 +49,16 @@ final class Page {
 				'host'     => Examples::hostnames(),
 				'agent'    => Examples::agents(),
 				'referrer' => Examples::referrers(),
-				'added'    => __( 'Those lines are in the boxes. Save writes them.', 'amazing-security' ),
-				'already'  => __( 'Those lines are already in the boxes.', 'amazing-security' ),
-				'full'     => __( 'A box already has 20 lines.', 'amazing-security' ),
+				'added'    => __( 'Those lines are in the boxes. Save writes them.', 'amazingplugins-security-scanner' ),
+				'already'  => __( 'Those lines are already in the boxes.', 'amazingplugins-security-scanner' ),
+				'full'     => __( 'A box already has 20 lines.', 'amazingplugins-security-scanner' ),
 			)
 		);
 	}
 
 	public function render(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'Administrator access required.', 'amazing-security' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'Administrator access required.', 'amazingplugins-security-scanner' ), '', array( 'response' => 403 ) );
 		}
 		$hostnames = $this->stored( Options::HOSTNAMES );
 		$agents    = $this->stored( Options::AGENTS );
@@ -72,14 +72,14 @@ final class Page {
 		}
 		ScreenTabs::bar(
 			array(
-				'bots'    => __( 'Comments and registration', 'amazing-security' ),
-				'lists'   => __( 'Lists', 'amazing-security' ),
-				'rest'    => __( 'REST rate controls', 'amazing-security' ),
-				'precise' => __( 'Precise blocks', 'amazing-security' ),
-				'network' => __( 'Network controls', 'amazing-security' ),
-				'headers' => __( 'Security headers', 'amazing-security' ),
-				'proxies' => __( 'Trusted proxies', 'amazing-security' ),
-				'history' => __( 'History', 'amazing-security' ),
+				'bots'    => __( 'Comments and registration', 'amazingplugins-security-scanner' ),
+				'lists'   => __( 'Lists', 'amazingplugins-security-scanner' ),
+				'rest'    => __( 'REST rate controls', 'amazingplugins-security-scanner' ),
+				'precise' => __( 'Precise blocks', 'amazingplugins-security-scanner' ),
+				'network' => __( 'Network controls', 'amazingplugins-security-scanner' ),
+				'headers' => __( 'Security headers', 'amazingplugins-security-scanner' ),
+				'proxies' => __( 'Trusted proxies', 'amazingplugins-security-scanner' ),
+				'history' => __( 'History', 'amazingplugins-security-scanner' ),
 			)
 		);
 		ScreenTabs::panel( 'bots', true );
@@ -89,24 +89,24 @@ final class Page {
 		( new \AmazingPlugins\Security\Bots\RateLimiter() )->render();
 		ScreenTabs::close();
 		ScreenTabs::panel( 'lists', false );
-		echo '<p>' . esc_html__( 'Block lists, the live log, and the hotlink check stay off until you turn them on.', 'amazing-security' ) . '</p>';
+		echo '<p>' . esc_html__( 'Block lists, the live log, and the hotlink check stay off until you turn them on.', 'amazingplugins-security-scanner' ) . '</p>';
 		echo '<section class="amsec-overview"><form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
 		echo '<input type="hidden" name="action" value="amsec_traffic_guard">';
 		wp_nonce_field( 'amsec_traffic_guard_save' );
-		echo '<h2>' . esc_html__( 'Block lists', 'amazing-security' ) . '</h2>';
-		echo '<p>' . esc_html__( 'One entry per line, 20 lines at most, 120 characters each. An empty box stays off. Host lines must match the whole hostname. A browser line blocks any browser string that contains it. Referrer lines must start with http:// or https://. Administrators are not blocked. A list that matches this request is not saved.', 'amazing-security' ) . '</p>';
-		echo '<p class="amsec-example-actions"><button type="button" class="button" id="amsec-put-examples">' . esc_html__( 'Put recommended examples', 'amazing-security' ) . '</button></p>';
+		echo '<h2>' . esc_html__( 'Block lists', 'amazingplugins-security-scanner' ) . '</h2>';
+		echo '<p>' . esc_html__( 'One entry per line, 20 lines at most, 120 characters each. An empty box stays off. Host lines must match the whole hostname. A browser line blocks any browser string that contains it. Referrer lines must start with http:// or https://. Administrators are not blocked. A list that matches this request is not saved.', 'amazingplugins-security-scanner' ) . '</p>';
+		echo '<p class="amsec-example-actions"><button type="button" class="button" id="amsec-put-examples">' . esc_html__( 'Put recommended examples', 'amazingplugins-security-scanner' ) . '</button></p>';
 		echo '<p id="amsec-example-note" class="amsec-example-note" hidden></p>';
-		$this->textarea( Options::HOSTNAMES, __( 'Hostname block list', 'amazing-security' ), $hostnames );
-		$this->textarea( Options::AGENTS, __( 'Browser block list', 'amazing-security' ), $agents );
-		$this->textarea( Options::REFERRERS, __( 'Referrer block list', 'amazing-security' ), $referrers );
-		echo '<h2>' . esc_html__( 'Live log', 'amazing-security' ) . '</h2>';
-		echo '<p>' . esc_html__( 'When this is on, up to 500 rows stay in the WordPress database. Each row stores the REMOTE_ADDR value (45 characters at most), the request path without the query string (200 characters at most), and a UTC unix time. wp-admin, cron, CLI, and REST requests are skipped. Turning this off stops recording and deletes the rows.', 'amazing-security' ) . '</p>';
-		$this->toggle( Options::LIVE, __( 'Live log', 'amazing-security' ), $live );
-		echo '<h2>' . esc_html__( 'Hotlink check', 'amazing-security' ) . '</h2>';
-		echo '<p>' . esc_html__( 'When this is on, an Apache rule is written in the uploads folder. jpg, jpeg, png, gif, and webp files are refused when the referrer is another site. An empty referrer is allowed. A referrer on this host is allowed. Nginx ignores that file.', 'amazing-security' ) . '</p>';
-		$this->toggle( Options::HOTLINK, __( 'Hotlink check', 'amazing-security' ), $hotlink );
-		submit_button( __( 'Save traffic controls', 'amazing-security' ) );
+		$this->textarea( Options::HOSTNAMES, __( 'Hostname block list', 'amazingplugins-security-scanner' ), $hostnames );
+		$this->textarea( Options::AGENTS, __( 'Browser block list', 'amazingplugins-security-scanner' ), $agents );
+		$this->textarea( Options::REFERRERS, __( 'Referrer block list', 'amazingplugins-security-scanner' ), $referrers );
+		echo '<h2>' . esc_html__( 'Live log', 'amazingplugins-security-scanner' ) . '</h2>';
+		echo '<p>' . esc_html__( 'When this is on, up to 500 rows stay in the WordPress database. Each row stores the REMOTE_ADDR value (45 characters at most), the request path without the query string (200 characters at most), and a UTC unix time. wp-admin, cron, CLI, and REST requests are skipped. Turning this off stops recording and deletes the rows.', 'amazingplugins-security-scanner' ) . '</p>';
+		$this->toggle( Options::LIVE, __( 'Live log', 'amazingplugins-security-scanner' ), $live );
+		echo '<h2>' . esc_html__( 'Hotlink check', 'amazingplugins-security-scanner' ) . '</h2>';
+		echo '<p>' . esc_html__( 'When this is on, an Apache rule is written in the uploads folder. jpg, jpeg, png, gif, and webp files are refused when the referrer is another site. An empty referrer is allowed. A referrer on this host is allowed. Nginx ignores that file.', 'amazingplugins-security-scanner' ) . '</p>';
+		$this->toggle( Options::HOTLINK, __( 'Hotlink check', 'amazingplugins-security-scanner' ), $hotlink );
+		submit_button( __( 'Save traffic controls', 'amazingplugins-security-scanner' ) );
 		echo '</form></section>';
 		$this->logTable( '1' === $live );
 		ScreenTabs::close();
@@ -133,7 +133,7 @@ final class Page {
 
 	public function save(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'Administrator access required.', 'amazing-security' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'Administrator access required.', 'amazingplugins-security-scanner' ), '', array( 'response' => 403 ) );
 		}
 		check_admin_referer( 'amsec_traffic_guard_save' );
 		$post = wp_unslash( $_POST ); // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Nonce checked above. Each field is sanitized before it is saved.
@@ -178,37 +178,37 @@ final class Page {
 	private function toggle( string $name, string $label, string $value ): void {
 		echo '<p><label for="' . esc_attr( $name ) . '">' . esc_html( $label ) . ' ';
 		echo '<select name="' . esc_attr( $name ) . '" id="' . esc_attr( $name ) . '">';
-		echo '<option value="0"' . selected( '1' === $value ? '1' : '0', '0', false ) . '>' . esc_html__( 'Off', 'amazing-security' ) . '</option>';
-		echo '<option value="1"' . selected( '1' === $value ? '1' : '0', '1', false ) . '>' . esc_html__( 'On', 'amazing-security' ) . '</option>';
+		echo '<option value="0"' . selected( '1' === $value ? '1' : '0', '0', false ) . '>' . esc_html__( 'Off', 'amazingplugins-security-scanner' ) . '</option>';
+		echo '<option value="1"' . selected( '1' === $value ? '1' : '0', '1', false ) . '>' . esc_html__( 'On', 'amazingplugins-security-scanner' ) . '</option>';
 		echo '</select></label></p>';
 	}
 
 	private function logTable( bool $enabled ): void {
-		echo '<h2>' . esc_html__( 'Latest 50 rows', 'amazing-security' ) . '</h2>';
+		echo '<h2>' . esc_html__( 'Latest 50 rows', 'amazingplugins-security-scanner' ) . '</h2>';
 		if ( ! $enabled ) {
-			echo '<p>' . esc_html__( 'Logging is off.', 'amazing-security' ) . '</p>';
+			echo '<p>' . esc_html__( 'Logging is off.', 'amazingplugins-security-scanner' ) . '</p>';
 			return;
 		}
 		try {
 			$stored = get_option( Options::LIVE_ROWS, array() );
 		} catch ( \Throwable $exception ) {
 			if ( $exception instanceof \Throwable ) {
-				echo '<p>' . esc_html__( 'The log could not be read.', 'amazing-security' ) . '</p>';
+				echo '<p>' . esc_html__( 'The log could not be read.', 'amazingplugins-security-scanner' ) . '</p>';
 				return;
 			}
 		}
 		$rows = ( new LiveTraffic() )->latest( is_array( $stored ) ? $stored : array(), LiveTraffic::VIEW );
 		if ( array() === $rows ) {
-			echo '<p>' . esc_html__( 'No rows stored.', 'amazing-security' ) . '</p>';
+			echo '<p>' . esc_html__( 'No rows stored.', 'amazingplugins-security-scanner' ) . '</p>';
 			return;
 		}
 		echo '<table class="widefat striped"><thead><tr>';
-		echo '<th scope="col">' . esc_html__( 'Time (UTC)', 'amazing-security' ) . '</th>';
-		echo '<th scope="col">' . esc_html__( 'Address', 'amazing-security' ) . '</th>';
-		echo '<th scope="col">' . esc_html__( 'Path', 'amazing-security' ) . '</th>';
+		echo '<th scope="col">' . esc_html__( 'Time (UTC)', 'amazingplugins-security-scanner' ) . '</th>';
+		echo '<th scope="col">' . esc_html__( 'Address', 'amazingplugins-security-scanner' ) . '</th>';
+		echo '<th scope="col">' . esc_html__( 'Path', 'amazingplugins-security-scanner' ) . '</th>';
 		echo '</tr></thead><tbody>';
 		foreach ( $rows as $row ) {
-			$stamp = $row['time'] > 0 ? gmdate( 'Y-m-d H:i:s', $row['time'] ) : __( 'Unknown', 'amazing-security' );
+			$stamp = $row['time'] > 0 ? gmdate( 'Y-m-d H:i:s', $row['time'] ) : __( 'Unknown', 'amazingplugins-security-scanner' );
 			echo '<tr><td>' . esc_html( $stamp ) . '</td><td>' . esc_html( $row['ip'] ) . '</td><td>' . esc_html( $row['path'] ) . '</td></tr>';
 		}
 		echo '</tbody></table>';
@@ -217,12 +217,12 @@ final class Page {
 	private function notice(): string {
 		$status = isset( $_GET['amsec_traffic_guard'] ) ? sanitize_key( wp_unslash( (string) $_GET['amsec_traffic_guard'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only status flag after a verified save redirect.
 		$notes  = array(
-			'saved'  => __( 'Traffic controls saved.', 'amazing-security' ),
-			'count'  => __( 'Use 20 entries or fewer in each list.', 'amazing-security' ),
-			'length' => __( 'Use 120 characters or fewer for each entry.', 'amazing-security' ),
-			'prefix' => __( 'Referrer entries have to start with http:// or https://.', 'amazing-security' ),
-			'self'   => __( 'That list matches this request, so nothing was saved.', 'amazing-security' ),
-			'save'   => __( 'The traffic controls could not be saved.', 'amazing-security' ),
+			'saved'  => __( 'Traffic controls saved.', 'amazingplugins-security-scanner' ),
+			'count'  => __( 'Use 20 entries or fewer in each list.', 'amazingplugins-security-scanner' ),
+			'length' => __( 'Use 120 characters or fewer for each entry.', 'amazingplugins-security-scanner' ),
+			'prefix' => __( 'Referrer entries have to start with http:// or https://.', 'amazingplugins-security-scanner' ),
+			'self'   => __( 'That list matches this request, so nothing was saved.', 'amazingplugins-security-scanner' ),
+			'save'   => __( 'The traffic controls could not be saved.', 'amazingplugins-security-scanner' ),
 		);
 		return $notes[ $status ] ?? '';
 	}

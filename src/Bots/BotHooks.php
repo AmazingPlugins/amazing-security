@@ -18,19 +18,19 @@ final class BotHooks {
 		if ( 'off' === $this->mode() || is_user_logged_in() ) {
 			return;
 		}
-		echo '<div hidden aria-hidden="true"><label for="amsec-contact-hint">' . esc_html__( 'Leave this field empty', 'amazing-security' ) . '</label><input id="amsec-contact-hint" type="text" name="amsec_contact_hint" value="" autocomplete="off" tabindex="-1"></div>';
+		echo '<div hidden aria-hidden="true"><label for="amsec-contact-hint">' . esc_html__( 'Leave this field empty', 'amazingplugins-security-scanner' ) . '</label><input id="amsec-contact-hint" type="text" name="amsec_contact_hint" value="" autocomplete="off" tabindex="-1"></div>';
 	}
 
 	public function comment( array $data ): array {
 		if ( $this->native( 'wp-comments-post.php' ) && $this->reject( 'comment', 20, 300 ) ) {
-			wp_die( esc_html__( 'This submission could not be accepted. Leave the hidden field empty and retry later, or contact the site owner.', 'amazing-security' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'This submission could not be accepted. Leave the hidden field empty and retry later, or contact the site owner.', 'amazingplugins-security-scanner' ), '', array( 'response' => 403 ) );
 		}
 		return $data;
 	}
 
 	public function registration( \WP_Error $errors ): \WP_Error {
 		if ( $this->native( 'wp-login.php' ) && $this->reject( 'registration', 5, 900 ) ) {
-			$errors->add( 'amsec_bot_check', __( 'This registration could not be accepted. Retry later or contact the site owner.', 'amazing-security' ) );
+			$errors->add( 'amsec_bot_check', __( 'This registration could not be accepted. Retry later or contact the site owner.', 'amazingplugins-security-scanner' ) );
 		}
 		return $errors;
 	}

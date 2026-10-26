@@ -11,8 +11,8 @@ final class RecordsPage {
 	public function register(): void {
 		add_submenu_page(
 			Submenu::PARENT,
-			__( 'Records', 'amazing-security' ),
-			__( 'Records', 'amazing-security' ),
+			__( 'Records', 'amazingplugins-security-scanner' ),
+			__( 'Records', 'amazingplugins-security-scanner' ),
 			'manage_options',
 			'amsec-records',
 			array( $this, 'render' )
@@ -21,42 +21,42 @@ final class RecordsPage {
 
 	public function render(): void {
 		SettingList::render(
-			__( 'Records', 'amazing-security' ),
-			__( 'Activity is first. Each row opens on its own screen.', 'amazing-security' ),
+			__( 'Records', 'amazingplugins-security-scanner' ),
+			__( 'Activity is first. Each row opens on its own screen.', 'amazingplugins-security-scanner' ),
 			array(
 				array(
-					'label' => __( 'Activity', 'amazing-security' ),
-					'note'  => __( 'Off until you turn recording on. It can store sign-ins, user changes, and plugin changes.', 'amazing-security' ),
+					'label' => __( 'Activity', 'amazingplugins-security-scanner' ),
+					'note'  => __( 'Off until you turn recording on. It can store sign-ins, user changes, and plugin changes.', 'amazingplugins-security-scanner' ),
 					'url'   => SettingList::page( 'amsec-activity' ),
 				),
 				array(
-					'label' => __( 'Settings', 'amazing-security' ),
-					'note'  => __( 'Notification settings: finding emails, test email, and account-change email. Uses WordPress mail to the admin address.', 'amazing-security' ),
+					'label' => __( 'Settings', 'amazingplugins-security-scanner' ),
+					'note'  => __( 'Notification settings: finding emails, test email, and account-change email. Uses WordPress mail to the admin address.', 'amazingplugins-security-scanner' ),
 					'url'   => SettingList::page( 'amsec-settings' ),
 				),
 				array(
-					'label' => __( 'Weekly digest', 'amazing-security' ),
-					'note'  => __( 'Off until you turn the email on. It sends a count summary once a week.', 'amazing-security' ),
+					'label' => __( 'Weekly digest', 'amazingplugins-security-scanner' ),
+					'note'  => __( 'Off until you turn the email on. It sends a count summary once a week.', 'amazingplugins-security-scanner' ),
 					'url'   => SettingList::page( 'amsec-digest' ),
 				),
 				array(
-					'label' => __( 'Daily checks', 'amazing-security' ),
-					'note'  => __( 'Shows whether the local cycle is waiting. Opening it does not start a check.', 'amazing-security' ),
+					'label' => __( 'Daily checks', 'amazingplugins-security-scanner' ),
+					'note'  => __( 'Shows whether the local cycle is waiting. Opening it does not start a check.', 'amazingplugins-security-scanner' ),
 					'url'   => SettingList::page( 'amsec-schedule' ),
 				),
 				array(
-					'label' => __( 'Incident response', 'amazing-security' ),
-					'note'  => __( 'Review administrators, end other sessions, then require a new password.', 'amazing-security' ),
+					'label' => __( 'Incident response', 'amazingplugins-security-scanner' ),
+					'note'  => __( 'Review administrators, end other sessions, then require a new password.', 'amazingplugins-security-scanner' ),
 					'url'   => SettingList::page( 'amsec-incident' ),
 				),
 				array(
-					'label' => __( 'Site review', 'amazing-security' ),
-					'note'  => __( 'Shows which protections are on. Each one stays off until you turn it on.', 'amazing-security' ),
+					'label' => __( 'Site review', 'amazingplugins-security-scanner' ),
+					'note'  => __( 'Shows which protections are on. Each one stays off until you turn it on.', 'amazingplugins-security-scanner' ),
 					'url'   => SettingList::page( 'amsec-guide' ),
 				),
 				array(
-					'label' => __( 'Saved change', 'amazing-security' ),
-					'note'  => __( 'Opens one saved proposal. This screen stays empty until a proposal exists.', 'amazing-security' ),
+					'label' => __( 'Saved change', 'amazingplugins-security-scanner' ),
+					'note'  => __( 'Opens one saved proposal. This screen stays empty until a proposal exists.', 'amazingplugins-security-scanner' ),
 					'url'   => SettingList::page( 'amsec-fix-review' ),
 				),
 			)

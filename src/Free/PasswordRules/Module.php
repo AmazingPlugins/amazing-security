@@ -182,26 +182,26 @@ final class Module {
 		if ( 'length' === $code ) {
 			return sprintf(
 				/* translators: %d: minimum number of characters. */
-				__( 'Use at least %d characters.', 'amazing-security' ),
+				__( 'Use at least %d characters.', 'amazingplugins-security-scanner' ),
 				Decision::minimum( self::stored() )
 			);
 		}
 		if ( 'number' === $code ) {
-			return __( 'Include a number.', 'amazing-security' );
+			return __( 'Include a number.', 'amazingplugins-security-scanner' );
 		}
 		if ( 'mixed' === $code ) {
-			return __( 'Include an uppercase letter and a lowercase letter.', 'amazing-security' );
+			return __( 'Include an uppercase letter and a lowercase letter.', 'amazingplugins-security-scanner' );
 		}
 		if ( 'symbol' === $code ) {
-			return __( 'Include a symbol.', 'amazing-security' );
+			return __( 'Include a symbol.', 'amazingplugins-security-scanner' );
 		}
 		if ( 'name' === $code ) {
-			return __( 'Do not include the account name or the email name.', 'amazing-security' );
+			return __( 'Do not include the account name or the email name.', 'amazingplugins-security-scanner' );
 		}
 		if ( 'reuse' === $code ) {
-			return __( 'Choose a password that is different from the current one.', 'amazing-security' );
+			return __( 'Choose a password that is different from the current one.', 'amazingplugins-security-scanner' );
 		}
-		return __( 'Choose a different password.', 'amazing-security' );
+		return __( 'Choose a different password.', 'amazingplugins-security-scanner' );
 	}
 
 	/**

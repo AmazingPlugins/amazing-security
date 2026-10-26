@@ -44,7 +44,7 @@ final class Module {
 		}
 		$sent = wp_mail(
 			$email,
-			__( 'Sign-in email', 'amazing-security' ),
+			__( 'Sign-in email', 'amazingplugins-security-scanner' ),
 			Decision::body( $site, $now )
 		);
 		if ( true !== $sent ) {

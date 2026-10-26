@@ -34,10 +34,10 @@ final class DatabaseDump {
 			return ChangeResult::failure( $denial );
 		}
 		if ( ! $confirmed ) {
-			return ChangeResult::failure( __( 'Confirm the database download before it starts.', 'amazing-security' ) );
+			return ChangeResult::failure( __( 'Confirm the database download before it starts.', 'amazingplugins-security-scanner' ) );
 		}
 		if ( 1 !== preg_match( '/\A[A-Za-z0-9_]+\z/', $prefix ) ) {
-			return ChangeResult::failure( __( 'The table prefix is empty or unexpected. No SQL file was created.', 'amazing-security' ) );
+			return ChangeResult::failure( __( 'The table prefix is empty or unexpected. No SQL file was created.', 'amazingplugins-security-scanner' ) );
 		}
 		$names = array();
 		foreach ( $this->source->tableNames( $prefix ) as $name ) {
@@ -50,16 +50,16 @@ final class DatabaseDump {
 			return ChangeResult::failure(
 				sprintf(
 					/* translators: %d: maximum number of tables in one dump. */
-					__( 'There are more than %d prefixed tables. No SQL file was created.', 'amazing-security' ),
+					__( 'There are more than %d prefixed tables. No SQL file was created.', 'amazingplugins-security-scanner' ),
 					$this->maxTables
 				)
 			);
 		}
-		$sql = "-- Amazing Security prefixed table dump\n-- This copy does not mean the site is clean.\n\n";
+		$sql = "-- AmazingPlugins Security Scanner prefixed table dump\n-- This copy does not mean the site is clean.\n\n";
 		foreach ( $names as $table ) {
 			$create = $this->source->createTable( $table );
 			if ( ! is_string( $create ) || ! $this->safeCreate( $create ) ) {
-				return ChangeResult::failure( __( 'A table definition was missing or included another database. No SQL file was created.', 'amazing-security' ) );
+				return ChangeResult::failure( __( 'A table definition was missing or included another database. No SQL file was created.', 'amazingplugins-security-scanner' ) );
 			}
 			$quoted = '`' . $table . '`';
 			$block  = 'DROP TABLE IF EXISTS ' . $quoted . ";\n" . rtrim( $create, " \t\r\n;" ) . ";\n";
@@ -77,7 +77,7 @@ final class DatabaseDump {
 				foreach ( $rows as $row ) {
 					$line = $this->insert( $table, $row );
 					if ( null === $line ) {
-						return ChangeResult::failure( __( 'A table row could not be escaped. No SQL file was created.', 'amazing-security' ) );
+						return ChangeResult::failure( __( 'A table row could not be escaped. No SQL file was created.', 'amazingplugins-security-scanner' ) );
 					}
 					$next = $this->append( $sql, $line );
 					if ( null === $next ) {
@@ -92,17 +92,17 @@ final class DatabaseDump {
 				$offset += $count;
 			}
 			if ( $offset >= 1000000 ) {
-				return ChangeResult::failure( __( 'A table is too large to export here. No SQL file was created.', 'amazing-security' ) );
+				return ChangeResult::failure( __( 'A table is too large to export here. No SQL file was created.', 'amazingplugins-security-scanner' ) );
 			}
 		}
 		if ( preg_match( '/CREATE\s+DATABASE/i', $sql ) ) {
-			return ChangeResult::failure( __( 'The SQL dump included a database statement. No file was created.', 'amazing-security' ) );
+			return ChangeResult::failure( __( 'The SQL dump included a database statement. No file was created.', 'amazingplugins-security-scanner' ) );
 		}
-		return ChangeResult::success( __( 'Prefixed tables are ready to download.', 'amazing-security' ), $sql );
+		return ChangeResult::success( __( 'Prefixed tables are ready to download.', 'amazingplugins-security-scanner' ), $sql );
 	}
 
 	private function tooLarge(): ChangeResult {
-		return ChangeResult::failure( __( 'The SQL dump would pass the size cap. No file was created.', 'amazing-security' ) );
+		return ChangeResult::failure( __( 'The SQL dump would pass the size cap. No file was created.', 'amazingplugins-security-scanner' ) );
 	}
 
 	private function safeCreate( string $create ): bool {

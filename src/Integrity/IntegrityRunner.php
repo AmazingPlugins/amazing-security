@@ -84,7 +84,7 @@ final class IntegrityRunner {
 				$cursor->findings[] = new CheckResult(
 					'integrity-file',
 					$state,
-					'ok' === $result->state ? __( 'Release file differs from the published checksum.', 'amazing-security' ) : ( 'missing' === $result->state ? __( 'Release file is missing.', 'amazing-security' ) : __( 'Release file could not be checked.', 'amazing-security' ) ),
+					'ok' === $result->state ? __( 'Release file differs from the published checksum.', 'amazingplugins-security-scanner' ) : ( 'missing' === $result->state ? __( 'Release file is missing.', 'amazingplugins-security-scanner' ) : __( 'Release file could not be checked.', 'amazingplugins-security-scanner' ) ),
 					$target->manifest->sourceUrl,
 					new DateTimeImmutable(),
 					'high',

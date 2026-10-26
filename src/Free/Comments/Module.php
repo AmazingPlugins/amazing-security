@@ -25,7 +25,7 @@ final class Module {
 			return;
 		}
 		echo '<p class="amsec-comment-check" style="position:absolute;left:-9999px" aria-hidden="true">';
-		echo '<label>' . esc_html__( 'Company', 'amazing-security' ) . ' ';
+		echo '<label>' . esc_html__( 'Company', 'amazingplugins-security-scanner' ) . ' ';
 		echo '<input type="text" name="' . esc_attr( Decision::FIELD ) . '" value="" tabindex="-1" autocomplete="off">';
 		echo '</label></p>';
 	}
@@ -53,7 +53,7 @@ final class Module {
 		if ( 'reject' === Decision::outcome( $enabled, $posted ) ) {
 			return new \WP_Error(
 				'amsec_comment_honeypot',
-				__( 'Leave the extra field empty.', 'amazing-security' ),
+				__( 'Leave the extra field empty.', 'amazingplugins-security-scanner' ),
 				403
 			);
 		}
@@ -65,7 +65,7 @@ final class Module {
 		if ( 'wait' === Rate::decide( $rate, $exempt, $last, time() ) ) {
 			return new \WP_Error(
 				'amsec_comment_rate',
-				__( 'Wait a minute before another comment.', 'amazing-security' ),
+				__( 'Wait a minute before another comment.', 'amazingplugins-security-scanner' ),
 				403
 			);
 		}
@@ -79,7 +79,7 @@ final class Module {
 		if ( 'hold' === SpamHold::decide( self::holdStored(), $exempt, $hash, is_array( $list ) ? $list : array() ) ) {
 			return new \WP_Error(
 				'amsec_comment_spam_hold',
-				__( 'This email is held after a spam comment.', 'amazing-security' ),
+				__( 'This email is held after a spam comment.', 'amazingplugins-security-scanner' ),
 				403
 			);
 		}
