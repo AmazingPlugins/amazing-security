@@ -1,10 +1,10 @@
-=== Amazing Security ===
+=== AmazingPlugins Security Scanner ===
 Contributors: amazingplugins
 Tags: security, hardening, malware scan, login security, file integrity
 Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 0.1.1
+Stable tag: 0.1.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -12,7 +12,7 @@ Security checks that show their evidence: hardening, file integrity, suspicious 
 
 == Description ==
 
-Amazing Security scans your site and shows what it found, with the evidence. Nothing changes until you approve it. Every protection is off when you install the plugin, so you choose what to turn on. Nothing runs in the background until you press Scan for the first time. After that, the scan repeats once a day.
+AmazingPlugins Security Scanner scans your site and shows what it found, with the evidence. Nothing changes until you approve it. Every protection is off when you install the plugin, so you choose what to turn on. Nothing runs in the background until you press Scan for the first time. After that, the scan repeats once a day.
 
 = Scan =
 
@@ -26,7 +26,6 @@ A passing check means that check didn't find the problem it looks for. It doesn'
 
 * **Integrity scan.** Compares WordPress core and WordPress.org plugin files with the published checksums. Up to three WordPress.org themes are compared with their release ZIP. On a big site one pass may not reach them all, and the result says so. A changed file is different from the release, which doesn't make it malware. Custom and child themes stay "unknown".
 * **File scan.** Reads PHP-like files in plugins, themes, and uploads with the same 63 local rules. A match shows the file, the line, and the rule, with a note on why it needs a look. A hit is suspected code, not proof of malware. Files never leave your server. The scan runs in short steps and picks up where it stopped. It stops for good after 50,000 files, 1 GiB, or 300 seconds of work.
-* **Repair.** When a WordPress.org plugin file differs from its release, an administrator can review a repair. The page shows the path and both SHA-256 hashes before you approve. The old file is saved to a private folder in the server's temporary directory, outside the site. Some hosts empty that directory on restart, so don't wait long to roll back. Roll back from wp-admin or with `wp amazing-security repair rollback <finding-id>`.
 
 = Login and accounts =
 
@@ -60,12 +59,12 @@ Optional emails for changed files, suspicious PHP matches, and high-severity plu
 
 = AI assistant access (MCP) =
 
-Off by default. On WordPress 6.9 or newer, with the official MCP Adapter plugin installed, an administrator can let an AI assistant list findings, run the local hardening checks, and propose a sign-in limit change. A proposal changes nothing until an administrator approves it in wp-admin. The assistant can't start a file repair.
+Off by default. On WordPress 6.9 or newer, with the official MCP Adapter plugin installed, an administrator can let an AI assistant list findings, run the local hardening checks, and propose a sign-in limit change. A proposal changes nothing until an administrator approves it in wp-admin.
 
 = What this plugin doesn't do =
 
 * It doesn't have a maintained malware signature feed. Patterns update with plugin releases.
-* It doesn't remove malware or repair a whole plugin.
+* It doesn't change plugin, theme or core files. When a file differs from its release, reinstall that plugin or theme from Plugins or Appearance, or reinstall WordPress from Dashboard > Updates.
 * Scheduled scans run on WP-Cron, which needs site traffic. A quiet site may run them late.
 
 == External services ==
@@ -73,7 +72,7 @@ Off by default. On WordPress 6.9 or newer, with the official MCP Adapter plugin 
 The plugin contacts these services only for the features listed below. It never sends file contents, passwords, or personal data, and AmazingPlugins doesn't receive any of it.
 
 **WordPress.org (api.wordpress.org, downloads.wordpress.org)**
-Used by the integrity scan, which runs when you press Scan and then once a day on WP-Cron. It sends the WordPress version and locale and the installed plugin and theme slugs and versions, then downloads published checksums and theme release ZIPs. A file repair downloads that plugin's release ZIP. The Directory status screen also asks api.wordpress.org/plugins/info about installed plugin slugs when you click to look them up.
+Used by the integrity scan, which runs when you press Scan and then once a day on WP-Cron. It sends the WordPress version and locale and the installed plugin and theme slugs and versions, then downloads published checksums and theme release ZIPs. The Directory status screen also asks api.wordpress.org/plugins/info about installed plugin slugs when you click to look them up.
 [Terms](https://wordpress.org/about/domains/) · [Privacy policy](https://wordpress.org/about/privacy/)
 
 **WPVulnerability (www.wpvulnerability.net)**
@@ -93,8 +92,8 @@ Each scan requests your own homepage once to read its response headers, the same
 
 == Installation ==
 
-1. In wp-admin, go to Plugins, Add New, Upload Plugin, and upload the ZIP. Or search for "Amazing Security".
-2. Activate the plugin and open **Amazing Security** in the admin menu.
+1. In wp-admin, go to Plugins, Add New, Upload Plugin, and upload the ZIP. Or search for "AmazingPlugins Security Scanner".
+2. Activate the plugin and open **Security Scanner** in the admin menu.
 3. Press **Scan**. Then go through Recommendations to choose which protections to turn on.
 
 == Frequently Asked Questions ==
@@ -109,7 +108,7 @@ Local checks stay on your server. See External services for the few lookups that
 
 = What happens when I delete the plugin? =
 
-By default, your settings are kept in case you reinstall. To remove everything, tick **Erase all Amazing Security settings, logs and scan results when the plugin is deleted** under Log In & Register before you delete the plugin. Repair backups stored outside the site folder are not removed.
+By default, your settings are kept in case you reinstall. To remove everything, tick **Erase all AmazingPlugins Security Scanner settings, logs and scan results when the plugin is deleted** under Log In & Register before you delete the plugin.
 
 = I'm locked out. What do I do? =
 
@@ -121,6 +120,11 @@ Run `wp amazing-security login disable` on the server. Other controls have their
 * Vulnerability data from WPVulnerability, credited to its original sources.
 
 == Changelog ==
+
+= 0.1.2 =
+* Renamed to AmazingPlugins Security Scanner (slug amazingplugins-security-scanner).
+* Removed the file repair and recovery tools that replaced, moved or chmodded site files. Scans still report changed files.
+* Theme release ZIPs are now downloaded with WordPress's download_url().
 
 = 0.1.1 =
 * Removed the unused passkey code and the bundled WebAuthn library. Passkey status for other plugins is still reported.

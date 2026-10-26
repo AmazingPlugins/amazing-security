@@ -50,14 +50,14 @@ final class PackageUpdateCheck implements SecurityCheck {
 		$plugins = 'plugin-updates' === $this->checkId;
 		$summary = match ( $state ) {
 			'warn' => $plugins
-				? __( 'Plugin updates are waiting. Open Dashboard, then Updates. This check does not install them and does not contact WordPress.org.', 'amazing-security' )
-				: __( 'Theme updates are waiting. Open Dashboard, then Updates. This check does not install them and does not contact WordPress.org.', 'amazing-security' ),
+				? __( 'Plugin updates are waiting. Open Dashboard, then Updates. This check does not install them and does not contact WordPress.org.', 'amazingplugins-security-scanner' )
+				: __( 'Theme updates are waiting. Open Dashboard, then Updates. This check does not install them and does not contact WordPress.org.', 'amazingplugins-security-scanner' ),
 			'pass' => $plugins
-				? __( 'WordPress does not report a plugin update waiting. This check does not install updates and does not contact WordPress.org.', 'amazing-security' )
-				: __( 'WordPress does not report a theme update waiting. This check does not install updates and does not contact WordPress.org.', 'amazing-security' ),
+				? __( 'WordPress does not report a plugin update waiting. This check does not install updates and does not contact WordPress.org.', 'amazingplugins-security-scanner' )
+				: __( 'WordPress does not report a theme update waiting. This check does not install updates and does not contact WordPress.org.', 'amazingplugins-security-scanner' ),
 			default => $plugins
-				? __( 'Plugin update status could not be read. This check does not install updates and does not contact WordPress.org.', 'amazing-security' )
-				: __( 'Theme update status could not be read. This check does not install updates and does not contact WordPress.org.', 'amazing-security' ),
+				? __( 'Plugin update status could not be read. This check does not install updates and does not contact WordPress.org.', 'amazingplugins-security-scanner' )
+				: __( 'Theme update status could not be read. This check does not install updates and does not contact WordPress.org.', 'amazingplugins-security-scanner' ),
 		};
 		return array(
 			new CheckResult( $this->id(), 'warn' === $state ? State::WARN : ( 'pass' === $state ? State::PASS : State::UNKNOWN ), $summary, self::SOURCE, new DateTimeImmutable( 'now', new DateTimeZone( 'UTC' ) ), 'unknown' === $state ? 'low' : 'medium', 'unknown' === $state ? 'unavailable' : 'complete', array( 'kind' => $kind ) ),

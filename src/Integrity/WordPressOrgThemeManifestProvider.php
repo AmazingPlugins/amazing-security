@@ -7,7 +7,18 @@ namespace AmazingPlugins\Security\Integrity;
 defined( 'ABSPATH' ) || exit;
 
 final class WordPressOrgThemeManifestProvider implements ThemeManifestProvider {
-	public function __construct( private readonly HttpClient $client, private readonly ThemeArchiveParser $parser ) {}
+	/** @var \Closure(string): ?string Downloads a URL to a temp file and returns its path. */
+	private readonly \Closure $download;
+
+	public function __construct( private readonly ThemeArchiveParser $parser, ?\Closure $download = null ) {
+		$this->download = $download ?? static function ( string $url ): ?string {
+			if ( ! function_exists( 'download_url' ) ) {
+				require_once ABSPATH . 'wp-admin/includes/file.php';
+			}
+			$path = download_url( $url, 30 );
+			return is_string( $path ) ? $path : null;
+		};
+	}
 
 	public function theme( string $slug, string $version ): ManifestResult {
 		if ( ! preg_match( '/^[a-z0-9]+(?:-[a-z0-9]+)*$/D', $slug ) || ! preg_match( '/^[0-9]+(?:\.[0-9A-Za-z-]+)*$/D', $version ) ) {
@@ -21,11 +32,15 @@ final class WordPressOrgThemeManifestProvider implements ThemeManifestProvider {
 				return new ManifestResult( $cached );
 			}
 		}
-		$response = $this->client->get( $url, 16777216 );
-		if ( 200 !== $response->status ) {
+		$path = ( $this->download )( $url );
+		if ( null === $path ) {
 			return new ManifestResult( null, 'unavailable' );
 		}
-		$result = $this->parser->parse( $slug, $version, $response->body, $url );
+		try {
+			$result = $this->parser->parse( $slug, $version, $path, $url );
+		} finally {
+			wp_delete_file( $path );
+		}
 		if ( null !== $result->manifest && function_exists( 'set_transient' ) ) {
 			set_transient( $key, $result->manifest, DAY_IN_SECONDS );
 		}

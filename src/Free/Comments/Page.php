@@ -11,8 +11,8 @@ final class Page {
 	public static function menu(): void {
 		add_submenu_page(
 			'amazing-security',
-			__( 'Comment checks', 'amazing-security' ),
-			__( 'Comment checks', 'amazing-security' ),
+			__( 'Comment checks', 'amazingplugins-security-scanner' ),
+			__( 'Comment checks', 'amazingplugins-security-scanner' ),
 			'manage_options',
 			'amsec-comments',
 			array( self::class, 'render' )
@@ -21,37 +21,37 @@ final class Page {
 
 	public static function render(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'Administrator access required.', 'amazing-security' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'Administrator access required.', 'amazingplugins-security-scanner' ), '', array( 'response' => 403 ) );
 		}
 		$enabled = self::stored();
 		$on      = '1' === $enabled;
 		echo '<div class="wrap amazing-security-admin amsec-brief">';
-		echo '<h1>' . esc_html__( 'Comment checks', 'amazing-security' ) . '</h1>';
-		echo '<p class="amsec-brief-status"><span class="amsec-pill' . ( $on ? ' is-on' : ' is-off' ) . '">' . esc_html( $on ? __( 'On', 'amazing-security' ) : __( 'Off', 'amazing-security' ) ) . '</span>';
+		echo '<h1>' . esc_html__( 'Comment checks', 'amazingplugins-security-scanner' ) . '</h1>';
+		echo '<p class="amsec-brief-status"><span class="amsec-pill' . ( $on ? ' is-on' : ' is-off' ) . '">' . esc_html( $on ? __( 'On', 'amazingplugins-security-scanner' ) : __( 'Off', 'amazingplugins-security-scanner' ) ) . '</span>';
 		echo esc_html( self::status( $enabled ) ) . '</p>';
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
 		echo '<input type="hidden" name="action" value="amsec_comments_save">';
 		wp_nonce_field( 'amsec_comments_save' );
 		echo '<p class="amsec-check"><label><input type="checkbox" name="' . esc_attr( Decision::OPTION ) . '" value="1"' . checked( '1', $enabled, false ) . '> ';
-		echo esc_html__( 'Add an extra field to the comment form', 'amazing-security' );
+		echo esc_html__( 'Add an extra field to the comment form', 'amazingplugins-security-scanner' );
 		echo '</label> ';
-		self::tip( __( 'The field is named Company and sits off screen. Leave it empty. A filled field refuses the comment. Nothing is sent to another host.', 'amazing-security' ) );
+		self::tip( __( 'The field is named Company and sits off screen. Leave it empty. A filled field refuses the comment. Nothing is sent to another host.', 'amazingplugins-security-scanner' ) );
 		echo '</p>';
 		echo '<p class="amsec-check"><label><input type="checkbox" name="' . esc_attr( Rate::OPTION ) . '" value="1"' . checked( '1', self::rateStored(), false ) . '> ';
-		echo esc_html__( 'Wait one minute between comments from the same account or email', 'amazing-security' );
+		echo esc_html__( 'Wait one minute between comments from the same account or email', 'amazingplugins-security-scanner' );
 		echo '</label> ';
-		self::tip( __( 'Administrators are not limited.', 'amazing-security' ) );
+		self::tip( __( 'Administrators are not limited.', 'amazingplugins-security-scanner' ) );
 		echo '</p>';
 		echo '<p class="amsec-check"><label><input type="checkbox" name="' . esc_attr( SpamHold::OPTION ) . '" value="1"' . checked( '1', self::holdStored(), false ) . '> ';
-		echo esc_html__( 'Hold later comments from an email you marked as spam', 'amazing-security' );
+		echo esc_html__( 'Hold later comments from an email you marked as spam', 'amazingplugins-security-scanner' );
 		echo '</label> ';
-		self::tip( __( 'The site stores a hash of that email, not the address.', 'amazing-security' ) );
+		self::tip( __( 'The site stores a hash of that email, not the address.', 'amazingplugins-security-scanner' ) );
 		echo '</p>';
-		submit_button( __( 'Save comment checks', 'amazing-security' ) );
+		submit_button( __( 'Save comment checks', 'amazingplugins-security-scanner' ) );
 		echo '</form>';
-		echo '<details class="amsec-more"><summary>' . esc_html__( 'See more', 'amazing-security' ) . '</summary>';
-		echo '<p>' . esc_html__( 'These start off. The extra field is for the WordPress comment form. A person leaves it empty. A filled field refuses the comment, and nothing is sent to another host.', 'amazing-security' ) . '</p>';
-		echo '<p>' . esc_html__( 'The minute switch allows one comment per minute from the same account or email. Administrators are not limited. The hold switch keeps later comments from an email after you mark one as spam, and it stores a hash of that email.', 'amazing-security' ) . '</p>';
+		echo '<details class="amsec-more"><summary>' . esc_html__( 'See more', 'amazingplugins-security-scanner' ) . '</summary>';
+		echo '<p>' . esc_html__( 'These start off. The extra field is for the WordPress comment form. A person leaves it empty. A filled field refuses the comment, and nothing is sent to another host.', 'amazingplugins-security-scanner' ) . '</p>';
+		echo '<p>' . esc_html__( 'The minute switch allows one comment per minute from the same account or email. Administrators are not limited. The hold switch keeps later comments from an email after you mark one as spam, and it stores a hash of that email.', 'amazingplugins-security-scanner' ) . '</p>';
 		echo '</details></div>';
 	}
 
@@ -59,7 +59,7 @@ final class Page {
 		static $n = 0;
 		++$n;
 		$id = 'amsec-comment-tip-' . $n;
-		echo '<span class="amsec-tip"><button type="button" class="amsec-tip-button" aria-describedby="' . esc_attr( $id ) . '">' . esc_html__( 'Details', 'amazing-security' ) . '</button>';
+		echo '<span class="amsec-tip"><button type="button" class="amsec-tip-button" aria-describedby="' . esc_attr( $id ) . '">' . esc_html__( 'Details', 'amazingplugins-security-scanner' ) . '</button>';
 		echo '<span class="amsec-tip-bubble" id="' . esc_attr( $id ) . '" role="tooltip">' . esc_html( $text ) . '</span></span>';
 	}
 
@@ -74,17 +74,17 @@ final class Page {
 
 	public static function status( string $flag ): string {
 		if ( '1' === $flag ) {
-			return __( 'Comment checks are on.', 'amazing-security' );
+			return __( 'Comment checks are on.', 'amazingplugins-security-scanner' );
 		}
-		return __( 'Comment checks are off.', 'amazing-security' );
+		return __( 'Comment checks are off.', 'amazingplugins-security-scanner' );
 	}
 
 	private static function guard(): void {
 		if ( ! self::postRequest() ) {
-			wp_die( esc_html__( 'Open the comment checks page and use the form.', 'amazing-security' ), '', array( 'response' => 405 ) );
+			wp_die( esc_html__( 'Open the comment checks page and use the form.', 'amazingplugins-security-scanner' ), '', array( 'response' => 405 ) );
 		}
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'Administrator access required.', 'amazing-security' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'Administrator access required.', 'amazingplugins-security-scanner' ), '', array( 'response' => 403 ) );
 		}
 		check_admin_referer( 'amsec_comments_save' );
 	}

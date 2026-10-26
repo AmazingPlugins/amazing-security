@@ -30,7 +30,7 @@ final class SessionDetail {
 				return $name;
 			}
 		}
-		return '' === $agent ? '' : __( 'Unknown browser', 'amazing-security' );
+		return '' === $agent ? '' : __( 'Unknown browser', 'amazingplugins-security-scanner' );
 	}
 
 	public static function computer( string $agent ): string {
@@ -49,9 +49,9 @@ final class SessionDetail {
 			}
 		}
 		if ( str_contains( $agent, 'curl/' ) || str_contains( $agent, 'Wget/' ) || str_contains( $agent, 'WP-CLI' ) || str_contains( $agent, 'python-requests' ) || str_contains( $agent, 'Go-http-client' ) ) {
-			return __( 'Command line', 'amazing-security' );
+			return __( 'Command line', 'amazingplugins-security-scanner' );
 		}
-		return '' === $agent ? '' : __( 'Unknown computer', 'amazing-security' );
+		return '' === $agent ? '' : __( 'Unknown computer', 'amazingplugins-security-scanner' );
 	}
 
 	public static function icon( string $computer ): string {
@@ -59,7 +59,7 @@ final class SessionDetail {
 			'iPhone'                                 => 'dashicons-smartphone',
 			'Android'                                => 'dashicons-smartphone',
 			'iPad'                                   => 'dashicons-tablet',
-			__( 'Command line', 'amazing-security' ) => 'dashicons-editor-code',
+			__( 'Command line', 'amazingplugins-security-scanner' ) => 'dashicons-editor-code',
 		);
 		return $icons[ $computer ] ?? 'dashicons-desktop';
 	}
@@ -73,8 +73,8 @@ final class SessionDetail {
 			return $ip;
 		}
 		if ( '::1' === $ip || str_starts_with( $ip, '127.' ) ) {
-			return __( 'This computer', 'amazing-security' );
+			return __( 'This computer', 'amazingplugins-security-scanner' );
 		}
-		return __( 'This network', 'amazing-security' );
+		return __( 'This network', 'amazingplugins-security-scanner' );
 	}
 }

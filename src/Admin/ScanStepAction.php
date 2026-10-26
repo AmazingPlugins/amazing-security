@@ -29,78 +29,78 @@ final class ScanStepAction {
 	/** @return array<string, string> */
 	public static function labels(): array {
 		return array(
-			'https-admin'            => __( 'Admin pages use HTTPS', 'amazing-security' ),
-			'core-updates'           => __( 'Update settings', 'amazing-security' ),
-			'default-admin-login'    => __( 'Administrator accounts', 'amazing-security' ),
-			'debug-display'          => __( 'Errors shown to visitors', 'amazing-security' ),
-			'file-editor'            => __( 'Built-in file editor', 'amazing-security' ),
-			'login-rate-mode'        => __( 'Sign-in attempt limits', 'amazing-security' ),
-			'filesystem-permissions' => __( 'Folder permissions', 'amazing-security' ),
-			'file-modes'             => __( 'File modes on key files', 'amazing-security' ),
-			'uploads-php-execution'  => __( 'PHP running in uploads', 'amazing-security' ),
-			'pingbacks'              => __( 'Pingbacks', 'amazing-security' ),
-			'xmlrpc-auth'            => __( 'XML-RPC sign-in', 'amazing-security' ),
-			'authenticator-app'      => __( 'Authenticator app sign-in', 'amazing-security' ),
-			'passkeys-status'        => __( 'Passkeys', 'amazing-security' ),
-			'captcha-login'          => __( 'Login bot trap', 'amazing-security' ),
-			'compromised-passwords'  => __( 'Breached password check', 'amazing-security' ),
-			'login-hints'            => __( 'Sign-in error hints', 'amazing-security' ),
-			'author-archives'        => __( 'Author archive pages', 'amazing-security' ),
-			'rest-user-list'         => __( 'Public REST user list', 'amazing-security' ),
-			'version-tag'            => __( 'WordPress version tag', 'amazing-security' ),
-			'discovery-links'        => __( 'Discovery links in the page head', 'amazing-security' ),
-			'readme-file'            => __( 'readme.html', 'amazing-security' ),
-			'license-file'           => __( 'license.txt', 'amazing-security' ),
-			'debug-log'              => __( 'debug.log', 'amazing-security' ),
-			'sample-config'          => __( 'wp-config-sample.php', 'amazing-security' ),
-			'error-log'              => __( 'error_log files', 'amazing-security' ),
-			'config-backup'          => __( 'Backup copies of wp-config.php', 'amazing-security' ),
-			'php-version'            => __( 'PHP version', 'amazing-security' ),
-			'background-updates'     => __( 'Background updates', 'amazing-security' ),
-			'plugin-updates'         => __( 'Plugin updates', 'amazing-security' ),
-			'theme-updates'          => __( 'Theme updates', 'amazing-security' ),
-			'inactive-plugins'       => __( 'Inactive plugins', 'amazing-security' ),
-			'inactive-themes'        => __( 'Inactive themes', 'amazing-security' ),
-			'uploads-php-files'      => __( 'PHP files in uploads', 'amazing-security' ),
-			'root-exposure'          => __( 'Files exposed in the site root', 'amazing-security' ),
-			'bot-controls'           => __( 'Bot protection mode', 'amazing-security' ),
-			'rest-rates'             => __( 'REST rate limits', 'amazing-security' ),
-			'rest-request-watch'     => __( 'REST request watch', 'amazing-security' ),
-			'finding-emails'         => __( 'Finding emails', 'amazing-security' ),
-			'weekly-digest'          => __( 'Weekly digest', 'amazing-security' ),
-			'traffic-history'        => __( 'Traffic history', 'amazing-security' ),
-			'network-controls'       => __( 'Network controls', 'amazing-security' ),
-			'trusted-proxies'        => __( 'Trusted proxies', 'amazing-security' ),
-			'security-activity'      => __( 'Security activity log', 'amazing-security' ),
-			'account-sessions'       => __( 'Account sessions', 'amazing-security' ),
-			'code-baselines'         => __( 'Code baselines', 'amazing-security' ),
-			'daily-checks'           => __( 'Daily checks', 'amazing-security' ),
-			'daily-file-checks'      => __( 'Daily file checks', 'amazing-security' ),
-			'rule-review'            => __( 'Rule review', 'amazing-security' ),
-			'ai-readers'             => __( 'AI crawler access', 'amazing-security' ),
-			'ai-readiness'           => __( 'AI readiness', 'amazing-security' ),
-			'known-holes'            => __( 'Known security holes', 'amazing-security' ),
-			'release-files'          => __( 'Release file integrity', 'amazing-security' ),
-			'closed-plugins'         => __( 'Closed plugins', 'amazing-security' ),
-			'public-content'         => __( 'Public content', 'amazing-security' ),
-			'local-code'             => __( 'Local plugin code', 'amazing-security' ),
-			'suspicious-files'       => __( 'Suspicious files', 'amazing-security' ),
-			'local-inventory'        => __( 'Local file inventory', 'amazing-security' ),
-			'security-headers'       => __( 'Security headers follow-up', 'amazing-security' ),
+			'https-admin'            => __( 'Admin pages use HTTPS', 'amazingplugins-security-scanner' ),
+			'core-updates'           => __( 'Update settings', 'amazingplugins-security-scanner' ),
+			'default-admin-login'    => __( 'Administrator accounts', 'amazingplugins-security-scanner' ),
+			'debug-display'          => __( 'Errors shown to visitors', 'amazingplugins-security-scanner' ),
+			'file-editor'            => __( 'Built-in file editor', 'amazingplugins-security-scanner' ),
+			'login-rate-mode'        => __( 'Sign-in attempt limits', 'amazingplugins-security-scanner' ),
+			'filesystem-permissions' => __( 'Folder permissions', 'amazingplugins-security-scanner' ),
+			'file-modes'             => __( 'File modes on key files', 'amazingplugins-security-scanner' ),
+			'uploads-php-execution'  => __( 'PHP running in uploads', 'amazingplugins-security-scanner' ),
+			'pingbacks'              => __( 'Pingbacks', 'amazingplugins-security-scanner' ),
+			'xmlrpc-auth'            => __( 'XML-RPC sign-in', 'amazingplugins-security-scanner' ),
+			'authenticator-app'      => __( 'Authenticator app sign-in', 'amazingplugins-security-scanner' ),
+			'passkeys-status'        => __( 'Passkeys', 'amazingplugins-security-scanner' ),
+			'captcha-login'          => __( 'Login bot trap', 'amazingplugins-security-scanner' ),
+			'compromised-passwords'  => __( 'Breached password check', 'amazingplugins-security-scanner' ),
+			'login-hints'            => __( 'Sign-in error hints', 'amazingplugins-security-scanner' ),
+			'author-archives'        => __( 'Author archive pages', 'amazingplugins-security-scanner' ),
+			'rest-user-list'         => __( 'Public REST user list', 'amazingplugins-security-scanner' ),
+			'version-tag'            => __( 'WordPress version tag', 'amazingplugins-security-scanner' ),
+			'discovery-links'        => __( 'Discovery links in the page head', 'amazingplugins-security-scanner' ),
+			'readme-file'            => __( 'readme.html', 'amazingplugins-security-scanner' ),
+			'license-file'           => __( 'license.txt', 'amazingplugins-security-scanner' ),
+			'debug-log'              => __( 'debug.log', 'amazingplugins-security-scanner' ),
+			'sample-config'          => __( 'wp-config-sample.php', 'amazingplugins-security-scanner' ),
+			'error-log'              => __( 'error_log files', 'amazingplugins-security-scanner' ),
+			'config-backup'          => __( 'Backup copies of wp-config.php', 'amazingplugins-security-scanner' ),
+			'php-version'            => __( 'PHP version', 'amazingplugins-security-scanner' ),
+			'background-updates'     => __( 'Background updates', 'amazingplugins-security-scanner' ),
+			'plugin-updates'         => __( 'Plugin updates', 'amazingplugins-security-scanner' ),
+			'theme-updates'          => __( 'Theme updates', 'amazingplugins-security-scanner' ),
+			'inactive-plugins'       => __( 'Inactive plugins', 'amazingplugins-security-scanner' ),
+			'inactive-themes'        => __( 'Inactive themes', 'amazingplugins-security-scanner' ),
+			'uploads-php-files'      => __( 'PHP files in uploads', 'amazingplugins-security-scanner' ),
+			'root-exposure'          => __( 'Files exposed in the site root', 'amazingplugins-security-scanner' ),
+			'bot-controls'           => __( 'Bot protection mode', 'amazingplugins-security-scanner' ),
+			'rest-rates'             => __( 'REST rate limits', 'amazingplugins-security-scanner' ),
+			'rest-request-watch'     => __( 'REST request watch', 'amazingplugins-security-scanner' ),
+			'finding-emails'         => __( 'Finding emails', 'amazingplugins-security-scanner' ),
+			'weekly-digest'          => __( 'Weekly digest', 'amazingplugins-security-scanner' ),
+			'traffic-history'        => __( 'Traffic history', 'amazingplugins-security-scanner' ),
+			'network-controls'       => __( 'Network controls', 'amazingplugins-security-scanner' ),
+			'trusted-proxies'        => __( 'Trusted proxies', 'amazingplugins-security-scanner' ),
+			'security-activity'      => __( 'Security activity log', 'amazingplugins-security-scanner' ),
+			'account-sessions'       => __( 'Account sessions', 'amazingplugins-security-scanner' ),
+			'code-baselines'         => __( 'Code baselines', 'amazingplugins-security-scanner' ),
+			'daily-checks'           => __( 'Daily checks', 'amazingplugins-security-scanner' ),
+			'daily-file-checks'      => __( 'Daily file checks', 'amazingplugins-security-scanner' ),
+			'rule-review'            => __( 'Rule review', 'amazingplugins-security-scanner' ),
+			'ai-readers'             => __( 'AI crawler access', 'amazingplugins-security-scanner' ),
+			'ai-readiness'           => __( 'AI readiness', 'amazingplugins-security-scanner' ),
+			'known-holes'            => __( 'Known security holes', 'amazingplugins-security-scanner' ),
+			'release-files'          => __( 'Release file integrity', 'amazingplugins-security-scanner' ),
+			'closed-plugins'         => __( 'Closed plugins', 'amazingplugins-security-scanner' ),
+			'public-content'         => __( 'Public content', 'amazingplugins-security-scanner' ),
+			'local-code'             => __( 'Local plugin code', 'amazingplugins-security-scanner' ),
+			'suspicious-files'       => __( 'Suspicious files', 'amazingplugins-security-scanner' ),
+			'local-inventory'        => __( 'Local file inventory', 'amazingplugins-security-scanner' ),
+			'security-headers'       => __( 'Security headers follow-up', 'amazingplugins-security-scanner' ),
 		);
 	}
 
 	/** @return array<string, array{0: string, 1: list<string>}> Scan categories in run order. File passes run before the checks that read them, and the header request before its follow-up. */
 	private static function groups(): array {
 		return array(
-			'code'     => array( __( 'Malware and code', 'amazing-security' ), array( 'file-code', 'file-inventory', 'file-content', 'local-code', 'suspicious-files', 'local-inventory', 'release-files', 'public-content' ) ),
-			'files'    => array( __( 'Files and folders', 'amazing-security' ), array( 'filesystem-permissions', 'file-modes', 'uploads-php-execution', 'uploads-php-files', 'root-exposure', 'readme-file', 'license-file', 'debug-log', 'sample-config', 'error-log', 'config-backup' ) ),
-			'sign-in'  => array( __( 'Sign-in and accounts', 'amazing-security' ), array( 'https-admin', 'default-admin-login', 'login-rate-mode', 'xmlrpc-auth', 'authenticator-app', 'passkeys-status', 'captcha-login', 'compromised-passwords', 'login-hints', 'account-sessions' ) ),
-			'updates'  => array( __( 'Updates and versions', 'amazing-security' ), array( 'core-updates', 'php-version', 'background-updates', 'plugin-updates', 'theme-updates', 'inactive-plugins', 'inactive-themes', 'known-holes', 'closed-plugins' ) ),
-			'settings' => array( __( 'Site settings', 'amazing-security' ), array( 'debug-display', 'file-editor', 'pingbacks', 'author-archives', 'rest-user-list', 'version-tag', 'discovery-links' ) ),
-			'traffic'  => array( __( 'Bots and traffic', 'amazing-security' ), array( 'bot-controls', 'rest-rates', 'rest-request-watch', 'network-controls', 'trusted-proxies', 'traffic-history', 'header-request', 'security-headers' ) ),
-			'watch'    => array( __( 'Monitoring and alerts', 'amazing-security' ), array( 'finding-emails', 'weekly-digest', 'security-activity', 'code-baselines', 'daily-checks', 'daily-file-checks', 'rule-review' ) ),
-			'ai'       => array( __( 'AI', 'amazing-security' ), array( 'ai-readers', 'ai-readiness' ) ),
+			'code'     => array( __( 'Malware and code', 'amazingplugins-security-scanner' ), array( 'file-code', 'file-inventory', 'file-content', 'local-code', 'suspicious-files', 'local-inventory', 'release-files', 'public-content' ) ),
+			'files'    => array( __( 'Files and folders', 'amazingplugins-security-scanner' ), array( 'filesystem-permissions', 'file-modes', 'uploads-php-execution', 'uploads-php-files', 'root-exposure', 'readme-file', 'license-file', 'debug-log', 'sample-config', 'error-log', 'config-backup' ) ),
+			'sign-in'  => array( __( 'Sign-in and accounts', 'amazingplugins-security-scanner' ), array( 'https-admin', 'default-admin-login', 'login-rate-mode', 'xmlrpc-auth', 'authenticator-app', 'passkeys-status', 'captcha-login', 'compromised-passwords', 'login-hints', 'account-sessions' ) ),
+			'updates'  => array( __( 'Updates and versions', 'amazingplugins-security-scanner' ), array( 'core-updates', 'php-version', 'background-updates', 'plugin-updates', 'theme-updates', 'inactive-plugins', 'inactive-themes', 'known-holes', 'closed-plugins' ) ),
+			'settings' => array( __( 'Site settings', 'amazingplugins-security-scanner' ), array( 'debug-display', 'file-editor', 'pingbacks', 'author-archives', 'rest-user-list', 'version-tag', 'discovery-links' ) ),
+			'traffic'  => array( __( 'Bots and traffic', 'amazingplugins-security-scanner' ), array( 'bot-controls', 'rest-rates', 'rest-request-watch', 'network-controls', 'trusted-proxies', 'traffic-history', 'header-request', 'security-headers' ) ),
+			'watch'    => array( __( 'Monitoring and alerts', 'amazingplugins-security-scanner' ), array( 'finding-emails', 'weekly-digest', 'security-activity', 'code-baselines', 'daily-checks', 'daily-file-checks', 'rule-review' ) ),
+			'ai'       => array( __( 'AI', 'amazingplugins-security-scanner' ), array( 'ai-readers', 'ai-readiness' ) ),
 		);
 	}
 
@@ -127,7 +127,7 @@ final class ScanStepAction {
 		}
 		$other = array_values( array_diff( array_keys( $checks ), $placed ) );
 		if ( array() !== $other ) {
-			$plan[] = array( __( 'Other', 'amazing-security' ), $other );
+			$plan[] = array( __( 'Other', 'amazingplugins-security-scanner' ), $other );
 		}
 		return $plan;
 	}
@@ -166,11 +166,11 @@ final class ScanStepAction {
 				15 * MINUTE_IN_SECONDS
 			);
 			$labels = self::labels() + array(
-				'file-code'      => __( 'Malware scan: next batch of files', 'amazing-security' ),
-				'file-inventory' => __( 'Listing files in the site folders', 'amazing-security' ),
-				'file-content'   => __( 'Posts and comments: checking links', 'amazing-security' ),
-				'header-request' => __( 'Homepage response headers', 'amazing-security' ),
-				'save'           => __( 'Saving the results', 'amazing-security' ),
+				'file-code'      => __( 'Malware scan: next batch of files', 'amazingplugins-security-scanner' ),
+				'file-inventory' => __( 'Listing files in the site folders', 'amazingplugins-security-scanner' ),
+				'file-content'   => __( 'Posts and comments: checking links', 'amazingplugins-security-scanner' ),
+				'header-request' => __( 'Homepage response headers', 'amazingplugins-security-scanner' ),
+				'save'           => __( 'Saving the results', 'amazingplugins-security-scanner' ),
 			);
 			$groups = array();
 			foreach ( self::plan() as $group ) {
@@ -206,14 +206,14 @@ final class ScanStepAction {
 			$cursor = LocalCodeScan::cursor();
 			if ( null !== $cursor ) {
 				/* translators: %s: number of files. */
-				$note = sprintf( _n( '%s file checked so far', '%s files checked so far', $cursor->processed, 'amazing-security' ), number_format_i18n( $cursor->processed ) );
+				$note = sprintf( _n( '%s file checked so far', '%s files checked so far', $cursor->processed, 'amazingplugins-security-scanner' ), number_format_i18n( $cursor->processed ) );
 			}
 		} elseif ( 'header-request' === $id ) {
 			try {
 				$headers = ( new WordPressHeaderService() )->create();
 				$headers->check( $headers->fingerprint(), time() );
 			} catch ( Throwable ) {
-				$note = __( 'The homepage could not be read', 'amazing-security' );
+				$note = __( 'The homepage could not be read', 'amazingplugins-security-scanner' );
 			}
 		} elseif ( 'save' === $id ) {
 			delete_transient( $key );

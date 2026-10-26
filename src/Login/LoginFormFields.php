@@ -12,6 +12,6 @@ final class LoginFormFields {
 	}
 
 	public function step(): void {
-		echo '<p class="amsec-login-factor"><label for="amsec-otp">' . esc_html__( 'Verification or recovery code', 'amazing-security' ) . '</label><input class="input" type="text" id="amsec-otp" name="amsec_otp" inputmode="numeric" autocomplete="one-time-code" maxlength="24"></p>';
+		echo '<p class="amsec-login-factor"><label for="amsec-otp">' . esc_html__( 'Verification or recovery code', 'amazingplugins-security-scanner' ) . '</label><input class="input" type="text" id="amsec-otp" name="amsec_otp" inputmode="numeric" autocomplete="one-time-code" maxlength="24"></p>';
 	}
 }

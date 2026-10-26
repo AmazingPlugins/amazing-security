@@ -97,7 +97,7 @@ final class FileScanAction {
 
 	private function authorize( string $nonceAction ): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'You are not allowed to run a file scan.', 'amazing-security' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'You are not allowed to run a file scan.', 'amazingplugins-security-scanner' ), '', array( 'response' => 403 ) );
 		}
 		check_admin_referer( $nonceAction );
 	}
@@ -114,7 +114,7 @@ final class FileScanAction {
 			$plugins          = $this->plugins();
 			$themes           = $this->themes();
 			$client           = new WordPressHttpClient();
-			$discovery        = ( new TargetDiscovery( new WordPressOrgManifestProvider( $client ), new WordPressOrgThemeManifestProvider( $client, new ThemeArchiveParser() ) ) )->discover( $this->coreVersion(), $this->coreLocale(), ABSPATH, $this->manifestPlugins( $plugins ), $themes );
+			$discovery        = ( new TargetDiscovery( new WordPressOrgManifestProvider( $client ), new WordPressOrgThemeManifestProvider( new ThemeArchiveParser() ) ) )->discover( $this->coreVersion(), $this->coreLocale(), ABSPATH, $this->manifestPlugins( $plugins ), $themes );
 			$cursor->elapsed += microtime( true ) - $started;
 			if ( $isStart ) {
 				$cursor->partial = $discovery->partial;

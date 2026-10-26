@@ -24,7 +24,7 @@
   },
   "scripts": {
     "test": "phpunit -c phpunit.xml.dist",
-    "cs": "phpcs --standard=phpcs.xml.dist src amazing-security.php"
+    "cs": "phpcs --standard=phpcs.xml.dist src amazingplugins-security-scanner.php"
   },
   "config": {
     "allow-plugins": {

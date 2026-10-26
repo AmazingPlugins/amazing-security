@@ -19,8 +19,8 @@ final class AccountPage {
 	public static function menu(): void {
 		add_submenu_page(
 			'amazing-security',
-			__( 'Log In & Register', 'amazing-security' ),
-			__( 'Log In & Register', 'amazing-security' ),
+			__( 'Log In & Register', 'amazingplugins-security-scanner' ),
+			__( 'Log In & Register', 'amazingplugins-security-scanner' ),
 			'manage_options',
 			'amsec-accounts',
 			array( self::class, 'render' )
@@ -29,7 +29,7 @@ final class AccountPage {
 
 	public static function render(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'Administrator access required.', 'amazing-security' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'Administrator access required.', 'amazingplugins-security-scanner' ), '', array( 'response' => 403 ) );
 		}
 		$idle      = IdleLogout::minutes( self::stored( IdleLogout::OPTION ) );
 		$approval  = Settings::flag( self::stored( RegistrationApproval::OPTION ) );
@@ -41,54 +41,54 @@ final class AccountPage {
 		echo '<div class="wrap amazing-security-admin">';
 		ScreenTabs::bar(
 			array(
-				'sign-in'        => __( 'Sign-in', 'amazing-security' ),
-				'password-rules' => __( 'Password rules', 'amazing-security' ),
-				'sessions'       => __( 'Sessions', 'amazing-security' ),
-				'sign-in-email'  => __( 'Sign-in email', 'amazing-security' ),
-				'verification'   => __( 'Verification', 'amazing-security' ),
-				'passkeys'       => __( 'Passkeys', 'amazing-security' ),
+				'sign-in'        => __( 'Sign-in', 'amazingplugins-security-scanner' ),
+				'password-rules' => __( 'Password rules', 'amazingplugins-security-scanner' ),
+				'sessions'       => __( 'Sessions', 'amazingplugins-security-scanner' ),
+				'sign-in-email'  => __( 'Sign-in email', 'amazingplugins-security-scanner' ),
+				'verification'   => __( 'Verification', 'amazingplugins-security-scanner' ),
+				'passkeys'       => __( 'Passkeys', 'amazingplugins-security-scanner' ),
 			)
 		);
 		ScreenTabs::panel( 'sign-in', true );
-		echo '<p>' . esc_html__( 'These stay off until you save them. Saving here does not mean the site is clean.', 'amazing-security' ) . '</p>';
+		echo '<p>' . esc_html__( 'These stay off until you save them. Saving here does not mean the site is clean.', 'amazingplugins-security-scanner' ) . '</p>';
 		echo '<form class="amsec-auth" method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
 		echo '<input type="hidden" name="action" value="amsec_accounts_save">';
 		wp_nonce_field( 'amsec_accounts_save' );
-		echo '<fieldset class="amsec-auth-group"><legend>' . esc_html__( 'Sign-in', 'amazing-security' ) . '</legend>';
-		echo '<div class="amsec-field"><label for="amsec-idle-minutes">' . esc_html__( 'Idle logout', 'amazing-security' ) . '</label>';
+		echo '<fieldset class="amsec-auth-group"><legend>' . esc_html__( 'Sign-in', 'amazingplugins-security-scanner' ) . '</legend>';
+		echo '<div class="amsec-field"><label for="amsec-idle-minutes">' . esc_html__( 'Idle logout', 'amazingplugins-security-scanner' ) . '</label>';
 		echo '<select id="amsec-idle-minutes" name="' . esc_attr( IdleLogout::OPTION ) . '">';
-		self::choice( '0', (string) $idle, __( 'Off', 'amazing-security' ) );
-		self::choice( '15', (string) $idle, __( '15 minutes', 'amazing-security' ) );
-		self::choice( '30', (string) $idle, __( '30 minutes', 'amazing-security' ) );
-		self::choice( '60', (string) $idle, __( '60 minutes', 'amazing-security' ) );
-		echo '</select><p>' . esc_html__( 'Signs someone out of wp-admin after this much quiet time.', 'amazing-security' ) . '</p></div>';
-		self::flagField( RegistrationApproval::OPTION, $approval, __( 'Hold new accounts until an administrator approves them', 'amazing-security' ) );
-		self::flagField( EmailFactor::OPTION, $email, __( 'Email a sign-in code when the account has no authenticator app', 'amazing-security' ) );
-		self::flagField( LoginChallenge::OPTION, $challenge, __( 'Ask for the sum of two numbers on the login form', 'amazing-security' ) );
-		echo '<p>' . esc_html__( 'When this is on, the WordPress login form and a WooCommerce login form ask the question. The answer stays on this site. An outside CAPTCHA service is not connected.', 'amazing-security' ) . '</p>';
+		self::choice( '0', (string) $idle, __( 'Off', 'amazingplugins-security-scanner' ) );
+		self::choice( '15', (string) $idle, __( '15 minutes', 'amazingplugins-security-scanner' ) );
+		self::choice( '30', (string) $idle, __( '30 minutes', 'amazingplugins-security-scanner' ) );
+		self::choice( '60', (string) $idle, __( '60 minutes', 'amazingplugins-security-scanner' ) );
+		echo '</select><p>' . esc_html__( 'Signs someone out of wp-admin after this much quiet time.', 'amazingplugins-security-scanner' ) . '</p></div>';
+		self::flagField( RegistrationApproval::OPTION, $approval, __( 'Hold new accounts until an administrator approves them', 'amazingplugins-security-scanner' ) );
+		self::flagField( EmailFactor::OPTION, $email, __( 'Email a sign-in code when the account has no authenticator app', 'amazingplugins-security-scanner' ) );
+		self::flagField( LoginChallenge::OPTION, $challenge, __( 'Ask for the sum of two numbers on the login form', 'amazingplugins-security-scanner' ) );
+		echo '<p>' . esc_html__( 'When this is on, the WordPress login form and a WooCommerce login form ask the question. The answer stays on this site. An outside CAPTCHA service is not connected.', 'amazingplugins-security-scanner' ) . '</p>';
 		echo '</fieldset>';
-		echo '<fieldset class="amsec-auth-group"><legend>' . esc_html__( 'Sign-in limits', 'amazing-security' ) . '</legend>';
-		echo '<div class="amsec-field"><label for="amsec-login-rate">' . esc_html__( 'Repeated sign-in tries', 'amazing-security' ) . '</label>';
+		echo '<fieldset class="amsec-auth-group"><legend>' . esc_html__( 'Sign-in limits', 'amazingplugins-security-scanner' ) . '</legend>';
+		echo '<div class="amsec-field"><label for="amsec-login-rate">' . esc_html__( 'Repeated sign-in tries', 'amazingplugins-security-scanner' ) . '</label>';
 		echo '<select id="amsec-login-rate" name="' . esc_attr( LoginExtras::RATE ) . '">';
-		self::choice( 'off', $rate, __( 'Off', 'amazing-security' ) );
-		self::choice( 'observe', $rate, __( 'Record only', 'amazing-security' ) );
-		self::choice( 'block', $rate, __( 'Limit repeats', 'amazing-security' ) );
-		echo '</select><p>' . esc_html__( 'Record only counts failed tries. Limit repeats pauses more tries for a while. A shared address can pause a real person too.', 'amazing-security' ) . '</p></div>';
-		echo '<div class="amsec-field"><label for="amsec-xmlrpc-auth">' . esc_html__( 'Password tries through xmlrpc.php', 'amazing-security' ) . '</label>';
+		self::choice( 'off', $rate, __( 'Off', 'amazingplugins-security-scanner' ) );
+		self::choice( 'observe', $rate, __( 'Record only', 'amazingplugins-security-scanner' ) );
+		self::choice( 'block', $rate, __( 'Limit repeats', 'amazingplugins-security-scanner' ) );
+		echo '</select><p>' . esc_html__( 'Record only counts failed tries. Limit repeats pauses more tries for a while. A shared address can pause a real person too.', 'amazingplugins-security-scanner' ) . '</p></div>';
+		echo '<div class="amsec-field"><label for="amsec-xmlrpc-auth">' . esc_html__( 'Password tries through xmlrpc.php', 'amazingplugins-security-scanner' ) . '</label>';
 		echo '<select id="amsec-xmlrpc-auth" name="' . esc_attr( LoginExtras::XMLRPC ) . '">';
-		self::choice( '0', $xmlrpc, __( 'Allowed', 'amazing-security' ) );
-		self::choice( '1', $xmlrpc, __( 'Turned off', 'amazing-security' ) );
-		echo '</select><p>' . esc_html__( 'Turned off stops password tries through xmlrpc.php. Pingbacks stay separate. Some apps still need this allowed.', 'amazing-security' ) . '</p></div>';
+		self::choice( '0', $xmlrpc, __( 'Allowed', 'amazingplugins-security-scanner' ) );
+		self::choice( '1', $xmlrpc, __( 'Turned off', 'amazingplugins-security-scanner' ) );
+		echo '</select><p>' . esc_html__( 'Turned off stops password tries through xmlrpc.php. Pingbacks stay separate. Some apps still need this allowed.', 'amazingplugins-security-scanner' ) . '</p></div>';
 		echo '</fieldset>';
-		echo '<fieldset class="amsec-auth-group"><legend>' . esc_html__( 'Uninstall', 'amazing-security' ) . '</legend>';
-		self::flagField( Settings::ERASE, $erase, __( 'Erase all Amazing Security settings, logs and scan results when the plugin is deleted', 'amazing-security' ) );
-		echo '<p>' . esc_html__( 'Leave this off to keep your settings if you reinstall later. Repair backups stored outside the site folder are not removed.', 'amazing-security' ) . '</p>';
+		echo '<fieldset class="amsec-auth-group"><legend>' . esc_html__( 'Uninstall', 'amazingplugins-security-scanner' ) . '</legend>';
+		self::flagField( Settings::ERASE, $erase, __( 'Erase all AmazingPlugins Security Scanner settings, logs and scan results when the plugin is deleted', 'amazingplugins-security-scanner' ) );
+		echo '<p>' . esc_html__( 'Leave this off to keep your settings if you reinstall later.', 'amazingplugins-security-scanner' ) . '</p>';
 		echo '</fieldset>';
-		submit_button( __( 'Save account protection', 'amazing-security' ) );
+		submit_button( __( 'Save account protection', 'amazingplugins-security-scanner' ) );
 		echo '</form>';
 		if ( '1' === $approval ) {
-			echo '<section class="amsec-auth-group"><h2>' . esc_html__( 'New accounts', 'amazing-security' ) . '</h2>';
-			echo '<p>' . esc_html__( 'These people registered and cannot sign in until you approve them.', 'amazing-security' ) . '</p>';
+			echo '<section class="amsec-auth-group"><h2>' . esc_html__( 'New accounts', 'amazingplugins-security-scanner' ) . '</h2>';
+			echo '<p>' . esc_html__( 'These people registered and cannot sign in until you approve them.', 'amazingplugins-security-scanner' ) . '</p>';
 			self::pendingList();
 			echo '</section>';
 		}
@@ -146,11 +146,11 @@ final class AccountPage {
 
 	public static function idleText( int $minutes ): string {
 		if ( ! in_array( $minutes, array( 15, 30, 60 ), true ) ) {
-			return __( 'Idle logout is off.', 'amazing-security' );
+			return __( 'Idle logout is off.', 'amazingplugins-security-scanner' );
 		}
 		return sprintf(
 			/* translators: %d: idle minutes */
-			__( 'Idle logout is on at %d minutes.', 'amazing-security' ),
+			__( 'Idle logout is on at %d minutes.', 'amazingplugins-security-scanner' ),
 			$minutes
 		);
 	}
@@ -174,7 +174,7 @@ final class AccountPage {
 			)
 		);
 		if ( ! is_array( $users ) || array() === $users ) {
-			echo '<p>' . esc_html__( 'No new accounts are waiting for you.', 'amazing-security' ) . '</p>';
+			echo '<p>' . esc_html__( 'No new accounts are waiting for you.', 'amazingplugins-security-scanner' ) . '</p>';
 			return;
 		}
 		echo '<ul>';
@@ -187,7 +187,7 @@ final class AccountPage {
 			echo '<input type="hidden" name="action" value="amsec_accounts_approve">';
 			echo '<input type="hidden" name="user_id" value="' . esc_attr( (string) $account->ID ) . '">';
 			wp_nonce_field( 'amsec_accounts_approve_' . $account->ID );
-			submit_button( __( 'Approve', 'amazing-security' ), 'secondary', 'submit', false );
+			submit_button( __( 'Approve', 'amazingplugins-security-scanner' ), 'secondary', 'submit', false );
 			echo '</form></li>';
 		}
 		echo '</ul>';
@@ -196,9 +196,8 @@ final class AccountPage {
 	private static function passkeys(): void {
 		$factor = AuthFactorDetector::fromWordPress()->passkeys( get_current_user_id() );
 		$url    = RequiredTotpPage::directoryUrl( (string) ( $factor['suggest_slug'] ?? 'two-factor' ) );
-		echo '<p>' . esc_html__( 'Amazing Security reports whether a passkey plugin is present. It does not enroll devices.', 'amazing-security' ) . '</p>';
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- AuthFactorPanel escapes output.
-		echo AuthFactorPanel::html( __( 'Passkeys', 'amazing-security' ), $factor, $url, 'passkeys' );
+		echo '<p>' . esc_html__( 'AmazingPlugins Security Scanner reports whether a passkey plugin is present. It does not enroll devices.', 'amazingplugins-security-scanner' ) . '</p>';
+		echo wp_kses( AuthFactorPanel::html( __( 'Passkeys', 'amazingplugins-security-scanner' ), $factor, $url, 'passkeys' ), \AmazingPlugins\Security\Admin\AdminHtml::allowed() );
 	}
 
 	private static function guard( string $nonce ): void {
@@ -208,10 +207,10 @@ final class AccountPage {
 
 	private static function requirePost(): void {
 		if ( ! self::postRequest() ) {
-			wp_die( esc_html__( 'Open the account protection page and use the form.', 'amazing-security' ), '', array( 'response' => 405 ) );
+			wp_die( esc_html__( 'Open the account protection page and use the form.', 'amazingplugins-security-scanner' ), '', array( 'response' => 405 ) );
 		}
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'Administrator access required.', 'amazing-security' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'Administrator access required.', 'amazingplugins-security-scanner' ), '', array( 'response' => 403 ) );
 		}
 	}
 

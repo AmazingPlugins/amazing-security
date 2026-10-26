@@ -32,8 +32,7 @@ final class ScreenTabs {
 	/** A screen embedded in a tab keeps one h1 per page: its own title becomes an h2. */
 	public static function close(): void {
 		$html = (string) ob_get_clean();
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Already-escaped panel markup; only the heading tag name changes.
-		echo preg_replace( '~<(/?)h1(?=[\s>])~i', '<$1h2', $html ) ?? $html;
+		echo wp_kses( preg_replace( '~<(/?)h1(?=[\s>])~i', '<$1h2', $html ) ?? $html, AdminHtml::allowed() );
 		echo '</div>';
 	}
 }

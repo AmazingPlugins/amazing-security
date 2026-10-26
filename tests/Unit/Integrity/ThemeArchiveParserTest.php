@@ -9,6 +9,8 @@ use PHPUnit\Framework\TestCase;
 use ZipArchive;
 
 final class ThemeArchiveParserTest extends TestCase {
+	private array $paths = array();
+
 	private function archive( array $entries, bool $symlink = false ): string {
 		$path = tempnam( sys_get_temp_dir(), 'amsec-zip-' );
 		$zip = new ZipArchive();
@@ -20,9 +22,16 @@ final class ThemeArchiveParserTest extends TestCase {
 			}
 		}
 		$zip->close();
-		$bytes = file_get_contents( $path );
-		unlink( $path );
-		return $bytes;
+		$this->paths[] = $path;
+		return $path;
+	}
+
+	protected function tearDown(): void {
+		foreach ( $this->paths as $path ) {
+			if ( is_file( $path ) ) {
+				unlink( $path );
+			}
+		}
 	}
 
 	public function test_exact_theme_archive_becomes_sha256_manifest(): void {
@@ -41,7 +50,10 @@ final class ThemeArchiveParserTest extends TestCase {
 	}
 
 	public function test_invalid_archive_returns_unknown_without_throwing(): void {
-		$result = ( new ThemeArchiveParser() )->parse( 'theme', '1.0', 'not a zip', 'https://downloads.wordpress.org/theme/theme.1.0.zip' );
+		$path = tempnam( sys_get_temp_dir(), 'amsec-bad-' );
+		file_put_contents( $path, 'not a zip' );
+		$this->paths[] = $path;
+		$result = ( new ThemeArchiveParser() )->parse( 'theme', '1.0', $path, 'https://downloads.wordpress.org/theme/theme.1.0.zip' );
 		self::assertNull( $result->manifest );
 		self::assertSame( 'invalid_archive', $result->reason );
 	}
@@ -65,8 +77,8 @@ final class ThemeArchiveParserTest extends TestCase {
 			$zip->addFromString( 'theme/file-' . $i . '.txt', '' );
 		}
 		$zip->close();
-		$bytes = file_get_contents( $path );
-		unlink( $path );
+		$this->paths[] = $path;
+		$bytes = $path;
 		self::assertNull( ( new ThemeArchiveParser() )->parse( 'theme', '1.0', $bytes, 'https://downloads.wordpress.org/theme/theme.1.0.zip' )->manifest );
 	}
 
@@ -79,8 +91,8 @@ final class ThemeArchiveParserTest extends TestCase {
 			$zip->addFromString( 'theme/file-' . $i . '.php', $body );
 		}
 		$zip->close();
-		$bytes = file_get_contents( $path );
-		unlink( $path );
+		$this->paths[] = $path;
+		$bytes = $path;
 		$result = ( new ThemeArchiveParser() )->parse( 'theme', '1.0', $bytes, 'https://downloads.wordpress.org/theme/theme.1.0.zip' );
 		self::assertSame( 'oversized_archive', $result->reason );
 	}

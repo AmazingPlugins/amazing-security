@@ -89,9 +89,9 @@ final class UploadsPhpFilesCheck implements SecurityCheck {
 		$kind    = (string) ( $this->readKind )();
 		$state   = self::decide( $kind );
 		$summary = match ( $state ) {
-			'warn' => __( 'A PHP file is in the uploads folder. This check does not open, run, or delete it.', 'amazing-security' ),
-			'pass' => __( 'No PHP file was found in the uploads folder. This check does not open, run, or delete files.', 'amazing-security' ),
-			default => __( 'The uploads folder could not be fully checked for PHP files. This check does not open, run, or delete files.', 'amazing-security' ),
+			'warn' => __( 'A PHP file is in the uploads folder. This check does not open, run, or delete it.', 'amazingplugins-security-scanner' ),
+			'pass' => __( 'No PHP file was found in the uploads folder. This check does not open, run, or delete files.', 'amazingplugins-security-scanner' ),
+			default => __( 'The uploads folder could not be fully checked for PHP files. This check does not open, run, or delete files.', 'amazingplugins-security-scanner' ),
 		};
 		return array(
 			new CheckResult( $this->id(), 'warn' === $state ? State::WARN : ( 'pass' === $state ? State::PASS : State::UNKNOWN ), $summary, self::SOURCE, new DateTimeImmutable( 'now', new DateTimeZone( 'UTC' ) ), 'medium', 'unknown' === $state ? 'unavailable' : 'complete', array( 'kind' => $kind ) ),

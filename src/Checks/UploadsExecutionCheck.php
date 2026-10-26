@@ -34,12 +34,12 @@ final class UploadsExecutionCheck implements SecurityCheck {
 		$label = is_string( $rule ) && in_array( $rule, array( 'engine-off', 'user-ini-engine-off', 'filesmatch-deny' ), true ) ? $rule : '';
 		if ( '' !== $label ) {
 			$state    = State::UNKNOWN;
-			$summary  = sprintf( /* translators: %s: code of the local uploads rule that was found, such as engine-off. */ __( 'A local uploads rule (%s) was found. That does not prove PHP is blocked. Ask your host how this server runs PHP. No test file was written.', 'amazing-security' ), $label );
+			$summary  = sprintf( /* translators: %s: code of the local uploads rule that was found, such as engine-off. */ __( 'A local uploads rule (%s) was found. That does not prove PHP is blocked. Ask your host how this server runs PHP. No test file was written.', 'amazingplugins-security-scanner' ), $label );
 			$coverage = 'partial';
 			$method   = 'local_rule';
 		} else {
 			$state    = State::WARN;
-			$summary  = __( 'No local uploads rule that disables PHP was found. Ask your host whether that folder can run PHP, or add an approved rule. No test file was written.', 'amazing-security' );
+			$summary  = __( 'No local uploads rule that disables PHP was found. Ask your host whether that folder can run PHP, or add an approved rule. No test file was written.', 'amazingplugins-security-scanner' );
 			$coverage = 'complete';
 			$method   = 'no_runtime_probe';
 		}

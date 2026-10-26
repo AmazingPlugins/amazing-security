@@ -102,7 +102,7 @@ final class IntegrityScanAction {
 
 	private function authorize( string $nonceAction ): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'You are not allowed to run an integrity scan.', 'amazing-security' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'You are not allowed to run an integrity scan.', 'amazingplugins-security-scanner' ), '', array( 'response' => 403 ) );
 		}
 		check_admin_referer( $nonceAction );
 	}
@@ -116,7 +116,7 @@ final class IntegrityScanAction {
 		try {
 			$started          = microtime( true );
 			$client           = new WordPressHttpClient();
-			$discovery        = ( new TargetDiscovery( new WordPressOrgManifestProvider( $client ), new WordPressOrgThemeManifestProvider( $client, new ThemeArchiveParser() ) ) )->discover( $this->coreVersion(), $this->coreLocale(), ABSPATH, $this->plugins(), $this->themes() );
+			$discovery        = ( new TargetDiscovery( new WordPressOrgManifestProvider( $client ), new WordPressOrgThemeManifestProvider( new ThemeArchiveParser() ) ) )->discover( $this->coreVersion(), $this->coreLocale(), ABSPATH, $this->plugins(), $this->themes() );
 			$cursor->elapsed += microtime( true ) - $started;
 			if ( $isStart ) {
 				$cursor->targetSignature = $discovery->signature;

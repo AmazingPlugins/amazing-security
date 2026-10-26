@@ -26,11 +26,7 @@ final class WordPressExposureService {
 		if ( false === $site || false === $root || '/' === $root || $site === $root || str_starts_with( $site, $root . '/' ) ) {
 			return null;}
 		if ( 'uploads' === $alias ) {
-			$excluded = array( WP_CONTENT_DIR, ABSPATH . '/wp-admin', ABSPATH . '/wp-includes', WP_CONTENT_DIR . '/plugins', WP_CONTENT_DIR . '/mu-plugins', WP_CONTENT_DIR . '/themes' );
-			foreach ( array( 'WP_PLUGIN_DIR', 'WPMU_PLUGIN_DIR' ) as $constant ) {
-				if ( defined( $constant ) ) {
-					$excluded[] = constant( $constant ); }
-			}
+			$excluded = array( WP_CONTENT_DIR, ABSPATH . 'wp-admin', ABSPATH . WPINC, WP_PLUGIN_DIR, WPMU_PLUGIN_DIR );
 			if ( function_exists( 'get_theme_root' ) ) {
 				$excluded[] = get_theme_root(); }
 			global $wp_theme_directories;

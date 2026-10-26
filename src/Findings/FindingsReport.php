@@ -12,17 +12,17 @@ use AmazingPlugins\Security\Scan\ScanRun;
 final class FindingsReport {
 	public static function text( ?ScanRun $run ): string {
 		$lines = array(
-			__( 'Amazing Security findings', 'amazing-security' ),
-			__( 'This is a starting list for the site owner or a host. It is not a compliance report. It does not show that the site is clean.', 'amazing-security' ),
-			__( 'Login CAPTCHA and compromised-password checks stay on this site. No password or login attempt was sent.', 'amazing-security' ),
+			__( 'AmazingPlugins Security Scanner findings', 'amazingplugins-security-scanner' ),
+			__( 'This is a starting list for the site owner or a host. It is not a compliance report. It does not show that the site is clean.', 'amazingplugins-security-scanner' ),
+			__( 'Login CAPTCHA and compromised-password checks stay on this site. No password or login attempt was sent.', 'amazingplugins-security-scanner' ),
 			'',
 		);
 		if ( null === $run ) {
-			$lines[] = __( 'No completed local check is stored.', 'amazing-security' );
+			$lines[] = __( 'No completed local check is stored.', 'amazingplugins-security-scanner' );
 			return implode( "\n", $lines ) . "\n";
 		}
-		$lines[] = sprintf( /* translators: %s: time the completed local check finished, in ISO 8601 format. */ __( 'Checked: %s', 'amazing-security' ), $run->finishedAt->format( 'c' ) );
-		$lines[] = $run->partial ? __( 'This check did not finish.', 'amazing-security' ) : __( 'This check finished.', 'amazing-security' );
+		$lines[] = sprintf( /* translators: %s: time the completed local check finished, in ISO 8601 format. */ __( 'Checked: %s', 'amazingplugins-security-scanner' ), $run->finishedAt->format( 'c' ) );
+		$lines[] = $run->partial ? __( 'This check did not finish.', 'amazingplugins-security-scanner' ) : __( 'This check finished.', 'amazingplugins-security-scanner' );
 		$lines[] = '';
 		foreach ( $run->results as $result ) {
 			if ( ! $result instanceof CheckResult ) {
@@ -37,12 +37,12 @@ final class FindingsReport {
 
 	private static function state( string $state ): string {
 		return match ( $state ) {
-			'critical' => __( 'Critical', 'amazing-security' ),
-			'fail' => __( 'Needs a change', 'amazing-security' ),
-			'warn' => __( 'Needs attention', 'amazing-security' ),
-			'pass' => __( 'Configured', 'amazing-security' ),
-			'unknown' => __( 'Could not check', 'amazing-security' ),
-			default => __( 'Could not check', 'amazing-security' ),
+			'critical' => __( 'Critical', 'amazingplugins-security-scanner' ),
+			'fail' => __( 'Needs a change', 'amazingplugins-security-scanner' ),
+			'warn' => __( 'Needs attention', 'amazingplugins-security-scanner' ),
+			'pass' => __( 'Configured', 'amazingplugins-security-scanner' ),
+			'unknown' => __( 'Could not check', 'amazingplugins-security-scanner' ),
+			default => __( 'Could not check', 'amazingplugins-security-scanner' ),
 		};
 	}
 

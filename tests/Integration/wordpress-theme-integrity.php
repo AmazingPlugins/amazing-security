@@ -21,7 +21,7 @@ $client = new class( $requested ) implements HttpClient {
 		return new HttpResult( 404, '' );
 	}
 };
-$discovery = ( new TargetDiscovery( new WordPressOrgManifestProvider( $client ), new WordPressOrgThemeManifestProvider( $client, new ThemeArchiveParser() ) ) )->discover(
+$discovery = ( new TargetDiscovery( new WordPressOrgManifestProvider( $client ), new WordPressOrgThemeManifestProvider( new ThemeArchiveParser(), static function ( string $url ) use ( $client ): ?string { $client->requested[] = $url; return null; } ) ) )->discover(
 	'6.6',
 	'en_US',
 	ABSPATH,

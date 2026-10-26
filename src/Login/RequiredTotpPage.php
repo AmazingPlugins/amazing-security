@@ -13,19 +13,18 @@ final class RequiredTotpPage {
 	}
 
 	public function notice(): void {
-		// No required-policy notices while Amazing Security does not own TOTP.
+		// No required-policy notices while AmazingPlugins Security Scanner does not own TOTP.
 	}
 
 	public function render(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'Administrator access required.', 'amazing-security' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'Administrator access required.', 'amazingplugins-security-scanner' ), '', array( 'response' => 403 ) );
 		}
 		$factor = AuthFactorDetector::fromWordPress()->totp( get_current_user_id() );
 		$url    = self::directoryUrl( (string) ( $factor['suggest_slug'] ?? 'two-factor' ) );
 		echo '<div class="wrap amazing-security-admin">';
-		echo '<p>' . esc_html__( 'Amazing Security reports whether an authenticator-app plugin is present. It does not enroll devices or store backup codes.', 'amazing-security' ) . '</p>';
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- AuthFactorPanel escapes output.
-		echo AuthFactorPanel::html( __( 'Authenticator app (TOTP)', 'amazing-security' ), $factor, $url, 'totp' );
+		echo '<p>' . esc_html__( 'AmazingPlugins Security Scanner reports whether an authenticator-app plugin is present. It does not enroll devices or store backup codes.', 'amazingplugins-security-scanner' ) . '</p>';
+		echo wp_kses( AuthFactorPanel::html( __( 'Authenticator app (TOTP)', 'amazingplugins-security-scanner' ), $factor, $url, 'totp' ), \AmazingPlugins\Security\Admin\AdminHtml::allowed() );
 		echo '</div>';
 	}
 

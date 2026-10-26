@@ -34,14 +34,14 @@ final class Module {
 		if ( ! is_array( $query ) || ! self::shouldBlock( self::queryStrings( $query ), '1', false ) ) {
 			return;
 		}
-		wp_die( esc_html__( 'This request was refused.', 'amazing-security' ), '', array( 'response' => 403 ) );
+		wp_die( esc_html__( 'This request was refused.', 'amazingplugins-security-scanner' ), '', array( 'response' => 403 ) );
 	}
 
 	public static function menu(): void {
 		add_submenu_page(
 			'amazing-security',
-			__( 'Precise blocks', 'amazing-security' ),
-			__( 'Precise blocks', 'amazing-security' ),
+			__( 'Precise blocks', 'amazingplugins-security-scanner' ),
+			__( 'Precise blocks', 'amazingplugins-security-scanner' ),
 			'manage_options',
 			'amsec-precise-block',
 			array( self::class, 'render' )
@@ -50,25 +50,25 @@ final class Module {
 
 	public static function render(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'Administrator access required.', 'amazing-security' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'Administrator access required.', 'amazingplugins-security-scanner' ), '', array( 'response' => 403 ) );
 		}
 		$option  = get_option( self::OPTION, '0' );
 		$enabled = '1' === ( is_scalar( $option ) ? (string) $option : '0' );
-		echo '<div class="wrap amazing-security-admin"><h1>' . esc_html__( 'Precise blocks', 'amazing-security' ) . '</h1>';
-		echo '<p>' . esc_html__( 'Off until you turn it on. A query is rejected only for two exact test markers. SQL keywords and ../ are left alone.', 'amazing-security' ) . '</p>';
-		echo '<p>' . esc_html__( 'Set AMSEC_DISABLE_PRECISE_BLOCK to true and this check stops.', 'amazing-security' ) . '</p>';
+		echo '<div class="wrap amazing-security-admin"><h1>' . esc_html__( 'Precise blocks', 'amazingplugins-security-scanner' ) . '</h1>';
+		echo '<p>' . esc_html__( 'Off until you turn it on. A query is rejected only for two exact test markers. SQL keywords and ../ are left alone.', 'amazingplugins-security-scanner' ) . '</p>';
+		echo '<p>' . esc_html__( 'Set AMSEC_DISABLE_PRECISE_BLOCK to true and this check stops.', 'amazingplugins-security-scanner' ) . '</p>';
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
 		echo '<input type="hidden" name="action" value="amsec_precise_block">';
 		wp_nonce_field( 'amsec_precise_block' );
-		echo '<p><label><input type="radio" name="amsec_precise_block" value="0"' . checked( ! $enabled, true, false ) . '> ' . esc_html__( 'Off', 'amazing-security' ) . '</label></p>';
-		echo '<p><label><input type="radio" name="amsec_precise_block" value="1"' . checked( $enabled, true, false ) . '> ' . esc_html__( 'On', 'amazing-security' ) . '</label></p>';
-		submit_button( __( 'Save precise blocks', 'amazing-security' ) );
+		echo '<p><label><input type="radio" name="amsec_precise_block" value="0"' . checked( ! $enabled, true, false ) . '> ' . esc_html__( 'Off', 'amazingplugins-security-scanner' ) . '</label></p>';
+		echo '<p><label><input type="radio" name="amsec_precise_block" value="1"' . checked( $enabled, true, false ) . '> ' . esc_html__( 'On', 'amazingplugins-security-scanner' ) . '</label></p>';
+		submit_button( __( 'Save precise blocks', 'amazingplugins-security-scanner' ) );
 		echo '</form></div>';
 	}
 
 	public static function save(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'Administrator access required.', 'amazing-security' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'Administrator access required.', 'amazingplugins-security-scanner' ), '', array( 'response' => 403 ) );
 		}
 		check_admin_referer( 'amsec_precise_block' );
 		$posted = isset( $_POST['amsec_precise_block'] ) ? sanitize_text_field( wp_unslash( $_POST['amsec_precise_block'] ) ) : '0'; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce checked above.

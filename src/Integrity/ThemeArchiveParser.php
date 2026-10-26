@@ -10,26 +10,19 @@ use DateTimeImmutable;
 use ZipArchive;
 
 final class ThemeArchiveParser {
-	public function parse( string $slug, string $version, string $zipBytes, string $sourceUrl ): ManifestResult {
+	/** Reads a release ZIP that WordPress downloaded to its temp directory. The caller deletes it. */
+	public function parse( string $slug, string $version, string $archivePath, string $sourceUrl ): ManifestResult {
 		if ( ! class_exists( ZipArchive::class ) ) {
 			return new ManifestResult( null, 'zip_unavailable' );
 		}
-		if ( '' === $zipBytes || strlen( $zipBytes ) > 16777216 ) {
+		$bytes = is_file( $archivePath ) ? filesize( $archivePath ) : false;
+		if ( false === $bytes || 0 === $bytes || $bytes > 16777216 ) {
 			return new ManifestResult( null, 'oversized_archive' );
-		}
-		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_tempnam -- ZipArchive requires a local seekable filename.
-		$temp = tempnam( sys_get_temp_dir(), 'amsec-theme-' );
-		if ( false === $temp ) {
-			return new ManifestResult( null, 'archive_unavailable' );
 		}
 		$zip    = new ZipArchive();
 		$opened = false;
 		try {
-			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents -- Temporary archive, never extracted into the site.
-			if ( strlen( $zipBytes ) !== file_put_contents( $temp, $zipBytes ) ) {
-				return new ManifestResult( null, 'invalid_archive' );
-			}
-			$opened = true === $zip->open( $temp, ZipArchive::RDONLY );
+			$opened = true === $zip->open( $archivePath, ZipArchive::RDONLY );
 			if ( ! $opened ) {
 				return new ManifestResult( null, 'invalid_archive' );
 			}
@@ -111,8 +104,6 @@ final class ThemeArchiveParser {
 			if ( $opened ) {
 				$zip->close();
 			}
-			// phpcs:ignore WordPress.WP.AlternativeFunctions.unlink_unlink -- Delete only our private temporary archive.
-			unlink( $temp );
 		}
 	}
 }
