@@ -62,9 +62,9 @@ final class BackgroundUpdatesCheck implements SecurityCheck {
 		$kind    = (string) ( $this->readKind )();
 		$state   = self::decide( $kind );
 		$summary = match ( $state ) {
-			'warn' => __( 'WordPress background updates are turned off. This check does not turn them on.', 'amazing-security-scanner' ),
-			'pass' => __( 'WordPress background updates are not turned off. This check does not turn them on.', 'amazing-security-scanner' ),
-			default => __( 'WordPress background updates could not be read. This check does not turn them on.', 'amazing-security-scanner' ),
+			'warn' => __( 'WordPress background updates are turned off. This check does not turn them on.', 'amazingplugins-security-scanner' ),
+			'pass' => __( 'WordPress background updates are not turned off. This check does not turn them on.', 'amazingplugins-security-scanner' ),
+			default => __( 'WordPress background updates could not be read. This check does not turn them on.', 'amazingplugins-security-scanner' ),
 		};
 		return array(
 			new CheckResult( $this->id(), 'warn' === $state ? State::WARN : ( 'pass' === $state ? State::PASS : State::UNKNOWN ), $summary, self::SOURCE, new DateTimeImmutable( 'now', new DateTimeZone( 'UTC' ) ), 'low', 'unknown' === $state ? 'unavailable' : 'complete', array( 'kind' => $kind ) ),

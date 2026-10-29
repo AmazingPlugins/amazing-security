@@ -160,13 +160,13 @@ final class RateLimiter {
 		nocache_headers();
 		header( 'Retry-After: ' . max( 1, $seconds ) );
 		header( 'Content-Type: text/plain; charset=utf-8' );
-		echo esc_html__( 'Too many requests from your address. Please wait a few minutes and try again.', 'amazing-security-scanner' );
+		echo esc_html__( 'Too many requests from your address. Please wait a few minutes and try again.', 'amazingplugins-security-scanner' );
 		exit;
 	}
 
 	public function handle(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'Administrator access required.', 'amazing-security-scanner' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'Administrator access required.', 'amazingplugins-security-scanner' ), '', array( 'response' => 403 ) );
 		}
 		check_admin_referer( 'amsec_rate_limits' );
 		$raw = array();
@@ -198,9 +198,9 @@ final class RateLimiter {
 		$settings = self::settings();
 		$mode     = $settings['mode'];
 		$choices  = array(
-			'off'   => __( 'Off', 'amazing-security-scanner' ),
-			'watch' => __( 'Watch', 'amazing-security-scanner' ),
-			'block' => __( 'Block', 'amazing-security-scanner' ),
+			'off'   => __( 'Off', 'amazingplugins-security-scanner' ),
+			'watch' => __( 'Watch', 'amazingplugins-security-scanner' ),
+			'block' => __( 'Block', 'amazingplugins-security-scanner' ),
 		);
 		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- Read-only flash values after a nonce-checked save.
 		$error = isset( $_GET['amsec_rate_error'] ) ? sanitize_key( wp_unslash( $_GET['amsec_rate_error'] ) ) : '';
@@ -208,45 +208,45 @@ final class RateLimiter {
 		// phpcs:enable
 		$count = self::recentCount( time() );
 		echo '<div class="wrap amazing-security-admin amsec-brief" id="amsec-rate">';
-		echo '<details class="amsec-more"' . ( '' !== $error ? ' open' : '' ) . '><summary>' . esc_html__( 'Advanced: rate limiting', 'amazing-security-scanner' ) . '</summary>';
+		echo '<details class="amsec-more"' . ( '' !== $error ? ' open' : '' ) . '><summary>' . esc_html__( 'Advanced: rate limiting', 'amazingplugins-security-scanner' ) . '</summary>';
 		if ( 'lines' === $error ) {
 			/* translators: %s: comma-separated line numbers. */
-			echo '<div class="notice notice-error inline"><p>' . esc_html( sprintf( __( 'Nothing was saved. These never-limit lines are not valid IP addresses or ranges: %s.', 'amazing-security-scanner' ), implode( ', ', array_filter( $lines ) ) ) ) . '</p></div>';
+			echo '<div class="notice notice-error inline"><p>' . esc_html( sprintf( __( 'Nothing was saved. These never-limit lines are not valid IP addresses or ranges: %s.', 'amazingplugins-security-scanner' ), implode( ', ', array_filter( $lines ) ) ) ) . '</p></div>';
 		} elseif ( 'too_many' === $error ) {
 			/* translators: %d: maximum number of entries. */
-			echo '<div class="notice notice-error inline"><p>' . esc_html( sprintf( __( 'Nothing was saved. The never-limit list holds up to %d entries.', 'amazing-security-scanner' ), RatePolicy::MAX_ALLOW ) ) . '</p></div>';
+			echo '<div class="notice notice-error inline"><p>' . esc_html( sprintf( __( 'Nothing was saved. The never-limit list holds up to %d entries.', 'amazingplugins-security-scanner' ), RatePolicy::MAX_ALLOW ) ) . '</p></div>';
 		} elseif ( 'proxy' === $error || self::proxyUnresolved() ) {
-			echo '<div class="notice notice-' . ( 'proxy' === $error ? 'error' : 'warning' ) . ' inline"><p>' . esc_html__( 'This site seems to sit behind a proxy or CDN that is not set up under Trusted proxies. Every visitor would share its address, so Block is not allowed until trusted proxies are set up.', 'amazing-security-scanner' ) . '</p></div>';
+			echo '<div class="notice notice-' . ( 'proxy' === $error ? 'error' : 'warning' ) . ' inline"><p>' . esc_html__( 'This site seems to sit behind a proxy or CDN that is not set up under Trusted proxies. Every visitor would share its address, so Block is not allowed until trusted proxies are set up.', 'amazingplugins-security-scanner' ) . '</p></div>';
 		} elseif ( '' !== $error ) {
-			echo '<div class="notice notice-error inline"><p>' . esc_html__( 'Nothing was saved. Use numbers inside the ranges shown.', 'amazing-security-scanner' ) . '</p></div>';
+			echo '<div class="notice notice-error inline"><p>' . esc_html__( 'Nothing was saved. Use numbers inside the ranges shown.', 'amazingplugins-security-scanner' ) . '</p></div>';
 		}
 		echo '<p class="amsec-brief-status"><span class="amsec-pill' . ( 'off' === $mode ? ' is-off' : ' is-on' ) . '">' . esc_html( $choices[ $mode ] ) . '</span>';
-		echo esc_html__( 'Limits how many requests one guest address can send each minute.', 'amazing-security-scanner' ) . '</p>';
+		echo esc_html__( 'Limits how many requests one guest address can send each minute.', 'amazingplugins-security-scanner' ) . '</p>';
 		echo '<ul class="amsec-facts"><li><strong>' . esc_html( number_format_i18n( $count ) ) . '</strong> ';
-		echo esc_html( _n( 'address went over a limit in the last 24 hours', 'addresses went over a limit in the last 24 hours', $count, 'amazing-security-scanner' ) ) . '</li></ul>';
-		echo '<p>' . esc_html__( 'Watch writes one line to the activity log when an address goes over a limit. Block also answers that address with a "too many requests" error until the block ends. Signed-in people, cron, WP-CLI, the server itself and the never-limit list are not counted. Blocks are shared with the scanner guard.', 'amazing-security-scanner' ) . '</p>';
+		echo esc_html( _n( 'address went over a limit in the last 24 hours', 'addresses went over a limit in the last 24 hours', $count, 'amazingplugins-security-scanner' ) ) . '</li></ul>';
+		echo '<p>' . esc_html__( 'Watch writes one line to the activity log when an address goes over a limit. Block also answers that address with a "too many requests" error until the block ends. Signed-in people, cron, WP-CLI, the server itself and the never-limit list are not counted. Blocks are shared with the scanner guard.', 'amazingplugins-security-scanner' ) . '</p>';
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '"><input type="hidden" name="action" value="amsec_rate_limits">';
 		wp_nonce_field( 'amsec_rate_limits' );
-		echo '<p><label for="amsec-rate-mode">' . esc_html__( 'Rate limiting', 'amazing-security-scanner' ) . '</label> <select id="amsec-rate-mode" name="amsec_rate_mode">';
+		echo '<p><label for="amsec-rate-mode">' . esc_html__( 'Rate limiting', 'amazingplugins-security-scanner' ) . '</label> <select id="amsec-rate-mode" name="amsec_rate_mode">';
 		foreach ( $choices as $value => $choice ) {
 			echo '<option value="' . esc_attr( $value ) . '"' . selected( $mode, $value, false ) . '>' . esc_html( $choice ) . '</option>';
 		}
 		echo '</select></p>';
 		$labels = array(
-			'page'  => __( 'Page requests per minute', 'amazing-security-scanner' ),
-			'rest'  => __( 'REST and XML-RPC requests per minute', 'amazing-security-scanner' ),
-			'login' => __( 'wp-login.php and admin-ajax.php posts per minute', 'amazing-security-scanner' ),
-			'block' => __( 'Block length in minutes', 'amazing-security-scanner' ),
+			'page'  => __( 'Page requests per minute', 'amazingplugins-security-scanner' ),
+			'rest'  => __( 'REST and XML-RPC requests per minute', 'amazingplugins-security-scanner' ),
+			'login' => __( 'wp-login.php and admin-ajax.php posts per minute', 'amazingplugins-security-scanner' ),
+			'block' => __( 'Block length in minutes', 'amazingplugins-security-scanner' ),
 		);
 		foreach ( $labels as $field => $label ) {
 			$bound = RatePolicy::BOUNDS[ $field ];
 			echo '<p><label for="amsec-rate-' . esc_attr( $field ) . '">' . esc_html( $label ) . '</label> <input type="number" class="small-text" id="amsec-rate-' . esc_attr( $field ) . '" name="amsec_rate_' . esc_attr( $field ) . '" value="' . esc_attr( (string) $settings[ $field ] ) . '" min="' . esc_attr( (string) $bound[1] ) . '" max="' . esc_attr( (string) $bound[2] ) . '" required> ';
 			/* translators: 1: smallest allowed number, 2: largest allowed number. */
-			echo '<span class="description">' . esc_html( sprintf( __( '%1$d to %2$d', 'amazing-security-scanner' ), $bound[1], $bound[2] ) ) . '</span></p>';
+			echo '<span class="description">' . esc_html( sprintf( __( '%1$d to %2$d', 'amazingplugins-security-scanner' ), $bound[1], $bound[2] ) ) . '</span></p>';
 		}
-		echo '<p><label for="amsec-rate-allow">' . esc_html__( 'Never limit these addresses (one IP or CIDR range per line, up to 50)', 'amazing-security-scanner' ) . '</label><br><textarea id="amsec-rate-allow" name="amsec_rate_allow" rows="4" class="large-text code" maxlength="4096">' . esc_html( implode( "\n", $settings['allow'] ) ) . '</textarea></p>';
+		echo '<p><label for="amsec-rate-allow">' . esc_html__( 'Never limit these addresses (one IP or CIDR range per line, up to 50)', 'amazingplugins-security-scanner' ) . '</label><br><textarea id="amsec-rate-allow" name="amsec_rate_allow" rows="4" class="large-text code" maxlength="4096">' . esc_html( implode( "\n", $settings['allow'] ) ) . '</textarea></p>';
 		echo '<p>';
-		submit_button( __( 'Save rate limiting', 'amazing-security-scanner' ), 'secondary', 'amsec-rate-save', false );
+		submit_button( __( 'Save rate limiting', 'amazingplugins-security-scanner' ), 'secondary', 'amsec-rate-save', false );
 		echo '</p></form></details></div>';
 	}
 }

@@ -13,5 +13,5 @@ final class HttpsAdminCheck extends AbstractCheck {
 		return 'https-admin'; }
 	public function run( ScanContext $context ): array {
 		$https = $this->values->adminUsesHttps();
-		return $this->result( null === $https ? null : ! $https, __( 'The admin address uses HTTPS.', 'amazing-security-scanner' ), __( 'The admin address is not using HTTPS. Turn on HTTPS for this site before you change other security settings.', 'amazing-security-scanner' ) ); }
+		return $this->result( null === $https ? null : ! $https, __( 'The admin address uses HTTPS.', 'amazingplugins-security-scanner' ), __( 'The admin address is not using HTTPS. Turn on HTTPS for this site before you change other security settings.', 'amazingplugins-security-scanner' ) ); }
 }

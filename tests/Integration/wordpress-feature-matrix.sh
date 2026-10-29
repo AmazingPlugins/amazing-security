@@ -94,7 +94,7 @@ result=Path(sys.argv[1]).read_text()
 assert not re.search(r'\t(?:ERROR|WARNING)\t',result), 'Plugin Check reported issues despite a successful process exit'
 assert 'Success: Checks complete. No errors found.' in result, 'Plugin Check success marker missing'
 PYCHECK
- docker exec "$site" sh -c 'find /var/www/html/wp-content/plugins/amazing-security-scanner -name "*.php" -exec php -l {} \;' > "$evidence/php-lint$tag.log"
+ docker exec "$site" sh -c 'find /var/www/html/wp-content/plugins/amazingplugins-security-scanner -name "*.php" -exec php -l {} \;' > "$evidence/php-lint$tag.log"
  restore
  trap - EXIT
 done

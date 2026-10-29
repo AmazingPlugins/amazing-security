@@ -1,15 +1,15 @@
 <?php
 /**
- * Plugin Name: Amazing Security Scanner
+ * Plugin Name: AmazingPlugins Security Scanner
  * Plugin URI: https://amazingplugins.com/plugins/amazing-security/
  * Description: Local WordPress security checks and optional login protection.
- * Version: 0.1.2
+ * Version: 0.1.3
  * Requires at least: 6.6
  * Requires PHP: 8.1
  * Author: Amazing Plugins
  * Author URI: https://amazingplugins.com/
  * License: GPL-2.0-or-later
- * Text Domain: amazing-security-scanner
+ * Text Domain: amazingplugins-security-scanner
  */
 
 declare(strict_types=1);

@@ -41,9 +41,9 @@ final class PingbackCheck implements SecurityCheck {
 			default => State::UNKNOWN,
 		};
 		$summary = match ( $known ) {
-			'open' => __( 'New posts can accept pingbacks. You can turn them off under Settings, then Discussion. This check leaves the setting as it is. Sign-in over XML-RPC is unchanged.', 'amazing-security-scanner' ),
-			'closed' => __( 'New posts do not accept pingbacks.', 'amazing-security-scanner' ),
-			default => __( 'The pingback setting could not be read.', 'amazing-security-scanner' ),
+			'open' => __( 'New posts can accept pingbacks. You can turn them off under Settings, then Discussion. This check leaves the setting as it is. Sign-in over XML-RPC is unchanged.', 'amazingplugins-security-scanner' ),
+			'closed' => __( 'New posts do not accept pingbacks.', 'amazingplugins-security-scanner' ),
+			default => __( 'The pingback setting could not be read.', 'amazingplugins-security-scanner' ),
 		};
 		return array(
 			new CheckResult(

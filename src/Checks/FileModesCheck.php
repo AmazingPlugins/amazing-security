@@ -36,9 +36,9 @@ final class FileModesCheck implements SecurityCheck {
 		}
 		$state   = $warn > 0 ? State::WARN : ( $unknown > 0 || array() === $rows ? State::UNKNOWN : State::PASS );
 		$summary = match ( $state ) {
-			State::WARN => __( 'A listed location is world-writable, or the configuration file is world-readable. Ask the host before changing modes.', 'amazing-security-scanner' ),
-			State::UNKNOWN => __( 'A listed location could not be read. Ask the host to review it.', 'amazing-security-scanner' ),
-			default => __( 'No selected world-write or configuration world-read mode was found.', 'amazing-security-scanner' ),
+			State::WARN => __( 'A listed location is world-writable, or the configuration file is world-readable. Ask the host before changing modes.', 'amazingplugins-security-scanner' ),
+			State::UNKNOWN => __( 'A listed location could not be read. Ask the host to review it.', 'amazingplugins-security-scanner' ),
+			default => __( 'No selected world-write or configuration world-read mode was found.', 'amazingplugins-security-scanner' ),
 		};
 		return array(
 			new CheckResult(

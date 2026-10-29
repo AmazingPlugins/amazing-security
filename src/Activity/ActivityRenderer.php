@@ -12,13 +12,13 @@ final class ActivityRenderer {
 
 	public function render( array $rows, int $page, string $event, int $pages = 1, string $recordingForm = '' ): string {
 		$html  = '<div class="wrap amazing-security-admin amsec-activity">';
-		$html .= '<h1>' . esc_html__( 'Security activity', 'amazing-security-scanner' ) . '</h1>';
-		$html .= '<p>' . esc_html__( 'Local history is best effort. A missing row does not mean nothing happened.', 'amazing-security-scanner' ) . '</p>';
-		$html .= '<p>' . esc_html__( 'New rows are stored only after you turn recording on. They stay for 30 days. Visitor addresses and passwords are not stored.', 'amazing-security-scanner' ) . '</p>';
+		$html .= '<h1>' . esc_html__( 'Security activity', 'amazingplugins-security-scanner' ) . '</h1>';
+		$html .= '<p>' . esc_html__( 'Local history is best effort. A missing row does not mean nothing happened.', 'amazingplugins-security-scanner' ) . '</p>';
+		$html .= '<p>' . esc_html__( 'New rows are stored only after you turn recording on. They stay for 30 days. Visitor addresses and passwords are not stored.', 'amazingplugins-security-scanner' ) . '</p>';
 		$html .= $recordingForm;
 		$html .= $this->filter( $event );
 		if ( array() === $rows ) {
-			$html .= '<p class="amsec-log-empty">' . esc_html__( 'No recorded events for this selection. This does not establish that no activity occurred.', 'amazing-security-scanner' ) . '</p>';
+			$html .= '<p class="amsec-log-empty">' . esc_html__( 'No recorded events for this selection. This does not establish that no activity occurred.', 'amazingplugins-security-scanner' ) . '</p>';
 		} else {
 			$html .= $this->days( $rows );
 		}
@@ -28,39 +28,39 @@ final class ActivityRenderer {
 
 	public static function label( string $event ): string {
 		$names = array(
-			'login_succeeded'          => __( 'Signed in', 'amazing-security-scanner' ),
-			'login_failed'             => __( 'Sign-in failed', 'amazing-security-scanner' ),
-			'login_rate_blocked'       => __( 'Sign-in limited', 'amazing-security-scanner' ),
-			'user_created'             => __( 'Account created', 'amazing-security-scanner' ),
-			'user_deleted'             => __( 'Account deleted', 'amazing-security-scanner' ),
-			'user_role_changed'        => __( 'Role changed', 'amazing-security-scanner' ),
-			'plugin_activated'         => __( 'Plugin activated', 'amazing-security-scanner' ),
-			'plugin_deactivated'       => __( 'Plugin deactivated', 'amazing-security-scanner' ),
-			'plugin_updated'           => __( 'Plugin updated', 'amazing-security-scanner' ),
-			'theme_switched'           => __( 'Theme switched', 'amazing-security-scanner' ),
-			'theme_updated'            => __( 'Theme updated', 'amazing-security-scanner' ),
-			'security_setting_changed' => __( 'Security setting changed', 'amazing-security-scanner' ),
-			'sessions_revoked'         => __( 'Sessions ended', 'amazing-security-scanner' ),
-			'password_reset_required'  => __( 'Password reset required', 'amazing-security-scanner' ),
-			'password_reset_cleared'   => __( 'Password reset cleared', 'amazing-security-scanner' ),
-			'totp_policy_changed'      => __( 'Verification policy changed', 'amazing-security-scanner' ),
-			'totp_grace_granted'       => __( 'Verification grace granted', 'amazing-security-scanner' ),
-			'baseline_approved'        => __( 'Code reference approved', 'amazing-security-scanner' ),
-			'bot_policy_changed'       => __( 'Comment check changed', 'amazing-security-scanner' ),
-			'scanner_flagged'          => __( 'Scanner spotted', 'amazing-security-scanner' ),
-			'scanner_blocked'          => __( 'Scanner blocked for an hour', 'amazing-security-scanner' ),
-			'rate_limited'             => __( 'Rate limit reached', 'amazing-security-scanner' ),
-			'rate_blocked'             => __( 'Rate limit block', 'amazing-security-scanner' ),
+			'login_succeeded'          => __( 'Signed in', 'amazingplugins-security-scanner' ),
+			'login_failed'             => __( 'Sign-in failed', 'amazingplugins-security-scanner' ),
+			'login_rate_blocked'       => __( 'Sign-in limited', 'amazingplugins-security-scanner' ),
+			'user_created'             => __( 'Account created', 'amazingplugins-security-scanner' ),
+			'user_deleted'             => __( 'Account deleted', 'amazingplugins-security-scanner' ),
+			'user_role_changed'        => __( 'Role changed', 'amazingplugins-security-scanner' ),
+			'plugin_activated'         => __( 'Plugin activated', 'amazingplugins-security-scanner' ),
+			'plugin_deactivated'       => __( 'Plugin deactivated', 'amazingplugins-security-scanner' ),
+			'plugin_updated'           => __( 'Plugin updated', 'amazingplugins-security-scanner' ),
+			'theme_switched'           => __( 'Theme switched', 'amazingplugins-security-scanner' ),
+			'theme_updated'            => __( 'Theme updated', 'amazingplugins-security-scanner' ),
+			'security_setting_changed' => __( 'Security setting changed', 'amazingplugins-security-scanner' ),
+			'sessions_revoked'         => __( 'Sessions ended', 'amazingplugins-security-scanner' ),
+			'password_reset_required'  => __( 'Password reset required', 'amazingplugins-security-scanner' ),
+			'password_reset_cleared'   => __( 'Password reset cleared', 'amazingplugins-security-scanner' ),
+			'totp_policy_changed'      => __( 'Verification policy changed', 'amazingplugins-security-scanner' ),
+			'totp_grace_granted'       => __( 'Verification grace granted', 'amazingplugins-security-scanner' ),
+			'baseline_approved'        => __( 'Code reference approved', 'amazingplugins-security-scanner' ),
+			'bot_policy_changed'       => __( 'Comment check changed', 'amazingplugins-security-scanner' ),
+			'scanner_flagged'          => __( 'Scanner spotted', 'amazingplugins-security-scanner' ),
+			'scanner_blocked'          => __( 'Scanner blocked for an hour', 'amazingplugins-security-scanner' ),
+			'rate_limited'             => __( 'Rate limit reached', 'amazingplugins-security-scanner' ),
+			'rate_blocked'             => __( 'Rate limit block', 'amazingplugins-security-scanner' ),
 		);
 		return $names[ $event ] ?? str_replace( '_', ' ', $event );
 	}
 
 	private function filter( string $event ): string {
-		$html = '<form class="amsec-activity-filter" method="get"><input type="hidden" name="page" value="amsec-activity"><label for="amsec-event">' . esc_html__( 'Show', 'amazing-security-scanner' ) . '</label> <select id="amsec-event" name="event"><option value="">' . esc_html__( 'All events', 'amazing-security-scanner' ) . '</option>';
+		$html = '<form class="amsec-activity-filter" method="get"><input type="hidden" name="page" value="amsec-activity"><label for="amsec-event">' . esc_html__( 'Show', 'amazingplugins-security-scanner' ) . '</label> <select id="amsec-event" name="event"><option value="">' . esc_html__( 'All events', 'amazingplugins-security-scanner' ) . '</option>';
 		foreach ( ActivityEvent::TYPES as $type ) {
 			$html .= '<option value="' . esc_attr( $type ) . '"' . ( $type === $event ? ' selected' : '' ) . '>' . esc_html( self::label( $type ) ) . '</option>';
 		}
-		return $html . '</select> <button class="button">' . esc_html__( 'Filter', 'amazing-security-scanner' ) . '</button></form>';
+		return $html . '</select> <button class="button">' . esc_html__( 'Filter', 'amazingplugins-security-scanner' ) . '</button></form>';
 	}
 
 	private function days( array $rows ): string {
@@ -88,21 +88,21 @@ final class ActivityRenderer {
 		$actor  = $this->account( (int) $row['actor_id'] );
 		$person = $this->account( (int) $row['user_id'] );
 		$target = $this->thing( (string) $row['target'] );
-		$line   = '' !== $target ? $target : __( 'No extra detail', 'amazing-security-scanner' );
+		$line   = '' !== $target ? $target : __( 'No extra detail', 'amazingplugins-security-scanner' );
 
 		if ( in_array( $event, array( 'login_succeeded', 'user_created', 'user_deleted', 'sessions_revoked', 'password_reset_required', 'password_reset_cleared', 'totp_grace_granted' ), true ) ) {
-			$line = '' !== $person ? $person : __( 'Unknown account', 'amazing-security-scanner' );
+			$line = '' !== $person ? $person : __( 'Unknown account', 'amazingplugins-security-scanner' );
 		} elseif ( 'user_role_changed' === $event ) {
-			$who  = '' !== $person ? $person : __( 'Unknown account', 'amazing-security-scanner' );
-			$role = '' !== $target ? $target : __( 'another role', 'amazing-security-scanner' );
+			$who  = '' !== $person ? $person : __( 'Unknown account', 'amazingplugins-security-scanner' );
+			$role = '' !== $target ? $target : __( 'another role', 'amazingplugins-security-scanner' );
 			$line = sprintf(
 				/* translators: 1: account name, 2: role name. */
-				__( '%1$s is now %2$s', 'amazing-security-scanner' ),
+				__( '%1$s is now %2$s', 'amazingplugins-security-scanner' ),
 				$who,
 				$role
 			);
 		} elseif ( in_array( $event, array( 'login_failed', 'login_rate_blocked' ), true ) ) {
-			$line = __( 'No account was recorded', 'amazing-security-scanner' );
+			$line = __( 'No account was recorded', 'amazingplugins-security-scanner' );
 		}
 
 		if ( '' === $actor ) {
@@ -110,7 +110,7 @@ final class ActivityRenderer {
 		}
 		return $line . ', ' . sprintf(
 			/* translators: %s: account login. */
-			__( 'by %s', 'amazing-security-scanner' ),
+			__( 'by %s', 'amazingplugins-security-scanner' ),
 			$actor
 		);
 	}
@@ -122,7 +122,7 @@ final class ActivityRenderer {
 		if ( isset( $this->names[ $id ] ) ) {
 			return $this->names[ $id ];
 		}
-		$name = sprintf( /* translators: %d: user ID of an account that cannot be read. */ __( 'Account %d', 'amazing-security-scanner' ), $id );
+		$name = sprintf( /* translators: %d: user ID of an account that cannot be read. */ __( 'Account %d', 'amazingplugins-security-scanner' ), $id );
 		if ( function_exists( 'get_userdata' ) ) {
 			$user = get_userdata( $id );
 			if ( is_object( $user ) && isset( $user->user_login ) && is_string( $user->user_login ) && '' !== $user->user_login ) {
@@ -137,13 +137,13 @@ final class ActivityRenderer {
 
 	private function thing( string $target ): string {
 		$names = array(
-			'amsec_login_rate_mode'        => __( 'Sign-in limit', 'amazing-security-scanner' ),
-			'amsec_login_xmlrpc_disabled'  => __( 'XML-RPC sign-in', 'amazing-security-scanner' ),
-			'amsec_alerts_enabled'         => __( 'Alert email', 'amazing-security-scanner' ),
-			'amsec_digest_enabled'         => __( 'Weekly digest', 'amazing-security-scanner' ),
-			'amazing_security_mcp_enabled' => __( 'Assistant connection', 'amazing-security-scanner' ),
-			'amazing_security_vulnerability_direct_enabled' => __( 'Direct vulnerability lookup', 'amazing-security-scanner' ),
-			'amazing_security_kev_enabled' => __( 'CISA list of exploited holes', 'amazing-security-scanner' ),
+			'amsec_login_rate_mode'        => __( 'Sign-in limit', 'amazingplugins-security-scanner' ),
+			'amsec_login_xmlrpc_disabled'  => __( 'XML-RPC sign-in', 'amazingplugins-security-scanner' ),
+			'amsec_alerts_enabled'         => __( 'Alert email', 'amazingplugins-security-scanner' ),
+			'amsec_digest_enabled'         => __( 'Weekly digest', 'amazingplugins-security-scanner' ),
+			'amazing_security_mcp_enabled' => __( 'Assistant connection', 'amazingplugins-security-scanner' ),
+			'amazing_security_vulnerability_direct_enabled' => __( 'Direct vulnerability lookup', 'amazingplugins-security-scanner' ),
+			'amazing_security_kev_enabled' => __( 'CISA list of exploited holes', 'amazingplugins-security-scanner' ),
 		);
 		if ( isset( $names[ $target ] ) ) {
 			return $names[ $target ];
@@ -171,17 +171,17 @@ final class ActivityRenderer {
 			return '';
 		}
 		$page  = max( 1, min( $pages, $page ) );
-		$html  = '<nav class="amsec-pager" aria-label="' . esc_attr__( 'Activity pages', 'amazing-security-scanner' ) . '">';
-		$html .= $page > 1 ? '<a class="amsec-pager-nav" href="' . esc_url( $this->url( $page - 1, $event ) ) . '">' . esc_html__( 'Previous', 'amazing-security-scanner' ) . '</a>' : '<span class="amsec-pager-nav is-spacer" aria-hidden="true">' . esc_html__( 'Previous', 'amazing-security-scanner' ) . '</span>';
+		$html  = '<nav class="amsec-pager" aria-label="' . esc_attr__( 'Activity pages', 'amazingplugins-security-scanner' ) . '">';
+		$html .= $page > 1 ? '<a class="amsec-pager-nav" href="' . esc_url( $this->url( $page - 1, $event ) ) . '">' . esc_html__( 'Previous', 'amazingplugins-security-scanner' ) . '</a>' : '<span class="amsec-pager-nav is-spacer" aria-hidden="true">' . esc_html__( 'Previous', 'amazingplugins-security-scanner' ) . '</span>';
 		$html .= '<span class="amsec-pager-label">' . esc_html(
 			sprintf(
 				/* translators: 1: current page, 2: page count. */
-				__( 'Page %1$d of %2$d', 'amazing-security-scanner' ),
+				__( 'Page %1$d of %2$d', 'amazingplugins-security-scanner' ),
 				$page,
 				$pages
 			)
 		) . '</span>';
-		$html .= $page < $pages ? '<a class="amsec-pager-nav" href="' . esc_url( $this->url( $page + 1, $event ) ) . '">' . esc_html__( 'Next', 'amazing-security-scanner' ) . '</a>' : '<span class="amsec-pager-nav is-spacer" aria-hidden="true">' . esc_html__( 'Next', 'amazing-security-scanner' ) . '</span>';
+		$html .= $page < $pages ? '<a class="amsec-pager-nav" href="' . esc_url( $this->url( $page + 1, $event ) ) . '">' . esc_html__( 'Next', 'amazingplugins-security-scanner' ) . '</a>' : '<span class="amsec-pager-nav is-spacer" aria-hidden="true">' . esc_html__( 'Next', 'amazingplugins-security-scanner' ) . '</span>';
 		return $html . '</nav>';
 	}
 

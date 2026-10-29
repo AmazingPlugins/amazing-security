@@ -6,7 +6,7 @@ namespace AmazingPlugins\Security\Admin;
 
 defined( 'ABSPATH' ) || exit;
 
-/** Landing-page frame for Amazing Security Scanner screens. */
+/** Landing-page frame for AmazingPlugins Security Scanner screens. */
 final class Brand {
 	public const DOCS = 'https://amazingplugins.com/plugins/amazing-security/';
 
@@ -28,7 +28,7 @@ final class Brand {
 	public static function savedNotice(): void {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only flash flag after a nonce-checked save.
 		if ( self::onScreen() && isset( $_GET['amsec_saved'] ) && '1' === $_GET['amsec_saved'] ) {
-			echo '<div class="notice notice-success is-dismissible" role="status"><p>' . esc_html__( 'Settings saved.', 'amazing-security-scanner' ) . '</p></div>';
+			echo '<div class="notice notice-success is-dismissible" role="status"><p>' . esc_html__( 'Settings saved.', 'amazingplugins-security-scanner' ) . '</p></div>';
 		}
 	}
 
@@ -62,13 +62,13 @@ final class Brand {
 			'amazing-security-scan',
 			'amsecScan',
 			array(
-				'error'  => __( 'Scan could not be saved.', 'amazing-security-scanner' ),
+				'error'  => __( 'Scan could not be saved.', 'amazingplugins-security-scanner' ),
 				'ajax'   => admin_url( 'admin-ajax.php' ),
-				'saving' => __( 'Saving the results', 'amazing-security-scanner' ),
+				'saving' => __( 'Saving the results', 'amazingplugins-security-scanner' ),
 				/* translators: 1: current category letter, 2: number of categories. */
-				'group'  => __( 'Category %1$s of %2$s', 'amazing-security-scanner' ),
+				'group'  => __( 'Category %1$s of %2$s', 'amazingplugins-security-scanner' ),
 				/* translators: 1: current step number, 2: total number of steps. */
-				'step'   => __( 'Step %1$s of %2$s', 'amazing-security-scanner' ),
+				'step'   => __( 'Step %1$s of %2$s', 'amazingplugins-security-scanner' ),
 			)
 		);
 	}
@@ -85,16 +85,16 @@ final class Brand {
 		$headers = get_file_data( AMAZING_SECURITY_FILE, array( 'Version' => 'Version' ) );
 		$version = is_string( $headers['Version'] ?? null ) ? $headers['Version'] : '';
 		echo '<div class="amsec-brand"><div class="amsec-brand-mark">';
-		echo '<img src="' . esc_url( $logo ) . '" alt="' . esc_attr__( 'AmazingPlugins', 'amazing-security-scanner' ) . '" width="44" height="44">';
-		echo '<div class="amsec-brand-title"><p class="amsec-brand-name">' . esc_html__( 'Amazing Security Scanner', 'amazing-security-scanner' ) . '</p>';
+		echo '<img src="' . esc_url( $logo ) . '" alt="' . esc_attr__( 'AmazingPlugins', 'amazingplugins-security-scanner' ) . '" width="44" height="44">';
+		echo '<div class="amsec-brand-title"><p class="amsec-brand-name">' . esc_html__( 'AmazingPlugins Security Scanner', 'amazingplugins-security-scanner' ) . '</p>';
 		if ( 1 === preg_match( '/^\d+\.\d+\.\d+$/', $version ) ) {
 			echo '<p class="amsec-brand-version">' . esc_html( $version ) . '</p>';
 		}
 		echo '</div></div>';
 		echo '<p class="amsec-brand-links"><a href="' . esc_url( self::DOCS ) . '" target="_blank" rel="noopener noreferrer">';
-		echo '<img src="' . esc_url( $docs . '?ver=0.1.18' ) . '" alt="" width="22" height="22">' . esc_html__( 'Docs', 'amazing-security-scanner' ) . '</a>';
+		echo '<img src="' . esc_url( $docs . '?ver=0.1.18' ) . '" alt="" width="22" height="22">' . esc_html__( 'Docs', 'amazingplugins-security-scanner' ) . '</a>';
 		echo '<a href="' . esc_url( self::GUIDE ) . '" target="_blank" rel="noopener noreferrer">';
-		echo '<img src="' . esc_url( $guide . '?ver=0.1.18' ) . '" alt="" width="22" height="22">' . esc_html__( 'Security guide', 'amazing-security-scanner' ) . '</a></p></div>';
+		echo '<img src="' . esc_url( $guide . '?ver=0.1.18' ) . '" alt="" width="22" height="22">' . esc_html__( 'Security guide', 'amazingplugins-security-scanner' ) . '</a></p></div>';
 		if ( 'amazing-security' === self::page() ) {
 			return;
 		}

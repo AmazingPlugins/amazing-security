@@ -43,10 +43,10 @@ final class RestRateCheck implements SecurityCheck {
 			default => State::UNKNOWN,
 		};
 		$summary = match ( $mode ) {
-			'off' => __( 'REST user and comment limits are off.', 'amazing-security-scanner' ),
-			'observe' => __( 'REST user and comment limits are recording only.', 'amazing-security-scanner' ),
-			'block' => __( 'REST user and comment limits can reject excess unauthenticated requests.', 'amazing-security-scanner' ),
-			default => __( 'The REST rate policy could not be read.', 'amazing-security-scanner' ),
+			'off' => __( 'REST user and comment limits are off.', 'amazingplugins-security-scanner' ),
+			'observe' => __( 'REST user and comment limits are recording only.', 'amazingplugins-security-scanner' ),
+			'block' => __( 'REST user and comment limits can reject excess unauthenticated requests.', 'amazingplugins-security-scanner' ),
+			default => __( 'The REST rate policy could not be read.', 'amazingplugins-security-scanner' ),
 		};
 		return array(
 			new CheckResult(

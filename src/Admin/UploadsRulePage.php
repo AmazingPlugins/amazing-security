@@ -14,8 +14,8 @@ final class UploadsRulePage {
 	public function register(): void {
 		add_submenu_page(
 			'amazing-security',
-			__( 'PHP in uploads', 'amazing-security-scanner' ),
-			__( 'PHP in uploads', 'amazing-security-scanner' ),
+			__( 'PHP in uploads', 'amazingplugins-security-scanner' ),
+			__( 'PHP in uploads', 'amazingplugins-security-scanner' ),
 			'manage_options',
 			'amsec-uploads',
 			array( $this, 'render' )
@@ -24,46 +24,46 @@ final class UploadsRulePage {
 
 	public function render(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'Administrator access required.', 'amazing-security-scanner' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'Administrator access required.', 'amazingplugins-security-scanner' ), '', array( 'response' => 403 ) );
 		}
 		$rule = UploadsExecutionCheck::classify( $this->current() );
 		echo '<div class="wrap amazing-security-admin">';
-		echo '<h1>' . esc_html__( 'PHP in the uploads folder', 'amazing-security-scanner' ) . '</h1>';
-		echo '<p>' . esc_html__( 'WordPress stores pictures and documents in uploads. Some servers will also run a PHP file that lands there. This plugin does not write a test file, and it cannot prove what this server will do.', 'amazing-security-scanner' ) . '</p>';
-		echo '<p>' . esc_html__( 'If the site uses Apache, you can add the rule below. Nginx and some hosts ignore that file. Ask the host if you are not sure.', 'amazing-security-scanner' ) . '</p>';
+		echo '<h1>' . esc_html__( 'PHP in the uploads folder', 'amazingplugins-security-scanner' ) . '</h1>';
+		echo '<p>' . esc_html__( 'WordPress stores pictures and documents in uploads. Some servers will also run a PHP file that lands there. This plugin does not write a test file, and it cannot prove what this server will do.', 'amazingplugins-security-scanner' ) . '</p>';
+		echo '<p>' . esc_html__( 'If the site uses Apache, you can add the rule below. Nginx and some hosts ignore that file. Ask the host if you are not sure.', 'amazingplugins-security-scanner' ) . '</p>';
 		if ( '' !== $rule ) {
-			echo '<p>' . esc_html__( 'A local uploads rule is already there. That still does not prove the server refuses PHP.', 'amazing-security-scanner' ) . '</p>';
+			echo '<p>' . esc_html__( 'A local uploads rule is already there. That still does not prove the server refuses PHP.', 'amazingplugins-security-scanner' ) . '</p>';
 		}
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only result after the confirmed write.
 		$notice = isset( $_GET['amsec_uploads'] ) ? sanitize_key( wp_unslash( $_GET['amsec_uploads'] ) ) : '';
 		if ( 'added' === $notice ) {
-			echo '<div class="notice notice-success"><p>' . esc_html__( 'The Apache rule was added. Ask the host whether this server reads it.', 'amazing-security-scanner' ) . '</p></div>';
+			echo '<div class="notice notice-success"><p>' . esc_html__( 'The Apache rule was added. Ask the host whether this server reads it.', 'amazingplugins-security-scanner' ) . '</p></div>';
 		} elseif ( 'present' === $notice ) {
-			echo '<div class="notice notice-info"><p>' . esc_html__( 'A rule was already present. Nothing was written.', 'amazing-security-scanner' ) . '</p></div>';
+			echo '<div class="notice notice-info"><p>' . esc_html__( 'A rule was already present. Nothing was written.', 'amazingplugins-security-scanner' ) . '</p></div>';
 		} elseif ( 'failed' === $notice ) {
-			echo '<div class="notice notice-error"><p>' . esc_html__( 'The rule could not be written. Ask the host to add it.', 'amazing-security-scanner' ) . '</p></div>';
+			echo '<div class="notice notice-error"><p>' . esc_html__( 'The rule could not be written. Ask the host to add it.', 'amazingplugins-security-scanner' ) . '</p></div>';
 		}
 		echo '<pre>' . esc_html( UploadsRule::snippet() ) . '</pre>';
 		if ( ! is_ssl() ) {
-			echo '<p>' . esc_html__( 'Open this page over HTTPS to add the rule.', 'amazing-security-scanner' ) . '</p></div>';
+			echo '<p>' . esc_html__( 'Open this page over HTTPS to add the rule.', 'amazingplugins-security-scanner' ) . '</p></div>';
 			return;
 		}
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
 		echo '<input type="hidden" name="action" value="amsec_uploads_rule">';
 		wp_nonce_field( 'amsec_uploads_rule' );
-		echo '<p><label><input type="checkbox" name="confirm" value="1" required> ' . esc_html__( 'Add this Apache rule to the uploads folder.', 'amazing-security-scanner' ) . '</label></p>';
-		submit_button( __( 'Add the Apache rule', 'amazing-security-scanner' ) );
+		echo '<p><label><input type="checkbox" name="confirm" value="1" required> ' . esc_html__( 'Add this Apache rule to the uploads folder.', 'amazingplugins-security-scanner' ) . '</label></p>';
+		submit_button( __( 'Add the Apache rule', 'amazingplugins-security-scanner' ) );
 		echo '</form></div>';
 	}
 
 	public function save(): void {
 		if ( ! current_user_can( 'manage_options' ) || ! is_ssl() ) {
-			wp_die( esc_html__( 'HTTPS and administrator access are required.', 'amazing-security-scanner' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'HTTPS and administrator access are required.', 'amazingplugins-security-scanner' ), '', array( 'response' => 403 ) );
 		}
 		check_admin_referer( 'amsec_uploads_rule' );
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce checked above.
 		if ( '1' !== ( isset( $_POST['confirm'] ) ? sanitize_text_field( wp_unslash( $_POST['confirm'] ) ) : '' ) ) {
-			wp_die( esc_html__( 'Confirm the rule before it is written.', 'amazing-security-scanner' ), '', array( 'response' => 400 ) );
+			wp_die( esc_html__( 'Confirm the rule before it is written.', 'amazingplugins-security-scanner' ), '', array( 'response' => 400 ) );
 		}
 		$path   = $this->path();
 		$result = 'failed';

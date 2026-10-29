@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
-<ruleset name="Amazing Security Scanner">
+<ruleset name="AmazingPlugins Security Scanner">
   <file>src</file>
-  <file>amazing-security-scanner.php</file>
+  <file>amazingplugins-security-scanner.php</file>
   <!-- PSR-4 class names and public result APIs use camel case. -->
   <rule ref="WordPress-Core">
     <exclude name="WordPress.Files.FileName"/>
@@ -13,5 +13,5 @@
     <exclude name="WordPress.NamingConventions.ValidFunctionName"/>
     <exclude name="WordPress.NamingConventions.ValidVariableName"/>
   </rule>
-  <config name="text_domain" value="amazing-security-scanner"/>
+  <config name="text_domain" value="amazingplugins-security-scanner"/>
 </ruleset>

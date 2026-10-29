@@ -32,7 +32,7 @@ final class FileScanReviewAction {
 
 	public function note(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'You cannot review this file finding.', 'amazing-security-scanner' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'You cannot review this file finding.', 'amazingplugins-security-scanner' ), '', array( 'response' => 403 ) );
 		}
 		check_admin_referer( 'amsec_file_scan_note' );
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce was checked above.
@@ -44,7 +44,7 @@ final class FileScanReviewAction {
 		$completed = $store->latestCompleted();
 		$current   = self::hasCurrentFinding( $progress, $completed, $id );
 		if ( ! self::canNote( true, true, $current ) || ! self::validInput( $id, $note ) || ! $store->saveNote( $id, $note ) ) {
-			wp_die( esc_html__( 'The finding or note is no longer valid.', 'amazing-security-scanner' ), '', array( 'response' => 400 ) );
+			wp_die( esc_html__( 'The finding or note is no longer valid.', 'amazingplugins-security-scanner' ), '', array( 'response' => 400 ) );
 		}
 		wp_safe_redirect( admin_url( 'admin.php?page=amsec-file-checks#amsec-file-scan' ) );
 		exit;

@@ -26,12 +26,12 @@ final class FirstRun {
 				'phone'   => array(
 					'target' => '#wp-admin-bar-menu-toggle',
 					'edge'   => 'top',
-					'title'  => __( 'Menu', 'amazing-security-scanner' ),
-					'text'   => __( 'Every section of this plugin is in the admin menu, under Security Scanner.', 'amazing-security-scanner' ),
+					'title'  => __( 'Menu', 'amazingplugins-security-scanner' ),
+					'text'   => __( 'Every section of this plugin is in the admin menu, under Security Scanner.', 'amazingplugins-security-scanner' ),
 				),
-				'next'    => __( 'Next', 'amazing-security-scanner' ),
-				'done'    => __( 'Done', 'amazing-security-scanner' ),
-				'skip'    => __( 'Skip tour', 'amazing-security-scanner' ),
+				'next'    => __( 'Next', 'amazingplugins-security-scanner' ),
+				'done'    => __( 'Done', 'amazingplugins-security-scanner' ),
+				'skip'    => __( 'Skip tour', 'amazingplugins-security-scanner' ),
 			)
 		);
 	}
@@ -49,57 +49,57 @@ final class FirstRun {
 		$steps = array(
 			array(
 				'target' => $link( 'amazing-security' ),
-				'title'  => __( 'Scan', 'amazing-security-scanner' ),
-				'text'   => __( 'Reads this site and lists what it finds. A scan does not change anything.', 'amazing-security-scanner' ),
+				'title'  => __( 'Scan', 'amazingplugins-security-scanner' ),
+				'text'   => __( 'Reads this site and lists what it finds. A scan does not change anything.', 'amazingplugins-security-scanner' ),
 			),
 			array(
 				'target' => $link( 'amsec-recommendations' ),
-				'title'  => __( 'Recommendations', 'amazing-security-scanner' ),
-				'text'   => __( 'Where to start, and which protections are still off.', 'amazing-security-scanner' ),
+				'title'  => __( 'Recommendations', 'amazingplugins-security-scanner' ),
+				'text'   => __( 'Where to start, and which protections are still off.', 'amazingplugins-security-scanner' ),
 			),
 			array(
 				'target' => $link( 'amsec-accounts' ),
-				'title'  => __( 'Log In & Register', 'amazing-security-scanner' ),
-				'text'   => __( 'Sign-in checks and authenticator status. Each one stays off until you turn it on.', 'amazing-security-scanner' ),
+				'title'  => __( 'Log In & Register', 'amazingplugins-security-scanner' ),
+				'text'   => __( 'Sign-in checks and authenticator status. Each one stays off until you turn it on.', 'amazingplugins-security-scanner' ),
 			),
 			array(
 				'target' => $link( 'amsec-traffic-guard' ),
-				'title'  => __( 'Traffic', 'amazing-security-scanner' ),
-				'text'   => __( 'Request limits and rules. Each one stays off until you turn it on.', 'amazing-security-scanner' ),
+				'title'  => __( 'Traffic', 'amazingplugins-security-scanner' ),
+				'text'   => __( 'Request limits and rules. Each one stays off until you turn it on.', 'amazingplugins-security-scanner' ),
 			),
 			array(
 				'target' => $link( 'amsec-files' ),
-				'title'  => __( 'Files', 'amazing-security-scanner' ),
-				'text'   => __( 'File checks. A fix only happens after you approve it.', 'amazing-security-scanner' ),
+				'title'  => __( 'Files', 'amazingplugins-security-scanner' ),
+				'text'   => __( 'File checks. A fix only happens after you approve it.', 'amazingplugins-security-scanner' ),
 			),
 			array(
 				'target' => $link( 'amsec-records' ),
-				'title'  => __( 'Records', 'amazing-security-scanner' ),
-				'text'   => __( 'The local record of sign-ins and account changes.', 'amazing-security-scanner' ),
+				'title'  => __( 'Records', 'amazingplugins-security-scanner' ),
+				'text'   => __( 'The local record of sign-ins and account changes.', 'amazingplugins-security-scanner' ),
 			),
 			array(
 				'target' => $link( 'amsec-settings' ),
-				'title'  => __( 'Settings', 'amazing-security-scanner' ),
-				'text'   => __( 'Email notices and the weekly digest. Both are off by default.', 'amazing-security-scanner' ),
+				'title'  => __( 'Settings', 'amazingplugins-security-scanner' ),
+				'text'   => __( 'Email notices and the weekly digest. Both are off by default.', 'amazingplugins-security-scanner' ),
 			),
 			array(
 				'target' => $link( 'amsec-assistant' ),
-				'title'  => __( 'AI & MCP', 'amazing-security-scanner' ),
-				'text'   => __( 'Optional access for an AI assistant.', 'amazing-security-scanner' ),
+				'title'  => __( 'AI & MCP', 'amazingplugins-security-scanner' ),
+				'text'   => __( 'Optional access for an AI assistant.', 'amazingplugins-security-scanner' ),
 			),
 			array(
 				'target' => '.amsec-scan-button',
 				'edge'   => 'top',
-				'title'  => $scanned ? __( 'Rescan button', 'amazing-security-scanner' ) : __( 'Scan button', 'amazing-security-scanner' ),
-				'text'   => $scanned ? __( 'Runs the checks again after you change something. It does not change the site.', 'amazing-security-scanner' ) : __( 'Nothing runs until you press this.', 'amazing-security-scanner' ),
+				'title'  => $scanned ? __( 'Rescan button', 'amazingplugins-security-scanner' ) : __( 'Scan button', 'amazingplugins-security-scanner' ),
+				'text'   => $scanned ? __( 'Runs the checks again after you change something. It does not change the site.', 'amazingplugins-security-scanner' ) : __( 'Nothing runs until you press this.', 'amazingplugins-security-scanner' ),
 			),
 		);
 		if ( $scanned ) {
 			$steps[] = array(
 				'target' => '.amsec-scan .amsec-cats',
 				'edge'   => 'top',
-				'title'  => __( 'Results', 'amazing-security-scanner' ),
-				'text'   => __( 'Findings are sorted into these tabs. The number is how many are in each.', 'amazing-security-scanner' ),
+				'title'  => __( 'Results', 'amazingplugins-security-scanner' ),
+				'text'   => __( 'Findings are sorted into these tabs. The number is how many are in each.', 'amazingplugins-security-scanner' ),
 			);
 		}
 		return $steps;
