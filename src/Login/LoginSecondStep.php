@@ -78,12 +78,12 @@ final class LoginSecondStep {
 				$error = $finished;
 			}
 		}
-		login_header( __( 'Verification', 'amazing-security-scanner' ), '', $error );
-		echo '<p>' . esc_html__( 'Enter the code from the authenticator app you set up, or a recovery code.', 'amazing-security-scanner' ) . '</p>';
+		login_header( __( 'Verification', 'amazingplugins-security-scanner' ), '', $error );
+		echo '<p>' . esc_html__( 'Enter the code from the authenticator app you set up, or a recovery code.', 'amazingplugins-security-scanner' ) . '</p>';
 		echo '<form method="post" action="' . esc_url( add_query_arg( 'action', 'amsec_verify', wp_login_url() ) ) . '">';
 		wp_nonce_field( 'amsec_login_step', 'amsec_login_step_nonce' );
 		( new LoginFormFields() )->step();
-		echo '<p class="submit"><input type="submit" class="button button-primary button-large" value="' . esc_attr__( 'Continue', 'amazing-security-scanner' ) . '"></p></form>';
+		echo '<p class="submit"><input type="submit" class="button button-primary button-large" value="' . esc_attr__( 'Continue', 'amazingplugins-security-scanner' ) . '"></p></form>';
 		login_footer();
 		exit;
 	}
@@ -94,7 +94,7 @@ final class LoginSecondStep {
 	private function finish( array $record ): ?\WP_Error {
 		$nonce = isset( $_POST['amsec_login_step_nonce'] ) ? sanitize_text_field( wp_unslash( (string) $_POST['amsec_login_step_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Verified on the next line for this logged-out code screen.
 		if ( ! wp_verify_nonce( $nonce, 'amsec_login_step' ) ) {
-			return new \WP_Error( 'amsec_verification_failed', __( 'Verification could not be completed. Start the sign-in again.', 'amazing-security-scanner' ) );
+			return new \WP_Error( 'amsec_verification_failed', __( 'Verification could not be completed. Start the sign-in again.', 'amazingplugins-security-scanner' ) );
 		}
 		$factor = isset( $_POST['amsec_otp'] ) && is_string( $_POST['amsec_otp'] ) ? sanitize_text_field( wp_unslash( $_POST['amsec_otp'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce checked above.
 		$totp   = new TotpAuthentication( new WordPressTotpStore( $GLOBALS['wpdb'] ), new SecretCipher( wp_salt( 'auth' ) ), new Totp() );
@@ -102,7 +102,7 @@ final class LoginSecondStep {
 			$this->clear( $record['token'] );
 			$user = get_userdata( $record['user'] );
 			if ( ! $user instanceof \WP_User ) {
-				return new \WP_Error( 'amsec_verification_failed', __( 'Verification could not be completed.', 'amazing-security-scanner' ) );
+				return new \WP_Error( 'amsec_verification_failed', __( 'Verification could not be completed.', 'amazingplugins-security-scanner' ) );
 			}
 			wp_set_current_user( $user->ID );
 			wp_set_auth_cookie( $user->ID, false );
@@ -126,7 +126,7 @@ final class LoginSecondStep {
 			),
 			self::TTL
 		);
-		return new \WP_Error( 'amsec_verification_failed', __( 'That code did not match. Try again.', 'amazing-security-scanner' ) );
+		return new \WP_Error( 'amsec_verification_failed', __( 'That code did not match. Try again.', 'amazingplugins-security-scanner' ) );
 	}
 
 	/**

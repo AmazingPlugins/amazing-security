@@ -22,7 +22,7 @@ final class McpSettingsAction {
 
 	public function save(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'You cannot change MCP access.', 'amazing-security-scanner' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'You cannot change MCP access.', 'amazingplugins-security-scanner' ), '', array( 'response' => 403 ) );
 		}
 		check_admin_referer( 'amsec_mcp_settings' );
 		try {
@@ -31,7 +31,7 @@ final class McpSettingsAction {
 			$enabled = self::parse( wp_unslash( $_POST ) );
 			( new McpPreferences( new WordPressOptions() ) )->setEnabled( $enabled );
 		} catch ( Throwable ) {
-			wp_die( esc_html__( 'MCP setting could not be saved.', 'amazing-security-scanner' ), '', array( 'response' => 400 ) );
+			wp_die( esc_html__( 'MCP setting could not be saved.', 'amazingplugins-security-scanner' ), '', array( 'response' => 400 ) );
 		}
 		wp_safe_redirect( admin_url( 'admin.php?page=amsec-assistant#amsec-mcp' ) );
 		exit;

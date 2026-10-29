@@ -10,7 +10,7 @@ final class DigestSummary {
 	public const SOURCES = array( 'hardening', 'integrity', 'files', 'vulnerabilities' );
 
 	public static function build( array $sources, array $activity, ?array $previous, int $now ): array {
-		$lines    = array( 'Amazing Security Scanner weekly digest', 'Generated UTC: ' . gmdate( 'Y-m-d H:i:s', $now ), null === $previous ? 'Initial snapshot; no earlier accepted digest for comparison.' : 'Newly observed findings compare with the last accepted digest.', '' );
+		$lines    = array( 'AmazingPlugins Security Scanner weekly digest', 'Generated UTC: ' . gmdate( 'Y-m-d H:i:s', $now ), null === $previous ? 'Initial snapshot; no earlier accepted digest for comparison.' : 'Newly observed findings compare with the last accepted digest.', '' );
 		$snapshot = array(
 			'identities' => array(),
 			'capped'     => array(),

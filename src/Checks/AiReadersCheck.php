@@ -108,19 +108,19 @@ final class AiReadersCheck implements SecurityCheck {
 
 	private static function summary( string $guest, string $registration, string $crawlers ): string {
 		$bots = match ( true ) {
-			'open' === $guest && 'open' === $registration => __( 'Guests can comment on new posts, and anyone can register.', 'amazing-security-scanner' ),
-			'open' === $guest && 'closed' === $registration => __( 'Guests can comment on new posts. Registration is closed.', 'amazing-security-scanner' ),
-			'closed' === $guest && 'open' === $registration => __( 'Guests cannot comment on new posts, and anyone can register.', 'amazing-security-scanner' ),
-			'closed' === $guest && 'closed' === $registration => __( 'Guests cannot comment on new posts, and registration is closed.', 'amazing-security-scanner' ),
-			'open' === $guest => __( 'Guests can comment on new posts. The registration setting could not be read.', 'amazing-security-scanner' ),
-			'open' === $registration => __( 'Anyone can register. The comment setting could not be read.', 'amazing-security-scanner' ),
-			default => __( 'Comment or registration settings could not be read.', 'amazing-security-scanner' ),
+			'open' === $guest && 'open' === $registration => __( 'Guests can comment on new posts, and anyone can register.', 'amazingplugins-security-scanner' ),
+			'open' === $guest && 'closed' === $registration => __( 'Guests can comment on new posts. Registration is closed.', 'amazingplugins-security-scanner' ),
+			'closed' === $guest && 'open' === $registration => __( 'Guests cannot comment on new posts, and anyone can register.', 'amazingplugins-security-scanner' ),
+			'closed' === $guest && 'closed' === $registration => __( 'Guests cannot comment on new posts, and registration is closed.', 'amazingplugins-security-scanner' ),
+			'open' === $guest => __( 'Guests can comment on new posts. The registration setting could not be read.', 'amazingplugins-security-scanner' ),
+			'open' === $registration => __( 'Anyone can register. The comment setting could not be read.', 'amazingplugins-security-scanner' ),
+			default => __( 'Comment or registration settings could not be read.', 'amazingplugins-security-scanner' ),
 		};
 		$rules = match ( $crawlers ) {
-			'allowed' => __( 'AI crawlers are not asked to stay out.', 'amazing-security-scanner' ),
-			'limited' => __( 'Some AI crawlers are asked to stay out.', 'amazing-security-scanner' ),
-			'blocked' => __( 'The crawler rules ask the main AI crawlers to stay out.', 'amazing-security-scanner' ),
-			default => __( 'The crawler rules could not be read.', 'amazing-security-scanner' ),
+			'allowed' => __( 'AI crawlers are not asked to stay out.', 'amazingplugins-security-scanner' ),
+			'limited' => __( 'Some AI crawlers are asked to stay out.', 'amazingplugins-security-scanner' ),
+			'blocked' => __( 'The crawler rules ask the main AI crawlers to stay out.', 'amazingplugins-security-scanner' ),
+			default => __( 'The crawler rules could not be read.', 'amazingplugins-security-scanner' ),
 		};
 		return $bots . ' ' . $rules . ' This check does not change those settings. Author names stay available over the content API.';
 	}

@@ -9,39 +9,39 @@ defined( 'ABSPATH' ) || exit;
 /** Integrity, file scan, vulnerability checks, and the daily cycle. Hidden from the side menu. */
 final class FollowUpPages {
 	public function register(): void {
-		add_submenu_page( 'amazing-security', __( 'Integrity and file scan', 'amazing-security-scanner' ), __( 'Integrity and file scan', 'amazing-security-scanner' ), 'manage_options', 'amsec-file-checks', array( $this, 'files' ) );
-		add_submenu_page( 'amazing-security', __( 'Published vulnerabilities', 'amazing-security-scanner' ), __( 'Published vulnerabilities', 'amazing-security-scanner' ), 'manage_options', 'amsec-vulnerabilities', array( $this, 'vulnerabilities' ) );
-		add_submenu_page( 'amazing-security', __( 'Daily checks', 'amazing-security-scanner' ), __( 'Daily checks', 'amazing-security-scanner' ), 'manage_options', 'amsec-schedule', array( $this, 'schedule' ) );
+		add_submenu_page( 'amazing-security', __( 'Integrity and file scan', 'amazingplugins-security-scanner' ), __( 'Integrity and file scan', 'amazingplugins-security-scanner' ), 'manage_options', 'amsec-file-checks', array( $this, 'files' ) );
+		add_submenu_page( 'amazing-security', __( 'Published vulnerabilities', 'amazingplugins-security-scanner' ), __( 'Published vulnerabilities', 'amazingplugins-security-scanner' ), 'manage_options', 'amsec-vulnerabilities', array( $this, 'vulnerabilities' ) );
+		add_submenu_page( 'amazing-security', __( 'Daily checks', 'amazingplugins-security-scanner' ), __( 'Daily checks', 'amazingplugins-security-scanner' ), 'manage_options', 'amsec-schedule', array( $this, 'schedule' ) );
 	}
 
 	public function files(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'You are not allowed to view this report.', 'amazing-security-scanner' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'You are not allowed to view this report.', 'amazingplugins-security-scanner' ), '', array( 'response' => 403 ) );
 		}
-		echo '<div class="wrap amazing-security-admin"><h1>' . esc_html__( 'Integrity and file scan', 'amazing-security-scanner' ) . '</h1>';
-		echo '<p>' . esc_html__( 'Compare installed release files, then review unfamiliar PHP. Each scan starts from its own button.', 'amazing-security-scanner' ) . '</p>';
-		$this->notice( 'amazing_security_integrity_error', __( 'Integrity scan could not finish. The previous completed report remains available.', 'amazing-security-scanner' ) );
-		$this->notice( 'amazing_security_file_scan_error', __( 'File scan could not finish. The previous completed report remains available.', 'amazing-security-scanner' ) );
+		echo '<div class="wrap amazing-security-admin"><h1>' . esc_html__( 'Integrity and file scan', 'amazingplugins-security-scanner' ) . '</h1>';
+		echo '<p>' . esc_html__( 'Compare installed release files, then review unfamiliar PHP. Each scan starts from its own button.', 'amazingplugins-security-scanner' ) . '</p>';
+		$this->notice( 'amazing_security_integrity_error', __( 'Integrity scan could not finish. The previous completed report remains available.', 'amazingplugins-security-scanner' ) );
+		$this->notice( 'amazing_security_file_scan_error', __( 'File scan could not finish. The previous completed report remains available.', 'amazingplugins-security-scanner' ) );
 		( new AdminPage() )->renderSection( 'files' );
 		echo '</div>';
 	}
 
 	public function vulnerabilities(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'You are not allowed to view this report.', 'amazing-security-scanner' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'You are not allowed to view this report.', 'amazingplugins-security-scanner' ), '', array( 'response' => 403 ) );
 		}
-		echo '<div class="wrap amazing-security-admin" id="amsec-vulnerabilities-page"><h1>' . esc_html__( 'Published vulnerabilities', 'amazing-security-scanner' ) . '</h1>';
-		$this->notice( 'amazing_security_vulnerability_error', __( 'Vulnerability inventory could not be saved. The previous report remains available.', 'amazing-security-scanner' ) );
+		echo '<div class="wrap amazing-security-admin" id="amsec-vulnerabilities-page"><h1>' . esc_html__( 'Published vulnerabilities', 'amazingplugins-security-scanner' ) . '</h1>';
+		$this->notice( 'amazing_security_vulnerability_error', __( 'Vulnerability inventory could not be saved. The previous report remains available.', 'amazingplugins-security-scanner' ) );
 		( new AdminPage() )->renderSection( 'vulnerabilities' );
 		echo '</div>';
 	}
 
 	public function schedule(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'You are not allowed to view this report.', 'amazing-security-scanner' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'You are not allowed to view this report.', 'amazingplugins-security-scanner' ), '', array( 'response' => 403 ) );
 		}
-		echo '<div class="wrap amazing-security-admin"><h1>' . esc_html__( 'Daily checks', 'amazing-security-scanner' ) . '</h1>';
-		echo '<p>' . esc_html__( 'This page shows whether the local cycle is waiting. It does not start a check.', 'amazing-security-scanner' ) . '</p>';
+		echo '<div class="wrap amazing-security-admin"><h1>' . esc_html__( 'Daily checks', 'amazingplugins-security-scanner' ) . '</h1>';
+		echo '<p>' . esc_html__( 'This page shows whether the local cycle is waiting. It does not start a check.', 'amazingplugins-security-scanner' ) . '</p>';
 		( new AdminPage() )->renderSection( 'schedule' );
 		echo '</div>';
 	}

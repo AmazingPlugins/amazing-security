@@ -14,16 +14,16 @@ final class Module {
 	}
 
 	public static function menu(): void {
-		add_submenu_page( 'amazing-security', __( 'Recovery', 'amazing-security-scanner' ), __( 'Recovery', 'amazing-security-scanner' ), 'manage_options', 'amsec-recovery', array( self::class, 'render' ) );
+		add_submenu_page( 'amazing-security', __( 'Recovery', 'amazingplugins-security-scanner' ), __( 'Recovery', 'amazingplugins-security-scanner' ), 'manage_options', 'amsec-recovery', array( self::class, 'render' ) );
 	}
 
 	public static function render(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'You do not have permission to run recovery tools.', 'amazing-security-scanner' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'You do not have permission to run recovery tools.', 'amazingplugins-security-scanner' ), '', array( 'response' => 403 ) );
 		}
 		$https = is_ssl();
-		echo '<div class="wrap amazing-security-admin"><h1>' . esc_html__( 'Recovery', 'amazing-security-scanner' ) . '</h1>';
-		echo '<p>' . esc_html__( 'Directory modes are shown for review. Change them in your hosting file manager or over SFTP.', 'amazing-security-scanner' ) . '</p>';
+		echo '<div class="wrap amazing-security-admin"><h1>' . esc_html__( 'Recovery', 'amazingplugins-security-scanner' ) . '</h1>';
+		echo '<p>' . esc_html__( 'Directory modes are shown for review. Change them in your hosting file manager or over SFTP.', 'amazingplugins-security-scanner' ) . '</p>';
 		if ( ! $https ) {
 			echo '<div class="notice notice-error inline"><p>' . esc_html( ( new Approval( false, true, true ) )->denial() ?? '' ) . '</p></div>';
 		}
@@ -38,12 +38,12 @@ final class Module {
 		self::guard( 'amsec_recovery_backup' );
 		global $wpdb;
 		if ( ! isset( $wpdb ) || ! is_object( $wpdb ) || ! is_string( $wpdb->prefix ) ) {
-			wp_die( esc_html__( 'The database connection is unavailable. No SQL file was created.', 'amazing-security-scanner' ), '', array( 'response' => 400 ) );
+			wp_die( esc_html__( 'The database connection is unavailable. No SQL file was created.', 'amazingplugins-security-scanner' ), '', array( 'response' => 400 ) );
 		}
 		$confirmed = isset( $_POST['confirm'] ) && '1' === sanitize_text_field( wp_unslash( $_POST['confirm'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce checked in guard().
 		$result    = ( new DatabaseDump( new WordPressTables( $wpdb ), array( WordPressTables::class, 'escape' ) ) )->build( $wpdb->prefix, self::approval(), $confirmed );
 		if ( ! $result->ok || '' === $result->body || preg_match( '/CREATE\s+DATABASE/i', $result->body ) ) {
-			wp_die( esc_html( '' === $result->message ? __( 'No SQL file was created.', 'amazing-security-scanner' ) : $result->message ), '', array( 'response' => 400 ) );
+			wp_die( esc_html( '' === $result->message ? __( 'No SQL file was created.', 'amazingplugins-security-scanner' ) : $result->message ), '', array( 'response' => 400 ) );
 		}
 		nocache_headers();
 		header( 'Content-Type: application/octet-stream' );
@@ -55,35 +55,35 @@ final class Module {
 	}
 
 	private static function renderModes(): void {
-		echo '<h2>' . esc_html__( 'Directory modes', 'amazing-security-scanner' ) . '</h2>';
-		echo '<p>' . esc_html__( 'The suggested mode for these directories is 0755. 0777 lets any user on the server write to them.', 'amazing-security-scanner' ) . '</p>';
-		echo '<table class="widefat striped"><thead><tr><th>' . esc_html__( 'Directory', 'amazing-security-scanner' ) . '</th><th>' . esc_html__( 'Current mode', 'amazing-security-scanner' ) . '</th><th>' . esc_html__( 'Suggested mode', 'amazing-security-scanner' ) . '</th></tr></thead><tbody>';
+		echo '<h2>' . esc_html__( 'Directory modes', 'amazingplugins-security-scanner' ) . '</h2>';
+		echo '<p>' . esc_html__( 'The suggested mode for these directories is 0755. 0777 lets any user on the server write to them.', 'amazingplugins-security-scanner' ) . '</p>';
+		echo '<table class="widefat striped"><thead><tr><th>' . esc_html__( 'Directory', 'amazingplugins-security-scanner' ) . '</th><th>' . esc_html__( 'Current mode', 'amazingplugins-security-scanner' ) . '</th><th>' . esc_html__( 'Suggested mode', 'amazingplugins-security-scanner' ) . '</th></tr></thead><tbody>';
 		foreach ( DirectoryModes::forSite()->preview() as $row ) {
-			echo '<tr><td><code>' . esc_html( $row['path'] ) . '</code></td><td>' . esc_html( null === $row['octal'] ? __( 'Unavailable', 'amazing-security-scanner' ) : $row['octal'] ) . '</td><td><code>' . esc_html( $row['suggested'] ) . '</code></td></tr>';
+			echo '<tr><td><code>' . esc_html( $row['path'] ) . '</code></td><td>' . esc_html( null === $row['octal'] ? __( 'Unavailable', 'amazingplugins-security-scanner' ) : $row['octal'] ) . '</td><td><code>' . esc_html( $row['suggested'] ) . '</code></td></tr>';
 		}
 		echo '</tbody></table>';
 	}
 
 	private static function renderBackup(): void {
-		echo '<h2>' . esc_html__( 'Database backup', 'amazing-security-scanner' ) . '</h2>';
-		echo '<p>' . esc_html__( 'Downloads tables whose names start with the site prefix. The file is not saved in the plugin or uploads. More than 50 tables, or more than 20 MB, is refused instead of a partial file.', 'amazing-security-scanner' ) . '</p>';
+		echo '<h2>' . esc_html__( 'Database backup', 'amazingplugins-security-scanner' ) . '</h2>';
+		echo '<p>' . esc_html__( 'Downloads tables whose names start with the site prefix. The file is not saved in the plugin or uploads. More than 50 tables, or more than 20 MB, is refused instead of a partial file.', 'amazingplugins-security-scanner' ) . '</p>';
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
 		echo '<input type="hidden" name="action" value="amsec_recovery_backup">';
 		wp_nonce_field( 'amsec_recovery_backup' );
-		echo '<p><label><input type="checkbox" name="confirm" value="1"> ' . esc_html__( 'Download the prefixed tables.', 'amazing-security-scanner' ) . '</label></p>';
-		echo '<p><button class="button button-primary" type="submit">' . esc_html__( 'Download SQL', 'amazing-security-scanner' ) . '</button></p></form>';
+		echo '<p><label><input type="checkbox" name="confirm" value="1"> ' . esc_html__( 'Download the prefixed tables.', 'amazingplugins-security-scanner' ) . '</label></p>';
+		echo '<p><button class="button button-primary" type="submit">' . esc_html__( 'Download SQL', 'amazingplugins-security-scanner' ) . '</button></p></form>';
 	}
 
 	private static function guard( string $action ): void {
 		$method = isset( $_SERVER['REQUEST_METHOD'] ) ? strtoupper( sanitize_text_field( wp_unslash( (string) $_SERVER['REQUEST_METHOD'] ) ) ) : '';
 		if ( 'POST' !== $method ) {
-			wp_die( esc_html__( 'Recovery tools run only from a submitted form.', 'amazing-security-scanner' ), '', array( 'response' => 405 ) );
+			wp_die( esc_html__( 'Recovery tools run only from a submitted form.', 'amazingplugins-security-scanner' ), '', array( 'response' => 405 ) );
 		}
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'You do not have permission to run recovery tools.', 'amazing-security-scanner' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'You do not have permission to run recovery tools.', 'amazingplugins-security-scanner' ), '', array( 'response' => 403 ) );
 		}
 		if ( ! is_ssl() ) {
-			wp_die( esc_html__( 'Recovery tools need HTTPS. No files were changed.', 'amazing-security-scanner' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'Recovery tools need HTTPS. No files were changed.', 'amazingplugins-security-scanner' ), '', array( 'response' => 403 ) );
 		}
 		check_admin_referer( $action );
 	}

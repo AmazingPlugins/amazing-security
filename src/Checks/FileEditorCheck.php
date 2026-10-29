@@ -17,8 +17,8 @@ final class FileEditorCheck extends AbstractCheck {
 		$disabled = $this->values->fileEditorDisabled();
 		$fix      = $this->values->fileEditorFix();
 		$warn     = 'config' === $fix
-			? __( 'People can edit theme and plugin files because wp-config.php turns the editor on. This plugin will not edit that file.', 'amazing-security-scanner' )
-			: __( 'People can edit theme and plugin files in wp-admin. Turn that editor off so a signed-in session cannot change PHP from the browser.', 'amazing-security-scanner' );
-		return $this->result( null === $disabled ? null : ! $disabled, __( 'The theme and plugin editor is turned off.', 'amazing-security-scanner' ), $warn, array( 'fix' => $fix ) );
+			? __( 'People can edit theme and plugin files because wp-config.php turns the editor on. This plugin will not edit that file.', 'amazingplugins-security-scanner' )
+			: __( 'People can edit theme and plugin files in wp-admin. Turn that editor off so a signed-in session cannot change PHP from the browser.', 'amazingplugins-security-scanner' );
+		return $this->result( null === $disabled ? null : ! $disabled, __( 'The theme and plugin editor is turned off.', 'amazingplugins-security-scanner' ), $warn, array( 'fix' => $fix ) );
 	}
 }

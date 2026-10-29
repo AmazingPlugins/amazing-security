@@ -28,7 +28,7 @@ final class LoginHints {
 			}
 		}
 		if ( $changed ) {
-			$messages['amsec_generic_login'] = __( 'The username or password is incorrect.', 'amazing-security-scanner' );
+			$messages['amsec_generic_login'] = __( 'The username or password is incorrect.', 'amazingplugins-security-scanner' );
 		}
 		return $messages;
 	}

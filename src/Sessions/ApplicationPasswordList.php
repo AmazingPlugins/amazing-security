@@ -24,7 +24,7 @@ final class ApplicationPasswordList {
 				continue;
 			}
 			if ( ! is_string( $name ) || '' === $name || strlen( $name ) > 100 ) {
-				$name = __( 'Unnamed', 'amazing-security-scanner' );
+				$name = __( 'Unnamed', 'amazingplugins-security-scanner' );
 			}
 			$rows[] = array(
 				'uuid'    => $uuid,

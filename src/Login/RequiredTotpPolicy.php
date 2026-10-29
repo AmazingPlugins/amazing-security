@@ -74,9 +74,9 @@ final class RequiredTotpPolicy {
 				return $user;
 			}
 		} catch ( \Throwable ) {
-			return new \WP_Error( 'amsec_policy_unavailable', __( 'Administrator verification policy is unavailable. Contact the site owner for recovery.', 'amazing-security-scanner' ) );
+			return new \WP_Error( 'amsec_policy_unavailable', __( 'Administrator verification policy is unavailable. Contact the site owner for recovery.', 'amazingplugins-security-scanner' ) );
 		}
-		return new \WP_Error( 'amsec_enrollment_required', __( 'Your verification enrollment period has ended. Ask an enrolled administrator to grant a new grace period, or use host-level recovery.', 'amazing-security-scanner' ) );
+		return new \WP_Error( 'amsec_enrollment_required', __( 'Your verification enrollment period has ended. Ask an enrolled administrator to grant a new grace period, or use host-level recovery.', 'amazingplugins-security-scanner' ) );
 	}
 
 	private static function accountCovered( int $id ): bool {

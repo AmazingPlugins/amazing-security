@@ -21,7 +21,7 @@ final class LoginRecoveryCommand {
 		foreach ( array( 'amsec_email_factor', 'amsec_login_challenge', 'amsec_login_confirm', 'amsec_common_passwords', 'amsec_idle_minutes' ) as $option ) {
 			update_option( $option, '0' );
 		}
-		\WP_CLI::success( 'Amazing Security Scanner sign-in limits, XML-RPC restriction, email code, sum question, hidden field, breached-password block and idle sign-out are off.' );
+		\WP_CLI::success( 'AmazingPlugins Security Scanner sign-in limits, XML-RPC restriction, email code, sum question, hidden field, breached-password block and idle sign-out are off.' );
 	}
 
 	public function disableTotp( array $args, array $assocArgs ): void {
@@ -34,6 +34,6 @@ final class LoginRecoveryCommand {
 			\WP_CLI::error( 'Could not disable TOTP for this user.' );
 		}
 		update_user_meta( (int) $userId, 'amsec_totp_recovery_at', gmdate( 'Y-m-d H:i:s' ) );
-		\WP_CLI::success( 'Amazing Security Scanner TOTP is off for the selected user. Re-enroll after signing in.' );
+		\WP_CLI::success( 'AmazingPlugins Security Scanner TOTP is off for the selected user. Re-enroll after signing in.' );
 	}
 }

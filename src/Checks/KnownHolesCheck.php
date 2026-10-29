@@ -103,13 +103,13 @@ final class KnownHolesCheck implements SecurityCheck {
 
 	private static function summary( string $enabled, string $stored ): string {
 		$text = match ( true ) {
-			'unknown' === $enabled => __( 'Vulnerability check status could not be read.', 'amazing-security-scanner' ),
-			'no' === $enabled => __( 'Known holes in installed plugins and themes are not being checked. Turn on vulnerability checks on this page when you want this site to ask the provider.', 'amazing-security-scanner' ),
-			'found' === $stored => __( 'A published issue matches an installed package. Review the vulnerability section on this page.', 'amazing-security-scanner' ),
-			'none' === $stored => __( 'Vulnerability checks are on, and no result is stored yet. Use Check installed versions on this page.', 'amazing-security-scanner' ),
-			'clean' === $stored => __( 'The last stored vulnerability check did not match a published issue to an installed package.', 'amazing-security-scanner' ),
-			'partial' === $stored => __( 'The last vulnerability check did not finish every package. Continue it from this page.', 'amazing-security-scanner' ),
-			default => __( 'The stored vulnerability result could not be read.', 'amazing-security-scanner' ),
+			'unknown' === $enabled => __( 'Vulnerability check status could not be read.', 'amazingplugins-security-scanner' ),
+			'no' === $enabled => __( 'Known holes in installed plugins and themes are not being checked. Turn on vulnerability checks on this page when you want this site to ask the provider.', 'amazingplugins-security-scanner' ),
+			'found' === $stored => __( 'A published issue matches an installed package. Review the vulnerability section on this page.', 'amazingplugins-security-scanner' ),
+			'none' === $stored => __( 'Vulnerability checks are on, and no result is stored yet. Use Check installed versions on this page.', 'amazingplugins-security-scanner' ),
+			'clean' === $stored => __( 'The last stored vulnerability check did not match a published issue to an installed package.', 'amazingplugins-security-scanner' ),
+			'partial' === $stored => __( 'The last vulnerability check did not finish every package. Continue it from this page.', 'amazingplugins-security-scanner' ),
+			default => __( 'The stored vulnerability result could not be read.', 'amazingplugins-security-scanner' ),
 		};
 		return $text . ' This check does not contact the provider.';
 	}

@@ -14,7 +14,7 @@ use Throwable;
 final class ApprovedSettingAction {
 	public function handle(): void {
 		if ( ! current_user_can( 'manage_options' ) || ! FixApprovalAction::cookieAuthenticated() ) {
-			wp_die( esc_html__( 'A current administrator session is required.', 'amazing-security-scanner' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'A current administrator session is required.', 'amazingplugins-security-scanner' ), '', array( 'response' => 403 ) );
 		}
 		check_admin_referer( 'amsec_approved_setting' );
 		// The nonce is verified above before the operation is applied.
@@ -45,7 +45,7 @@ final class ApprovedSettingAction {
 			default => false,
 		};
 		if ( ! $changed ) {
-			wp_die( esc_html__( 'That setting was not changed.', 'amazing-security-scanner' ), '', array( 'response' => 409 ) );
+			wp_die( esc_html__( 'That setting was not changed.', 'amazingplugins-security-scanner' ), '', array( 'response' => 409 ) );
 		}
 		try {
 			( new LocalHardeningScanService() )->run();

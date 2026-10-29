@@ -17,11 +17,11 @@ final class Guard {
 		$this->record( $server );
 		$lists = new BlockList();
 		if ( $lists->blocked( $this->list( Options::HOSTNAMES ), $this->list( Options::AGENTS ), $this->list( Options::REFERRERS ), $server, $this->canManage() ) ) {
-			$this->deny( __( 'Request blocked.', 'amazing-security-scanner' ) );
+			$this->deny( __( 'Request blocked.', 'amazingplugins-security-scanner' ) );
 		}
 		$hotlink = new Hotlink();
 		if ( $hotlink->blocked( $this->enabled( Options::HOTLINK ), $server, $this->siteHost() ) ) {
-			$this->deny( __( 'Image request blocked.', 'amazing-security-scanner' ) );
+			$this->deny( __( 'Image request blocked.', 'amazingplugins-security-scanner' ) );
 		}
 	}
 

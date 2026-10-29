@@ -58,15 +58,15 @@ final class AuthFactorCheck implements SecurityCheck {
 			default                     => State::CRITICAL,
 		};
 		$kind     = 'passkeys-status' === $this->checkId ? 'passkeys' : 'authenticator';
-		$provider = is_string( $factor['provider'] ?? null ) && '' !== $factor['provider'] ? $factor['provider'] : __( 'That plugin', 'amazing-security-scanner' );
+		$provider = is_string( $factor['provider'] ?? null ) && '' !== $factor['provider'] ? $factor['provider'] : __( 'That plugin', 'amazingplugins-security-scanner' );
 		$summary  = match ( $kind . ':' . $stateKey ) {
-			'authenticator:active' => $provider . ' is handling authenticator codes for this account. Amazing Security Scanner does not store backup codes; manage enrollment there.',
-			'authenticator:available' => $provider . ' is installed but not in use for this account. Turn it on there. Amazing Security Scanner only reports status.',
-			'authenticator:missing' => __( 'No authenticator-app plugin was detected. Install a dedicated plugin such as Two Factor if you want app codes. Amazing Security Scanner does not enroll devices.', 'amazing-security-scanner' ),
-			'passkeys:active' => $provider . ' is handling passkeys for this account. Manage devices there. Amazing Security Scanner does not enroll passkeys.',
-			'passkeys:available' => $provider . ' is installed but not in use for this account. Turn it on there. Amazing Security Scanner only reports status.',
-			'passkeys:missing' => __( 'No passkey plugin was detected. Install a dedicated plugin such as Two Factor if you want passkeys. Amazing Security Scanner does not enroll devices.', 'amazing-security-scanner' ),
-			default => __( 'Authenticator status could not be read. Amazing Security Scanner does not enroll devices.', 'amazing-security-scanner' ),
+			'authenticator:active' => $provider . ' is handling authenticator codes for this account. AmazingPlugins Security Scanner does not store backup codes; manage enrollment there.',
+			'authenticator:available' => $provider . ' is installed but not in use for this account. Turn it on there. AmazingPlugins Security Scanner only reports status.',
+			'authenticator:missing' => __( 'No authenticator-app plugin was detected. Install a dedicated plugin such as Two Factor if you want app codes. AmazingPlugins Security Scanner does not enroll devices.', 'amazingplugins-security-scanner' ),
+			'passkeys:active' => $provider . ' is handling passkeys for this account. Manage devices there. AmazingPlugins Security Scanner does not enroll passkeys.',
+			'passkeys:available' => $provider . ' is installed but not in use for this account. Turn it on there. AmazingPlugins Security Scanner only reports status.',
+			'passkeys:missing' => __( 'No passkey plugin was detected. Install a dedicated plugin such as Two Factor if you want passkeys. AmazingPlugins Security Scanner does not enroll devices.', 'amazingplugins-security-scanner' ),
+			default => __( 'Authenticator status could not be read. AmazingPlugins Security Scanner does not enroll devices.', 'amazingplugins-security-scanner' ),
 		};
 		$confidence = match ( $state ) {
 			State::CRITICAL => 'high',
