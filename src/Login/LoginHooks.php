@@ -22,7 +22,7 @@ final class LoginHooks {
 		}
 		$decision = $this->limiter->beforePassword( $this->addresses->fromServer( $_SERVER ), time() );
 		if ( $decision->blocked ) {
-			return new \WP_Error( 'amsec_rate_limited', __( 'Please try again shortly.', 'amazingplugins-security-scanner' ) );
+			return new \WP_Error( 'amsec_rate_limited', __( 'Please try again shortly.', 'amsec-security-scanner' ) );
 		}
 		return $user;
 	}

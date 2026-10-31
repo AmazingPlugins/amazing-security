@@ -14,9 +14,9 @@ final class AuthFactorPanel {
 	public static function html( string $title, array $factor, string $directoryUrl, string $domId = 'factor' ): string {
 		$state = $factor['state'] ?? AuthFactorStatus::MISSING;
 		$label = match ( $state ) {
-			AuthFactorStatus::ACTIVE    => __( 'Active', 'amazingplugins-security-scanner' ),
-			AuthFactorStatus::AVAILABLE => __( 'Available, off', 'amazingplugins-security-scanner' ),
-			default                     => __( 'Not on this site', 'amazingplugins-security-scanner' ),
+			AuthFactorStatus::ACTIVE    => __( 'Active', 'amsec-security-scanner' ),
+			AuthFactorStatus::AVAILABLE => __( 'Available, off', 'amsec-security-scanner' ),
+			default                     => __( 'Not on this site', 'amsec-security-scanner' ),
 		};
 		$safe  = preg_replace( '/[^a-z0-9\-]+/', '-', strtolower( $domId ) );
 		$id    = is_string( $safe ) && '' !== $safe ? $safe : 'factor';
@@ -31,21 +31,21 @@ final class AuthFactorPanel {
 				$activate
 					? sprintf(
 						/* translators: %s: suggested plugin name */
-						__( 'AmazingPlugins Security Scanner does not provide this itself. %1$s is installed but not active. Click Activate %1$s, then Activate on the Plugins screen. Set it up under Users > Profile, then come back here to check the status.', 'amazingplugins-security-scanner' ),
+						__( 'AmSec Security Scanner does not provide this itself. %1$s is installed but not active. Click Activate %1$s, then Activate on the Plugins screen. Set it up under Users > Profile, then come back here to check the status.', 'amsec-security-scanner' ),
 						$name
 					)
 					: ( $install
 					? sprintf(
 						/* translators: %s: suggested plugin name */
-						__( 'AmazingPlugins Security Scanner does not provide this itself. Click Find %s, then Install Now and Activate on the search page. Set it up under Users > Profile, then come back here to check the status.', 'amazingplugins-security-scanner' ),
+						__( 'AmSec Security Scanner does not provide this itself. Click Find %s, then Install Now and Activate on the search page. Set it up under Users > Profile, then come back here to check the status.', 'amsec-security-scanner' ),
 						$name
 					)
-					: __( 'AmazingPlugins Security Scanner does not provide this itself. Ask a network administrator to install a dedicated plugin, then set it up under Users > Profile.', 'amazingplugins-security-scanner' ) )
+					: __( 'AmSec Security Scanner does not provide this itself. Ask a network administrator to install a dedicated plugin, then set it up under Users > Profile.', 'amsec-security-scanner' ) )
 			) . '</p>';
 			$html .= '<p><a class="button" href="' . esc_url( $directoryUrl ) . '">' . esc_html(
 				sprintf(
 					/* translators: %s: suggested plugin name */
-					$activate ? __( 'Activate %s', 'amazingplugins-security-scanner' ) : ( $install ? __( 'Find %s', 'amazingplugins-security-scanner' ) : __( 'View %s on WordPress.org', 'amazingplugins-security-scanner' ) ),
+					$activate ? __( 'Activate %s', 'amsec-security-scanner' ) : ( $install ? __( 'Find %s', 'amsec-security-scanner' ) : __( 'View %s on WordPress.org', 'amsec-security-scanner' ) ),
 					$name
 				)
 			) . '</a></p>';
@@ -54,7 +54,7 @@ final class AuthFactorPanel {
 			$html    .= '<p>' . esc_html(
 				sprintf(
 					/* translators: %s: installed plugin name */
-					__( '%s is installed. Turn it on and enroll from that plugin’s screens. AmazingPlugins Security Scanner only reports the status.', 'amazingplugins-security-scanner' ),
+					__( '%s is installed. Turn it on and enroll from that plugin’s screens. AmSec Security Scanner only reports the status.', 'amsec-security-scanner' ),
 					$provider
 				)
 			) . '</p>';
@@ -63,7 +63,7 @@ final class AuthFactorPanel {
 			$html    .= '<p>' . esc_html(
 				sprintf(
 					/* translators: %s: installed plugin name */
-					__( '%s is handling this factor. Manage enrollment and backup codes there.', 'amazingplugins-security-scanner' ),
+					__( '%s is handling this factor. Manage enrollment and backup codes there.', 'amsec-security-scanner' ),
 					$provider
 				)
 			) . '</p>';

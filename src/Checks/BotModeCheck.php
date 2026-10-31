@@ -41,10 +41,10 @@ final class BotModeCheck implements SecurityCheck {
 			default => State::UNKNOWN,
 		};
 		$summary = match ( $mode ) {
-			'off' => __( 'Native comment and registration controls are off.', 'amazingplugins-security-scanner' ),
-			'observe' => __( 'Native comment and registration controls are recording only.', 'amazingplugins-security-scanner' ),
-			'block' => __( 'Native comment and registration controls can reject excess unauthenticated requests.', 'amazingplugins-security-scanner' ),
-			default => __( 'The bot control mode could not be read.', 'amazingplugins-security-scanner' ),
+			'off' => __( 'Native comment and registration controls are off.', 'amsec-security-scanner' ),
+			'observe' => __( 'Native comment and registration controls are recording only.', 'amsec-security-scanner' ),
+			'block' => __( 'Native comment and registration controls can reject excess unauthenticated requests.', 'amsec-security-scanner' ),
+			default => __( 'The bot control mode could not be read.', 'amsec-security-scanner' ),
 		};
 		return array(
 			new CheckResult(

@@ -54,9 +54,9 @@ final class DebugLogCheck implements SecurityCheck {
 		$kind    = (string) ( $this->readKind )();
 		$state   = self::decide( $kind );
 		$summary = match ( $state ) {
-			'warn' => __( 'A debug.log file is in the content directory. This check does not read or delete it. A custom log path is not checked.', 'amazingplugins-security-scanner' ),
-			'pass' => __( 'No debug.log file is in the content directory. This check does not read or delete it. A custom log path is not checked.', 'amazingplugins-security-scanner' ),
-			default => __( 'The content directory debug log could not be checked. This check does not read or delete it.', 'amazingplugins-security-scanner' ),
+			'warn' => __( 'A debug.log file is in the content directory. This check does not read or delete it. A custom log path is not checked.', 'amsec-security-scanner' ),
+			'pass' => __( 'No debug.log file is in the content directory. This check does not read or delete it. A custom log path is not checked.', 'amsec-security-scanner' ),
+			default => __( 'The content directory debug log could not be checked. This check does not read or delete it.', 'amsec-security-scanner' ),
 		};
 		return array(
 			new CheckResult( $this->id(), 'warn' === $state ? State::WARN : ( 'pass' === $state ? State::PASS : State::UNKNOWN ), $summary, self::SOURCE, new DateTimeImmutable( 'now', new DateTimeZone( 'UTC' ) ), 'low', 'unknown' === $state ? 'unavailable' : 'complete', array( 'kind' => $kind ) ),

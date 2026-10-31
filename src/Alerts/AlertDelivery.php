@@ -81,9 +81,9 @@ final class AlertDelivery {
 		$batch    = array_slice( $pending, 0, 50 );
 		$accepted = false;
 		if ( false !== filter_var( $this->email, FILTER_VALIDATE_EMAIL ) ) {
-			$body = "New security findings need review.\n\nFinding IDs:\n" . implode( "\n", $batch ) . "\n\nOpen the AmazingPlugins Security Scanner dashboard:\n" . $this->dashboardUrl;
+			$body = "New security findings need review.\n\nFinding IDs:\n" . implode( "\n", $batch ) . "\n\nOpen the AmSec Security Scanner dashboard:\n" . $this->dashboardUrl;
 			try {
-				$accepted = (bool) ( $this->send )( $this->email, 'AmazingPlugins Security Scanner: findings need review', $body );
+				$accepted = (bool) ( $this->send )( $this->email, 'AmSec Security Scanner: findings need review', $body );
 			} catch ( Throwable ) {
 				$accepted = false;
 			}

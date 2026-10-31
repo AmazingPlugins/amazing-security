@@ -80,7 +80,7 @@ final class DirectScanRunner {
 		}
 		$report = $this->matcher->evaluate( $matchedInventory, $responses, $now, is_callable( $this->exploited ) ? ( $this->exploited )() : array() );
 		if ( count( $inventory ) > $total ) {
-			$report = new VulnerabilityReport( $report->results, true, __( 'Inventory exceeded direct-check limit.', 'amazingplugins-security-scanner' ), $report->snapshotGeneratedAt, null );
+			$report = new VulnerabilityReport( $report->results, true, __( 'Inventory exceeded direct-check limit.', 'amsec-security-scanner' ), $report->snapshotGeneratedAt, null );
 		}
 		return new DirectScanStep( $total, $report, $allFetched && count( $inventory ) <= $total, 'complete', $verified );
 	}

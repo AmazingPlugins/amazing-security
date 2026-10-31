@@ -24,7 +24,7 @@ final class LoginSettingsAction {
 
 	public function save(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'You cannot change login protection.', 'amazingplugins-security-scanner' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'You cannot change login protection.', 'amsec-security-scanner' ), '', array( 'response' => 403 ) );
 		}
 		check_admin_referer( 'amsec_login_settings' );
 		try {
@@ -39,7 +39,7 @@ final class LoginSettingsAction {
 			$settings->setXmlRpcAuthDisabled( $xmlRpc );
 			$settings->setEraseOnUninstall( $erase );
 		} catch ( \Throwable ) {
-			wp_die( esc_html__( 'Login settings could not be saved.', 'amazingplugins-security-scanner' ), '', array( 'response' => 400 ) );
+			wp_die( esc_html__( 'Login settings could not be saved.', 'amsec-security-scanner' ), '', array( 'response' => 400 ) );
 		}
 		wp_safe_redirect( admin_url( 'admin.php?page=amsec-accounts#sign-in' ) );
 		exit;

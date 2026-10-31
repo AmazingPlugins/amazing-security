@@ -42,18 +42,18 @@ final class LocalCodeCheck implements SecurityCheck {
 			default => State::UNKNOWN,
 		};
 		/* translators: %s: number of files checked. */
-		$files   = sprintf( _n( '%s file', '%s files', $scanned, 'amazingplugins-security-scanner' ), (string) $scanned );
+		$files   = sprintf( _n( '%s file', '%s files', $scanned, 'amsec-security-scanner' ), (string) $scanned );
 		$summary = match ( $stored ) {
-			'none' => __( 'Plugins, themes, uploads, mu-plugins and loose PHP files in the site root have not been checked for malware yet. Run the scan on this page. Files stay on this server.', 'amazingplugins-security-scanner' ),
+			'none' => __( 'Plugins, themes, uploads, mu-plugins and loose PHP files in the site root have not been checked for malware yet. Run the scan on this page. Files stay on this server.', 'amsec-security-scanner' ),
 			/* translators: %s: number of files checked, for example 12 files. */
-			'running' => sprintf( __( 'The malware scan has checked %s so far and keeps going in the background. Open this page again in a minute.', 'amazingplugins-security-scanner' ), $files ),
+			'running' => sprintf( __( 'The malware scan has checked %s so far and keeps going in the background. Open this page again in a minute.', 'amsec-security-scanner' ), $files ),
 			/* translators: %s: number of files checked, for example 12 files. */
-			'partial' => sprintf( __( 'The malware scan checked %s and stopped before every file was read. Scan again to finish it.', 'amazingplugins-security-scanner' ), $files ),
+			'partial' => sprintf( __( 'The malware scan checked %s and stopped before every file was read. Scan again to finish it.', 'amsec-security-scanner' ), $files ),
 			/* translators: %s: number of files checked, for example 12 files. */
-			'found' => sprintf( __( 'The malware scan checked %s and found code shaped like malware.', 'amazingplugins-security-scanner' ), $files ) . ' ' . ( '' !== $matches ? $matches . '. ' : '' ) . __( 'Open the findings and check each file.', 'amazingplugins-security-scanner' ),
+			'found' => sprintf( __( 'The malware scan checked %s and found code shaped like malware.', 'amsec-security-scanner' ), $files ) . ' ' . ( '' !== $matches ? $matches . '. ' : '' ) . __( 'Open the findings and check each file.', 'amsec-security-scanner' ),
 			/* translators: %s: number of files checked, for example 12 files. */
-			'clean' => sprintf( __( 'The malware scan checked %s and found no known malware shapes. That does not prove the site is clean.', 'amazingplugins-security-scanner' ), $files ),
-			default => __( 'The malware scan result could not be read. Scan again.', 'amazingplugins-security-scanner' ),
+			'clean' => sprintf( __( 'The malware scan checked %s and found no known malware shapes. That does not prove the site is clean.', 'amsec-security-scanner' ), $files ),
+			default => __( 'The malware scan result could not be read. Scan again.', 'amsec-security-scanner' ),
 		};
 		return array(
 			new CheckResult(

@@ -27,8 +27,8 @@ final class AbilityRegistrar {
 			wp_register_ability_category(
 				'amazing-security',
 				array(
-					'label'       => 'AmazingPlugins Security Scanner',
-					'description' => __( 'Security findings and bounded checks for this site.', 'amazingplugins-security-scanner' ),
+					'label'       => 'AmSec Security Scanner',
+					'description' => __( 'Security findings and bounded checks for this site.', 'amsec-security-scanner' ),
 				)
 			);
 		}
@@ -122,18 +122,18 @@ final class AbilityRegistrar {
 			),
 		);
 		$labels  = array(
-			'list-findings'  => __( 'List security findings', 'amazingplugins-security-scanner' ),
-			'get-finding'    => __( 'Get a security finding', 'amazingplugins-security-scanner' ),
-			'start-scan'     => __( 'Run local hardening checks', 'amazingplugins-security-scanner' ),
-			'get-scan'       => __( 'Get a local hardening scan', 'amazingplugins-security-scanner' ),
-			'propose-fix'    => __( 'Propose a login protection setting change', 'amazingplugins-security-scanner' ),
-			'get-fix-status' => __( 'Get a proposed fix status', 'amazingplugins-security-scanner' ),
+			'list-findings'  => __( 'List security findings', 'amsec-security-scanner' ),
+			'get-finding'    => __( 'Get a security finding', 'amsec-security-scanner' ),
+			'start-scan'     => __( 'Run local hardening checks', 'amsec-security-scanner' ),
+			'get-scan'       => __( 'Get a local hardening scan', 'amsec-security-scanner' ),
+			'propose-fix'    => __( 'Propose a login protection setting change', 'amsec-security-scanner' ),
+			'get-fix-status' => __( 'Get a proposed fix status', 'amsec-security-scanner' ),
 		);
 		$out     = array();
 		foreach ( $schemas as $short => $schema ) {
 			$out[ 'amazing-security/' . $short ] = array(
 				'label'               => $labels[ $short ],
-				'description'         => sprintf( /* translators: %s: short description of the assistant ability. */ __( '%s for an authenticated site administrator.', 'amazingplugins-security-scanner' ), $labels[ $short ] ),
+				'description'         => sprintf( /* translators: %s: short description of the assistant ability. */ __( '%s for an authenticated site administrator.', 'amsec-security-scanner' ), $labels[ $short ] ),
 				'category'            => 'amazing-security',
 				'input_schema'        => $schema,
 				'execute_callback'    => fn( $input = array() ): array => $this->execute( $short, $input ),

@@ -12,5 +12,5 @@ final class AdminAccountsCheck extends AbstractCheck {
 	public function id(): string {
 		return 'default-admin-login'; }
 	public function run( ScanContext $context ): array {
-		return $this->result( $this->values->hasDefaultAdminLogin(), __( 'No checked administrator uses admin as a login or as the name shown on the site.', 'amazingplugins-security-scanner' ), __( 'An administrator uses admin as a login or as the name shown on the site. Open Users and change it.', 'amazingplugins-security-scanner' ) ); }
+		return $this->result( $this->values->hasDefaultAdminLogin(), __( 'No checked administrator uses admin as a login or as the name shown on the site.', 'amsec-security-scanner' ), __( 'An administrator uses admin as a login or as the name shown on the site. Open Users and change it.', 'amsec-security-scanner' ) ); }
 }

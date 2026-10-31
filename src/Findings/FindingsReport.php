@@ -12,17 +12,17 @@ use AmazingPlugins\Security\Scan\ScanRun;
 final class FindingsReport {
 	public static function text( ?ScanRun $run ): string {
 		$lines = array(
-			__( 'AmazingPlugins Security Scanner findings', 'amazingplugins-security-scanner' ),
-			__( 'This is a starting list for the site owner or a host. It is not a compliance report. It does not show that the site is clean.', 'amazingplugins-security-scanner' ),
-			__( 'Login CAPTCHA and compromised-password checks stay on this site. No password or login attempt was sent.', 'amazingplugins-security-scanner' ),
+			__( 'AmSec Security Scanner findings', 'amsec-security-scanner' ),
+			__( 'This is a starting list for the site owner or a host. It is not a compliance report. It does not show that the site is clean.', 'amsec-security-scanner' ),
+			__( 'Login CAPTCHA and compromised-password checks stay on this site. No password or login attempt was sent.', 'amsec-security-scanner' ),
 			'',
 		);
 		if ( null === $run ) {
-			$lines[] = __( 'No completed local check is stored.', 'amazingplugins-security-scanner' );
+			$lines[] = __( 'No completed local check is stored.', 'amsec-security-scanner' );
 			return implode( "\n", $lines ) . "\n";
 		}
-		$lines[] = sprintf( /* translators: %s: time the completed local check finished, in ISO 8601 format. */ __( 'Checked: %s', 'amazingplugins-security-scanner' ), $run->finishedAt->format( 'c' ) );
-		$lines[] = $run->partial ? __( 'This check did not finish.', 'amazingplugins-security-scanner' ) : __( 'This check finished.', 'amazingplugins-security-scanner' );
+		$lines[] = sprintf( /* translators: %s: time the completed local check finished, in ISO 8601 format. */ __( 'Checked: %s', 'amsec-security-scanner' ), $run->finishedAt->format( 'c' ) );
+		$lines[] = $run->partial ? __( 'This check did not finish.', 'amsec-security-scanner' ) : __( 'This check finished.', 'amsec-security-scanner' );
 		$lines[] = '';
 		foreach ( $run->results as $result ) {
 			if ( ! $result instanceof CheckResult ) {
@@ -37,12 +37,12 @@ final class FindingsReport {
 
 	private static function state( string $state ): string {
 		return match ( $state ) {
-			'critical' => __( 'Critical', 'amazingplugins-security-scanner' ),
-			'fail' => __( 'Needs a change', 'amazingplugins-security-scanner' ),
-			'warn' => __( 'Needs attention', 'amazingplugins-security-scanner' ),
-			'pass' => __( 'Configured', 'amazingplugins-security-scanner' ),
-			'unknown' => __( 'Could not check', 'amazingplugins-security-scanner' ),
-			default => __( 'Could not check', 'amazingplugins-security-scanner' ),
+			'critical' => __( 'Critical', 'amsec-security-scanner' ),
+			'fail' => __( 'Needs a change', 'amsec-security-scanner' ),
+			'warn' => __( 'Needs attention', 'amsec-security-scanner' ),
+			'pass' => __( 'Configured', 'amsec-security-scanner' ),
+			'unknown' => __( 'Could not check', 'amsec-security-scanner' ),
+			default => __( 'Could not check', 'amsec-security-scanner' ),
 		};
 	}
 

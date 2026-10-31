@@ -48,9 +48,9 @@ final class PhpVersionCheck implements SecurityCheck {
 		$kind    = (string) ( $this->readKind )();
 		$state   = self::decide( $kind );
 		$summary = match ( $state ) {
-			'warn' => __( 'PHP is older than the version this WordPress release requires. This check does not change PHP and does not contact WordPress.org.', 'amazingplugins-security-scanner' ),
-			'pass' => __( 'PHP meets the version this WordPress release requires. This check does not change PHP and does not contact WordPress.org.', 'amazingplugins-security-scanner' ),
-			default => __( 'The required PHP version could not be read. This check does not change PHP and does not contact WordPress.org.', 'amazingplugins-security-scanner' ),
+			'warn' => __( 'PHP is older than the version this WordPress release requires. This check does not change PHP and does not contact WordPress.org.', 'amsec-security-scanner' ),
+			'pass' => __( 'PHP meets the version this WordPress release requires. This check does not change PHP and does not contact WordPress.org.', 'amsec-security-scanner' ),
+			default => __( 'The required PHP version could not be read. This check does not change PHP and does not contact WordPress.org.', 'amsec-security-scanner' ),
 		};
 		return array(
 			new CheckResult( $this->id(), 'warn' === $state ? State::WARN : ( 'pass' === $state ? State::PASS : State::UNKNOWN ), $summary, self::SOURCE, new DateTimeImmutable( 'now', new DateTimeZone( 'UTC' ) ), 'low', 'unknown' === $state ? 'unavailable' : 'complete', array( 'kind' => $kind ) ),

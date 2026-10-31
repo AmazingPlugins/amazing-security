@@ -117,22 +117,22 @@ final class AiReadinessCheck implements SecurityCheck {
 
 	private static function summary( string $passwords, string $assistant, string $ready, string $guide ): string {
 		$tools = match ( $passwords ) {
-			'open' => __( 'Application passwords are available, so a tool can sign in without the login form. You can pause them here. Saved passwords stay stored.', 'amazingplugins-security-scanner' ),
-			'plugin-off' => __( 'Application passwords are paused by this plugin. Saved passwords stay stored and work again if you allow them.', 'amazingplugins-security-scanner' ),
-			'closed' => __( 'Application passwords are turned off.', 'amazingplugins-security-scanner' ),
-			default => __( 'Application password availability could not be read.', 'amazingplugins-security-scanner' ),
+			'open' => __( 'Application passwords are available, so a tool can sign in without the login form. You can pause them here. Saved passwords stay stored.', 'amsec-security-scanner' ),
+			'plugin-off' => __( 'Application passwords are paused by this plugin. Saved passwords stay stored and work again if you allow them.', 'amsec-security-scanner' ),
+			'closed' => __( 'Application passwords are turned off.', 'amsec-security-scanner' ),
+			default => __( 'Application password availability could not be read.', 'amsec-security-scanner' ),
 		};
 		$access = match ( true ) {
-			'on' === $assistant => __( 'AI assistant access is on.', 'amazingplugins-security-scanner' ),
-			'off' === $assistant && 'yes' === $ready => __( 'AI assistant access is off. This site can connect an assistant when you turn that on.', 'amazingplugins-security-scanner' ),
-			'off' === $assistant && 'no' === $ready => __( 'AI assistant access is off. This site is not ready to connect an assistant yet.', 'amazingplugins-security-scanner' ),
-			'off' === $assistant => __( 'AI assistant access is off. Assistant readiness could not be read.', 'amazingplugins-security-scanner' ),
-			default => __( 'AI assistant access could not be read.', 'amazingplugins-security-scanner' ),
+			'on' === $assistant => __( 'AI assistant access is on.', 'amsec-security-scanner' ),
+			'off' === $assistant && 'yes' === $ready => __( 'AI assistant access is off. This site can connect an assistant when you turn that on.', 'amsec-security-scanner' ),
+			'off' === $assistant && 'no' === $ready => __( 'AI assistant access is off. This site is not ready to connect an assistant yet.', 'amsec-security-scanner' ),
+			'off' === $assistant => __( 'AI assistant access is off. Assistant readiness could not be read.', 'amsec-security-scanner' ),
+			default => __( 'AI assistant access could not be read.', 'amsec-security-scanner' ),
 		};
 		$file = match ( $guide ) {
-			'present' => __( 'An llms.txt guide is published for AI readers.', 'amazingplugins-security-scanner' ),
-			'absent' => __( 'No llms.txt guide is published.', 'amazingplugins-security-scanner' ),
-			default => __( 'The llms.txt guide could not be read.', 'amazingplugins-security-scanner' ),
+			'present' => __( 'An llms.txt guide is published for AI readers.', 'amsec-security-scanner' ),
+			'absent' => __( 'No llms.txt guide is published.', 'amsec-security-scanner' ),
+			default => __( 'The llms.txt guide could not be read.', 'amsec-security-scanner' ),
 		};
 		return $tools . ' ' . $access . ' ' . $file . ' This check does not change those settings and does not send the site to a model.';
 	}

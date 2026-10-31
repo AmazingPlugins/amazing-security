@@ -7,7 +7,7 @@ use AmazingPlugins\Security\Login\WordPressRateCounterStore;
 use AmazingPlugins\Security\Login\WordPressTotpStore;
 
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
-	define( 'WP_UNINSTALL_PLUGIN', 'amazingplugins-security-scanner/amazingplugins-security-scanner.php' );
+	define( 'WP_UNINSTALL_PLUGIN', 'amsec-security-scanner/amsec-security-scanner.php' );
 }
 $settings = new WordPressLoginSettings( new WordPressOptions() );
 $store = new WordPressTotpStore( $GLOBALS['wpdb'] );
