@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 final class RulePatternTest extends TestCase {
 	public function test_new_rules_match_and_miss(): void {
-		$cases   = array(
+		$cases = array(
 			array( "<?php move_uploaded_file(\$tmp, 'wp-content/uploads/' . \$name . '.php');", array( 'AS-PHP-029' ) ),
 			array( "<?php move_uploaded_file(\$tmp, 'wp-content/uploads/shell.php');", array() ),
 			array( "<?php file_put_contents('wp-content/uploads/drop.php', \$_POST['body']);", array( 'AS-PHP-030' ) ),
@@ -31,7 +31,7 @@ final class RulePatternTest extends TestCase {
 			array( "<?php header('Refresh: 0;url=https://example.com');", array() ),
 			array( "<?php header('Refresh: 0;url=' . \$next);", array() ),
 			array( "<?php readfile(\$_POST['path']);", array( 'AS-PHP-035' ) ),
-			array( '<?php readfile($path);', array() ),
+			array( "<?php readfile(\$path);", array() ),
 			array( "<?php readfile(\$_COOKIE['path']);", array() ),
 			array( '<?php eval(wp_remote_retrieve_body($response));', array( 'AS-PHP-036' ) ),
 			array( '<?php $body = wp_remote_retrieve_body($response); echo $body;', array() ),

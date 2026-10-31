@@ -6,7 +6,7 @@ use AmazingPlugins\Security\FileScan\RuleMatcher;
 
 $matcher = new RuleMatcher( new BundledRulePack() );
 $checked = 0;
-$hits    = array();
+$hits = array();
 foreach ( array( WP_PLUGIN_DIR . '/akismet', WP_PLUGIN_DIR . '/hello.php', WP_PLUGIN_DIR . '/amsec-security-scanner', WP_CONTENT_DIR . '/themes' ) as $root ) {
 	if ( is_file( $root ) ) {
 		$bytes = file_get_contents( $root );

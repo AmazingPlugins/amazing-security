@@ -42,7 +42,7 @@ final class FixApprovalActionTest extends TestCase {
 
 	public function test_stale_live_setting_is_visible_and_cannot_be_approved(): void {
 		$proposal = new FixProposal( str_repeat( 'a', 32 ), str_repeat( 'b', 32 ), 'login-rate-observe', 'off', 'observe', 7, 1000, 1900 );
-		$html     = ( new FixReviewPage() )->html( $proposal, 'abc', 'https://example.test/wp-admin/admin-post.php', true, true, 1100, '', '', 'block' );
+		$html = ( new FixReviewPage() )->html( $proposal, 'abc', 'https://example.test/wp-admin/admin-post.php', true, true, 1100, '', '', 'block' );
 		self::assertStringContainsString( 'The setting changed since this proposal was created', $html );
 		self::assertStringContainsString( '<dt>Current</dt><dd>Block repeated failures</dd>', $html );
 		self::assertStringNotContainsString( 'name="action" value="amsec_fix_approve"', $html );

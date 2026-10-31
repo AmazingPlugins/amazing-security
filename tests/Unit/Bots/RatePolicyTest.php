@@ -6,14 +6,7 @@ use PHPUnit\Framework\TestCase;
 
 final class RatePolicyTest extends TestCase {
 	private static function input( array $over = array() ): array {
-		return $over + array(
-			'mode'  => 'block',
-			'page'  => '120',
-			'rest'  => '60',
-			'login' => '20',
-			'block' => '10',
-			'allow' => '',
-		);
+		return $over + array( 'mode' => 'block', 'page' => '120', 'rest' => '60', 'login' => '20', 'block' => '10', 'allow' => '' );
 	}
 
 	private static function kind( string $path, string $method = 'GET', string $pagenow = 'index.php', bool $restRoute = false, bool $xmlrpc = false, bool $ajax = false ): string {
@@ -46,15 +39,7 @@ final class RatePolicyTest extends TestCase {
 	}
 
 	public function test_valid_input_saves_and_canonicalises(): void {
-		list( $s, $e ) = RatePolicy::validate(
-			self::input(
-				array(
-					'page'  => '30',
-					'block' => '60',
-					'allow' => " 203.0.113.7 \n\n198.51.100.9/24\r\n2001:db8::1\n2001:DB8::/32\n203.0.113.7",
-				)
-			)
-		);
+		list( $s, $e ) = RatePolicy::validate( self::input( array( 'page' => '30', 'block' => '60', 'allow' => " 203.0.113.7 \n\n198.51.100.9/24\r\n2001:db8::1\n2001:DB8::/32\n203.0.113.7" ) ) );
 		self::assertSame( array(), $e );
 		self::assertSame( 30, $s['page'] );
 		self::assertSame( 60, $s['block'] );
@@ -80,15 +65,7 @@ final class RatePolicyTest extends TestCase {
 
 	public function test_read_falls_back_to_defaults(): void {
 		self::assertSame( RatePolicy::defaults(), RatePolicy::read( 'junk' ) );
-		$s = RatePolicy::read(
-			array(
-				'mode'  => 'block',
-				'page'  => 5000,
-				'rest'  => '60',
-				'login' => 50,
-				'allow' => array( '10.0.0.0/8', 'bad', 7 ),
-			)
-		);
+		$s = RatePolicy::read( array( 'mode' => 'block', 'page' => 5000, 'rest' => '60', 'login' => 50, 'allow' => array( '10.0.0.0/8', 'bad', 7 ) ) );
 		self::assertSame( 'block', $s['mode'] );
 		self::assertSame( 120, $s['page'] );
 		self::assertSame( 60, $s['rest'] );

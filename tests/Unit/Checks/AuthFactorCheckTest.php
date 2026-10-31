@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
 
 final class AuthFactorCheckTest extends TestCase {
 	public function test_missing_is_critical_and_mentions_two_factor(): void {
-		$check  = new AuthFactorCheck(
+		$check = new AuthFactorCheck(
 			'authenticator-app',
 			static fn (): array => array(
 				'state'        => AuthFactorStatus::MISSING,
@@ -29,7 +29,7 @@ final class AuthFactorCheckTest extends TestCase {
 	}
 
 	public function test_active_is_success(): void {
-		$check  = new AuthFactorCheck(
+		$check = new AuthFactorCheck(
 			'passkeys-status',
 			static fn (): array => array(
 				'state'        => AuthFactorStatus::ACTIVE,
@@ -44,7 +44,7 @@ final class AuthFactorCheckTest extends TestCase {
 	}
 
 	public function test_available_is_warning(): void {
-		$check  = new AuthFactorCheck(
+		$check = new AuthFactorCheck(
 			'authenticator-app',
 			static fn (): array => array(
 				'state'        => AuthFactorStatus::AVAILABLE,

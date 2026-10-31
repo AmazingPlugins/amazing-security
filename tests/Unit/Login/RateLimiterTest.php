@@ -16,20 +16,15 @@ final class RateLimiterTest extends TestCase {
 		$key = new AddressKey( str_repeat( 'k', 32 ) );
 		self::assertSame(
 			$key->fromServer( array( 'REMOTE_ADDR' => '2001:db8::1' ) ),
-			$key->fromServer(
-				array(
-					'REMOTE_ADDR'          => '2001:db8::1',
-					'HTTP_X_FORWARDED_FOR' => '203.0.113.10',
-				)
-			)
+			$key->fromServer( array( 'REMOTE_ADDR' => '2001:db8::1', 'HTTP_X_FORWARDED_FOR' => '203.0.113.10' ) )
 		);
 		self::assertNull( $key->fromServer( array( 'REMOTE_ADDR' => 'bad-ip' ) ) );
 	}
 
 	public function test_observe_never_blocks_but_block_mode_does(): void {
 		$settings = $this->settings( 'observe' );
-		$store    = $this->store();
-		$limiter  = new RateLimiter( $settings, $store );
+		$store = $this->store();
+		$limiter = new RateLimiter( $settings, $store );
 		for ( $i = 0; $i < 5; ++$i ) {
 			$limiter->afterFailure( 'key', 100 );
 		}
@@ -43,29 +38,21 @@ final class RateLimiterTest extends TestCase {
 	private function settings( string $mode ): LoginSettings {
 		return new class( $mode ) implements LoginSettings {
 			public function __construct( public string $mode ) {}
-			public function rateMode(): string {
-				return $this->mode; }
-			public function setRateMode( string $mode ): void {
-				$this->mode = $mode; }
-			public function xmlRpcAuthDisabled(): bool {
-				return false; }
+			public function rateMode(): string { return $this->mode; }
+			public function setRateMode( string $mode ): void { $this->mode = $mode; }
+			public function xmlRpcAuthDisabled(): bool { return false; }
 			public function setXmlRpcAuthDisabled( bool $disabled ): void {}
-			public function eraseOnUninstall(): bool {
-				return false; }
+			public function eraseOnUninstall(): bool { return false; }
 			public function setEraseOnUninstall( bool $erase ): void {}
 		};
 	}
 
 	private function store(): RateCounterStore {
-		return new class() implements RateCounterStore {
+		return new class implements RateCounterStore {
 			public RateState $state;
-			public function __construct() {
-				$this->state = RateState::empty( 100 ); }
-			public function state( string $addressKey, int $now ): RateState {
-				return $this->state; }
-			public function recordFailure( string $addressKey, int $now ): RateState {
-				$this->state = $this->state->afterFailure( $now );
-				return $this->state; }
+			public function __construct() { $this->state = RateState::empty( 100 ); }
+			public function state( string $addressKey, int $now ): RateState { return $this->state; }
+			public function recordFailure( string $addressKey, int $now ): RateState { $this->state = $this->state->afterFailure( $now ); return $this->state; }
 			public function clearExpired( int $now ): void {}
 		};
 	}

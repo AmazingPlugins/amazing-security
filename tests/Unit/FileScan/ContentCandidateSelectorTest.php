@@ -13,7 +13,7 @@ use PHPUnit\Framework\TestCase;
 final class ContentCandidateSelectorTest extends TestCase {
 	public function test_skips_only_fresh_exact_release_match_for_php_like_file(): void {
 		$manifest = new Manifest( 'plugin', 'demo:1.0', 'https://wordpress.org/', new DateTimeImmutable(), 'sha256', array( 'known.php' => array( hash( 'sha256', 'known' ) ) ) );
-		$target   = new FileScanTarget( 'demo:1.0', 'plugin', '/tmp/demo', $manifest );
+		$target = new FileScanTarget( 'demo:1.0', 'plugin', '/tmp/demo', $manifest );
 		$selector = new ContentCandidateSelector();
 		self::assertFalse( $selector->eligible( $target, 'known.php', hash( 'sha256', 'known' ) ) );
 		self::assertTrue( $selector->eligible( $target, 'known.php', hash( 'sha256', 'changed' ) ) );

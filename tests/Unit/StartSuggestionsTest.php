@@ -471,12 +471,12 @@ final class StartSuggestionsTest extends TestCase {
 	}
 
 	public function test_watch_rows_link_only_when_the_setting_needs_review(): void {
-		$emails    = ( new SiteWatchCheck( 'finding-emails', static fn(): array => array( 'status' => 'off' ) ) )->run( new ScanContext() )[0];
-		$digest    = ( new SiteWatchCheck( 'weekly-digest', static fn(): array => array( 'status' => 'off' ) ) )->run( new ScanContext() )[0];
-		$traffic   = ( new SiteWatchCheck( 'traffic-history', static fn(): array => array( 'status' => 'off' ) ) )->run( new ScanContext() )[0];
-		$network   = ( new SiteWatchCheck( 'network-controls', static fn(): array => array( 'status' => 'off' ) ) )->run( new ScanContext() )[0];
-		$blocked   = ( new SiteWatchCheck( 'network-controls', static fn(): array => array( 'status' => 'block' ) ) )->run( new ScanContext() )[0];
-		$proxies   = ( new SiteWatchCheck( 'trusted-proxies', static fn(): array => array( 'status' => 'off' ) ) )->run( new ScanContext() )[0];
+		$emails = ( new SiteWatchCheck( 'finding-emails', static fn(): array => array( 'status' => 'off' ) ) )->run( new ScanContext() )[0];
+		$digest = ( new SiteWatchCheck( 'weekly-digest', static fn(): array => array( 'status' => 'off' ) ) )->run( new ScanContext() )[0];
+		$traffic = ( new SiteWatchCheck( 'traffic-history', static fn(): array => array( 'status' => 'off' ) ) )->run( new ScanContext() )[0];
+		$network = ( new SiteWatchCheck( 'network-controls', static fn(): array => array( 'status' => 'off' ) ) )->run( new ScanContext() )[0];
+		$blocked = ( new SiteWatchCheck( 'network-controls', static fn(): array => array( 'status' => 'block' ) ) )->run( new ScanContext() )[0];
+		$proxies = ( new SiteWatchCheck( 'trusted-proxies', static fn(): array => array( 'status' => 'off' ) ) )->run( new ScanContext() )[0];
 		$forwarded = ( new SiteWatchCheck( 'trusted-proxies', static fn(): array => array( 'status' => 'xff' ) ) )->run( new ScanContext() )[0];
 
 		self::assertSame( 'warn', $emails->state );
@@ -518,10 +518,10 @@ final class StartSuggestionsTest extends TestCase {
 		);
 		self::assertSame( 'xff', SiteWatchCheck::proxies( $forward ) );
 
-		$activity  = ( new SiteWatchCheck( 'security-activity', static fn(): array => array( 'status' => 'off' ) ) )->run( new ScanContext() )[0];
+		$activity = ( new SiteWatchCheck( 'security-activity', static fn(): array => array( 'status' => 'off' ) ) )->run( new ScanContext() )[0];
 		$recording = ( new SiteWatchCheck( 'security-activity', static fn(): array => array( 'status' => 'on' ) ) )->run( new ScanContext() )[0];
-		$baseline  = ( new SiteWatchCheck( 'code-baselines', static fn(): array => array( 'status' => 'none' ) ) )->run( new ScanContext() )[0];
-		$stored    = ( new SiteWatchCheck( 'code-baselines', static fn(): array => array( 'status' => 'stored' ) ) )->run( new ScanContext() )[0];
+		$baseline = ( new SiteWatchCheck( 'code-baselines', static fn(): array => array( 'status' => 'none' ) ) )->run( new ScanContext() )[0];
+		$stored = ( new SiteWatchCheck( 'code-baselines', static fn(): array => array( 'status' => 'stored' ) ) )->run( new ScanContext() )[0];
 		self::assertSame( 'warn', $activity->state );
 		self::assertSame( 'amsec-activity', StartHere::control( $activity )['page'] );
 		self::assertSame( 'pass', $recording->state );
@@ -539,10 +539,10 @@ final class StartSuggestionsTest extends TestCase {
 		self::assertSame( 'preview', SiteWatchCheck::baselines( '{"version":1,"baselines":[],"previews":{"1":{}}}' ) );
 		self::assertSame( 'unknown', SiteWatchCheck::baselines( '{' ) );
 
-		$extra  = ( new SiteWatchCheck( 'account-sessions', static fn(): array => array( 'status' => 'extra' ) ) )->run( new ScanContext() )[0];
+		$extra = ( new SiteWatchCheck( 'account-sessions', static fn(): array => array( 'status' => 'extra' ) ) )->run( new ScanContext() )[0];
 		$single = ( new SiteWatchCheck( 'account-sessions', static fn(): array => array( 'status' => 'single' ) ) )->run( new ScanContext() )[0];
-		$daily  = ( new SiteWatchCheck( 'daily-checks', static fn(): array => array( 'status' => 'never' ) ) )->run( new ScanContext() )[0];
-		$done   = ( new SiteWatchCheck( 'daily-checks', static fn(): array => array( 'status' => 'complete' ) ) )->run( new ScanContext() )[0];
+		$daily = ( new SiteWatchCheck( 'daily-checks', static fn(): array => array( 'status' => 'never' ) ) )->run( new ScanContext() )[0];
+		$done = ( new SiteWatchCheck( 'daily-checks', static fn(): array => array( 'status' => 'complete' ) ) )->run( new ScanContext() )[0];
 		self::assertSame( 'warn', $extra->state );
 		self::assertStringContainsString( 'does not revoke a session', $extra->summary );
 		self::assertStringNotContainsString( 'safe', $extra->summary );
@@ -556,10 +556,10 @@ final class StartSuggestionsTest extends TestCase {
 		self::assertArrayNotHasKey( 'action', StartHere::control( $daily ) );
 		self::assertSame( 'pass', $done->state );
 
-		$files     = ( new SiteWatchCheck( 'daily-file-checks', static fn(): array => array( 'status' => 'never' ) ) )->run( new ScanContext() )[0];
+		$files = ( new SiteWatchCheck( 'daily-file-checks', static fn(): array => array( 'status' => 'never' ) ) )->run( new ScanContext() )[0];
 		$filesDone = ( new SiteWatchCheck( 'daily-file-checks', static fn(): array => array( 'status' => 'complete' ) ) )->run( new ScanContext() )[0];
-		$rules     = ( new SiteWatchCheck( 'rule-review', static fn(): array => array( 'status' => 'overdue' ) ) )->run( new ScanContext() )[0];
-		$rulesOk   = ( new SiteWatchCheck( 'rule-review', static fn(): array => array( 'status' => 'recent' ) ) )->run( new ScanContext() )[0];
+		$rules = ( new SiteWatchCheck( 'rule-review', static fn(): array => array( 'status' => 'overdue' ) ) )->run( new ScanContext() )[0];
+		$rulesOk = ( new SiteWatchCheck( 'rule-review', static fn(): array => array( 'status' => 'recent' ) ) )->run( new ScanContext() )[0];
 		self::assertSame( 'warn', $files->state );
 		self::assertStringContainsString( 'does not start one', $files->summary );
 		self::assertSame( 'amsec-schedule', StartHere::control( $files )['hash'] );

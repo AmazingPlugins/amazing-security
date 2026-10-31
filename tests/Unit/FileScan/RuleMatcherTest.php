@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 final class RuleMatcherTest extends TestCase {
 	public function test_suspicious_constructs_have_stable_ids_and_no_snippets(): void {
 		$matcher = new RuleMatcher( new BundledRulePack() );
-		$cases   = array(
+		$cases = array(
 			'AS-PHP-001' => 'obfuscated-eval.txt',
 			'AS-PHP-002' => 'request-command.txt',
 			'AS-PHP-003' => 'remote-include.txt',
@@ -34,7 +34,7 @@ final class RuleMatcherTest extends TestCase {
 
 	public function test_comments_strings_and_common_encoding_do_not_trigger(): void {
 		$matcher = new RuleMatcher( new BundledRulePack() );
-		$benign  = array(
+		$benign = array(
 			file_get_contents( dirname( __DIR__, 2 ) . '/Fixtures/FileScan/benign-comments.txt' ),
 			'<?php $docs = "system(\\$_POST[cmd])";',
 			file_get_contents( dirname( __DIR__, 2 ) . '/Fixtures/FileScan/benign-encoding.txt' ),

@@ -4,7 +4,7 @@
 use AmazingPlugins\Security\Integrity\WordPressOptions;
 use AmazingPlugins\Security\Mcp\McpPreferences;
 
-$case  = getenv( 'AMSEC_CASE' );
+$case = getenv( 'AMSEC_CASE' );
 $names = array( 'list-findings', 'get-finding', 'start-scan', 'get-scan', 'propose-fix', 'get-fix-status' );
 if ( ! function_exists( 'wp_get_ability' ) ) {
 	throw new RuntimeException( 'Abilities API unavailable on supported MCP fixture.' );
@@ -37,7 +37,7 @@ if ( 'disabled' === $case ) {
 	if ( is_wp_error( $detail ) || 'complete' !== ( $detail['state'] ?? null ) ) {
 		throw new RuntimeException( 'Saved scan could not be read.' );
 	}
-	$page    = $list->execute( array( 'limit' => 1 ) );
+	$page = $list->execute( array( 'limit' => 1 ) );
 	$finding = wp_get_ability( 'amsec-security-scanner/get-finding' )->execute( array( 'finding_id' => $page['findings'][0]['id'] ) );
 	if ( is_wp_error( $finding ) || 'found' !== ( $finding['state'] ?? null ) ) {
 		throw new RuntimeException( 'Saved finding could not be read.' );
@@ -47,12 +47,7 @@ if ( 'disabled' === $case ) {
 		throw new RuntimeException( 'MCP scan cooldown failed.' );
 	}
 	$fixFinding = substr( hash( 'sha256', 'hardening:login-rate-mode' ), 0, 32 );
-	$proposal   = wp_get_ability( 'amsec-security-scanner/propose-fix' )->execute(
-		array(
-			'finding_id' => $fixFinding,
-			'recipe_id'  => 'login-rate-observe',
-		)
-	);
+	$proposal   = wp_get_ability( 'amsec-security-scanner/propose-fix' )->execute( array( 'finding_id' => $fixFinding, 'recipe_id' => 'login-rate-observe' ) );
 	if ( is_wp_error( $proposal ) || 'pending' !== ( $proposal['state'] ?? null ) || 'off' !== get_option( 'amsec_login_rate_mode' ) ) {
 		throw new RuntimeException( 'MCP proposal mutated or was unavailable.' );
 	}
@@ -65,14 +60,7 @@ if ( 'disabled' === $case ) {
 	if ( ! is_wp_error( $list->execute( array() ) ) || ! is_wp_error( wp_get_ability( 'amsec-security-scanner/start-scan' )->execute( array( 'type' => 'hardening' ) ) ) ) {
 		throw new RuntimeException( 'Low-privilege caller accessed MCP.' );
 	}
-	if ( ! is_wp_error(
-		wp_get_ability( 'amsec-security-scanner/propose-fix' )->execute(
-			array(
-				'finding_id' => substr( hash( 'sha256', 'hardening:login-rate-mode' ), 0, 32 ),
-				'recipe_id'  => 'login-rate-observe',
-			)
-		)
-	) ) {
+	if ( ! is_wp_error( wp_get_ability( 'amsec-security-scanner/propose-fix' )->execute( array( 'finding_id' => substr( hash( 'sha256', 'hardening:login-rate-mode' ), 0, 32 ), 'recipe_id' => 'login-rate-observe' ) ) ) ) {
 		throw new RuntimeException( 'Low-privilege caller proposed a fix.' );
 	}
 } elseif ( 'optout' === $case ) {
@@ -80,14 +68,7 @@ if ( 'disabled' === $case ) {
 	if ( ! is_wp_error( $list->execute( array() ) ) ) {
 		throw new RuntimeException( 'Known ability still executed after opt-out.' );
 	}
-	if ( ! is_wp_error(
-		wp_get_ability( 'amsec-security-scanner/propose-fix' )->execute(
-			array(
-				'finding_id' => substr( hash( 'sha256', 'hardening:login-rate-mode' ), 0, 32 ),
-				'recipe_id'  => 'login-rate-observe',
-			)
-		)
-	) ) {
+	if ( ! is_wp_error( wp_get_ability( 'amsec-security-scanner/propose-fix' )->execute( array( 'finding_id' => substr( hash( 'sha256', 'hardening:login-rate-mode' ), 0, 32 ), 'recipe_id' => 'login-rate-observe' ) ) ) ) {
 		throw new RuntimeException( 'Fix proposal still executed after opt-out.' );
 	}
 } else {

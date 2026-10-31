@@ -17,7 +17,7 @@ if ( false !== get_option( 'amsec_security_scanner_integrity_active', false ) ||
 	throw new RuntimeException( 'Activation performed an integrity scan.' );
 }
 
-$outbound      = 0;
+$outbound = 0;
 $countRequests = static function ( $preempt ) use ( &$outbound ) {
 	++$outbound;
 	return $preempt;
@@ -33,19 +33,19 @@ if ( 0 !== $outbound || ! str_contains( $html, 'Run integrity scan' ) ) {
 }
 
 global $wp_version, $wp_local_package;
-$locale   = isset( $wp_local_package ) && $wp_local_package ? $wp_local_package : 'en_US';
+$locale = isset( $wp_local_package ) && $wp_local_package ? $wp_local_package : 'en_US';
 $provider = new WordPressOrgManifestProvider( new WordPressHttpClient() );
-$core     = $provider->core( (string) $wp_version, $locale );
+$core = $provider->core( (string) $wp_version, $locale );
 if ( null === $core->manifest || ! isset( $core->manifest->files['wp-includes/version.php'] ) ) {
 	throw new RuntimeException( 'Core manifest unavailable: ' . $core->reason );
 }
 $reader = new FileReader();
-$match  = $reader->hash( ABSPATH, 'wp-includes/version.php', 'md5', new IntegrityBudget() );
+$match = $reader->hash( ABSPATH, 'wp-includes/version.php', 'md5', new IntegrityBudget() );
 if ( 'ok' !== $match->state || ! in_array( $match->digest, $core->manifest->files['wp-includes/version.php'], true ) ) {
 	throw new RuntimeException( 'Clean core file did not match manifest.' );
 }
 $runner = new IntegrityRunner( $reader );
-$step   = $runner->step( array( new IntegrityTarget( $core->manifest, ABSPATH ) ), new IntegrityCursor( 'fixture' ), new ScanContext( null, 5 ) );
+$step = $runner->step( array( new IntegrityTarget( $core->manifest, ABSPATH ) ), new IntegrityCursor( 'fixture' ), new ScanContext( null, 5 ) );
 if ( $step->finished || 5 !== $step->cursor->processed || 0 === $step->cursor->matched ) {
 	throw new RuntimeException( 'Expected bounded partial step over clean core files.' );
 }

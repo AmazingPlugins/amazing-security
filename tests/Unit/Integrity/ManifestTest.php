@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 
 final class ManifestTest extends TestCase {
 	public function test_core_manifest_rejects_unsafe_paths_before_use(): void {
-		$client = new class() implements HttpClient {
+		$client = new class implements HttpClient {
 			public function get( string $url, int $maxBytes ): HttpResult {
 				return new HttpResult( 200, '{"checksums":{"../wp-config.php":"' . str_repeat( 'a', 32 ) . '"}}' );
 			}
@@ -22,7 +22,7 @@ final class ManifestTest extends TestCase {
 	}
 
 	public function test_plugin_prefers_sha256_and_accepts_multiple_hashes(): void {
-		$client = new class() implements HttpClient {
+		$client = new class implements HttpClient {
 			public function get( string $url, int $maxBytes ): HttpResult {
 				return new HttpResult( 200, '{"files":{"akismet.php":{"sha256":["' . str_repeat( 'a', 64 ) . '","' . str_repeat( 'b', 64 ) . '"],"md5":"' . str_repeat( 'c', 32 ) . '"}}}' );
 			}
@@ -33,7 +33,7 @@ final class ManifestTest extends TestCase {
 	}
 
 	public function test_wrong_locale_manifest_cannot_be_reused(): void {
-		$client   = new class() implements HttpClient {
+		$client = new class implements HttpClient {
 			public array $urls = array();
 			public function get( string $url, int $maxBytes ): HttpResult {
 				$this->urls[] = $url;

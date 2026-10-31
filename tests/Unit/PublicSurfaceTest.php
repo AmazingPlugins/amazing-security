@@ -87,10 +87,10 @@ final class PublicSurfaceTest extends TestCase {
 	}
 
 	public function test_root_and_runtime_warnings_do_not_change_the_site(): void {
-		$sample  = ( new SampleConfigCheck( static fn(): string => 'present' ) )->run( new ScanContext() )[0];
-		$error   = ( new ErrorLogCheck( static fn(): string => 'present' ) )->run( new ScanContext() )[0];
-		$backup  = ( new ConfigBackupCheck( static fn(): string => 'present' ) )->run( new ScanContext() )[0];
-		$php     = ( new PhpVersionCheck( static fn(): string => 'older' ) )->run( new ScanContext() )[0];
+		$sample = ( new SampleConfigCheck( static fn(): string => 'present' ) )->run( new ScanContext() )[0];
+		$error  = ( new ErrorLogCheck( static fn(): string => 'present' ) )->run( new ScanContext() )[0];
+		$backup = ( new ConfigBackupCheck( static fn(): string => 'present' ) )->run( new ScanContext() )[0];
+		$php    = ( new PhpVersionCheck( static fn(): string => 'older' ) )->run( new ScanContext() )[0];
 		$updates = ( new BackgroundUpdatesCheck( static fn(): string => 'off' ) )->run( new ScanContext() )[0];
 		self::assertSame( 'warn', $sample->state );
 		self::assertStringContainsString( 'does not delete', $sample->summary );
@@ -160,18 +160,8 @@ final class PublicSurfaceTest extends TestCase {
 		self::assertArrayNotHasKey( 'action', StartHere::control( $php ) );
 		self::assertSame( 'pass', $clear->state );
 		self::assertSame( 'unknown', UploadsPhpFilesCheck::decide( 'partial' ) );
-		$running = ( new LocalCodeCheck(
-			static fn(): array => array(
-				'stored' => 'running',
-				'found'  => 0,
-			)
-		) )->run( new ScanContext() )[0];
-		$clean   = ( new LocalCodeCheck(
-			static fn(): array => array(
-				'stored' => 'clean',
-				'found'  => 0,
-			)
-		) )->run( new ScanContext() )[0];
+		$running = ( new LocalCodeCheck( static fn(): array => array( 'stored' => 'running', 'found' => 0 ) ) )->run( new ScanContext() )[0];
+		$clean   = ( new LocalCodeCheck( static fn(): array => array( 'stored' => 'clean', 'found' => 0 ) ) )->run( new ScanContext() )[0];
 		self::assertSame( 'unknown', $running->state );
 		self::assertSame( 'running', $running->evidence['stored'] );
 		self::assertStringContainsString( 'keeps going in the background', $running->summary );

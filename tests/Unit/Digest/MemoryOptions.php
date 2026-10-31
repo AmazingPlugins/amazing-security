@@ -1,39 +1,12 @@
 <?php
 namespace AmazingPlugins\Security\Tests\Unit\Digest;
-
 use AmazingPlugins\Security\Integrity\OptionGateway;
 final class MemoryOptions implements OptionGateway {
-	public array $values              = array();
-	public bool $failWrites           = false;
-	public bool $failStateWrites      = false;
-	public bool $failContentWrites    = false;
-	public bool $failRepositoryWrites = false;
-	public bool $failExposureWrites   = false;
-	public bool $failHeaderWrites     = false;
-	public bool $failRestRateWrites   = false;
-	public bool $failNetworkWrites    = false;
-	public function get( string $key ): mixed {
-		return $this->values[ $key ] ?? null;}
-	public function add( string $key, string $value ): bool {
-		if ( $this->failWrites || ( $this->failStateWrites && $key === 'amsec_digest_state' ) || ( $this->failContentWrites && $key === 'amsec_content_state' ) || ( $this->failRepositoryWrites && $key === 'amsec_repository_state' ) || ( $this->failExposureWrites && $key === 'amsec_exposure_state' ) || ( $this->failHeaderWrites && $key === 'amsec_headers_state' ) || ( $this->failRestRateWrites && $key === 'amsec_rest_rate_policy' ) || ( $this->failNetworkWrites && in_array( $key, array( 'amsec_network_policy', 'amsec_network_observation' ), true ) ) || isset( $this->values[ $key ] ) ) {
-			return false;
-		}$this->values[ $key ] = $value;
-		return true;}
-	public function set( string $key, string $value ): bool {
-		if ( $this->failWrites ) {
-			return false;
-		}$this->values[ $key ] = $value;
-		return true;}
-	public function delete( string $key ): void {
-		unset( $this->values[ $key ] );}
-	public function replaceIfSame( string $key, string $expected, string $replacement ): bool {
-		if ( $this->failWrites || ( $this->failStateWrites && $key === 'amsec_digest_state' ) || ( $this->failContentWrites && $key === 'amsec_content_state' ) || ( $this->failRepositoryWrites && $key === 'amsec_repository_state' ) || ( $this->failExposureWrites && $key === 'amsec_exposure_state' ) || ( $this->failHeaderWrites && $key === 'amsec_headers_state' ) || ( $this->failRestRateWrites && $key === 'amsec_rest_rate_policy' ) || ( $this->failNetworkWrites && in_array( $key, array( 'amsec_network_policy', 'amsec_network_observation' ), true ) ) || ( $this->values[ $key ] ?? null ) !== $expected ) {
-			return false;
-		}$this->values[ $key ] = $replacement;
-		return true;}
-	public function deleteIfSame( string $key, string $expected ): bool {
-		if ( $this->failWrites || ( $this->failStateWrites && $key === 'amsec_digest_state' ) || ( $this->failContentWrites && $key === 'amsec_content_state' ) || ( $this->failRepositoryWrites && $key === 'amsec_repository_state' ) || ( $this->failExposureWrites && $key === 'amsec_exposure_state' ) || ( $this->failHeaderWrites && $key === 'amsec_headers_state' ) || ( $this->failRestRateWrites && $key === 'amsec_rest_rate_policy' ) || ( $this->failNetworkWrites && in_array( $key, array( 'amsec_network_policy', 'amsec_network_observation' ), true ) ) || ( $this->values[ $key ] ?? null ) !== $expected ) {
-			return false;
-		}unset( $this->values[ $key ] );
-		return true;}
+ public array $values=[]; public bool $failWrites=false; public bool $failStateWrites=false; public bool $failContentWrites=false; public bool $failRepositoryWrites=false; public bool $failExposureWrites=false; public bool $failHeaderWrites=false; public bool $failRestRateWrites=false; public bool $failNetworkWrites=false;
+ public function get(string $key):mixed{return $this->values[$key]??null;}
+ public function add(string $key,string $value):bool{if($this->failWrites||($this->failStateWrites&&$key==='amsec_digest_state')||($this->failContentWrites&&$key==='amsec_content_state')||($this->failRepositoryWrites&&$key==='amsec_repository_state')||($this->failExposureWrites&&$key==='amsec_exposure_state')||($this->failHeaderWrites&&$key==='amsec_headers_state')||($this->failRestRateWrites&&$key==='amsec_rest_rate_policy')||($this->failNetworkWrites&&in_array($key,['amsec_network_policy','amsec_network_observation'],true))||isset($this->values[$key]))return false;$this->values[$key]=$value;return true;}
+ public function set(string $key,string $value):bool{if($this->failWrites)return false;$this->values[$key]=$value;return true;}
+ public function delete(string $key):void{unset($this->values[$key]);}
+ public function replaceIfSame(string $key,string $expected,string $replacement):bool{if($this->failWrites||($this->failStateWrites&&$key==='amsec_digest_state')||($this->failContentWrites&&$key==='amsec_content_state')||($this->failRepositoryWrites&&$key==='amsec_repository_state')||($this->failExposureWrites&&$key==='amsec_exposure_state')||($this->failHeaderWrites&&$key==='amsec_headers_state')||($this->failRestRateWrites&&$key==='amsec_rest_rate_policy')||($this->failNetworkWrites&&in_array($key,['amsec_network_policy','amsec_network_observation'],true))||($this->values[$key]??null)!==$expected)return false;$this->values[$key]=$replacement;return true;}
+ public function deleteIfSame(string $key,string $expected):bool{if($this->failWrites||($this->failStateWrites&&$key==='amsec_digest_state')||($this->failContentWrites&&$key==='amsec_content_state')||($this->failRepositoryWrites&&$key==='amsec_repository_state')||($this->failExposureWrites&&$key==='amsec_exposure_state')||($this->failHeaderWrites&&$key==='amsec_headers_state')||($this->failRestRateWrites&&$key==='amsec_rest_rate_policy')||($this->failNetworkWrites&&in_array($key,['amsec_network_policy','amsec_network_observation'],true))||($this->values[$key]??null)!==$expected)return false;unset($this->values[$key]);return true;}
 }

@@ -15,7 +15,7 @@ if ( ! $cycle->start( time() ) ) {
 }
 $options->delete( 'amsec_security_scanner_integrity_active' );
 $store = new WordPressIntegrityStore( $options );
-$id    = wp_generate_uuid4();
+$id = wp_generate_uuid4();
 if ( ! $store->begin( $id, new IntegrityCursor( $id ) ) ) {
 	throw new RuntimeException( 'Could not create an unfinished integrity scan.' );
 }
@@ -25,15 +25,7 @@ if ( null === $progress || $progress->finished ) {
 }
 wp_clear_scheduled_hook( 'amsec_file_tick' );
 $lock = 'amsec_security_scanner_integrity_worker_lock';
-$options->set(
-	$lock,
-	json_encode(
-		array(
-			'scan_id' => 'other-worker',
-			'expires' => time() + 60,
-		)
-	)
-);
+$options->set( $lock, json_encode( array( 'scan_id' => 'other-worker', 'expires' => time() + 60 ) ) );
 try {
 	( new IntegrityScanAction() )->scheduled();
 	if ( false !== wp_next_scheduled( 'amsec_file_tick' ) ) {

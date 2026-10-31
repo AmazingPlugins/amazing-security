@@ -63,35 +63,13 @@ final class SiteRiskTest extends TestCase {
 	}
 
 	public function test_ai(): void {
-		$https = self::finding( 'https-admin', array(), 'pass' );
-		$plain = self::finding( 'https-admin', array() );
-		$on    = self::finding(
-			'ai-readiness',
-			array(
-				'assistant' => 'on',
-				'guide'     => 'present',
-			)
-		);
-		$set   = self::finding( 'ai-readers', array( 'ai_crawlers' => 'limited' ) );
+		$https   = self::finding( 'https-admin', array(), 'pass' );
+		$plain   = self::finding( 'https-admin', array() );
+		$on      = self::finding( 'ai-readiness', array( 'assistant' => 'on', 'guide' => 'present' ) );
+		$set     = self::finding( 'ai-readers', array( 'ai_crawlers' => 'limited' ) );
 		self::assertSame( array( 'risk', 'assistant-plain' ), self::verdict( 'ai', array( $plain, $on, $set ) ) );
 		self::assertSame( array( 'check', 'crawlers' ), self::verdict( 'ai', array( $https, $on, self::finding( 'ai-readers', array( 'ai_crawlers' => 'allowed' ) ) ) ) );
-		self::assertSame(
-			array( 'check', 'no-guide' ),
-			self::verdict(
-				'ai',
-				array(
-					$https,
-					self::finding(
-						'ai-readiness',
-						array(
-							'assistant' => 'off',
-							'guide'     => 'absent',
-						)
-					),
-					$set,
-				)
-			)
-		);
+		self::assertSame( array( 'check', 'no-guide' ), self::verdict( 'ai', array( $https, self::finding( 'ai-readiness', array( 'assistant' => 'off', 'guide' => 'absent' ) ), $set ) ) );
 		self::assertSame( array( 'check', 'unknown' ), self::verdict( 'ai', array( $https, $set ) ) );
 		self::assertSame( array( 'good', 'ready' ), self::verdict( 'ai', array( $https, $on, $set ) ) );
 	}
@@ -106,21 +84,9 @@ final class SiteRiskTest extends TestCase {
 	public function test_card_shows_status_as_text_with_a_link_and_skips_unknown_rows(): void {
 		$html = SiteRiskCard::render(
 			array(
-				array(
-					'area'   => 'bots',
-					'status' => 'risk',
-					'reason' => 'all-off',
-				),
-				array(
-					'area'   => 'signin',
-					'status' => 'good',
-					'reason' => 'on',
-				),
-				array(
-					'area'   => 'nope',
-					'status' => 'good',
-					'reason' => 'on',
-				),
+				array( 'area' => 'bots', 'status' => 'risk', 'reason' => 'all-off' ),
+				array( 'area' => 'signin', 'status' => 'good', 'reason' => 'on' ),
+				array( 'area' => 'nope', 'status' => 'good', 'reason' => 'on' ),
 			)
 		);
 		self::assertStringContainsString( '<h2 id="amsec-risk-title">', $html );

@@ -39,9 +39,9 @@ final class FileScanRunnerTest extends TestCase {
 		file_put_contents( $root . '/b-extra.php', '<?php eval(base64_decode("ZWNobyAxOw=="));' );
 		file_put_contents( $root . '/c-extra.css', 'css' );
 		$manifest = new Manifest( 'plugin', 'demo:1', 'https://wordpress.org/', new DateTimeImmutable(), 'sha256', array( 'a-known.php' => array( hash( 'sha256', '<?php echo 1;' ) ) ) );
-		$targets  = array( new FileScanTarget( 'demo:1', 'plugin', $root, $manifest ) );
-		$runner   = new FileScanRunner();
-		$first    = $runner->step( $targets, new FileScanCursor( 'scan-1' ), new ScanContext( null, 2 ) );
+		$targets = array( new FileScanTarget( 'demo:1', 'plugin', $root, $manifest ) );
+		$runner = new FileScanRunner();
+		$first = $runner->step( $targets, new FileScanCursor( 'scan-1' ), new ScanContext( null, 2 ) );
 		self::assertFalse( $first->finished );
 		self::assertSame( 2, $first->cursor->processed );
 		$second = $runner->step( $targets, $first->cursor, new ScanContext() );
@@ -62,26 +62,26 @@ final class FileScanRunnerTest extends TestCase {
 		self::assertSame( 'oversized', $step->cursor->findings[0]['reason'] );
 	}
 
-	public function test_file_too_large_for_tokens_gets_signatures_and_counts_as_checked(): void {
-		$root = $this->root();
-		file_put_contents( $root . '/dense.php', '<?php ' . str_repeat( '$a;', 600000 ) );
-		file_put_contents( $root . '/small.php', '<?php eval($_POST["fixture"]);' );
-		$step = ( new FileScanRunner() )->step( array( new FileScanTarget( 'uploads', 'uploads', $root ) ), new FileScanCursor( 'memory' ), new ScanContext() );
-		self::assertTrue( $step->finished );
-		self::assertFalse( $step->cursor->partial );
-		self::assertSame( 0, $step->cursor->unknown );
-		self::assertSame( 2, $step->cursor->scanned );
-		self::assertContains( 'AS-PHP-004', array_column( $step->cursor->findings, 'rule_id' ) );
-	}
+    public function test_file_too_large_for_tokens_gets_signatures_and_counts_as_checked(): void {
+        $root = $this->root();
+        file_put_contents( $root . '/dense.php', '<?php ' . str_repeat( '$a;', 600000 ) );
+        file_put_contents( $root . '/small.php', '<?php eval($_POST["fixture"]);' );
+        $step = ( new FileScanRunner() )->step( array( new FileScanTarget( 'uploads', 'uploads', $root ) ), new FileScanCursor( 'memory' ), new ScanContext() );
+        self::assertTrue( $step->finished );
+        self::assertFalse( $step->cursor->partial );
+        self::assertSame( 0, $step->cursor->unknown );
+        self::assertSame( 2, $step->cursor->scanned );
+        self::assertContains( 'AS-PHP-004', array_column( $step->cursor->findings, 'rule_id' ) );
+    }
 
 	public function test_manifest_change_refuses_resume(): void {
 		$root = $this->root();
 		file_put_contents( $root . '/a.php', 'a' );
 		file_put_contents( $root . '/b.php', 'b' );
-		$old    = new Manifest( 'plugin', 'demo:1', 'https://wordpress.org/', new DateTimeImmutable(), 'sha256', array( 'a.php' => array( hash( 'sha256', 'a' ) ) ) );
-		$new    = new Manifest( 'plugin', 'demo:1', 'https://wordpress.org/', new DateTimeImmutable(), 'sha256', array( 'a.php' => array( hash( 'sha256', 'changed' ) ) ) );
+		$old = new Manifest( 'plugin', 'demo:1', 'https://wordpress.org/', new DateTimeImmutable(), 'sha256', array( 'a.php' => array( hash( 'sha256', 'a' ) ) ) );
+		$new = new Manifest( 'plugin', 'demo:1', 'https://wordpress.org/', new DateTimeImmutable(), 'sha256', array( 'a.php' => array( hash( 'sha256', 'changed' ) ) ) );
 		$runner = new FileScanRunner();
-		$first  = $runner->step( array( new FileScanTarget( 'demo:1', 'plugin', $root, $old ) ), new FileScanCursor( 'scan-1' ), new ScanContext( null, 1 ) );
+		$first = $runner->step( array( new FileScanTarget( 'demo:1', 'plugin', $root, $old ) ), new FileScanCursor( 'scan-1' ), new ScanContext( null, 1 ) );
 		$second = $runner->step( array( new FileScanTarget( 'demo:1', 'plugin', $root, $new ) ), $first->cursor, new ScanContext() );
 		self::assertTrue( $second->cursor->partial );
 		self::assertSame( 'inconclusive', $second->cursor->state() );
@@ -93,9 +93,9 @@ final class FileScanRunnerTest extends TestCase {
 			file_put_contents( $root . '/extra-' . sprintf( '%03d', $i ) . '.php', '<?php echo 1;' );
 		}
 		$manifest = new Manifest( 'plugin', 'demo:1', 'https://wordpress.org/', new DateTimeImmutable(), 'sha256', array() );
-		$runner   = new FileScanRunner();
-		$first    = $runner->step( array( new FileScanTarget( 'demo:1', 'plugin', $root, $manifest ) ), new FileScanCursor( 'scan-1' ), new ScanContext() );
-		$second   = $runner->step( array( new FileScanTarget( 'demo:1', 'plugin', $root, $manifest ) ), $first->cursor, new ScanContext() );
+		$runner = new FileScanRunner();
+		$first = $runner->step( array( new FileScanTarget( 'demo:1', 'plugin', $root, $manifest ) ), new FileScanCursor( 'scan-1' ), new ScanContext() );
+		$second = $runner->step( array( new FileScanTarget( 'demo:1', 'plugin', $root, $manifest ) ), $first->cursor, new ScanContext() );
 		self::assertCount( 250, $second->cursor->findings );
 		self::assertGreaterThan( 0, $second->cursor->omitted );
 		self::assertTrue( $second->cursor->partial );
@@ -107,7 +107,7 @@ final class FileScanRunnerTest extends TestCase {
 		file_put_contents( $root . '/b.php', '<?php echo 2;' );
 		$target = new FileScanTarget( 'uploads', 'uploads', $root );
 		$runner = new FileScanRunner();
-		$first  = $runner->step( array( $target ), new FileScanCursor( 'scan-1' ), new ScanContext( null, 1 ) );
+		$first = $runner->step( array( $target ), new FileScanCursor( 'scan-1' ), new ScanContext( null, 1 ) );
 		file_put_contents( $root . '/c.php', '<?php echo 3;' );
 		$second = $runner->step( array( $target ), $first->cursor, new ScanContext() );
 		self::assertTrue( $second->cursor->partial );
@@ -117,9 +117,9 @@ final class FileScanRunnerTest extends TestCase {
 	public function test_exhausted_run_time_is_partial_and_finished(): void {
 		$root = $this->root();
 		file_put_contents( $root . '/code.php', '<?php echo 1;' );
-		$cursor          = new FileScanCursor( 'scan-1' );
+		$cursor = new FileScanCursor( 'scan-1' );
 		$cursor->elapsed = (float) FileScanCursor::MAX_SECONDS;
-		$step            = ( new FileScanRunner() )->step( array( new FileScanTarget( 'uploads', 'uploads', $root ) ), $cursor, new ScanContext() );
+		$step = ( new FileScanRunner() )->step( array( new FileScanTarget( 'uploads', 'uploads', $root ) ), $cursor, new ScanContext() );
 		self::assertTrue( $step->finished );
 		self::assertTrue( $step->cursor->partial );
 		self::assertSame( 'inconclusive', $step->cursor->state() );
@@ -130,7 +130,7 @@ final class FileScanRunnerTest extends TestCase {
 		file_put_contents( $root . '/single.php', '<?php eval(base64_decode("ZWNobyAxOw=="));' );
 		file_put_contents( $root . '/neighbor.php', '<?php echo 1;' );
 		$target = new FileScanTarget( 'single.php:1.0', 'plugin', $root, null, 'single.php' );
-		$step   = ( new FileScanRunner() )->step( array( $target ), new FileScanCursor( 'scan-1' ), new ScanContext() );
+		$step = ( new FileScanRunner() )->step( array( $target ), new FileScanCursor( 'scan-1' ), new ScanContext() );
 		self::assertTrue( $step->finished );
 		self::assertSame( 1, $step->cursor->processed );
 		self::assertSame( array( 'AS-PHP-001' ), array_column( $step->cursor->findings, 'rule_id' ) );

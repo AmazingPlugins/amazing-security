@@ -22,93 +22,14 @@ final class LocalLoginGateTest extends TestCase {
 	}
 
 	public function test_confirmation_stays_on_the_wordpress_login_form(): void {
-		self::assertSame(
-			'allow',
-			LoginConfirmation::decision(
-				false,
-				array(
-					'log' => 'a',
-					'pwd' => 'secret',
-				),
-				false,
-				false
-			)
-		);
-		self::assertSame(
-			'allow',
-			LoginConfirmation::decision(
-				true,
-				array(
-					'username' => 'a',
-					'password' => 'secret',
-				),
-				false,
-				false
-			)
-		);
-		self::assertSame(
-			'allow',
-			LoginConfirmation::decision(
-				true,
-				array(
-					'log' => 'a',
-					'pwd' => 'secret',
-				),
-				true,
-				false
-			)
-		);
-		self::assertSame(
-			'allow',
-			LoginConfirmation::decision(
-				true,
-				array(
-					'log' => 'a',
-					'pwd' => 'secret',
-				),
-				false,
-				true
-			)
-		);
+		self::assertSame( 'allow', LoginConfirmation::decision( false, array( 'log' => 'a', 'pwd' => 'secret' ), false, false ) );
+		self::assertSame( 'allow', LoginConfirmation::decision( true, array( 'username' => 'a', 'password' => 'secret' ), false, false ) );
+		self::assertSame( 'allow', LoginConfirmation::decision( true, array( 'log' => 'a', 'pwd' => 'secret' ), true, false ) );
+		self::assertSame( 'allow', LoginConfirmation::decision( true, array( 'log' => 'a', 'pwd' => 'secret' ), false, true ) );
 		// Nothing to tick: an untouched form, or one without the field, signs in. Only a filled hidden field is refused.
-		self::assertSame(
-			'allow',
-			LoginConfirmation::decision(
-				true,
-				array(
-					'log' => 'a',
-					'pwd' => 'secret',
-				),
-				false,
-				false
-			)
-		);
-		self::assertSame(
-			'allow',
-			LoginConfirmation::decision(
-				true,
-				array(
-					'log'                    => 'a',
-					'pwd'                    => 'secret',
-					LoginConfirmation::FIELD => '',
-				),
-				false,
-				false
-			)
-		);
-		self::assertSame(
-			'reject',
-			LoginConfirmation::decision(
-				true,
-				array(
-					'log'                    => 'a',
-					'pwd'                    => 'secret',
-					LoginConfirmation::FIELD => 'filled',
-				),
-				false,
-				false
-			)
-		);
+		self::assertSame( 'allow', LoginConfirmation::decision( true, array( 'log' => 'a', 'pwd' => 'secret' ), false, false ) );
+		self::assertSame( 'allow', LoginConfirmation::decision( true, array( 'log' => 'a', 'pwd' => 'secret', LoginConfirmation::FIELD => '' ), false, false ) );
+		self::assertSame( 'reject', LoginConfirmation::decision( true, array( 'log' => 'a', 'pwd' => 'secret', LoginConfirmation::FIELD => 'filled' ), false, false ) );
 	}
 
 	public function test_gap_rows_do_not_send_data(): void {

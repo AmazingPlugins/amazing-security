@@ -11,20 +11,10 @@ final class AlertSettingsRendererTest extends TestCase {
 	public function test_shows_switch_and_attempt_status_without_claiming_delivery(): void {
 		$html = ( new AlertSettingsRenderer() )->render(
 			true,
-			array(
-				'last_attempt' => array(
-					'status' => 'accepted',
-					'at'     => 1000,
-					'count'  => 2,
-				),
-			),
+			array( 'last_attempt' => array( 'status' => 'accepted', 'at' => 1000, 'count' => 2 ) ),
 			'https://example.test/admin-post.php',
 			'nonce',
-			array(
-				'email'      => 'owner@example.test',
-				'configured' => true,
-				'summary'    => 'ok',
-			)
+			array( 'email' => 'owner@example.test', 'configured' => true, 'summary' => 'ok' )
 		);
 		self::assertStringContainsString( 'Finding emails', $html );
 		self::assertStringContainsString( 'Accepted for sending', $html );
@@ -38,11 +28,7 @@ final class AlertSettingsRendererTest extends TestCase {
 			array(),
 			'https://example.test/admin-post.php',
 			'nonce',
-			array(
-				'email'      => '',
-				'configured' => false,
-				'summary'    => 'missing',
-			)
+			array( 'email' => '', 'configured' => false, 'summary' => 'missing' )
 		);
 		self::assertStringContainsString( 'Email is not configured', $html );
 	}

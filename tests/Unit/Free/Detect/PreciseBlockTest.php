@@ -10,10 +10,10 @@ use PHPUnit\Framework\TestCase;
 final class PreciseBlockTest extends TestCase {
 	public function test_option_off_stays_quiet(): void {
 		$query = array(
-			Module::PROBE_KEY => '1',
-			'q'               => Module::VALUE_NEEDLE,
-			'union'           => 'UNION SELECT',
-			'walk'            => '../',
+			Module::PROBE_KEY   => '1',
+			'q'                  => Module::VALUE_NEEDLE,
+			'union'              => 'UNION SELECT',
+			'walk'               => '../',
 		);
 		foreach ( array( '0', '', 'off', 'true' ) as $option ) {
 			self::assertFalse( Module::shouldBlock( $query, $option, false ) );
@@ -45,8 +45,8 @@ final class PreciseBlockTest extends TestCase {
 		self::assertFalse(
 			Module::shouldBlock(
 				array(
-					'pad'             => str_repeat( 'b', Module::QUERY_BUDGET ),
-					Module::PROBE_KEY => '1',
+					'pad'              => str_repeat( 'b', Module::QUERY_BUDGET ),
+					Module::PROBE_KEY  => '1',
 				),
 				'1',
 				false

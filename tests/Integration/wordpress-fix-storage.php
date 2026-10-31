@@ -12,9 +12,9 @@ FixTables::install();
 $GLOBALS['wpdb']->query( 'DELETE FROM ' . $GLOBALS['wpdb']->prefix . 'amsec_fix_audit' );
 $GLOBALS['wpdb']->query( 'DELETE FROM ' . $GLOBALS['wpdb']->prefix . 'amsec_fix_proposals' );
 delete_option( 'amsec_login_rate_mode' );
-$now      = time();
-$repo     = new WordPressFixRepository( $GLOBALS['wpdb'] );
-$id       = bin2hex( random_bytes( 16 ) );
+$now  = time();
+$repo = new WordPressFixRepository( $GLOBALS['wpdb'] );
+$id   = bin2hex( random_bytes( 16 ) );
 $proposal = new FixProposal( $id, str_repeat( 'a', 32 ), 'login-rate-observe', 'off', 'observe', 1, $now, $now + 900 );
 if ( ! $repo->create( $proposal ) || 'applied' !== $repo->apply( $id, 1, $now + 1 ) || 'observe' !== get_option( 'amsec_login_rate_mode' ) ) {
 	throw new RuntimeException( 'Atomic apply failed.' );
@@ -28,7 +28,7 @@ if ( 'rolled_back' !== $repo->rollback( $id, 1, $now + 3 ) || 'off' !== get_opti
 
 $staleId = bin2hex( random_bytes( 16 ) );
 update_option( 'amsec_login_rate_mode', 'observe', false );
-$stale = new FixProposal( $staleId, str_repeat( 'b', 32 ), 'login-rate-block', 'observe', 'block', 1, $now, $now + 900 );
+$stale   = new FixProposal( $staleId, str_repeat( 'b', 32 ), 'login-rate-block', 'observe', 'block', 1, $now, $now + 900 );
 $repo->create( $stale );
 update_option( 'amsec_login_rate_mode', 'off', false );
 if ( 'stale' !== $repo->apply( $staleId, 1, $now + 1 ) || 'off' !== get_option( 'amsec_login_rate_mode' ) ) {
@@ -37,20 +37,15 @@ if ( 'stale' !== $repo->apply( $staleId, 1, $now + 1 ) || 'off' !== get_option( 
 
 $failureId = bin2hex( random_bytes( 16 ) );
 $failure   = new FixProposal( $failureId, str_repeat( 'c', 32 ), 'login-rate-observe', 'off', 'observe', 1, $now, $now + 900 );
-$faulty    = new WordPressFixRepository(
-	$GLOBALS['wpdb'],
-	static function (): void {
-		throw new RuntimeException( 'Injected audit failure.' );
-	}
-);
+$faulty    = new WordPressFixRepository( $GLOBALS['wpdb'], static function (): void { throw new RuntimeException( 'Injected audit failure.' ); } );
 $repo->create( $failure );
 if ( 'unavailable' !== $faulty->apply( $failureId, 1, $now + 1 ) || 'off' !== get_option( 'amsec_login_rate_mode' ) || 'pending' !== $repo->get( $failureId )->status ) {
 	throw new RuntimeException( 'Audit failure did not roll back the setting and proposal.' );
 }
 for ( $n = 0; $n < 6; ++$n ) {
-	$quotaId = bin2hex( random_bytes( 16 ) );
-	$quota   = new FixProposal( $quotaId, str_repeat( 'd', 32 ), 'login-rate-observe', 'off', 'observe', 2, $now + $n, $now + $n + 900 );
-	$created = $repo->create( $quota );
+	$quotaId  = bin2hex( random_bytes( 16 ) );
+	$quota    = new FixProposal( $quotaId, str_repeat( 'd', 32 ), 'login-rate-observe', 'off', 'observe', 2, $now + $n, $now + $n + 900 );
+	$created  = $repo->create( $quota );
 	if ( $created !== ( $n < 5 ) ) {
 		throw new RuntimeException( 'Per-administrator proposal quota failed.' );
 	}

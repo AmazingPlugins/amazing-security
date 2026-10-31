@@ -10,22 +10,14 @@ use PHPUnit\Framework\TestCase;
 
 final class LoginSettingsTest extends TestCase {
 	public function test_defaults_are_off_and_writes_are_validated(): void {
-		$options  = new class() implements OptionGateway {
+		$options = new class implements OptionGateway {
 			public array $data = array();
-			public function get( string $key ): mixed {
-				return $this->data[ $key ] ?? null; }
-			public function add( string $key, string $value ): bool {
-				$this->data[ $key ] = $value;
-				return true; }
-			public function set( string $key, string $value ): bool {
-				$this->data[ $key ] = $value;
-				return true; }
-			public function delete( string $key ): void {
-				unset( $this->data[ $key ] ); }
-			public function replaceIfSame( string $key, string $expected, string $replacement ): bool {
-				return false; }
-			public function deleteIfSame( string $key, string $expected ): bool {
-				return false; }
+			public function get( string $key ): mixed { return $this->data[ $key ] ?? null; }
+			public function add( string $key, string $value ): bool { $this->data[ $key ] = $value; return true; }
+			public function set( string $key, string $value ): bool { $this->data[ $key ] = $value; return true; }
+			public function delete( string $key ): void { unset( $this->data[ $key ] ); }
+			public function replaceIfSame( string $key, string $expected, string $replacement ): bool { return false; }
+			public function deleteIfSame( string $key, string $expected ): bool { return false; }
 		};
 		$settings = new WordPressLoginSettings( $options );
 		self::assertSame( 'off', $settings->rateMode() );

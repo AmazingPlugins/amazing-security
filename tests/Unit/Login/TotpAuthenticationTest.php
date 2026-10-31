@@ -14,20 +14,16 @@ namespace {
 		}
 	}
 	if ( ! function_exists( 'user_can' ) ) {
-		function user_can( WP_User $user, string $capability ): bool {
-			return $user->admin; }
+		function user_can( WP_User $user, string $capability ): bool { return $user->admin; }
 	}
 	if ( ! function_exists( '__' ) ) {
-		function __( string $text, string $domain ): string {
-			return $text; }
+		function __( string $text, string $domain ): string { return $text; }
 	}
 	if ( ! function_exists( 'wp_unslash' ) ) {
-		function wp_unslash( string $value ): string {
-			return stripslashes( $value ); }
+		function wp_unslash( string $value ): string { return stripslashes( $value ); }
 	}
 	if ( ! function_exists( 'sanitize_text_field' ) ) {
-		function sanitize_text_field( string $value ): string {
-			return strip_tags( $value ); }
+		function sanitize_text_field( string $value ): string { return strip_tags( $value ); }
 	}
 }
 
@@ -40,11 +36,11 @@ namespace AmazingPlugins\Security\Tests\Unit\Login {
 
 	final class TotpAuthenticationTest extends TestCase {
 		public function test_enrolled_admin_needs_one_time_factor_after_password(): void {
-			$seed          = '12345678901234567890';
-			$cipher        = new SecretCipher( str_repeat( 's', 64 ) );
-			$store         = $this->store( $cipher->encrypt( $seed ) );
-			$auth          = new TotpAuthentication( $store, $cipher, new Totp() );
-			$admin         = new \WP_User( 7 );
+			$seed = '12345678901234567890';
+			$cipher = new SecretCipher( str_repeat( 's', 64 ) );
+			$store = $this->store( $cipher->encrypt( $seed ) );
+			$auth = new TotpAuthentication( $store, $cipher, new Totp() );
+			$admin = new \WP_User( 7 );
 			$wrongPassword = new \WP_Error( 'incorrect_password', 'Wrong password' );
 			self::assertSame( $wrongPassword, $auth->authenticate( $wrongPassword, 'owner', 'wrong' ) );
 			$_POST = array();
@@ -58,12 +54,12 @@ namespace AmazingPlugins\Security\Tests\Unit\Login {
 		}
 
 		public function test_matching_a_factor_does_not_spend_it(): void {
-			$seed   = random_bytes( 20 );
+			$seed = random_bytes( 20 );
 			$cipher = new SecretCipher( str_repeat( 's', 64 ) );
-			$store  = $this->store( $cipher->encrypt( $seed ) );
-			$auth   = new TotpAuthentication( $store, $cipher, new Totp() );
-			$now    = 1800000000;
-			$code   = ( new Totp() )->atStep( $seed, intdiv( $now, 30 ) );
+			$store = $this->store( $cipher->encrypt( $seed ) );
+			$auth = new TotpAuthentication( $store, $cipher, new Totp() );
+			$now = 1800000000;
+			$code = ( new Totp() )->atStep( $seed, intdiv( $now, 30 ) );
 			self::assertTrue( $auth->matchesFactor( 7, $code, $now ) );
 			self::assertSame( -1, $store->last );
 			self::assertTrue( $auth->verifyFactor( 7, $code, $now ) );
@@ -80,57 +76,26 @@ namespace AmazingPlugins\Security\Tests\Unit\Login {
 		}
 
 		public function test_shared_factor_verification_preserves_one_use_steps_recovery_and_failures(): void {
-			$seed   = random_bytes( 20 );
-			$cipher = new SecretCipher( str_repeat( 's', 64 ) );
-			$store  = $this->store( $cipher->encrypt( $seed ) );
-			$auth   = new TotpAuthentication( $store, $cipher, new Totp() );
-			$now    = 1800000000;
-			self::assertFalse( $auth->verifyFactor( 8, '123456', $now ) );
-			self::assertFalse( $auth->verifyFactor( 7, 'wrong', $now ) );
-			$code = ( new Totp() )->atStep( $seed, intdiv( $now, 30 ) );
-			self::assertTrue( $auth->verifyFactor( 7, $code, $now ) );
-			self::assertFalse( $auth->verifyFactor( 7, $code, $now ) );
-			$store->recovery = bin2hex( random_bytes( 12 ) );
-			$recovery        = $store->recovery;
-			self::assertTrue( $auth->verifyFactor( 7, $recovery, $now ) );
-			self::assertFalse( $auth->verifyFactor( 7, $recovery, $now ) );
-			self::assertFalse( $auth->verifyFactor( 7, str_repeat( 'x', 129 ), $now ) );
-			$store->broken = true;
-			self::assertFalse( $auth->verifyFactor( 7, $code, $now ) );
+			$seed = random_bytes(20);$cipher = new SecretCipher(str_repeat('s',64));$store = $this->store($cipher->encrypt($seed));$auth = new TotpAuthentication($store,$cipher,new Totp());$now = 1800000000;
+			self::assertFalse($auth->verifyFactor(8,'123456',$now));self::assertFalse($auth->verifyFactor(7,'wrong',$now));$code = (new Totp())->atStep($seed,intdiv($now,30));self::assertTrue($auth->verifyFactor(7,$code,$now));self::assertFalse($auth->verifyFactor(7,$code,$now));
+			$store->recovery = bin2hex(random_bytes(12));$recovery = $store->recovery;self::assertTrue($auth->verifyFactor(7,$recovery,$now));self::assertFalse($auth->verifyFactor(7,$recovery,$now));self::assertFalse($auth->verifyFactor(7,str_repeat('x',129),$now));$store->broken = true;self::assertFalse($auth->verifyFactor(7,$code,$now));
 		}
 
 		private function store( string $encrypted ): TotpStore {
 			return new class( $encrypted ) implements TotpStore {
-				public int $last        = -1;
+				public int $last = -1;
 				public string $recovery = '';
-				public bool $broken     = false;
+				public bool $broken = false;
 				public function __construct( private string $encrypted ) {}
-				public function enroll( int $userId, string $encryptedSecret, array $recoveryHashes ): bool {
-					return false; }
-				public function isEnrolled( int $userId ): bool {
-					if ( $this->broken ) {
-						throw new \RuntimeException( 'Unavailable' );
-					}return 7 === $userId; }
-				public function encryptedSecret( int $userId ): ?string {
-					return $this->encrypted; }
-				public function lastStep( int $userId ): ?int {
-					return $this->last; }
-				public function consumeStep( int $userId, int $step ): bool {
-					if ( $step <= $this->last ) {
-						return false;
-					} $this->last = $step;
-					return true; }
-				public function consumeRecoveryCode( int $userId, string $code ): bool {
-					if ( $this->recovery !== '' && $code === $this->recovery ) {
-						$this->recovery = '';
-						return true;
-					}return false; }
-				public function hasRecoveryCode( int $userId, string $code ): bool {
-					return $this->recovery !== '' && $code === $this->recovery; }
-				public function replaceRecoveryCodes( int $userId, array $hashes ): bool {
-					return false; }
-				public function disable( int $userId ): bool {
-					return false; }
+				public function enroll( int $userId, string $encryptedSecret, array $recoveryHashes ): bool { return false; }
+				public function isEnrolled( int $userId ): bool { if($this->broken)throw new \RuntimeException('Unavailable');return 7 === $userId; }
+				public function encryptedSecret( int $userId ): ?string { return $this->encrypted; }
+				public function lastStep( int $userId ): ?int { return $this->last; }
+				public function consumeStep( int $userId, int $step ): bool { if ( $step <= $this->last ) { return false; } $this->last = $step; return true; }
+				public function consumeRecoveryCode( int $userId, string $code ): bool { if($this->recovery!==''&&$code===$this->recovery){$this->recovery='';return true;}return false; }
+				public function hasRecoveryCode( int $userId, string $code ): bool { return $this->recovery !== '' && $code === $this->recovery; }
+				public function replaceRecoveryCodes( int $userId, array $hashes ): bool { return false; }
+				public function disable( int $userId ): bool { return false; }
 			};
 		}
 	}

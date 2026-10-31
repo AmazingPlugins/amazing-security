@@ -9,13 +9,12 @@ use PHPUnit\Framework\TestCase;
 
 final class ScheduleHooksTest extends TestCase {
 	public function test_schedules_once_and_clears_on_deactivation(): void {
-		$existing  = false;
+		$existing = false;
 		$scheduled = 0;
-		$cleared   = array();
-		$started   = false;
-		$hooks     = new ScheduleHooks(
-			static function () use ( &$existing ): bool {
-				return $existing; },
+		$cleared = array();
+		$started = false;
+		$hooks = new ScheduleHooks(
+			static function () use ( &$existing ): bool { return $existing; },
 			static function ( int $when, string $recurrence, string $hook ) use ( &$existing, &$scheduled ): bool {
 				self::assertSame( 'daily', $recurrence );
 				self::assertSame( 'amsec_local_daily_scan', $hook );
@@ -24,13 +23,10 @@ final class ScheduleHooksTest extends TestCase {
 				++$scheduled;
 				return true;
 			},
-			static function ( string $hook ) use ( &$existing, &$cleared ): void {
-				$existing  = false;
-				$cleared[] = $hook; },
-			static function () use ( &$started ): bool {
-				return $started; }
+			static function ( string $hook ) use ( &$existing, &$cleared ): void { $existing = false; $cleared[] = $hook; },
+			static function () use ( &$started ): bool { return $started; }
 		);
-		$started   = false;
+		$started = false;
 		$hooks->ensure();
 		self::assertSame( 0, $scheduled, 'Nothing is scheduled before the first manual scan.' );
 		$started = true;

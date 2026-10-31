@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 final class TotpTest extends TestCase {
 	public function test_rfc_vector_skew_and_replay(): void {
-		$totp   = new Totp();
+		$totp = new Totp();
 		$secret = '12345678901234567890';
 		self::assertSame( 1, $totp->verify( $secret, '287082', 59, null ) );
 		self::assertSame( 1, $totp->verify( $secret, '287082', 89, null ) );

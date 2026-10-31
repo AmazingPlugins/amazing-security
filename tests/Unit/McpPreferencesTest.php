@@ -24,7 +24,7 @@ final class McpPreferencesTest extends TestCase {
 	}
 
 	public function test_failed_write_never_claims_enabled(): void {
-		$options       = $this->options();
+		$options = $this->options();
 		$options->fail = true;
 		$this->expectException( RuntimeException::class );
 		( new McpPreferences( $options ) )->setEnabled( true );
@@ -46,27 +46,15 @@ final class McpPreferencesTest extends TestCase {
 	}
 
 	private function options(): OptionGateway {
-		return new class() implements OptionGateway {
+		return new class implements OptionGateway {
 			public array $values = array();
-			public bool $fail    = false;
-			public function get( string $key ): mixed {
-				return $this->values[ $key ] ?? null; }
-			public function add( string $key, string $value ): bool {
-				if ( $this->fail ) {
-					return false;
-				} $this->values[ $key ] = $value;
-				return true; }
-			public function set( string $key, string $value ): bool {
-				if ( $this->fail ) {
-					return false;
-				} $this->values[ $key ] = $value;
-				return true; }
-			public function delete( string $key ): void {
-				unset( $this->values[ $key ] ); }
-			public function replaceIfSame( string $key, string $expected, string $replacement ): bool {
-				return false; }
-			public function deleteIfSame( string $key, string $expected ): bool {
-				return false; }
+			public bool $fail = false;
+			public function get( string $key ): mixed { return $this->values[ $key ] ?? null; }
+			public function add( string $key, string $value ): bool { if ( $this->fail ) { return false; } $this->values[ $key ] = $value; return true; }
+			public function set( string $key, string $value ): bool { if ( $this->fail ) { return false; } $this->values[ $key ] = $value; return true; }
+			public function delete( string $key ): void { unset( $this->values[ $key ] ); }
+			public function replaceIfSame( string $key, string $expected, string $replacement ): bool { return false; }
+			public function deleteIfSame( string $key, string $expected ): bool { return false; }
 		};
 	}
 }
