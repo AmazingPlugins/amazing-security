@@ -1,21 +1,225 @@
 <?php
-if(!defined('WP_CLI')||!WP_CLI||DB_HOST!=='amsec-next-db'||!in_array(DB_NAME,['wordpress','wordpress69'],true)){exit(1);}
-use AmazingPlugins\Security\Network\{NetworkSettingsService,NetworkSettings,NetworkObservation};
+if ( ! defined( 'WP_CLI' ) || ! WP_CLI || DB_HOST !== 'amsec-next-db' || ! in_array( DB_NAME, array( 'wordpress', 'wordpress69' ), true ) ) {
+	exit( 1 );}
+use AmazingPlugins\Security\Network\{NetworkSettingsService, NetworkSettings, NetworkObservation};
 use AmazingPlugins\Security\Integrity\WordPressOptions;
-$saved=[];foreach(['amsec_network_policy','amsec_network_observation'] as $key){$saved[$key]=get_option($key,null);delete_option($key);}$service=new NetworkSettingsService(new WordPressOptions());$slug='amsec-net-'.bin2hex(random_bytes(4));$password=bin2hex(random_bytes(20));$actor=wp_insert_user(['user_login'=>$slug,'user_pass'=>$password,'role'=>'administrator']);if(is_wp_error($actor)){throw new RuntimeException('Fixture account failed.');}$die=static fn()=>static function($m,$t,$a){throw new RuntimeException('denied:'.($a['response']??500));};$redirect=static function(){throw new RuntimeException('redirect');};add_filter('wp_die_handler',$die);add_filter('wp_redirect',$redirect);
-try{
-wp_set_current_user($actor);$manager=WP_Session_Tokens::get_instance($actor);$token=$manager->create(time()+3600);$other=$manager->create(time()+3600);$_SERVER['HTTPS']='on';$_SERVER['REQUEST_METHOD']='POST';$_SERVER['REMOTE_ADDR']='203.0.113.7';$_COOKIE[SECURE_AUTH_COOKIE]=wp_generate_auth_cookie($actor,time()+3600,'secure_auth',$token);$_COOKIE[LOGGED_IN_COOKIE]=wp_generate_auth_cookie($actor,time()+3600,'logged_in',$token);$fp=$service->fingerprint();$base=['fingerprint'=>$fp,'mode'=>'observe','rules'=>'192.0.2.0/24','methods'=>['*'],'password'=>$password,'confirm'=>'1','_wpnonce'=>wp_create_nonce('amsec_network_'.$fp)];
-foreach(['nonce'=>['_wpnonce'=>'bad'],'password'=>['password'=>'bad'],'consent'=>['confirm'=>'0'],'mode'=>['mode'=>'bad'],'rules'=>['rules'=>'<script>'],'methods'=>['methods'=>'GET'],'self'=>['mode'=>'block','rules'=>'203.0.113.0/24']] as $name=>$change){$_POST=array_replace($base,$change);$_REQUEST=$_POST;try{(new NetworkSettings())->handle();throw new LogicException('Network gate accepted '.$name);}catch(RuntimeException $e){if(!str_starts_with($e->getMessage(),'denied:')){throw $e;}}if(get_option('amsec_network_policy',null)!==null){throw new RuntimeException('Rejected network request wrote policy.');}}
-foreach(['https','cookie','mismatch','guest','method'] as $name){$_POST=$base;$_REQUEST=$_POST;if($name==='https'){$_SERVER['HTTPS']='off';}if($name==='cookie'){unset($_COOKIE[SECURE_AUTH_COOKIE]);}if($name==='mismatch'){$_COOKIE[SECURE_AUTH_COOKIE]=wp_generate_auth_cookie($actor,time()+3600,'secure_auth',$other);}if($name==='guest'){wp_set_current_user(0);}if($name==='method'){$_SERVER['REQUEST_METHOD']='GET';}try{(new NetworkSettings())->handle();throw new LogicException('Network gate accepted '.$name);}catch(RuntimeException $e){if(!str_starts_with($e->getMessage(),'denied:')){throw $e;}}$_SERVER['HTTPS']='on';$_SERVER['REQUEST_METHOD']='POST';wp_set_current_user($actor);$_COOKIE[SECURE_AUTH_COOKIE]=wp_generate_auth_cookie($actor,time()+3600,'secure_auth',$token);}
-$host=DB_NAME==='wordpress'?'amsec-next-wp':'amsec-next-wp69';$client=gethostbyname(gethostname());$approve=static function($mode,$methods=['*'])use($service,$client,$password,$actor){wp_set_current_user($actor);$fp=$service->fingerprint();$_POST=['fingerprint'=>$fp,'mode'=>$mode,'rules'=>$client.'\n2001:db8::/32','methods'=>$methods,'password'=>$password,'confirm'=>'1','_wpnonce'=>wp_create_nonce('amsec_network_'.$fp)];$_POST['rules']=str_replace('\\n',"\n",$_POST['rules']);$_REQUEST=$_POST;try{(new NetworkSettings())->handle();throw new LogicException('Missing network redirect.');}catch(RuntimeException $e){if($e->getMessage()!=='redirect'){throw $e;}}};
-$http=static function($method='GET',$path='/?rest_route=/wc/store/v1/cart',$args=[])use($host){$r=wp_remote_request('http://'.$host.$path,array_replace(['method'=>$method,'timeout'=>20,'redirection'=>0],$args));if(is_wp_error($r)){throw new RuntimeException('Network HTTP fixture transport failed.');}return $r;};
-$approve('observe');if(wp_remote_retrieve_response_code($http())!==200){throw new RuntimeException('Observe blocked guest cart.');}$metric=(new NetworkObservation(new WordPressOptions()))->status();if(($metric['count']??0)<1){throw new RuntimeException('Observe match counter absent.');}
-$approve('block');if(wp_remote_retrieve_response_code($http())!==403||wp_remote_retrieve_response_code($http('GET','/wp-login.php'))!==403){throw new RuntimeException('Manual network deny did not block PHP request.');}$r=$http('GET','/?rest_route=/wc/store/v1/cart',['headers'=>['X-Forwarded-For'=>'8.8.8.8']]);if(wp_remote_retrieve_response_code($r)!==403){throw new RuntimeException('Header spoof bypassed network deny in direct-address fixture.');}
-$cookie=new WP_Http_Cookie(['name'=>LOGGED_IN_COOKIE,'value'=>$_COOKIE[LOGGED_IN_COOKIE]]);$admin=$http('GET','/?rest_route=/wc/store/v1/cart', ['cookies'=>[$cookie]]);if(wp_remote_retrieve_response_code($admin)!==200){throw new RuntimeException('Authenticated admin bypass failed.');}
-$approve('block',['POST']);if(wp_remote_retrieve_response_code($http())!==200||wp_remote_retrieve_response_code($http('POST','/?rest_route=/wp/v2/comments',['body'=>['content'=>'Harmless fixture']]))!==403){throw new RuntimeException('Selected-method scope failed.');}
-wp_set_current_user($actor);ob_start();(new NetworkSettings())->render();$html=ob_get_clean();foreach(['Manual network controls','PHP requests only','self-lockout','network disable','methods[]'] as $text){if(!str_contains($html,$text)){throw new RuntimeException('Network page scope missing '.$text);}}if(str_contains($html,$password)||str_contains($html,$token)){throw new RuntimeException('Network approval secret rendered.');}
-$raw=get_option('amsec_network_observation');if(is_string($raw)&&(str_contains($raw,$client)||str_contains($raw,'/wc/store'))){throw new RuntimeException('Raw visitor information logged.');}
-$race=static function($ok)use($service){$service->disable();return $ok;};$fp=$service->fingerprint();$_POST=array_replace($base,['fingerprint'=>$fp,'_wpnonce'=>wp_create_nonce('amsec_network_'.$fp)]);$_REQUEST=$_POST;add_filter('check_password',$race);try{try{(new NetworkSettings())->handle();throw new LogicException('Changed network policy approved.');}catch(RuntimeException $e){if($e->getMessage()!=='denied:409'){throw $e;}}}finally{remove_filter('check_password',$race);}
-update_option('amsec_network_policy','corrupt',false);if(wp_remote_retrieve_response_code($http())!==200){throw new RuntimeException('Corrupt policy blocked site.');}WP_CLI::runcommand('amazing-security network disable',['return'=>true,'launch'=>false]);if($service->status()['mode']!=='off'||wp_remote_retrieve_response_code($http())!==200){throw new RuntimeException('Network CLI recovery failed.');}
-echo 'Actual guest PHP/cart/login deny/observe/off, method selection, forwarded-header refusal under direct host setup, authenticated admin bypass, self-lockout/exact approval gates, changed-policy refusal, redacted metrics, corrupt-policy fail-open and CLI recovery passed.'.PHP_EOL;
-}finally{remove_filter('wp_die_handler',$die);remove_filter('wp_redirect',$redirect);wp_set_current_user(1);$_COOKIE=[];require_once ABSPATH.'wp-admin/includes/user.php';wp_delete_user($actor);foreach($saved as $key=>$value){if($value===null){delete_option($key);}else{update_option($key,$value,false);}}}
+$saved = array();
+foreach ( array( 'amsec_network_policy', 'amsec_network_observation' ) as $key ) {
+	$saved[ $key ] = get_option( $key, null );
+	delete_option( $key );
+}$service = new NetworkSettingsService( new WordPressOptions() );
+$slug     = 'amsec-net-' . bin2hex( random_bytes( 4 ) );
+$password = bin2hex( random_bytes( 20 ) );
+$actor    = wp_insert_user(
+	array(
+		'user_login' => $slug,
+		'user_pass'  => $password,
+		'role'       => 'administrator',
+	)
+);
+if ( is_wp_error( $actor ) ) {
+	throw new RuntimeException( 'Fixture account failed.' );
+}$die      = static fn()=>static function ( $m, $t, $a ) {
+throw new RuntimeException( 'denied:' . ( $a['response'] ?? 500 ) );
+}$redirect = static function () {
+	throw new RuntimeException( 'redirect' );
+};
+add_filter( 'wp_die_handler', $die );
+add_filter( 'wp_redirect', $redirect );
+try {
+	wp_set_current_user( $actor );
+	$manager                       = WP_Session_Tokens::get_instance( $actor );
+	$token                         = $manager->create( time() + 3600 );
+	$other                         = $manager->create( time() + 3600 );
+	$_SERVER['HTTPS']              = 'on';
+	$_SERVER['REQUEST_METHOD']     = 'POST';
+	$_SERVER['REMOTE_ADDR']        = '203.0.113.7';
+	$_COOKIE[ SECURE_AUTH_COOKIE ] = wp_generate_auth_cookie( $actor, time() + 3600, 'secure_auth', $token );
+	$_COOKIE[ LOGGED_IN_COOKIE ]   = wp_generate_auth_cookie( $actor, time() + 3600, 'logged_in', $token );
+	$fp                            = $service->fingerprint();
+	$base                          = array(
+		'fingerprint' => $fp,
+		'mode'        => 'observe',
+		'rules'       => '192.0.2.0/24',
+		'methods'     => array( '*' ),
+		'password'    => $password,
+		'confirm'     => '1',
+		'_wpnonce'    => wp_create_nonce( 'amsec_network_' . $fp ),
+	);
+	foreach ( array(
+		'nonce'    => array( '_wpnonce' => 'bad' ),
+		'password' => array( 'password' => 'bad' ),
+		'consent'  => array( 'confirm' => '0' ),
+		'mode'     => array( 'mode' => 'bad' ),
+		'rules'    => array( 'rules' => '<script>' ),
+		'methods'  => array( 'methods' => 'GET' ),
+		'self'     => array(
+			'mode'  => 'block',
+			'rules' => '203.0.113.0/24',
+		),
+	) as $name => $change ) {
+		$_POST    = array_replace( $base, $change );
+		$_REQUEST = $_POST;
+		try {
+			( new NetworkSettings() )->handle();
+			throw new LogicException( 'Network gate accepted ' . $name );
+		} catch ( RuntimeException $e ) {
+			if ( ! str_starts_with( $e->getMessage(), 'denied:' ) ) {
+				throw $e;
+			}
+		}if ( get_option( 'amsec_network_policy', null ) !== null ) {
+			throw new RuntimeException( 'Rejected network request wrote policy.' );}
+	}
+	foreach ( array( 'https', 'cookie', 'mismatch', 'guest', 'method' ) as $name ) {
+		$_POST    = $base;
+		$_REQUEST = $_POST;
+		if ( $name === 'https' ) {
+			$_SERVER['HTTPS'] = 'off';
+		}if ( $name === 'cookie' ) {
+			unset( $_COOKIE[ SECURE_AUTH_COOKIE ] );
+		}if ( $name === 'mismatch' ) {
+			$_COOKIE[ SECURE_AUTH_COOKIE ] = wp_generate_auth_cookie( $actor, time() + 3600, 'secure_auth', $other );
+		}if ( $name === 'guest' ) {
+			wp_set_current_user( 0 );
+		}if ( $name === 'method' ) {
+			$_SERVER['REQUEST_METHOD'] = 'GET';
+		}try {
+			( new NetworkSettings() )->handle();
+			throw new LogicException( 'Network gate accepted ' . $name );
+		} catch ( RuntimeException $e ) {
+			if ( ! str_starts_with( $e->getMessage(), 'denied:' ) ) {
+				throw $e;
+			}
+		}$_SERVER['HTTPS']         = 'on';
+		$_SERVER['REQUEST_METHOD'] = 'POST';
+		wp_set_current_user( $actor );
+		$_COOKIE[ SECURE_AUTH_COOKIE ] = wp_generate_auth_cookie( $actor, time() + 3600, 'secure_auth', $token );}
+	$host    = DB_NAME === 'WordPress' ? 'amsec-next-wp' : 'amsec-next-wp69';
+	$client  = gethostbyname( gethostname() );
+	$approve = static function ( $mode, $methods = array( '*' ) ) use ( $service, $client, $password, $actor ) {
+		wp_set_current_user( $actor );
+		$fp             = $service->fingerprint();
+		$_POST          = array(
+			'fingerprint' => $fp,
+			'mode'        => $mode,
+			'rules'       => $client . '\n2001:db8::/32',
+			'methods'     => $methods,
+			'password'    => $password,
+			'confirm'     => '1',
+			'_wpnonce'    => wp_create_nonce( 'amsec_network_' . $fp ),
+		);
+		$_POST['rules'] = str_replace( '\\n', "\n", $_POST['rules'] );
+		$_REQUEST       = $_POST;
+		try {
+			( new NetworkSettings() )->handle();
+			throw new LogicException( 'Missing network redirect.' );
+		} catch ( RuntimeException $e ) {
+			if ( $e->getMessage() !== 'redirect' ) {
+				throw $e;
+			}
+		}};
+	$http    = static function ( $method = 'GET', $path = '/?rest_route=/wc/store/v1/cart', $args = array() ) use ( $host ) {
+		$r = wp_remote_request(
+			'http://' . $host . $path,
+			array_replace(
+				array(
+					'method'      => $method,
+					'timeout'     => 20,
+					'redirection' => 0,
+				),
+				$args
+			)
+		);
+		if ( is_wp_error( $r ) ) {
+			throw new RuntimeException( 'Network HTTP fixture transport failed.' );
+		}return $r;
+	};
+	$approve( 'observe' );
+	if ( wp_remote_retrieve_response_code( $http() ) !== 200 ) {
+		throw new RuntimeException( 'Observe blocked guest cart.' );
+	}$metric = ( new NetworkObservation( new WordPressOptions() ) )->status();
+	if ( ( $metric['count'] ?? 0 ) < 1 ) {
+		throw new RuntimeException( 'Observe match counter absent.' );}
+	$approve( 'block' );
+	if ( wp_remote_retrieve_response_code( $http() ) !== 403 || wp_remote_retrieve_response_code( $http( 'GET', '/wp-login.php' ) ) !== 403 ) {
+		throw new RuntimeException( 'Manual network deny did not block PHP request.' );
+	}$r = $http( 'GET', '/?rest_route=/wc/store/v1/cart', array( 'headers' => array( 'X-Forwarded-For' => '8.8.8.8' ) ) );
+	if ( wp_remote_retrieve_response_code( $r ) !== 403 ) {
+		throw new RuntimeException( 'Header spoof bypassed network deny in direct-address fixture.' );}
+	$cookie = new WP_Http_Cookie(
+		array(
+			'name'  => LOGGED_IN_COOKIE,
+			'value' => $_COOKIE[ LOGGED_IN_COOKIE ],
+		)
+	);
+	$admin  = $http( 'GET', '/?rest_route=/wc/store/v1/cart', array( 'cookies' => array( $cookie ) ) );
+	if ( wp_remote_retrieve_response_code( $admin ) !== 200 ) {
+		throw new RuntimeException( 'Authenticated admin bypass failed.' );}
+	$approve( 'block', array( 'POST' ) );
+	if ( wp_remote_retrieve_response_code( $http() ) !== 200 || wp_remote_retrieve_response_code( $http( 'POST', '/?rest_route=/wp/v2/comments', array( 'body' => array( 'content' => 'Harmless fixture' ) ) ) ) !== 403 ) {
+		throw new RuntimeException( 'Selected-method scope failed.' );}
+	wp_set_current_user( $actor );
+	ob_start();
+	( new NetworkSettings() )->render();
+	$html = ob_get_clean();
+	foreach ( array( 'Manual network controls', 'PHP requests only', 'self-lockout', 'network disable', 'methods[]' ) as $text ) {
+		if ( ! str_contains( $html, $text ) ) {
+			throw new RuntimeException( 'Network page scope missing ' . $text );
+		}
+	}if ( str_contains( $html, $password ) || str_contains( $html, $token ) ) {
+		throw new RuntimeException( 'Network approval secret rendered.' );}
+	$raw = get_option( 'amsec_network_observation' );
+	if ( is_string( $raw ) && ( str_contains( $raw, $client ) || str_contains( $raw, '/wc/store' ) ) ) {
+		throw new RuntimeException( 'Raw visitor information logged.' );}
+	$race     = static function ( $ok ) use ( $service ) {
+		$service->disable();
+		return $ok;
+	};
+	$fp       = $service->fingerprint();
+	$_POST    = array_replace(
+		$base,
+		array(
+			'fingerprint' => $fp,
+			'_wpnonce'    => wp_create_nonce( 'amsec_network_' . $fp ),
+		)
+	);
+	$_REQUEST = $_POST;
+	add_filter( 'check_password', $race );
+	try {
+		try {
+			( new NetworkSettings() )->handle();
+			throw new LogicException( 'Changed network policy approved.' );
+		} catch ( RuntimeException $e ) {
+			if ( $e->getMessage() !== 'denied:409' ) {
+				throw $e;
+			}
+		}
+	} finally {
+		remove_filter( 'check_password', $race );}
+	update_option( 'amsec_network_policy', 'corrupt', false );
+	if ( wp_remote_retrieve_response_code( $http() ) !== 200 ) {
+		throw new RuntimeException( 'Corrupt policy blocked site.' );
+	}WP_CLI::runcommand(
+		'amsec-security-scanner network disable',
+		array(
+			'return' => true,
+			'launch' => false,
+		)
+	);
+	if ( $service->status()['mode'] !== 'off' || wp_remote_retrieve_response_code( $http() ) !== 200 ) {
+		throw new RuntimeException( 'Network CLI recovery failed.' );}
+	echo 'Actual guest PHP/cart/login deny/observe/off, method selection, forwarded-header refusal under direct host setup, authenticated admin bypass, self-lockout/exact approval gates, changed-policy refusal, redacted metrics, corrupt-policy fail-open and CLI recovery passed.' . PHP_EOL;
+} finally {
+	remove_filter( 'wp_die_handler', $die );
+	remove_filter( 'wp_redirect', $redirect );
+	wp_set_current_user( 1 );
+	$_COOKIE = array();
+	require_once ABSPATH . 'wp-admin/includes/user.php';
+	wp_delete_user( $actor );
+	foreach ( $saved as $key => $value ) {
+		if ( $value === null ) {
+			delete_option( $key );
+		} else {
+			update_option( $key, $value, false );}
+	}
+}

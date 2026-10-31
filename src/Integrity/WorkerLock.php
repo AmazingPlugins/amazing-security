@@ -7,7 +7,7 @@ namespace AmazingPlugins\Security\Integrity;
 defined( 'ABSPATH' ) || exit;
 
 final class WorkerLock {
-	private const OPTION       = 'amazing_security_integrity_worker_lock';
+	private const OPTION       = 'amsec_security_scanner_integrity_worker_lock';
 	private ?string $heldValue = null;
 
 	public function __construct( private readonly OptionGateway $options, private readonly string $optionKey = self::OPTION ) {}

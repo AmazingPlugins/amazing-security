@@ -16,13 +16,13 @@ final class FirstRun {
 			return;
 		}
 		wp_enqueue_style( 'wp-pointer' );
-		wp_enqueue_script( 'amazing-security-tour', plugins_url( 'assets/admin-tour.js', AMAZING_SECURITY_FILE ), array( 'wp-pointer' ), '0.1.4', true );
+		wp_enqueue_script( 'amsec-security-scanner-tour', plugins_url( 'assets/admin-tour.js', AMSEC_SECURITY_SCANNER_FILE ), array( 'wp-pointer' ), '0.1.5', true );
 		wp_localize_script(
-			'amazing-security-tour',
+			'amsec-security-scanner-tour',
 			'amsecTour',
 			array(
 				'pointer' => self::POINTER,
-				'steps'   => self::steps( false !== get_option( 'amazing_security_latest_run', false ) ),
+				'steps'   => self::steps( false !== get_option( 'amsec_security_scanner_latest_run', false ) ),
 				'phone'   => array(
 					'target' => '#wp-admin-bar-menu-toggle',
 					'edge'   => 'top',
@@ -48,7 +48,7 @@ final class FirstRun {
 		$link  = static fn ( string $page ): string => '#adminmenu a[href$="page=' . $page . '"]';
 		$steps = array(
 			array(
-				'target' => $link( 'amazing-security' ),
+				'target' => $link( 'amsec-security-scanner' ),
 				'title'  => __( 'Scan', 'amsec-security-scanner' ),
 				'text'   => __( 'Reads this site and lists what it finds. A scan does not change anything.', 'amsec-security-scanner' ),
 			),

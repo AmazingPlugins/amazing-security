@@ -38,7 +38,7 @@ final class ThemeManifestProviderTest extends TestCase {
 				return $path;
 			}
 		);
-		$result = $provider->theme( 'sample', '1.2' );
+		$result    = $provider->theme( 'sample', '1.2' );
 		self::assertSame( 'https://downloads.wordpress.org/theme/sample.1.2.zip', $requested );
 		self::assertSame( array( hash( 'sha256', 'css' ) ), $result->manifest->files['style.css'] );
 		self::assertFileDoesNotExist( $path );

@@ -10,14 +10,14 @@ use AmazingPlugins\Security\Integrity\WordPressOptions;
 
 final class BaselinePage {
 	public function register(): void {
-		add_submenu_page( 'amazing-security', __( 'Custom-code baselines', 'amsec-security-scanner' ), __( 'Code baselines', 'amsec-security-scanner' ), 'manage_options', 'amsec-baselines', array( $this, 'render' ) );
+		add_submenu_page( 'amsec-security-scanner', __( 'Custom-code baselines', 'amsec-security-scanner' ), __( 'Code baselines', 'amsec-security-scanner' ), 'manage_options', 'amsec-baselines', array( $this, 'render' ) );
 	}
 
 	public function render(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_die( esc_html__( 'Administrator access required.', 'amsec-security-scanner' ), '', array( 'response' => 403 ) );
 		}
-		echo '<div class="wrap amazing-security-admin"><h1>' . esc_html__( 'Watch a plugin or theme', 'amsec-security-scanner' ) . '</h1><p>' . esc_html__( 'Pick an installed package, preview the file list, then approve it with your password. Later you can compare that reference with the files on disk. A reference is not proof the code was clean. WordPress.org checksums stay a separate check.', 'amsec-security-scanner' ) . '</p><details><summary>' . esc_html__( 'What the reference covers', 'amsec-security-scanner' ) . '</summary><p>' . esc_html__( 'PHP, PHTML, INC, JS, CSS, HTML, HTM, SVG, JSON and Twig. Up to 300 files. A mu-plugin or a plugin with one file covers that entry file. Linked, unreadable, or oversized files make the collection incomplete.', 'amsec-security-scanner' ) . '</p></details>';
+		echo '<div class="wrap amsec-security-scanner-admin"><h1>' . esc_html__( 'Watch a plugin or theme', 'amsec-security-scanner' ) . '</h1><p>' . esc_html__( 'Pick an installed package, preview the file list, then approve it with your password. Later you can compare that reference with the files on disk. A reference is not proof the code was clean. WordPress.org checksums stay a separate check.', 'amsec-security-scanner' ) . '</p><details><summary>' . esc_html__( 'What the reference covers', 'amsec-security-scanner' ) . '</summary><p>' . esc_html__( 'PHP, PHTML, INC, JS, CSS, HTML, HTM, SVG, JSON and Twig. Up to 300 files. A mu-plugin or a plugin with one file covers that entry file. Linked, unreadable, or oversized files make the collection incomplete.', 'amsec-security-scanner' ) . '</p></details>';
 		$repository = new BaselineRepository( new WordPressOptions() );
 		try {
 			list( , $state ) = $repository->snapshot();

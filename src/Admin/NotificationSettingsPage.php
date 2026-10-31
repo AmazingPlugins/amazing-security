@@ -37,7 +37,7 @@ final class NotificationSettingsPage {
 		$events  = '1' === Notice::flag( get_option( Notice::OPTION, '0' ) );
 		$notice  = isset( $_GET['amsec_mail'] ) ? sanitize_key( wp_unslash( $_GET['amsec_mail'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only flash after test mail.
 
-		echo '<div class="wrap amazing-security-admin">';
+		echo '<div class="wrap amsec-security-scanner-admin">';
 		echo '<header class="amsec-header"><div><h1>' . esc_html__( 'Settings', 'amsec-security-scanner' ) . '</h1>';
 		echo '<p>' . esc_html__( 'Administrators configure notifications here. Messages use this site’s WordPress mail and go to the WordPress admin email.', 'amsec-security-scanner' ) . '</p></div></header>';
 

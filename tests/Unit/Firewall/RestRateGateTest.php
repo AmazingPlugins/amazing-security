@@ -1,8 +1,60 @@
 <?php
 namespace AmazingPlugins\Security\Tests\Unit\Firewall;
+
 use AmazingPlugins\Security\Firewall\RestRateGate;
 use PHPUnit\Framework\TestCase;
 final class RestRateGateTest extends TestCase {
- public function test_repeated_request_revision_separation_and_storage_outage():void{$calls=0;$keys=[];$null=false;$counter=static function($key,$window,$now)use(&$calls,&$keys,&$null){$calls++;$keys[]=$key;self::assertSame(300,$window);return $null?null:61;};$g=new RestRateGate('salt',$counter);$s=['version'=>1,'mode'=>'block','exemptions'=>[],'revision'=>str_repeat('a',32)];$r=new \stdClass();$server=['REMOTE_ADDR'=>'192.0.2.1','HTTP_X_FORWARDED_FOR'=>'8.8.8.8'];self::assertTrue($g->reject($r,$s,'/wp/v2/users','GET',false,null,$server,1000));self::assertTrue($g->reject($r,$s,'/wp/v2/users','GET',false,null,$server,1001));self::assertSame(1,$calls);$s['revision']=str_repeat('b',32);self::assertTrue($g->reject(new \stdClass(),$s,'/wp/v2/users','GET',false,null,$server,1002));self::assertNotSame($keys[0],$keys[1]);$null=true;self::assertFalse($g->reject(new \stdClass(),$s,'/wp/v2/users','GET',false,null,$server,1003));}
- public function test_exempt_auth_prior_invalid_address_and_off_do_not_count():void{$calls=0;$g=new RestRateGate('salt',static function()use(&$calls){$calls++;return 99;});$s=['version'=>1,'mode'=>'block','exemptions'=>[],'revision'=>str_repeat('a',32)];foreach([['/wp/v2/users','GET',true,null,['REMOTE_ADDR'=>'192.0.2.1']],['/wp/v2/users','GET',false,false,['REMOTE_ADDR'=>'192.0.2.1']],['/wc/store/v1/cart','GET',false,null,['REMOTE_ADDR'=>'192.0.2.1']],['/wp/v2/users','GET',false,null,['REMOTE_ADDR'=>'bad']]] as $args){self::assertFalse($g->reject(new \stdClass(),$s,...array_merge($args,[1000])));}$s['exemptions']=['users-read'];self::assertFalse($g->reject(new \stdClass(),$s,'/wp/v2/users','GET',false,null,['REMOTE_ADDR'=>'192.0.2.1'],1000));$s['exemptions']=[];$s['mode']='off';self::assertFalse($g->reject(new \stdClass(),$s,'/wp/v2/users','GET',false,null,['REMOTE_ADDR'=>'192.0.2.1'],1000));self::assertSame(0,$calls);}
+	public function test_repeated_request_revision_separation_and_storage_outage(): void {
+		$calls   = 0;
+		$keys    = array();
+		$null    = false;
+		$counter = static function ( $key, $window, $now ) use ( &$calls, &$keys, &$null ) {
+			++$calls;
+			$keys[] = $key;
+			self::assertSame( 300, $window );
+			return $null ? null : 61;
+		};
+		$g       = new RestRateGate( 'salt', $counter );
+		$s       = array(
+			'version'    => 1,
+			'mode'       => 'block',
+			'exemptions' => array(),
+			'revision'   => str_repeat( 'a', 32 ),
+		);
+		$r       = new \stdClass();
+		$server  = array(
+			'REMOTE_ADDR'          => '192.0.2.1',
+			'HTTP_X_FORWARDED_FOR' => '8.8.8.8',
+		);
+		self::assertTrue( $g->reject( $r, $s, '/wp/v2/users', 'GET', false, null, $server, 1000 ) );
+		self::assertTrue( $g->reject( $r, $s, '/wp/v2/users', 'GET', false, null, $server, 1001 ) );
+		self::assertSame( 1, $calls );
+		$s['revision'] = str_repeat( 'b', 32 );
+		self::assertTrue( $g->reject( new \stdClass(), $s, '/wp/v2/users', 'GET', false, null, $server, 1002 ) );
+		self::assertNotSame( $keys[0], $keys[1] );
+		$null = true;
+		self::assertFalse( $g->reject( new \stdClass(), $s, '/wp/v2/users', 'GET', false, null, $server, 1003 ) );}
+	public function test_exempt_auth_prior_invalid_address_and_off_do_not_count(): void {
+		$calls = 0;
+		$g     = new RestRateGate(
+			'salt',
+			static function () use ( &$calls ) {
+				$calls++;
+				return 99;
+			}
+		);
+		$s     = array(
+			'version'    => 1,
+			'mode'       => 'block',
+			'exemptions' => array(),
+			'revision'   => str_repeat( 'a', 32 ),
+		);
+		foreach ( array( array( '/wp/v2/users', 'GET', true, null, array( 'REMOTE_ADDR' => '192.0.2.1' ) ), array( '/wp/v2/users', 'GET', false, false, array( 'REMOTE_ADDR' => '192.0.2.1' ) ), array( '/wc/store/v1/cart', 'GET', false, null, array( 'REMOTE_ADDR' => '192.0.2.1' ) ), array( '/wp/v2/users', 'GET', false, null, array( 'REMOTE_ADDR' => 'bad' ) ) ) as $args ) {
+			self::assertFalse( $g->reject( new \stdClass(), $s, ...array_merge( $args, array( 1000 ) ) ) );
+		}$s['exemptions'] = array( 'users-read' );
+		self::assertFalse( $g->reject( new \stdClass(), $s, '/wp/v2/users', 'GET', false, null, array( 'REMOTE_ADDR' => '192.0.2.1' ), 1000 ) );
+		$s['exemptions'] = array();
+		$s['mode']       = 'off';
+		self::assertFalse( $g->reject( new \stdClass(), $s, '/wp/v2/users', 'GET', false, null, array( 'REMOTE_ADDR' => '192.0.2.1' ), 1000 ) );
+		self::assertSame( 0, $calls );}
 }

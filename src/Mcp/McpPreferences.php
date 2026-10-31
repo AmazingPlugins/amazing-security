@@ -10,7 +10,7 @@ use AmazingPlugins\Security\Integrity\OptionGateway;
 use RuntimeException;
 
 final class McpPreferences {
-	private const ENABLED = 'amazing_security_mcp_enabled';
+	private const ENABLED = 'amsec_security_scanner_mcp_enabled';
 
 	public function __construct( private readonly OptionGateway $options ) {}
 

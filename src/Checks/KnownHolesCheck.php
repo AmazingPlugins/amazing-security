@@ -67,9 +67,9 @@ final class KnownHolesCheck implements SecurityCheck {
 
 	/** @return array{enabled: string, stored: string, found: int} */
 	public static function wordpressSnapshot(): array {
-		$flag    = get_option( 'amazing_security_vulnerability_direct_enabled', null );
+		$flag    = get_option( 'amsec_security_scanner_vulnerability_direct_enabled', null );
 		$enabled = '1' === $flag ? 'yes' : ( in_array( $flag, array( '0', '', false, null ), true ) ? 'no' : 'unknown' );
-		$raw     = get_option( 'amazing_security_vulnerability_current', null );
+		$raw     = get_option( 'amsec_security_scanner_vulnerability_current', null );
 		if ( ! is_string( $raw ) || '' === $raw ) {
 			return array(
 				'enabled' => $enabled,

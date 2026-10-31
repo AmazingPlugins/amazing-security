@@ -22,14 +22,21 @@ final class LoginRateModeCheckTest extends TestCase {
 	}
 
 	public function test_hardening_composition_has_six_unique_checks(): void {
-		$values = new class implements Values {
-			public function coreUpdateAvailable(): ?bool { return false; }
-			public function debugDisplayed(): ?bool { return false; }
-			public function fileEditorDisabled(): ?bool { return true; }
-			public function fileEditorFix(): string { return 'config-on'; }
-			public function debugHiddenByPlugin(): bool { return false; }
-			public function adminUsesHttps(): ?bool { return true; }
-			public function hasDefaultAdminLogin(): ?bool { return false; }
+		$values = new class() implements Values {
+			public function coreUpdateAvailable(): ?bool {
+				return false; }
+			public function debugDisplayed(): ?bool {
+				return false; }
+			public function fileEditorDisabled(): ?bool {
+				return true; }
+			public function fileEditorFix(): string {
+				return 'config-on'; }
+			public function debugHiddenByPlugin(): bool {
+				return false; }
+			public function adminUsesHttps(): ?bool {
+				return true; }
+			public function hasDefaultAdminLogin(): ?bool {
+				return false; }
 		};
 		$checks = LocalHardeningScanService::checks( $values, static fn(): mixed => 'off' );
 		self::assertSame( array( 'https-admin', 'core-updates', 'default-admin-login', 'debug-display', 'file-editor', 'login-rate-mode' ), array_map( static fn( $check ): string => $check->id(), $checks ) );

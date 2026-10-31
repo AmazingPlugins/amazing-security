@@ -10,7 +10,14 @@ $case = getenv( 'AMSEC_CASE' );
 if ( 'editor' === $case ) {
 	$editor = get_user_by( 'login', 'amsec_file_fixture_editor' );
 	if ( ! $editor ) {
-		$id = wp_insert_user( array( 'user_login' => 'amsec_file_fixture_editor', 'user_pass' => wp_generate_password( 32 ), 'user_email' => 'amsec-file-editor@example.invalid', 'role' => 'editor' ) );
+		$id = wp_insert_user(
+			array(
+				'user_login' => 'amsec_file_fixture_editor',
+				'user_pass'  => wp_generate_password( 32 ),
+				'user_email' => 'amsec-file-editor@example.invalid',
+				'role'       => 'editor',
+			)
+		);
 		if ( is_wp_error( $id ) ) {
 			throw new RuntimeException( 'Could not make editor fixture.' );
 		}
@@ -29,15 +36,15 @@ if ( 'plan' === $case ) {
 	if ( ! is_dir( $fixtureDirectory ) ) {
 		mkdir( $fixtureDirectory );
 	}
-	file_put_contents( $fixtureDirectory . '/main.php', '<?php /* Plugin Name: Amazing Security scan fixture */' );
+	file_put_contents( $fixtureDirectory . '/main.php', '<?php /* Plugin Name: AmSec Security Scanner scan fixture */' );
 	wp_clean_plugins_cache();
-	$method = new ReflectionMethod( FileScanAction::class, 'plugins' );
+	$method  = new ReflectionMethod( FileScanAction::class, 'plugins' );
 	$plugins = $method->invoke( new FileScanAction() );
 	unlink( $fixtureDirectory . '/main.php' );
 	rmdir( $fixtureDirectory );
 	wp_clean_plugins_cache();
 	$slugs = array_column( $plugins, 'slug' );
-	if ( ! in_array( 'amazing-security', $slugs, true ) || ! in_array( 'hello.php', array_column( $plugins, 'single_file' ), true ) || ! in_array( 'amsec_fixture_plugin', $slugs, true ) ) {
+	if ( ! in_array( 'amsec-security-scanner', $slugs, true ) || ! in_array( 'hello.php', array_column( $plugins, 'single_file' ), true ) || ! in_array( 'amsec_fixture_plugin', $slugs, true ) ) {
 		throw new RuntimeException( 'The file scan omitted its own package or a local plugin.' );
 	}
 	$folder = $plugins[ array_search( 'amsec_fixture_plugin', $slugs, true ) ];
@@ -45,7 +52,7 @@ if ( 'plan' === $case ) {
 		throw new RuntimeException( 'The nonrepository plugin lacked a bounded local root.' );
 	}
 	$candidates = ( new ReflectionMethod( FileScanAction::class, 'manifestPlugins' ) )->invoke( new FileScanAction(), $plugins );
-	if ( in_array( 'amazing-security', array_column( $candidates, 'slug' ), true ) || in_array( 'hello.php', array_column( $candidates, 'slug' ), true ) || in_array( 'amsec_fixture_plugin', array_column( $candidates, 'slug' ), true ) ) {
+	if ( in_array( 'amsec-security-scanner', array_column( $candidates, 'slug' ), true ) || in_array( 'hello.php', array_column( $candidates, 'slug' ), true ) || in_array( 'amsec_fixture_plugin', array_column( $candidates, 'slug' ), true ) ) {
 		throw new RuntimeException( 'Local-only plugins consumed repository manifest slots.' );
 	}
 	echo 'File action: own and single-file plugins are in the local scan plan.' . PHP_EOL;
@@ -83,12 +90,12 @@ if ( 'resume' === $case ) {
 	if ( null === $progress || $progress->finished ) {
 		throw new RuntimeException( 'No resumable file scan.' );
 	}
-	$_POST['scan_id'] = $progress->cursor->scanId;
-	$_POST['_wpnonce'] = wp_create_nonce( 'amazing_security_file_scan_resume' );
+	$_POST['scan_id']     = $progress->cursor->scanId;
+	$_POST['_wpnonce']    = wp_create_nonce( 'amsec_security_scanner_file_scan_resume' );
 	$_REQUEST['_wpnonce'] = $_POST['_wpnonce'];
 	( new FileScanAction() )->resume();
 }
 
-$_POST['_wpnonce'] = 'forged' === $case ? 'invalid' : wp_create_nonce( 'amazing_security_file_scan_start' );
+$_POST['_wpnonce']    = 'forged' === $case ? 'invalid' : wp_create_nonce( 'amsec_security_scanner_file_scan_start' );
 $_REQUEST['_wpnonce'] = $_POST['_wpnonce'];
 ( new FileScanAction() )->start();

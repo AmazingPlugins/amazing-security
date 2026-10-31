@@ -96,7 +96,7 @@ final class ScannerGuard {
 			'block' => __( 'Block', 'amsec-security-scanner' ),
 		);
 		$count   = ( new BotCounterStore( $GLOBALS['wpdb'] ) )->flaggedSince( time() - DAY_IN_SECONDS );
-		echo '<div class="wrap amazing-security-admin amsec-brief">';
+		echo '<div class="wrap amsec-security-scanner-admin amsec-brief">';
 		echo '<h2>' . esc_html__( 'Scanner guard', 'amsec-security-scanner' ) . '</h2>';
 		$flash = isset( $_GET['amsec_scanner_error'] ) ? sanitize_key( wp_unslash( $_GET['amsec_scanner_error'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only flash after saving.
 		if ( 'proxy' === $flash ) {

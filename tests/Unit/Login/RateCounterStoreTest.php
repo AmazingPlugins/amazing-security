@@ -24,13 +24,18 @@ final class RateCounterStoreTest extends TestCase {
 	}
 
 	public function test_database_write_failure_fails_open_and_uses_atomic_upsert(): void {
-		$db = new class {
-			public string $prefix = 'wp_';
+		$db    = new class() {
+			public string $prefix    = 'wp_';
 			public string $lastQuery = '';
-			public function prepare( string $sql, mixed ...$values ): string { return vsprintf( str_replace( array( '%s', '%d' ), array( "'%s'", '%d' ), $sql ), $values ); }
-			public function query( string $sql ): bool { $this->lastQuery = $sql; return false; }
-			public function get_var( string $sql ): int { return str_contains( $sql, 'GET_LOCK' ) ? 1 : 0; }
-			public function get_row( string $sql, string $mode ): ?array { return null; }
+			public function prepare( string $sql, mixed ...$values ): string {
+				return vsprintf( str_replace( array( '%s', '%d' ), array( "'%s'", '%d' ), $sql ), $values ); }
+			public function query( string $sql ): bool {
+				$this->lastQuery = $sql;
+				return false; }
+			public function get_var( string $sql ): int {
+				return str_contains( $sql, 'GET_LOCK' ) ? 1 : 0; }
+			public function get_row( string $sql, string $mode ): ?array {
+				return null; }
 		};
 		$store = new WordPressRateCounterStore( $db );
 		self::assertFalse( $store->recordFailure( str_repeat( 'a', 64 ), 400 )->available );
@@ -38,31 +43,49 @@ final class RateCounterStoreTest extends TestCase {
 	}
 
 	public function test_summary_reports_unknown_when_counter_table_cannot_be_read(): void {
-		$db = new class {
-			public string $prefix = 'wp_';
+		$db = new class() {
+			public string $prefix     = 'wp_';
 			public string $last_error = 'table missing';
-			public function prepare( string $query, mixed ...$args ): string { return $query; }
-			public function query( string $sql ): bool { return false; }
-			public function get_row( string $query, string $mode ): ?array { return null; }
+			public function prepare( string $query, mixed ...$args ): string {
+				return $query; }
+			public function query( string $sql ): bool {
+				return false; }
+			public function get_row( string $query, string $mode ): ?array {
+				return null; }
 		};
-		self::assertSame( array( 'available' => false, 'observed' => 0, 'blocked' => 0 ), ( new WordPressRateCounterStore( $db ) )->summary( 1000 ) );
+		self::assertSame(
+			array(
+				'available' => false,
+				'observed'  => 0,
+				'blocked'   => 0,
+			),
+			( new WordPressRateCounterStore( $db ) )->summary( 1000 )
+		);
 	}
 
 	public function test_capacity_denies_new_address_and_reports_unknown_coverage(): void {
-		$db = new class {
-			public string $prefix = 'wp_';
+		$db    = new class() {
+			public string $prefix     = 'wp_';
 			public string $last_error = '';
-			public array $queries = array();
-			public function prepare( string $sql, mixed ...$values ): string { return vsprintf( str_replace( array( '%s', '%d' ), array( "'%s'", '%d' ), $sql ), $values ); }
-			public function query( string $sql ): int { $this->queries[] = $sql; return 1; }
+			public array $queries     = array();
+			public function prepare( string $sql, mixed ...$values ): string {
+				return vsprintf( str_replace( array( '%s', '%d' ), array( "'%s'", '%d' ), $sql ), $values ); }
+			public function query( string $sql ): int {
+				$this->queries[] = $sql;
+				return 1; }
 			public function get_var( string $sql ): ?int {
 				$this->queries[] = $sql;
-				if ( str_contains( $sql, 'GET_LOCK' ) || str_contains( $sql, 'RELEASE_LOCK' ) ) { return 1; }
-				if ( str_contains( $sql, 'COUNT(*)' ) ) { return 10000; }
+				if ( str_contains( $sql, 'GET_LOCK' ) || str_contains( $sql, 'RELEASE_LOCK' ) ) {
+					return 1; }
+				if ( str_contains( $sql, 'COUNT(*)' ) ) {
+					return 10000; }
 				return null;
 			}
 			public function get_row( string $sql, string $mode ): ?array {
-				return str_contains( $sql, 'AS observed' ) ? array( 'observed' => 10000, 'blocked' => 0 ) : null;
+				return str_contains( $sql, 'AS observed' ) ? array(
+					'observed' => 10000,
+					'blocked'  => 0,
+				) : null;
 			}
 		};
 		$store = new WordPressRateCounterStore( $db );
@@ -75,20 +98,25 @@ final class RateCounterStoreTest extends TestCase {
 	public function test_admission_locks_are_separate_for_databases_with_the_same_table_name(): void {
 		$driver = static function ( string $database ): object {
 			return new class( $database ) {
-				public string $prefix = 'wp_';
+				public string $prefix     = 'wp_';
 				public string $last_error = '';
-				public string $lock = '';
+				public string $lock       = '';
 				public function __construct( public string $dbname ) {}
-				public function prepare( string $sql, mixed ...$values ): string { return vsprintf( str_replace( array( '%s', '%d' ), array( "'%s'", '%d' ), $sql ), $values ); }
-				public function query( string $sql ): int { return 1; }
+				public function prepare( string $sql, mixed ...$values ): string {
+					return vsprintf( str_replace( array( '%s', '%d' ), array( "'%s'", '%d' ), $sql ), $values ); }
+				public function query( string $sql ): int {
+					return 1; }
 				public function get_var( string $sql ): ?int {
-					if ( str_contains( $sql, 'GET_LOCK' ) ) { $this->lock = $sql; return 1; }
+					if ( str_contains( $sql, 'GET_LOCK' ) ) {
+						$this->lock = $sql;
+						return 1; }
 					return str_contains( $sql, 'COUNT(*)' ) ? 0 : null;
 				}
-				public function get_row( string $sql, string $mode ): ?array { return null; }
+				public function get_row( string $sql, string $mode ): ?array {
+					return null; }
 			};
 		};
-		$first = $driver( 'wordpress_one' );
+		$first  = $driver( 'wordpress_one' );
 		$second = $driver( 'wordpress_two' );
 		( new WordPressRateCounterStore( $first ) )->recordFailure( str_repeat( 'a', 64 ), 100000 );
 		( new WordPressRateCounterStore( $second ) )->recordFailure( str_repeat( 'b', 64 ), 100000 );

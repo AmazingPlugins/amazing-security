@@ -7,12 +7,12 @@ defined( 'ABSPATH' ) || exit;
 
 final class DirectoryPage {
 	public function register(): void {
-		$hook = add_submenu_page( 'amazing-security', __( 'Plugin directory status', 'amsec-security-scanner' ), __( 'Directory status', 'amsec-security-scanner' ), 'manage_options', 'amsec-repository', array( $this, 'render' ) );
+		$hook = add_submenu_page( 'amsec-security-scanner', __( 'Plugin directory status', 'amsec-security-scanner' ), __( 'Directory status', 'amsec-security-scanner' ), 'manage_options', 'amsec-repository', array( $this, 'render' ) );
 		add_action(
 			'admin_enqueue_scripts',
 			static function ( string $current ) use ( $hook ): void {
 				if ( $current === $hook ) {
-					wp_enqueue_style( 'amazing-security-admin', plugins_url( 'assets/admin.css', AMAZING_SECURITY_FILE ), array(), '0.1.0' );
+					wp_enqueue_style( 'amsec-security-scanner-admin', plugins_url( 'assets/admin.css', AMSEC_SECURITY_SCANNER_FILE ), array(), '0.1.0' );
 				}}
 		);
 	}
@@ -21,7 +21,7 @@ final class DirectoryPage {
 			wp_die( esc_html__( 'Administrator access required.', 'amsec-security-scanner' ), '', array( 'response' => 403 ) );}
 		$state = ( new WordPressDirectoryService() )->create()->status();
 		$now   = time();
-		echo '<div class="wrap amazing-security-admin"><header class="amsec-header"><div><h1>' . esc_html__( 'Plugin directory status', 'amsec-security-scanner' ) . '</h1><p>' . esc_html__( 'Optional WordPress.org directory observations for selected installed plugin candidates.', 'amsec-security-scanner' ) . '</p></div></header><section class="amsec-overview"><h2>' . esc_html__( 'Scope and privacy', 'amsec-security-scanner' ) . '</h2><p>' . esc_html__( 'Each consented lookup sends one directory slug to WordPress.org, which sees your server IP. It does not send the installed version, site URL, credentials or contents. No lookup runs automatically. Up to 100 standard plugin entries are listed; custom-update, standalone and symlink packages are unsupported.', 'amsec-security-scanner' ) . '</p><p>' . esc_html__( 'A directory slug match does not authenticate installed code. Closure is a directory observation, not a malware verdict. Missing records and old updates do not prove abandonment or a vulnerability. No plugin is deactivated or changed. Results older than 24 hours, or for a changed installation, are historical. A repeated lookup within ten minutes uses its saved result.', 'amsec-security-scanner' ) . '</p></section>';
+		echo '<div class="wrap amsec-security-scanner-admin"><header class="amsec-header"><div><h1>' . esc_html__( 'Plugin directory status', 'amsec-security-scanner' ) . '</h1><p>' . esc_html__( 'Optional WordPress.org directory observations for selected installed plugin candidates.', 'amsec-security-scanner' ) . '</p></div></header><section class="amsec-overview"><h2>' . esc_html__( 'Scope and privacy', 'amsec-security-scanner' ) . '</h2><p>' . esc_html__( 'Each consented lookup sends one directory slug to WordPress.org, which sees your server IP. It does not send the installed version, site URL, credentials or contents. No lookup runs automatically. Up to 100 standard plugin entries are listed; custom-update, standalone and symlink packages are unsupported.', 'amsec-security-scanner' ) . '</p><p>' . esc_html__( 'A directory slug match does not authenticate installed code. Closure is a directory observation, not a malware verdict. Missing records and old updates do not prove abandonment or a vulnerability. No plugin is deactivated or changed. Results older than 24 hours, or for a changed installation, are historical. A repeated lookup within ten minutes uses its saved result.', 'amsec-security-scanner' ) . '</p></section>';
 		if ( ! empty( $state['invalid'] ) ) {
 			echo '<div class="notice notice-error"><p>' . esc_html__( 'Stored advisory state is invalid. No current directory status can be established; ask the host administrator to review it.', 'amsec-security-scanner' ) . '</p></div></div>';
 			return;}

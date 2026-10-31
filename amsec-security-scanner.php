@@ -1,9 +1,9 @@
 <?php
 /**
  * Plugin Name: AmSec Security Scanner
- * Plugin URI: https://amazingplugins.com/plugins/amazing-security/
+ * Plugin URI: https://amazingplugins.com/plugins/amsec-security-scanner/
  * Description: Local WordPress security checks and optional login protection.
- * Version: 0.1.4
+ * Version: 0.1.5
  * Requires at least: 6.6
  * Requires PHP: 8.1
  * Author: Amazing Plugins
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'AMAZING_SECURITY_FILE', __FILE__ );
+define( 'AMSEC_SECURITY_SCANNER_FILE', __FILE__ );
 
 $amsec_file_editor = get_option( 'amsec_disallow_file_edit', '0' );
 if ( '1' === $amsec_file_editor && ! defined( 'DISALLOW_FILE_EDIT' ) ) {
@@ -181,8 +181,8 @@ add_action(
 		add_filter( 'xmlrpc_enabled', array( new AmazingPlugins\Security\Login\XmlRpcPolicy( $settings ), 'enabled' ) );
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {
 			$recovery = new AmazingPlugins\Security\Login\LoginRecoveryCommand();
-			\WP_CLI::add_command( 'amazing-security login disable', array( $recovery, 'disableLogin' ) );
-			\WP_CLI::add_command( 'amazing-security totp disable', array( $recovery, 'disableTotp' ) );
+			\WP_CLI::add_command( 'amsec-security-scanner login disable', array( $recovery, 'disableLogin' ) );
+			\WP_CLI::add_command( 'amsec-security-scanner totp disable', array( $recovery, 'disableTotp' ) );
 		}
 	}
 );
@@ -195,18 +195,18 @@ add_action( 'admin_post_amsec_findings_report', array( new AmazingPlugins\Securi
 add_action( 'admin_post_amsec_approved_setting', array( new AmazingPlugins\Security\Admin\ApprovedSettingAction(), 'handle' ) );
 add_action( 'admin_post_amsec_fix_approve', array( new AmazingPlugins\Security\Admin\FixApprovalAction(), 'handle' ) );
 add_action( 'admin_post_amsec_fix_rollback', array( new AmazingPlugins\Security\Admin\FixRollbackAction(), 'handle' ) );
-add_action( 'admin_post_amazing_security_scan', array( new AmazingPlugins\Security\Admin\ScanAction(), 'handle' ) );
+add_action( 'admin_post_amsec_security_scanner_scan', array( new AmazingPlugins\Security\Admin\ScanAction(), 'handle' ) );
 add_action( 'wp_ajax_amsec_scan_step', array( new AmazingPlugins\Security\Admin\ScanStepAction(), 'handle' ) );
-add_action( 'admin_post_amazing_security_integrity_start', array( new AmazingPlugins\Security\Admin\IntegrityScanAction(), 'start' ) );
-add_action( 'admin_post_amazing_security_integrity_resume', array( new AmazingPlugins\Security\Admin\IntegrityScanAction(), 'resume' ) );
-add_action( 'admin_post_amazing_security_file_scan_start', array( new AmazingPlugins\Security\Admin\FileScanAction(), 'start' ) );
-add_action( 'admin_post_amazing_security_file_scan_resume', array( new AmazingPlugins\Security\Admin\FileScanAction(), 'resume' ) );
-add_action( 'admin_post_amazing_security_file_scan_note', array( new AmazingPlugins\Security\Admin\FileScanReviewAction(), 'note' ) );
-add_action( 'admin_post_amazing_security_vulnerability_scan', array( new AmazingPlugins\Security\Admin\VulnerabilityScanAction(), 'handle' ) );
-add_action( 'admin_post_amazing_security_vulnerability_enable', array( new AmazingPlugins\Security\Admin\VulnerabilityConsentAction(), 'enable' ) );
-add_action( 'admin_post_amazing_security_vulnerability_disable', array( new AmazingPlugins\Security\Admin\VulnerabilityConsentAction(), 'disable' ) );
-add_action( 'admin_post_amazing_security_vulnerability_clear', array( new AmazingPlugins\Security\Admin\VulnerabilityConsentAction(), 'clearReports' ) );
-add_action( 'admin_post_amazing_security_kev_toggle', array( new AmazingPlugins\Security\Admin\VulnerabilityConsentAction(), 'exploited' ) );
+add_action( 'admin_post_amsec_security_scanner_integrity_start', array( new AmazingPlugins\Security\Admin\IntegrityScanAction(), 'start' ) );
+add_action( 'admin_post_amsec_security_scanner_integrity_resume', array( new AmazingPlugins\Security\Admin\IntegrityScanAction(), 'resume' ) );
+add_action( 'admin_post_amsec_security_scanner_file_scan_start', array( new AmazingPlugins\Security\Admin\FileScanAction(), 'start' ) );
+add_action( 'admin_post_amsec_security_scanner_file_scan_resume', array( new AmazingPlugins\Security\Admin\FileScanAction(), 'resume' ) );
+add_action( 'admin_post_amsec_security_scanner_file_scan_note', array( new AmazingPlugins\Security\Admin\FileScanReviewAction(), 'note' ) );
+add_action( 'admin_post_amsec_security_scanner_vulnerability_scan', array( new AmazingPlugins\Security\Admin\VulnerabilityScanAction(), 'handle' ) );
+add_action( 'admin_post_amsec_security_scanner_vulnerability_enable', array( new AmazingPlugins\Security\Admin\VulnerabilityConsentAction(), 'enable' ) );
+add_action( 'admin_post_amsec_security_scanner_vulnerability_disable', array( new AmazingPlugins\Security\Admin\VulnerabilityConsentAction(), 'disable' ) );
+add_action( 'admin_post_amsec_security_scanner_vulnerability_clear', array( new AmazingPlugins\Security\Admin\VulnerabilityConsentAction(), 'clearReports' ) );
+add_action( 'admin_post_amsec_security_scanner_kev_toggle', array( new AmazingPlugins\Security\Admin\VulnerabilityConsentAction(), 'exploited' ) );
 add_action( 'admin_post_amsec_login_settings', array( new AmazingPlugins\Security\Admin\LoginSettingsAction(), 'save' ) );
 add_action( 'admin_post_amsec_mcp_settings', array( new AmazingPlugins\Security\Admin\McpSettingsAction(), 'save' ) );
 add_action( 'admin_post_amsec_alert_settings', array( new AmazingPlugins\Security\Admin\AlertSettingsAction(), 'save' ) );
@@ -248,14 +248,14 @@ add_action( 'profile_update', array( $amsec_reset, 'profileUpdated' ), 10, 2 );
 add_action( 'admin_menu', array( new AmazingPlugins\Security\Incident\IncidentPage(), 'register' ) );
 add_action( 'admin_post_amsec_incident_reset', array( new AmazingPlugins\Security\Incident\IncidentAction(), 'handle' ) );
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
-	\WP_CLI::add_command( 'amazing-security accounts clear-reset', array( $amsec_reset, 'recovery' ) );
+	\WP_CLI::add_command( 'amsec-security-scanner accounts clear-reset', array( $amsec_reset, 'recovery' ) );
 }
 
 $amsec_policy = new AmazingPlugins\Security\Login\RequiredTotpPolicy();
 // Required TOTP policy login gate retired; WP-CLI cleanup remains.
 add_action( 'admin_post_amsec_totp_policy', array( new AmazingPlugins\Security\Login\RequiredTotpAction(), 'handle' ) );
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
-	\WP_CLI::add_command( 'amazing-security policy disable', array( $amsec_policy, 'recovery' ) );
+	\WP_CLI::add_command( 'amsec-security-scanner policy disable', array( $amsec_policy, 'recovery' ) );
 }
 
 add_action( 'admin_menu', array( new AmazingPlugins\Security\Baseline\BaselinePage(), 'register' ) );
@@ -296,7 +296,7 @@ add_action( 'init', array( $amsec_rate, 'check' ), 0 );
 add_action( 'admin_post_amsec_rate_limits', array( $amsec_rate, 'handle' ) );
 add_action( 'admin_post_amsec_bot_settings', array( new AmazingPlugins\Security\Bots\BotSettings(), 'handle' ) );
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
-	\WP_CLI::add_command( 'amazing-security bots disable', array( new AmazingPlugins\Security\Bots\BotSettings(), 'recovery' ) );
+	\WP_CLI::add_command( 'amsec-security-scanner bots disable', array( new AmazingPlugins\Security\Bots\BotSettings(), 'recovery' ) );
 }
 
 $amsec_digest = new AmazingPlugins\Security\Digest\DigestHooks();
@@ -321,13 +321,13 @@ add_filter( 'rest_pre_dispatch', array( new AmazingPlugins\Security\Firewall\Res
 add_action( 'admin_menu', array( new AmazingPlugins\Security\Firewall\RestRateSettings(), 'register' ) );
 add_action( 'admin_post_amsec_rest_rate_settings', array( new AmazingPlugins\Security\Firewall\RestRateSettings(), 'handle' ) );
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
-	WP_CLI::add_command( 'amazing-security rest-rates disable', array( new AmazingPlugins\Security\Firewall\RestRateSettings(), 'recovery' ) ); }
+	WP_CLI::add_command( 'amsec-security-scanner rest-rates disable', array( new AmazingPlugins\Security\Firewall\RestRateSettings(), 'recovery' ) ); }
 
 add_action( 'init', array( new AmazingPlugins\Security\Network\NetworkHook(), 'handle' ), 5 );
 add_action( 'admin_menu', array( new AmazingPlugins\Security\Network\NetworkSettings(), 'register' ) );
 add_action( 'admin_post_amsec_network_settings', array( new AmazingPlugins\Security\Network\NetworkSettings(), 'handle' ) );
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
-	WP_CLI::add_command( 'amazing-security network disable', array( new AmazingPlugins\Security\Network\NetworkSettings(), 'recovery' ) ); }
+	WP_CLI::add_command( 'amsec-security-scanner network disable', array( new AmazingPlugins\Security\Network\NetworkSettings(), 'recovery' ) ); }
 
 register_activation_hook( __FILE__, array( AmazingPlugins\Security\Traffic\TrafficTables::class, 'install' ) );
 register_deactivation_hook(
@@ -357,9 +357,9 @@ AmazingPlugins\Security\Traffic\TrafficHooks::register();
 add_action( 'admin_menu', array( new AmazingPlugins\Security\Traffic\TrafficSettings(), 'register' ) );
 add_action( 'admin_post_amsec_traffic_settings', array( new AmazingPlugins\Security\Traffic\TrafficSettings(), 'handle' ) );
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
-	WP_CLI::add_command( 'amazing-security traffic disable', array( new AmazingPlugins\Security\Traffic\TrafficSettings(), 'recovery' ) ); }
+	WP_CLI::add_command( 'amsec-security-scanner traffic disable', array( new AmazingPlugins\Security\Traffic\TrafficSettings(), 'recovery' ) ); }
 
 add_action( 'admin_menu', array( new AmazingPlugins\Security\Proxy\ProxySettings(), 'register' ) );
 add_action( 'admin_post_amsec_proxy_settings', array( new AmazingPlugins\Security\Proxy\ProxySettings(), 'handle' ) );
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
-	WP_CLI::add_command( 'amazing-security proxies disable', array( new AmazingPlugins\Security\Proxy\ProxySettings(), 'recovery' ) ); }
+	WP_CLI::add_command( 'amsec-security-scanner proxies disable', array( new AmazingPlugins\Security\Proxy\ProxySettings(), 'recovery' ) ); }

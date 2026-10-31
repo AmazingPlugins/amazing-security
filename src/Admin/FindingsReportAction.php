@@ -19,7 +19,7 @@ final class FindingsReportAction {
 		$report = FindingsReport::text( ( new FindingsRepository() )->latest() );
 		nocache_headers();
 		header( 'Content-Type: text/plain; charset=utf-8' );
-		header( 'Content-Disposition: attachment; filename="amazing-security-findings.txt"' );
+		header( 'Content-Disposition: attachment; filename="amsec-security-scanner-findings.txt"' );
 		header( 'X-Content-Type-Options: nosniff' );
 		echo $report; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Plain-text download, not HTML.
 		exit;

@@ -133,7 +133,7 @@ final class WordPressFixRepository implements FixRepository {
 			}
 			if ( ! $rollback ) {
 				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Serialize approval with a concurrent MCP opt-out.
-				$permission = $this->db->get_row( $this->db->prepare( "SELECT option_value FROM {$this->db->options} WHERE option_name = %s FOR UPDATE", 'amazing_security_mcp_enabled' ), ARRAY_A );
+				$permission = $this->db->get_row( $this->db->prepare( "SELECT option_value FROM {$this->db->options} WHERE option_name = %s FOR UPDATE", 'amsec_security_scanner_mcp_enabled' ), ARRAY_A );
 				if ( '' !== $this->db->last_error ) {
 					throw new RuntimeException( 'Could not read MCP permission.' );
 				}

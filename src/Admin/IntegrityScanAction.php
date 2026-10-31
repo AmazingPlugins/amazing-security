@@ -27,7 +27,7 @@ use Throwable;
 
 final class IntegrityScanAction {
 	public function start(): void {
-		$this->authorize( 'amazing_security_integrity_start' );
+		$this->authorize( 'amsec_security_scanner_integrity_start' );
 		$store  = new WordPressIntegrityStore( new WordPressOptions() );
 		$scanId = wp_generate_uuid4();
 		$cursor = new IntegrityCursor( $scanId, startedAt: new DateTimeImmutable() );
@@ -38,7 +38,7 @@ final class IntegrityScanAction {
 	}
 
 	public function resume(): void {
-		$this->authorize( 'amazing_security_integrity_resume' );
+		$this->authorize( 'amsec_security_scanner_integrity_resume' );
 		$store    = new WordPressIntegrityStore( new WordPressOptions() );
 		$progress = $store->latestProgress();
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified above.
@@ -177,7 +177,7 @@ final class IntegrityScanAction {
 		}
 		$plugins = array();
 		foreach ( get_plugins() as $file => $data ) {
-			if ( str_starts_with( $file, 'amazing-security/' ) ) {
+			if ( str_starts_with( $file, 'amsec-security-scanner/' ) ) {
 				continue;
 			}
 			$slug = dirname( $file );
@@ -215,7 +215,7 @@ final class IntegrityScanAction {
 	}
 
 	private function redirect( bool $error ): never {
-		wp_safe_redirect( admin_url( 'admin.php?page=amsec-file-checks' . ( $error ? '&amazing_security_integrity_error=1' : '' ) . '#amsec-integrity' ) );
+		wp_safe_redirect( admin_url( 'admin.php?page=amsec-file-checks' . ( $error ? '&amsec_security_scanner_integrity_error=1' : '' ) . '#amsec-integrity' ) );
 		exit;
 	}
 }

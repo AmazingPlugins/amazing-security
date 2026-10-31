@@ -111,7 +111,7 @@ final class FollowUpCheck implements SecurityCheck {
 
 	/** @return array{stored: string, found: int} */
 	public static function releaseFiles(): array {
-		return self::integritySnapshot( 'amazing_security_integrity_completed', 'amazing_security_integrity_active' );
+		return self::integritySnapshot( 'amsec_security_scanner_integrity_completed', 'amsec_security_scanner_integrity_active' );
 	}
 
 	/** @return array{stored: string, found: int} */
@@ -166,7 +166,7 @@ final class FollowUpCheck implements SecurityCheck {
 
 	/** @return array{stored: string, found: int} */
 	public static function suspiciousFiles(): array {
-		return self::fileScanSnapshot( 'amazing_security_file_scan_completed', 'amazing_security_file_scan_active' );
+		return self::fileScanSnapshot( 'amsec_security_scanner_file_scan_completed', 'amsec_security_scanner_file_scan_active' );
 	}
 
 	/** @return array{stored: string, found: int} */

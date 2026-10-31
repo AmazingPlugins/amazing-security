@@ -8,14 +8,14 @@ defined( 'ABSPATH' ) || exit;
 
 final class IncidentPage {
 	public function register(): void {
-		add_submenu_page( 'amazing-security', __( 'Incident response', 'amsec-security-scanner' ), __( 'Incident response', 'amsec-security-scanner' ), 'manage_options', 'amsec-incident', array( $this, 'render' ) );
+		add_submenu_page( 'amsec-security-scanner', __( 'Incident response', 'amsec-security-scanner' ), __( 'Incident response', 'amsec-security-scanner' ), 'manage_options', 'amsec-incident', array( $this, 'render' ) );
 	}
 
 	public function render(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_die( esc_html__( 'Administrator access required.', 'amsec-security-scanner' ), '', array( 'response' => 403 ) );
 		}
-		echo '<div class="wrap amazing-security-admin"><h1>' . esc_html__( 'If something looks wrong', 'amsec-security-scanner' ) . '</h1><ol><li>' . esc_html__( 'Look at the administrator names below.', 'amsec-security-scanner' ) . '</li><li>' . esc_html__( 'Open that account’s sessions and end the other ones.', 'amsec-security-scanner' ) . '</li><li>' . esc_html__( 'Require a new password for one other account. This signs out its current sessions. It does not email them, and application passwords stay active.', 'amsec-security-scanner' ) . '</li><li><a href="' . esc_url( admin_url( 'admin.php?page=amazing-security' ) ) . '">' . esc_html__( 'Run the scan again.', 'amsec-security-scanner' ) . '</a></li></ol><p>' . esc_html__( 'Change', 'amsec-security-scanner' ) . ' <a href="' . esc_url( admin_url( 'profile.php' ) ) . '">' . esc_html__( 'your own password', 'amsec-security-scanner' ) . '</a> ' . esc_html__( 'from your profile. If you lock the wrong account out, the host can run', 'amsec-security-scanner' ) . ' <code>wp amazing-security accounts clear-reset</code> ' . esc_html__( 'with that user id.', 'amsec-security-scanner' ) . '</p>';
+		echo '<div class="wrap amsec-security-scanner-admin"><h1>' . esc_html__( 'If something looks wrong', 'amsec-security-scanner' ) . '</h1><ol><li>' . esc_html__( 'Look at the administrator names below.', 'amsec-security-scanner' ) . '</li><li>' . esc_html__( 'Open that account’s sessions and end the other ones.', 'amsec-security-scanner' ) . '</li><li>' . esc_html__( 'Require a new password for one other account. This signs out its current sessions. It does not email them, and application passwords stay active.', 'amsec-security-scanner' ) . '</li><li><a href="' . esc_url( admin_url( 'admin.php?page=amsec-security-scanner' ) ) . '">' . esc_html__( 'Run the scan again.', 'amsec-security-scanner' ) . '</a></li></ol><p>' . esc_html__( 'Change', 'amsec-security-scanner' ) . ' <a href="' . esc_url( admin_url( 'profile.php' ) ) . '">' . esc_html__( 'your own password', 'amsec-security-scanner' ) . '</a> ' . esc_html__( 'from your profile. If you lock the wrong account out, the host can run', 'amsec-security-scanner' ) . ' <code>wp amsec-security-scanner accounts clear-reset</code> ' . esc_html__( 'with that user id.', 'amsec-security-scanner' ) . '</p>';
 		$policy = new ResetRequirement();
 		$users  = get_users(
 			array(

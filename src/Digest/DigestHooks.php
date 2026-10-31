@@ -11,7 +11,7 @@ use AmazingPlugins\Security\Activity\ActivityRepository;
 
 final class DigestHooks {
 	public function delivery(): DigestDelivery {
-		return new DigestDelivery( new WordPressOptions(), static fn( string $to, string $subject, string $body ): bool => wp_mail( $to, $subject, $body ), (string) get_option( 'admin_email', '' ), admin_url( 'admin.php?page=amazing-security' ) );
+		return new DigestDelivery( new WordPressOptions(), static fn( string $to, string $subject, string $body ): bool => wp_mail( $to, $subject, $body ), (string) get_option( 'admin_email', '' ), admin_url( 'admin.php?page=amsec-security-scanner' ) );
 	}
 	public function ensure(): void {
 		if ( '1' !== get_option( 'amsec_digest_enabled' ) ) {

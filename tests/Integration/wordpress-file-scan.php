@@ -16,10 +16,10 @@ mkdir( $root );
 file_put_contents( $root . '/known.php', '<?php echo 1;' );
 file_put_contents( $root . '/extra.php', '<?php eval(base64_decode("ZWNobyAxOw=="));' );
 $manifest = new Manifest( 'plugin', 'fixture:1', 'https://wordpress.org/', new DateTimeImmutable(), 'sha256', array( 'known.php' => array( hash( 'sha256', '<?php echo 1;' ) ) ) );
-$target = new FileScanTarget( 'fixture:1', 'plugin', $root, $manifest );
-$store = new WordPressFileScanStore( new WordPressOptions() );
-$cursor = new FileScanCursor( 'fixture-1' );
-$step = ( new FileScanRunner() )->step( array( $target ), $cursor, new ScanContext( null, 1 ) );
+$target   = new FileScanTarget( 'fixture:1', 'plugin', $root, $manifest );
+$store    = new WordPressFileScanStore( new WordPressOptions() );
+$cursor   = new FileScanCursor( 'fixture-1' );
+$step     = ( new FileScanRunner() )->step( array( $target ), $cursor, new ScanContext( null, 1 ) );
 if ( $step->finished || 1 !== $cursor->processed ) {
 	throw new RuntimeException( 'First file scan step was not bounded.' );
 }
@@ -36,12 +36,12 @@ $store->complete( 'fixture-1', FileScanReport::fromCursor( $cursor ) );
 if ( 'warn' !== $store->latestCompleted()->state || 'warn' !== $store->historicalWarnings()[0]->state ) {
 	throw new RuntimeException( 'Completed warning or history was not saved.' );
 }
-$raw = get_option( 'amazing_security_file_scan_completed' );
-if ( str_contains( $raw, 'ZWNobyAxOw==' ) || str_contains( $raw, $root ) || isset( wp_load_alloptions()['amazing_security_file_scan_completed'] ) ) {
+$raw = get_option( 'amsec_security_scanner_file_scan_completed' );
+if ( str_contains( $raw, 'ZWNobyAxOw==' ) || str_contains( $raw, $root ) || isset( wp_load_alloptions()['amsec_security_scanner_file_scan_completed'] ) ) {
 	throw new RuntimeException( 'Stored report contains content, absolute paths, or autoloaded data.' );
 }
-$partial = new FileScanCursor( 'fixture-2' );
-$partial->partial = true;
+$partial           = new FileScanCursor( 'fixture-2' );
+$partial->partial  = true;
 $partial->finished = true;
 if ( ! $store->begin( 'fixture-2', $partial ) ) {
 	throw new RuntimeException( 'Could not begin later partial scan.' );
@@ -50,9 +50,9 @@ $store->saveProgress( 'fixture-2', new FileScanStep( $partial, true ) );
 if ( 'warn' !== $store->latestCompleted()->state ) {
 	throw new RuntimeException( 'Partial scan erased prior warning.' );
 }
-delete_option( 'amazing_security_file_scan_active' );
-delete_option( 'amazing_security_file_scan_completed' );
-delete_option( 'amazing_security_file_scan_history' );
+delete_option( 'amsec_security_scanner_file_scan_active' );
+delete_option( 'amsec_security_scanner_file_scan_completed' );
+delete_option( 'amsec_security_scanner_file_scan_history' );
 unlink( $root . '/known.php' );
 unlink( $root . '/extra.php' );
 rmdir( $root );

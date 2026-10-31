@@ -1,23 +1,239 @@
 <?php
-if(!defined('WP_CLI')||!WP_CLI||DB_HOST!=='amsec-next-db'||!in_array(DB_NAME,['wordpress','wordpress69'],true)){exit(1);}
+if ( ! defined( 'WP_CLI' ) || ! WP_CLI || DB_HOST !== 'amsec-next-db' || ! in_array( DB_NAME, array( 'wordpress', 'wordpress69' ), true ) ) {
+	exit( 1 );}
 use AmazingPlugins\Security\Repository\WordPressDirectoryInventory;
 use AmazingPlugins\Security\Repository\WordPressDirectoryService;
 use AmazingPlugins\Security\Repository\WordPressDirectoryClient;
 use AmazingPlugins\Security\Repository\DirectoryAction;
 use AmazingPlugins\Security\Repository\DirectoryPage;
-$saved=[];foreach(['amsec_repository_state','amsec_repository_lock'] as $key){$saved[$key]=get_option($key,null);delete_option($key);}
-$mode='missing';$calls=0;$die=static fn()=>static function($m,$t,$a){throw new RuntimeException('denied:'.($a['response']??500));};$redirect=static function(){throw new RuntimeException('redirect');};add_filter('wp_die_handler',$die);add_filter('wp_redirect',$redirect);
-$http=static function($pre,$args,$url)use(&$mode,&$calls){if(!str_starts_with($url,'https://api.wordpress.org/plugins/info/1.0/')){return $pre;}++$calls;$parts=wp_parse_url($url);parse_str($parts['query']??'',$query);$slug=basename($parts['path'],'.json');if($parts['host']!=='api.wordpress.org'||$args['redirection']!==0||$args['sslverify']!==true||$args['limit_response_size']!==65537||$args['timeout']!==4||$args['user-agent']!=='AmazingSecurity-directory-advisory/0.1'||!empty($args['cookies'])||($query['fields']['sections']??null)!=='0'){throw new RuntimeException('Unsafe directory transport arguments.');}if($mode==='live'){return $pre;}if($mode==='outage'){return new WP_Error('fixture_outage','No connection.');}$data=$mode==='closed'?['slug'=>$slug,'error'=>'closed','closed'=>true,'closed_date'=>'2021-11-12','reason'=>'security-issue','description'=>'<script>DO-NOT-STORE-RESPONSE</script>']:($mode==='reopen'?['slug'=>$slug,'version'=>'1.0','last_updated'=>'2020-01-01 9:02am GMT']:['error'=>'Plugin not found.']);return ['headers'=>[],'body'=>wp_json_encode($data),'response'=>['code'=>$mode==='reopen'?200:404,'message'=>'Fixture'],'cookies'=>[]];};add_filter('pre_http_request',$http,10,3);
-try{
-wp_set_current_user(1);$_SERVER['REQUEST_METHOD']='POST';$inventory=new WordPressDirectoryInventory();$items=[];foreach($inventory->all() as $item){if(in_array($item['slug'],['woocommerce','contact-form-7','classic-editor'],true)){$items[$item['slug']]=$item;}}if(count($items)!==3||in_array(false,array_column($items,'supported'),true)){throw new RuntimeException('Common plugins not eligible candidates.');}$item=$items['classic-editor'];$base=['target'=>$item['key'],'fingerprint'=>$item['fingerprint'],'consent'=>'1','_wpnonce'=>wp_create_nonce('amsec_repository_'.$item['key'].'_'.$item['fingerprint'])];
-$run=static function($post){$_POST=$post;$_REQUEST=$_POST;try{(new DirectoryAction())->handle();throw new LogicException('Lookup did not redirect.');}catch(RuntimeException $e){if($e->getMessage()!=='redirect'){throw $e;}}};
-foreach(['nonce'=>['_wpnonce'=>'bad'],'consent'=>['consent'=>'0'],'key'=>['target'=>'bad']] as $name=>$change){$_POST=array_replace($base,$change);$_REQUEST=$_POST;try{(new DirectoryAction())->handle();throw new LogicException('Lookup gate accepted '.$name);}catch(RuntimeException $e){if(!str_starts_with($e->getMessage(),'denied:')){throw $e;}}}foreach(['method','guest'] as $name){$_POST=$base;$_REQUEST=$_POST;if($name==='method'){$_SERVER['REQUEST_METHOD']='GET';}else{wp_set_current_user(0);}try{(new DirectoryAction())->handle();throw new LogicException('Lookup gate accepted '.$name);}catch(RuntimeException $e){if(!str_starts_with($e->getMessage(),'denied:')){throw $e;}}wp_set_current_user(1);$_SERVER['REQUEST_METHOD']='POST';}if($calls!==0){throw new RuntimeException('Denied lookup contacted provider.');}
-$stale=$base;$stale['fingerprint']=str_repeat('0',64);$stale['_wpnonce']=wp_create_nonce('amsec_repository_'.$item['key'].'_'.$stale['fingerprint']);$_POST=$stale;$_REQUEST=$_POST;try{(new DirectoryAction())->handle();throw new LogicException('Stale candidate accepted.');}catch(RuntimeException $e){if($e->getMessage()!=='denied:409'){throw $e;}}if($calls!==0){throw new RuntimeException('Stale candidate contacted provider.');}
-$mode='live';$live=[];foreach($items as $slug=>$candidate){$r=(new WordPressDirectoryClient())->fetch($slug,time());if($r['state']!=='listed'){throw new RuntimeException('Live common-plugin directory observation unavailable: '.$slug);}$live[]=$slug;}echo 'Actual official metadata observed for '.implode(', ',$live).'. No installed version/site URL/cookie/content sent.'.PHP_EOL;
-$mode='closed';$run($base);$service=(new WordPressDirectoryService())->create();$row=$service->status()['records'][$item['key']];if($row['result']['state']!=='closed'||str_contains(get_option('amsec_repository_state'),'DO-NOT-STORE-RESPONSE')){throw new RuntimeException('Closure normalization or redaction failed.');}$beforeCalls=$calls;$run($base);if($calls!==$beforeCalls){throw new RuntimeException('Ten-minute cache ignored.');}
-// Move the saved observation backward to expire its request cooldown while preserving a valid history record.
-$age=static function(){ $s=json_decode(get_option('amsec_repository_state'),true);foreach($s['records'] as &$row){$row['checked_at']-=601;if($row['last_closed']){$row['last_closed']['checked_at']-=601;}}update_option('amsec_repository_state',wp_json_encode($s),false);};$age();$mode='outage';$run($base);$row=$service->status()['records'][$item['key']];if($row['result']['state']!=='unknown'||$row['last_closed']['result']['state']!=='closed'){throw new RuntimeException('Outage cleared closure history.');}$age();$mode='missing';$run($base);$row=$service->status()['records'][$item['key']];if($row['result']['state']!=='unknown'||!$row['last_closed']){throw new RuntimeException('Missing record became closure/abandonment or erased history.');}$age();$mode='reopen';$run($base);$row=$service->status()['records'][$item['key']];if($row['result']['state']!=='listed'||!$row['result']['old_update']||!$row['last_closed']){throw new RuntimeException('Reopen or old-update advisory failed.');}
-$valid=get_option('amsec_repository_state');$broken=json_decode($valid,true);$broken['records'][$item['key']]['result']=$row['last_closed']['result'];$broken['records'][$item['key']]['last_closed']=null;update_option('amsec_repository_state',wp_json_encode($broken),false);$beforeCalls=$calls;if(empty($service->status()['invalid'])||$service->lookup($item['key'],$item['fingerprint'],time())!=='invalid'||$calls!==$beforeCalls){throw new RuntimeException('Inconsistent closure history was accepted.');}update_option('amsec_repository_state',$valid,false);$before=get_option('amsec_repository_state');$beforeCalls=$calls;ob_start();(new DirectoryPage())->render();$html=ob_get_clean();foreach(['Plugin directory status','Directory listing observed','Old repository update','Earlier closure observation retained','slug match does not authenticate','Send this candidate slug'] as $text){if(!str_contains($html,$text)){throw new RuntimeException('Repository report content missing.');}}if(str_contains($html,'DO-NOT-STORE-RESPONSE')||get_option('amsec_repository_state')!==$before||$calls!==$beforeCalls){throw new RuntimeException('Read-only page fetched, mutated or exposed raw response.');}
-$id=wp_create_user('amsec-dir-sub-'.bin2hex(random_bytes(4)),bin2hex(random_bytes(16)));if(is_wp_error($id)){throw new RuntimeException('Subscriber fixture failed.');}(new WP_User($id))->set_role('subscriber');wp_set_current_user($id);try{$_POST=$base;$_REQUEST=$_POST;try{(new DirectoryAction())->handle();throw new LogicException('Subscriber lookup accepted.');}catch(RuntimeException $e){if($e->getMessage()!=='denied:403'){throw $e;}}try{(new DirectoryPage())->render();throw new LogicException('Subscriber report accepted.');}catch(RuntimeException $e){if($e->getMessage()!=='denied:403'){throw $e;}}}finally{wp_set_current_user(1);require_once ABSPATH.'wp-admin/includes/user.php';wp_delete_user($id);}
-echo 'Directory advisory native nonce/consent/role/changed-target gates, bounded transport, cooldown, explicit closed 404 vs missing 404, outage/reopen history, old-update wording and redacted report passed.'.PHP_EOL;
-}finally{remove_filter('pre_http_request',$http,10);remove_filter('wp_die_handler',$die);remove_filter('wp_redirect',$redirect);wp_set_current_user(1);foreach($saved as $key=>$value){if($value===null){delete_option($key);}else{update_option($key,$value,false);}}}
+$saved = array();
+foreach ( array( 'amsec_repository_state', 'amsec_repository_lock' ) as $key ) {
+	$saved[ $key ] = get_option( $key, null );
+	delete_option( $key );}
+$mode      = 'missing';
+$calls     = 0;
+$die       = static fn()=>static function ( $m, $t, $a ) {
+throw new RuntimeException( 'denied:' . ( $a['response'] ?? 500 ) );
+}$redirect = static function () {
+	throw new RuntimeException( 'redirect' );
+};
+add_filter( 'wp_die_handler', $die );
+add_filter( 'wp_redirect', $redirect );
+$http = static function ( $pre, $args, $url ) use ( &$mode, &$calls ) {
+	if ( ! str_starts_with( $url, 'https://api.wordpress.org/plugins/info/1.0/' ) ) {
+		return $pre;
+	}++$calls;
+	$parts = wp_parse_url( $url );
+	parse_str( $parts['query'] ?? '', $query );
+	$slug = basename( $parts['path'], '.json' );
+	if ( $parts['host'] !== 'api.wordpress.org' || $args['redirection'] !== 0 || $args['sslverify'] !== true || $args['limit_response_size'] !== 65537 || $args['timeout'] !== 4 || $args['user-agent'] !== 'AmSecSecurityScanner-directory-advisory/0.1' || ! empty( $args['cookies'] ) || ( $query['fields']['sections'] ?? null ) !== '0' ) {
+		throw new RuntimeException( 'Unsafe directory transport arguments.' );
+	}if ( $mode === 'live' ) {
+		return $pre;
+	}if ( $mode === 'outage' ) {
+		return new WP_Error( 'fixture_outage', 'No connection.' );
+	}$data = $mode === 'closed' ? array(
+		'slug'        => $slug,
+		'error'       => 'closed',
+		'closed'      => true,
+		'closed_date' => '2021-11-12',
+		'reason'      => 'security-issue',
+		'description' => '<script>DO-NOT-STORE-RESPONSE</script>',
+	) : ( $mode === 'reopen' ? array(
+		'slug'         => $slug,
+		'version'      => '1.0',
+		'last_updated' => '2020-01-01 9:02am GMT',
+	) : array( 'error' => 'Plugin not found.' ) );
+	return array(
+		'headers'  => array(),
+		'body'     => wp_json_encode( $data ),
+		'response' => array(
+			'code'    => $mode === 'reopen' ? 200 : 404,
+			'message' => 'Fixture',
+		),
+		'cookies'  => array(),
+	);
+};
+add_filter( 'pre_http_request', $http, 10, 3 );
+try {
+	wp_set_current_user( 1 );
+	$_SERVER['REQUEST_METHOD'] = 'POST';
+	$inventory                 = new WordPressDirectoryInventory();
+	$items                     = array();
+	foreach ( $inventory->all() as $item ) {
+		if ( in_array( $item['slug'], array( 'woocommerce', 'contact-form-7', 'classic-editor' ), true ) ) {
+			$items[ $item['slug'] ] = $item;
+		}
+	}if ( count( $items ) !== 3 || in_array( false, array_column( $items, 'supported' ), true ) ) {
+		throw new RuntimeException( 'Common plugins not eligible candidates.' );
+	}$item = $items['classic-editor'];
+	$base  = array(
+		'target'      => $item['key'],
+		'fingerprint' => $item['fingerprint'],
+		'consent'     => '1',
+		'_wpnonce'    => wp_create_nonce( 'amsec_repository_' . $item['key'] . '_' . $item['fingerprint'] ),
+	);
+	$run   = static function ( $post ) {
+		$_POST    = $post;
+		$_REQUEST = $_POST;
+		try {
+			( new DirectoryAction() )->handle();
+			throw new LogicException( 'Lookup did not redirect.' );
+		} catch ( RuntimeException $e ) {
+			if ( $e->getMessage() !== 'redirect' ) {
+				throw $e;
+			}
+		}};
+	foreach ( array(
+		'nonce'   => array( '_wpnonce' => 'bad' ),
+		'consent' => array( 'consent' => '0' ),
+		'key'     => array( 'target' => 'bad' ),
+	) as $name => $change ) {
+		$_POST    = array_replace( $base, $change );
+		$_REQUEST = $_POST;
+		try {
+			( new DirectoryAction() )->handle();
+			throw new LogicException( 'Lookup gate accepted ' . $name );
+		} catch ( RuntimeException $e ) {
+			if ( ! str_starts_with( $e->getMessage(), 'denied:' ) ) {
+				throw $e;
+			}
+		}
+	}foreach ( array( 'method', 'guest' ) as $name ) {
+		$_POST    = $base;
+		$_REQUEST = $_POST;
+		if ( $name === 'method' ) {
+			$_SERVER['REQUEST_METHOD'] = 'GET';
+		} else {
+			wp_set_current_user( 0 );
+		}try {
+			( new DirectoryAction() )->handle();
+			throw new LogicException( 'Lookup gate accepted ' . $name );
+		} catch ( RuntimeException $e ) {
+			if ( ! str_starts_with( $e->getMessage(), 'denied:' ) ) {
+				throw $e;
+			}
+		}wp_set_current_user( 1 );
+		$_SERVER['REQUEST_METHOD'] = 'POST';
+	}if ( $calls !== 0 ) {
+		throw new RuntimeException( 'Denied lookup contacted provider.' );}
+	$stale                = $base;
+	$stale['fingerprint'] = str_repeat( '0', 64 );
+	$stale['_wpnonce']    = wp_create_nonce( 'amsec_repository_' . $item['key'] . '_' . $stale['fingerprint'] );
+	$_POST                = $stale;
+	$_REQUEST             = $_POST;
+	try {
+		( new DirectoryAction() )->handle();
+		throw new LogicException( 'Stale candidate accepted.' );
+	} catch ( RuntimeException $e ) {
+		if ( $e->getMessage() !== 'denied:409' ) {
+			throw $e;
+		}
+	}if ( $calls !== 0 ) {
+		throw new RuntimeException( 'Stale candidate contacted provider.' );}
+	$mode = 'live';
+	$live = array();
+	foreach ( $items as $slug => $candidate ) {
+		$r = ( new WordPressDirectoryClient() )->fetch( $slug, time() );
+		if ( $r['state'] !== 'listed' ) {
+			throw new RuntimeException( 'Live common-plugin directory observation unavailable: ' . $slug );
+		}$live[] = $slug;
+	}echo 'Actual official metadata observed for ' . implode( ', ', $live ) . '. No installed version/site URL/cookie/content sent.' . PHP_EOL;
+	$mode = 'closed';
+	$run( $base );
+	$service = ( new WordPressDirectoryService() )->create();
+	$row     = $service->status()['records'][ $item['key'] ];
+	if ( $row['result']['state'] !== 'closed' || str_contains( get_option( 'amsec_repository_state' ), 'DO-NOT-STORE-RESPONSE' ) ) {
+		throw new RuntimeException( 'Closure normalization or redaction failed.' );
+	}$beforeCalls = $calls;
+	$run( $base );
+	if ( $calls !== $beforeCalls ) {
+		throw new RuntimeException( 'Ten-minute cache ignored.' );}
+	// Move the saved observation backward to expire its request cooldown while preserving a valid history record.
+	$age = static function () {
+		$s = json_decode( get_option( 'amsec_repository_state' ), true );
+		foreach ( $s['records'] as &$row ) {
+			$row['checked_at'] -= 601;
+			if ( $row['last_closed'] ) {
+				$row['last_closed']['checked_at'] -= 601;
+			}
+		}update_option( 'amsec_repository_state', wp_json_encode( $s ), false );
+	};
+	$age();
+	$mode = 'outage';
+	$run( $base );
+	$row = $service->status()['records'][ $item['key'] ];
+	if ( $row['result']['state'] !== 'unknown' || $row['last_closed']['result']['state'] !== 'closed' ) {
+		throw new RuntimeException( 'Outage cleared closure history.' );
+	}$age();
+	$mode = 'missing';
+	$run( $base );
+	$row = $service->status()['records'][ $item['key'] ];
+	if ( $row['result']['state'] !== 'unknown' || ! $row['last_closed'] ) {
+		throw new RuntimeException( 'Missing record became closure/abandonment or erased history.' );
+	}$age();
+	$mode = 'reopen';
+	$run( $base );
+	$row = $service->status()['records'][ $item['key'] ];
+	if ( $row['result']['state'] !== 'listed' || ! $row['result']['old_update'] || ! $row['last_closed'] ) {
+		throw new RuntimeException( 'Reopen or old-update advisory failed.' );}
+	$valid                                       = get_option( 'amsec_repository_state' );
+	$broken                                      = json_decode( $valid, true );
+	$broken['records'][ $item['key'] ]['result'] = $row['last_closed']['result'];
+	$broken['records'][ $item['key'] ]['last_closed'] = null;
+	update_option( 'amsec_repository_state', wp_json_encode( $broken ), false );
+	$beforeCalls = $calls;
+	if ( empty( $service->status()['invalid'] ) || $service->lookup( $item['key'], $item['fingerprint'], time() ) !== 'invalid' || $calls !== $beforeCalls ) {
+		throw new RuntimeException( 'Inconsistent closure history was accepted.' );
+	}update_option( 'amsec_repository_state', $valid, false );
+	$before      = get_option( 'amsec_repository_state' );
+	$beforeCalls = $calls;
+	ob_start();
+	( new DirectoryPage() )->render();
+	$html = ob_get_clean();
+	foreach ( array( 'Plugin directory status', 'Directory listing observed', 'Old repository update', 'Earlier closure observation retained', 'slug match does not authenticate', 'Send this candidate slug' ) as $text ) {
+		if ( ! str_contains( $html, $text ) ) {
+			throw new RuntimeException( 'Repository report content missing.' );
+		}
+	}if ( str_contains( $html, 'DO-NOT-STORE-RESPONSE' ) || get_option( 'amsec_repository_state' ) !== $before || $calls !== $beforeCalls ) {
+		throw new RuntimeException( 'Read-only page fetched, mutated or exposed raw response.' );}
+	$id = wp_create_user( 'amsec-dir-sub-' . bin2hex( random_bytes( 4 ) ), bin2hex( random_bytes( 16 ) ) );
+	if ( is_wp_error( $id ) ) {
+		throw new RuntimeException( 'Subscriber fixture failed.' );
+	}( new WP_User( $id ) )->set_role( 'subscriber' );
+	wp_set_current_user( $id );
+	try {
+		$_POST    = $base;
+		$_REQUEST = $_POST;
+		try {
+			( new DirectoryAction() )->handle();
+			throw new LogicException( 'Subscriber lookup accepted.' );
+		} catch ( RuntimeException $e ) {
+			if ( $e->getMessage() !== 'denied:403' ) {
+				throw $e;
+			}
+		}try {
+			( new DirectoryPage() )->render();
+			throw new LogicException( 'Subscriber report accepted.' );
+		} catch ( RuntimeException $e ) {
+			if ( $e->getMessage() !== 'denied:403' ) {
+				throw $e;
+			}
+		}
+	} finally {
+		wp_set_current_user( 1 );
+		require_once ABSPATH . 'wp-admin/includes/user.php';
+		wp_delete_user( $id );}
+	echo 'Directory advisory native nonce/consent/role/changed-target gates, bounded transport, cooldown, explicit closed 404 vs missing 404, outage/reopen history, old-update wording and redacted report passed.' . PHP_EOL;
+} finally {
+	remove_filter( 'pre_http_request', $http, 10 );
+	remove_filter( 'wp_die_handler', $die );
+	remove_filter( 'wp_redirect', $redirect );
+	wp_set_current_user( 1 );
+	foreach ( $saved as $key => $value ) {
+		if ( $value === null ) {
+			delete_option( $key );
+		} else {
+			update_option( $key, $value, false );}
+	}
+}

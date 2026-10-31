@@ -19,10 +19,21 @@ final class IntegrityRunnerTest extends TestCase {
 		mkdir( $root );
 		file_put_contents( $root . '/good.php', 'good' );
 		file_put_contents( $root . '/changed.php', 'changed' );
-		$manifest = new Manifest( 'core', '6.6:en_US', 'https://api.wordpress.org/core/checksums/1.0/', new DateTimeImmutable(), 'md5', array( 'good.php' => array( md5( 'good' ) ), 'changed.php' => array( md5( 'original' ) ), 'missing.php' => array( md5( 'missing' ) ) ) );
-		$runner = new IntegrityRunner( new FileReader() );
-		$target = new IntegrityTarget( $manifest, $root );
-		$first = $runner->step( array( $target ), new IntegrityCursor( 'scan-1' ), new ScanContext( null, 2 ) );
+		$manifest = new Manifest(
+			'core',
+			'6.6:en_US',
+			'https://api.wordpress.org/core/checksums/1.0/',
+			new DateTimeImmutable(),
+			'md5',
+			array(
+				'good.php'    => array( md5( 'good' ) ),
+				'changed.php' => array( md5( 'original' ) ),
+				'missing.php' => array( md5( 'missing' ) ),
+			)
+		);
+		$runner   = new IntegrityRunner( new FileReader() );
+		$target   = new IntegrityTarget( $manifest, $root );
+		$first    = $runner->step( array( $target ), new IntegrityCursor( 'scan-1' ), new ScanContext( null, 2 ) );
 		self::assertFalse( $first->finished );
 		self::assertSame( 1, $first->cursor->matched );
 		self::assertSame( 3, $first->cursor->packages['core:6.6:en_US']['total'] );
@@ -39,8 +50,8 @@ final class IntegrityRunnerTest extends TestCase {
 
 	public function test_cumulative_deadline_ends_scan_as_partial(): void {
 		$manifest = new Manifest( 'core', '6.6:en_US', 'https://api.wordpress.org/', new DateTimeImmutable(), 'md5', array( 'index.php' => array( str_repeat( 'a', 32 ) ) ) );
-		$cursor = new IntegrityCursor( 'scan-2', elapsed: 30.0 );
-		$step = ( new IntegrityRunner( new FileReader() ) )->step( array( new IntegrityTarget( $manifest, sys_get_temp_dir() ) ), $cursor, new ScanContext() );
+		$cursor   = new IntegrityCursor( 'scan-2', elapsed: 30.0 );
+		$step     = ( new IntegrityRunner( new FileReader() ) )->step( array( new IntegrityTarget( $manifest, sys_get_temp_dir() ) ), $cursor, new ScanContext() );
 		self::assertTrue( $step->finished );
 		self::assertTrue( $step->cursor->partial );
 	}

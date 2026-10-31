@@ -8,10 +8,10 @@ use AmazingPlugins\Security\Integrity\WordPressIntegrityStore;
 use AmazingPlugins\Security\Integrity\WordPressOptions;
 use AmazingPlugins\Security\Schedule\SuiteCycle;
 
-$options = new WordPressOptions();
+$options   = new WordPressOptions();
 $integrity = new WordPressIntegrityStore( $options );
-$files = new WordPressFileScanStore( $options );
-$cycle = new SuiteCycle( $options );
+$files     = new WordPressFileScanStore( $options );
+$cycle     = new SuiteCycle( $options );
 $options->delete( 'amsec_suite_cycle' );
 if ( ! $cycle->start( time() ) ) {
 	throw new RuntimeException( 'Could not start scheduled suite.' );

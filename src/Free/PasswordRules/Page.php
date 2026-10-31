@@ -10,7 +10,7 @@ defined( 'ABSPATH' ) || exit;
 final class Page {
 	public function register(): void {
 		add_submenu_page(
-			'amazing-security',
+			'amsec-security-scanner',
 			__( 'Password rules', 'amsec-security-scanner' ),
 			__( 'Password rules', 'amsec-security-scanner' ),
 			'manage_options',
@@ -25,7 +25,7 @@ final class Page {
 		}
 		$current = Module::stored();
 		$notice  = $this->notice();
-		echo '<div class="wrap amazing-security-admin">';
+		echo '<div class="wrap amsec-security-scanner-admin">';
 		echo '<h1>' . esc_html__( 'Password rules', 'amsec-security-scanner' ) . '</h1>';
 		if ( '' !== $notice ) {
 			echo '<div class="notice notice-info"><p>' . esc_html( $notice ) . '</p></div>';

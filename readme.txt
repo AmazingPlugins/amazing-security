@@ -4,7 +4,7 @@ Tags: security, hardening, malware scan, login security, file integrity
 Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 0.1.4
+Stable tag: 0.1.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -43,11 +43,11 @@ All of these are off until you turn them on. Most are under **Log In & Register*
 
 You need HTTPS and your password to end sessions or change some Traffic settings.
 
-If you get locked out, run `wp amazing-security login disable` from WP-CLI on the server. It turns off every sign-in check above. Accounts waiting for approval stay waiting.
+If you get locked out, run `wp amsec-security-scanner login disable` from WP-CLI on the server. It turns off every sign-in check above. Accounts waiting for approval stay waiting.
 
 = Traffic =
 
-Hostname, browser and referrer block lists, a live request log, hotlink protection, comment and registration limits, REST rate controls, manual network rules, a security headers check, and trusted proxy settings. Each blocking control stays off until you save it, and each can be turned off from WP-CLI. `wp amazing-security traffic disable` turns off the block lists, live log, hotlink protection, precise blocks and comment checks. `bots disable`, `rest-rates disable`, `network disable` and `proxies disable` cover the rest.
+Hostname, browser and referrer block lists, a live request log, hotlink protection, comment and registration limits, REST rate controls, manual network rules, a security headers check, and trusted proxy settings. Each blocking control stays off until you save it, and each can be turned off from WP-CLI. `wp amsec-security-scanner traffic disable` turns off the block lists, live log, hotlink protection, precise blocks and comment checks. `bots disable`, `rest-rates disable`, `network disable` and `proxies disable` cover the rest.
 
 The security headers check reads your homepage's response headers and lists the missing ones. It doesn't add headers.
 
@@ -112,7 +112,7 @@ By default, your settings are kept in case you reinstall. To remove everything, 
 
 = I'm locked out. What do I do? =
 
-Run `wp amazing-security login disable` on the server. Other controls have their own commands, such as `wp amazing-security traffic disable` and `wp amazing-security network disable`.
+Run `wp amsec-security-scanner login disable` on the server. Other controls have their own commands, such as `wp amsec-security-scanner traffic disable` and `wp amsec-security-scanner network disable`.
 
 == Credits ==
 
@@ -121,6 +121,9 @@ Run `wp amazing-security login disable` on the server. Other controls have their
 
 == Changelog ==
 
+= 0.1.5 =
+* Finished the rename: menu, settings, commands and emails now use the AmSec Security Scanner name. The command is now wp amsec-security-scanner.
+
 = 0.1.4 =
 * Renamed to AmSec Security Scanner (slug amsec-security-scanner).
 
@@ -128,7 +131,7 @@ Run `wp amazing-security login disable` on the server. Other controls have their
 * Renamed to AmazingPlugins Security Scanner.
 
 = 0.1.2 =
-* Renamed to Amazing Security Scanner.
+* Renamed to AmSec Security Scanner.
 * Removed the file repair and recovery tools that replaced, moved or chmodded site files. Scans still report changed files.
 * Theme release ZIPs are now downloaded with WordPress's download_url().
 

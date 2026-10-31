@@ -18,7 +18,7 @@ use AmazingPlugins\Security\Sessions\SessionPage;
 final class AccountPage {
 	public static function menu(): void {
 		add_submenu_page(
-			'amazing-security',
+			'amsec-security-scanner',
 			__( 'Log In & Register', 'amsec-security-scanner' ),
 			__( 'Log In & Register', 'amsec-security-scanner' ),
 			'manage_options',
@@ -38,7 +38,7 @@ final class AccountPage {
 		$rate      = LoginExtras::rate( self::stored( LoginExtras::RATE ) ) ?? 'off';
 		$xmlrpc    = LoginExtras::xmlrpc( self::stored( LoginExtras::XMLRPC ) ) ?? '0';
 		$erase     = Settings::flag( self::stored( Settings::ERASE ) );
-		echo '<div class="wrap amazing-security-admin">';
+		echo '<div class="wrap amsec-security-scanner-admin">';
 		ScreenTabs::bar(
 			array(
 				'sign-in'        => __( 'Sign-in', 'amsec-security-scanner' ),

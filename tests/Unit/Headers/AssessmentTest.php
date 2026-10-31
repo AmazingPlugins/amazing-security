@@ -1,18 +1,63 @@
 <?php
 namespace AmazingPlugins\Security\Tests\Unit\Headers;
+
 use AmazingPlugins\Security\Headers\HeaderTarget;
 use AmazingPlugins\Security\Headers\HeaderAssessment;
 use PHPUnit\Framework\TestCase;
 final class AssessmentTest extends TestCase {
- public function test_fixed_url_boundaries():void {
-  self::assertSame('https://example.org/blog/',HeaderTarget::url('https://example.org/blog/'));
-  self::assertSame('http://8.8.8.8/',HeaderTarget::url('http://8.8.8.8'));
-  foreach(['ftp://example.org/','https://u:p@example.org/','https://example.org:81/','https://example.org/?q=x','https://example.org/#x','https://127.0.0.1/','http://169.254.169.254/','http://2130706433/','http://[::1]/','http://localhost/','https://example.org/%2e%2e/','https://example.org/../x',"https://example.org/\n"] as $url){self::assertNull(HeaderTarget::url($url),$url);}
- }
- public function test_address_boundaries():void {foreach(['8.8.8.8','1.1.1.1'] as $ip){self::assertTrue(HeaderTarget::publicIp($ip));}foreach(['0.1.2.3','10.0.0.1','100.64.0.1','127.1.1.1','169.254.1.1','172.16.1.1','192.0.0.8','192.0.2.1','192.168.1.1','198.18.1.1','198.51.100.1','203.0.113.1','224.1.1.1','255.255.255.255','::1','bad'] as $ip){self::assertFalse(HeaderTarget::publicIp($ip),$ip);}}
- private function parse(array $headers=[],bool $tls=true,int $code=200):array{return (new HeaderAssessment())->parse($code,array_merge(['content-type'=>['text/html; charset=UTF-8']],$headers),$tls);}
- public function test_semantics_and_no_raw_values():void {$r=$this->parse(['strict-transport-security'=>['max-age=31536000; includeSubDomains'],'x-content-type-options'=>['nosniff'],'x-frame-options'=>['SAMEORIGIN'],'referrer-policy'=>['strict-origin-when-cross-origin'],'content-security-policy'=>["script-src 'nonce-SECRET'; report-uri https://secret.invalid/"],'content-security-policy-report-only'=>["default-src 'self'"]]);self::assertSame('assessed',$r['state']);self::assertSame(['hsts'=>'positive','content_type'=>'recognized','framing'=>'recognized','referrer'=>'recognized','csp'=>'present','csp_report_only'=>'present'],$r['headers']);self::assertStringNotContainsString('SECRET',json_encode($r));self::assertStringNotContainsString('secret.invalid',json_encode($r));}
- public function test_http_disabled_missing_duplicate_and_malformed():void{self::assertSame('ineffective',$this->parse(['strict-transport-security'=>['max-age=100']],false)['headers']['hsts']);self::assertSame('disabled',$this->parse(['strict-transport-security'=>['max-age=0']])['headers']['hsts']);self::assertSame('review',$this->parse(['strict-transport-security'=>['max-age=12; max-age=24']])['headers']['hsts']);foreach(['x-content-type-options','x-frame-options','referrer-policy'] as $name){$r=$this->parse([$name=>['bad','bad']]);self::assertContains('review',$r['headers']);}self::assertSame('missing',$this->parse()['headers']['csp']);self::assertSame('present',$this->parse(['content-security-policy-report-only'=>["default-src 'none'"]])['headers']['csp_report_only']);}
- public function test_duplicate_hsts_directives_need_review():void{foreach(['max-age=100; includeSubDomains; includeSubDomains','max-age=100; preload; preload'] as $value){self::assertSame('review',$this->parse(['strict-transport-security'=>[$value]])['headers']['hsts']);}}
- public function test_failed_response_or_unbounded_values_is_unknown():void{foreach([301,404,500] as $code){self::assertSame('unknown',$this->parse([],true,$code)['state']);}foreach([['content-type'=>['application/json']],['content-type'=>['text/html','text/html']],['x-frame-options'=>[str_repeat('x',2049)]],['x-frame-options'=>["DENY\r\nInjected: value"]]] as $headers){self::assertSame('unknown',$this->parse($headers)['state']);}}
+	public function test_fixed_url_boundaries(): void {
+		self::assertSame( 'https://example.org/blog/', HeaderTarget::url( 'https://example.org/blog/' ) );
+		self::assertSame( 'http://8.8.8.8/', HeaderTarget::url( 'http://8.8.8.8' ) );
+		foreach ( array( 'ftp://example.org/', 'https://u:p@example.org/', 'https://example.org:81/', 'https://example.org/?q=x', 'https://example.org/#x', 'https://127.0.0.1/', 'http://169.254.169.254/', 'http://2130706433/', 'http://[::1]/', 'http://localhost/', 'https://example.org/%2e%2e/', 'https://example.org/../x', "https://example.org/\n" ) as $url ) {
+			self::assertNull( HeaderTarget::url( $url ), $url );}
+	}
+	public function test_address_boundaries(): void {
+		foreach ( array( '8.8.8.8', '1.1.1.1' ) as $ip ) {
+			self::assertTrue( HeaderTarget::publicIp( $ip ) );
+		}foreach ( array( '0.1.2.3', '10.0.0.1', '100.64.0.1', '127.1.1.1', '169.254.1.1', '172.16.1.1', '192.0.0.8', '192.0.2.1', '192.168.1.1', '198.18.1.1', '198.51.100.1', '203.0.113.1', '224.1.1.1', '255.255.255.255', '::1', 'bad' ) as $ip ) {
+			self::assertFalse( HeaderTarget::publicIp( $ip ), $ip );}}
+	private function parse( array $headers = array(), bool $tls = true, int $code = 200 ): array {
+		return ( new HeaderAssessment() )->parse( $code, array_merge( array( 'content-type' => array( 'text/html; charset=UTF-8' ) ), $headers ), $tls );}
+	public function test_semantics_and_no_raw_values(): void {
+		$r = $this->parse(
+			array(
+				'strict-transport-security'           => array( 'max-age=31536000; includeSubDomains' ),
+				'x-content-type-options'              => array( 'nosniff' ),
+				'x-frame-options'                     => array( 'SAMEORIGIN' ),
+				'referrer-policy'                     => array( 'strict-origin-when-cross-origin' ),
+				'content-security-policy'             => array( "script-src 'nonce-SECRET'; report-uri https://secret.invalid/" ),
+				'content-security-policy-report-only' => array( "default-src 'self'" ),
+			)
+		);
+		self::assertSame( 'assessed', $r['state'] );
+		self::assertSame(
+			array(
+				'hsts'            => 'positive',
+				'content_type'    => 'recognized',
+				'framing'         => 'recognized',
+				'referrer'        => 'recognized',
+				'csp'             => 'present',
+				'csp_report_only' => 'present',
+			),
+			$r['headers']
+		);
+		self::assertStringNotContainsString( 'SECRET', json_encode( $r ) );
+		self::assertStringNotContainsString( 'secret.invalid', json_encode( $r ) );}
+	public function test_http_disabled_missing_duplicate_and_malformed(): void {
+		self::assertSame( 'ineffective', $this->parse( array( 'strict-transport-security' => array( 'max-age=100' ) ), false )['headers']['hsts'] );
+		self::assertSame( 'disabled', $this->parse( array( 'strict-transport-security' => array( 'max-age=0' ) ) )['headers']['hsts'] );
+		self::assertSame( 'review', $this->parse( array( 'strict-transport-security' => array( 'max-age=12; max-age=24' ) ) )['headers']['hsts'] );
+		foreach ( array( 'x-content-type-options', 'x-frame-options', 'referrer-policy' ) as $name ) {
+			$r = $this->parse( array( $name => array( 'bad', 'bad' ) ) );
+			self::assertContains( 'review', $r['headers'] );
+		}self::assertSame( 'missing', $this->parse()['headers']['csp'] );
+		self::assertSame( 'present', $this->parse( array( 'content-security-policy-report-only' => array( "default-src 'none'" ) ) )['headers']['csp_report_only'] );}
+	public function test_duplicate_hsts_directives_need_review(): void {
+		foreach ( array( 'max-age=100; includeSubDomains; includeSubDomains', 'max-age=100; preload; preload' ) as $value ) {
+			self::assertSame( 'review', $this->parse( array( 'strict-transport-security' => array( $value ) ) )['headers']['hsts'] );}}
+	public function test_failed_response_or_unbounded_values_is_unknown(): void {
+		foreach ( array( 301, 404, 500 ) as $code ) {
+			self::assertSame( 'unknown', $this->parse( array(), true, $code )['state'] );
+		}foreach ( array( array( 'content-type' => array( 'application/json' ) ), array( 'content-type' => array( 'text/html', 'text/html' ) ), array( 'x-frame-options' => array( str_repeat( 'x', 2049 ) ) ), array( 'x-frame-options' => array( "DENY\r\nInjected: value" ) ) ) as $headers ) {
+			self::assertSame( 'unknown', $this->parse( $headers )['state'] );}}
 }

@@ -7,20 +7,20 @@ defined( 'ABSPATH' ) || exit;
 
 final class RulePage {
 	public function register(): void {
-		$hook = add_submenu_page( 'amazing-security', __( 'Rule information', 'amsec-security-scanner' ), __( 'Rule information', 'amsec-security-scanner' ), 'manage_options', 'amsec-rules', array( $this, 'render' ) );
+		$hook = add_submenu_page( 'amsec-security-scanner', __( 'Rule information', 'amsec-security-scanner' ), __( 'Rule information', 'amsec-security-scanner' ), 'manage_options', 'amsec-rules', array( $this, 'render' ) );
 		add_action(
 			'admin_enqueue_scripts',
 			static function ( string $current ) use ( $hook ): void {
 				if ( $current === $hook ) {
-					wp_enqueue_style( 'amazing-security-admin', plugins_url( 'assets/admin.css', AMAZING_SECURITY_FILE ), array(), '0.1.0' );
+					wp_enqueue_style( 'amsec-security-scanner-admin', plugins_url( 'assets/admin.css', AMSEC_SECURITY_SCANNER_FILE ), array(), '0.1.0' );
 				}}
 		);
 	}
 	public function render(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_die( esc_html__( 'Administrator access required.', 'amsec-security-scanner' ), '', array( 'response' => 403 ) );}
-		$packs = ( new RuleCatalog( dirname( AMAZING_SECURITY_FILE ) ) )->status( time() );
-		echo '<div class="wrap amazing-security-admin"><header class="amsec-header"><div><h1>' . esc_html__( 'Rule information', 'amsec-security-scanner' ) . '</h1><p>' . esc_html__( 'Versions and review records for the local patterns installed with this plugin.', 'amsec-security-scanner' ) . '</p></div></header><section class="amsec-overview"><h2>' . esc_html__( 'What the review date means', 'amsec-security-scanner' ) . '</h2><p>' . esc_html__( 'The date records bundled metadata review. It does not establish current threat coverage, a maintained malware feed or a clean site. After 90 days, metadata review is marked overdue. Missing, changed or invalid source records are unknown. Scanning behavior is unchanged by these advisory labels.', 'amsec-security-scanner' ) . '</p><p>' . esc_html__( 'Source hashes are compared with a record in the same plugin package. This can reveal package drift, but it is not independent proof of authenticity. Existing findings retain their recorded rule version; installing another version does not refresh old scans.', 'amsec-security-scanner' ) . '</p></section>';
+		$packs = ( new RuleCatalog( dirname( AMSEC_SECURITY_SCANNER_FILE ) ) )->status( time() );
+		echo '<div class="wrap amsec-security-scanner-admin"><header class="amsec-header"><div><h1>' . esc_html__( 'Rule information', 'amsec-security-scanner' ) . '</h1><p>' . esc_html__( 'Versions and review records for the local patterns installed with this plugin.', 'amsec-security-scanner' ) . '</p></div></header><section class="amsec-overview"><h2>' . esc_html__( 'What the review date means', 'amsec-security-scanner' ) . '</h2><p>' . esc_html__( 'The date records bundled metadata review. It does not establish current threat coverage, a maintained malware feed or a clean site. After 90 days, metadata review is marked overdue. Missing, changed or invalid source records are unknown. Scanning behavior is unchanged by these advisory labels.', 'amsec-security-scanner' ) . '</p><p>' . esc_html__( 'Source hashes are compared with a record in the same plugin package. This can reveal package drift, but it is not independent proof of authenticity. Existing findings retain their recorded rule version; installing another version does not refresh old scans.', 'amsec-security-scanner' ) . '</p></section>';
 		foreach ( $packs as $pack ) {
 			$label = match ( $pack['status'] ) {
 				'recent'=>__( 'Metadata recently reviewed', 'amsec-security-scanner' ), 'overdue'=>__( 'Metadata review overdue', 'amsec-security-scanner' ), default=>__( 'Package record unknown', 'amsec-security-scanner' )};

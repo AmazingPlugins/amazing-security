@@ -24,7 +24,7 @@ final class RequestInspectorTest extends TestCase {
 		self::assertSame( array(), $inspector->inspect( array( 'q' => 'dataset example' ), false )['rules'] );
 		self::assertSame( array(), $inspector->inspect( array( 'q' => 'onload handler' ), false )['rules'] );
 		self::assertSame( array(), $inspector->inspect( array( 'q' => '&#60;script&#62;' ), false )['rules'] );
-		self::assertSame( array( 'AS-REST-005' ), $inspector->inspect( array( 'q' => "%00" ), false )['rules'] );
+		self::assertSame( array( 'AS-REST-005' ), $inspector->inspect( array( 'q' => '%00' ), false )['rules'] );
 		self::assertSame( array( 'AS-REST-005' ), $inspector->inspect( array( 'q' => '%2500' ), false )['rules'] );
 		self::assertSame( array( 'AS-REST-001' ), $inspector->inspect( array( 'q' => '%252e%252e%252fsecret' ), false )['rules'] );
 		self::assertSame( array( 'AS-REST-005' ), $inspector->inspect( array( 'q' => '%252500' ), false )['rules'] );
@@ -45,7 +45,16 @@ final class RequestInspectorTest extends TestCase {
 	public function test_skips_credentials_and_authenticated_requests(): void {
 		$inspector = new RequestInspector();
 		self::assertSame( 'skip', $inspector->inspect( array( 'q' => '../private' ), true )['state'] );
-		self::assertSame( 'pass', $inspector->inspect( array( 'password' => '../private', 'q' => 'normal' ), false )['state'] );
+		self::assertSame(
+			'pass',
+			$inspector->inspect(
+				array(
+					'password' => '../private',
+					'q'        => 'normal',
+				),
+				false
+			)['state']
+		);
 	}
 
 	public function test_nested_or_oversized_query_is_partial_not_clean(): void {

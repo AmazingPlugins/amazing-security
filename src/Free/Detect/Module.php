@@ -39,7 +39,7 @@ final class Module {
 
 	public static function menu(): void {
 		add_submenu_page(
-			'amazing-security',
+			'amsec-security-scanner',
 			__( 'Precise blocks', 'amsec-security-scanner' ),
 			__( 'Precise blocks', 'amsec-security-scanner' ),
 			'manage_options',
@@ -54,7 +54,7 @@ final class Module {
 		}
 		$option  = get_option( self::OPTION, '0' );
 		$enabled = '1' === ( is_scalar( $option ) ? (string) $option : '0' );
-		echo '<div class="wrap amazing-security-admin"><h1>' . esc_html__( 'Precise blocks', 'amsec-security-scanner' ) . '</h1>';
+		echo '<div class="wrap amsec-security-scanner-admin"><h1>' . esc_html__( 'Precise blocks', 'amsec-security-scanner' ) . '</h1>';
 		echo '<p>' . esc_html__( 'Off until you turn it on. A query is rejected only for two exact test markers. SQL keywords and ../ are left alone.', 'amsec-security-scanner' ) . '</p>';
 		echo '<p>' . esc_html__( 'Set AMSEC_DISABLE_PRECISE_BLOCK to true and this check stops.', 'amsec-security-scanner' ) . '</p>';
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';

@@ -33,7 +33,7 @@ final class HttpHeaderClient implements HeaderClient {
 					'timeout'     => 5,
 					'redirection' => 0,
 					'sslverify'   => true,
-					'user-agent'  => 'AmazingSecurity-header-assessment/0.1',
+					'user-agent'  => 'AmSecSecurityScanner-header-assessment/0.1',
 				)
 			);
 			// A WP_Error is an object, so this also covers failed requests.

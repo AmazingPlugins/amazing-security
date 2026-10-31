@@ -1,10 +1,10 @@
 (function () {
-  var root = document.querySelector('.amazing-security-admin [data-amsec-tabs]');
+  var root = document.querySelector('.amsec-security-scanner-admin [data-amsec-tabs]');
   if (!root) {
     return;
   }
   var buttons = root.querySelectorAll('[data-amsec-tab]');
-  var panels = document.querySelectorAll('.amazing-security-admin [data-amsec-panel]');
+  var panels = document.querySelectorAll('.amsec-security-scanner-admin [data-amsec-panel]');
 
   function show(id) {
     buttons.forEach(function (button) {

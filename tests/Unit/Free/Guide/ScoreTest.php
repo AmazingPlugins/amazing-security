@@ -15,7 +15,10 @@ final class ScoreTest extends TestCase {
 	}
 
 	public function test_idle_and_flags_count_when_on(): void {
-		$options = array( 'amsec_idle_minutes' => '30', 'amsec_hotlink' => '1' );
+		$options = array(
+			'amsec_idle_minutes' => '30',
+			'amsec_hotlink'      => '1',
+		);
 		self::assertSame( 2, Score::tally( $options )['on'] );
 	}
 

@@ -31,8 +31,8 @@ final class DecisionTest extends TestCase {
 			array( '16', 16 ),
 		);
 		foreach ( $cases as $case ) {
-			$stored   = $case[0];
-			$minimum  = $case[1];
+			$stored  = $case[0];
+			$minimum = $case[1];
 			self::assertSame( $stored, Decision::normalize( $stored ) );
 			self::assertSame( $minimum, Decision::minimum( $stored ) );
 			self::assertTrue( Decision::rejects( $stored, 0, 'new' ) );

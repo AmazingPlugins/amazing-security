@@ -36,7 +36,7 @@ proposal_id="$(wp eval '
   echo $id;
 ' --user=admin --quiet)"
 app_result="$(wp eval '
-  $result = WP_Application_Passwords::create_new_application_password( 1, array( "name" => "Amazing Security approval gate test " . bin2hex( random_bytes( 4 ) ) ) );
+  $result = WP_Application_Passwords::create_new_application_password( 1, array( "name" => "AmSec Security Scanner approval gate test " . bin2hex( random_bytes( 4 ) ) ) );
   if ( is_wp_error( $result ) ) { throw new RuntimeException( $result->get_error_message() ); }
   echo $result[1]["uuid"] . "|" . $result[0];
 ' --user=admin --quiet)"

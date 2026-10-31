@@ -11,7 +11,7 @@ final class ActivityRenderer {
 	private array $names = array();
 
 	public function render( array $rows, int $page, string $event, int $pages = 1, string $recordingForm = '' ): string {
-		$html  = '<div class="wrap amazing-security-admin amsec-activity">';
+		$html  = '<div class="wrap amsec-security-scanner-admin amsec-activity">';
 		$html .= '<h1>' . esc_html__( 'Security activity', 'amsec-security-scanner' ) . '</h1>';
 		$html .= '<p>' . esc_html__( 'Local history is best effort. A missing row does not mean nothing happened.', 'amsec-security-scanner' ) . '</p>';
 		$html .= '<p>' . esc_html__( 'New rows are stored only after you turn recording on. They stay for 30 days. Visitor addresses and passwords are not stored.', 'amsec-security-scanner' ) . '</p>';
@@ -137,13 +137,13 @@ final class ActivityRenderer {
 
 	private function thing( string $target ): string {
 		$names = array(
-			'amsec_login_rate_mode'        => __( 'Sign-in limit', 'amsec-security-scanner' ),
-			'amsec_login_xmlrpc_disabled'  => __( 'XML-RPC sign-in', 'amsec-security-scanner' ),
-			'amsec_alerts_enabled'         => __( 'Alert email', 'amsec-security-scanner' ),
-			'amsec_digest_enabled'         => __( 'Weekly digest', 'amsec-security-scanner' ),
-			'amazing_security_mcp_enabled' => __( 'Assistant connection', 'amsec-security-scanner' ),
-			'amazing_security_vulnerability_direct_enabled' => __( 'Direct vulnerability lookup', 'amsec-security-scanner' ),
-			'amazing_security_kev_enabled' => __( 'CISA list of exploited holes', 'amsec-security-scanner' ),
+			'amsec_login_rate_mode'              => __( 'Sign-in limit', 'amsec-security-scanner' ),
+			'amsec_login_xmlrpc_disabled'        => __( 'XML-RPC sign-in', 'amsec-security-scanner' ),
+			'amsec_alerts_enabled'               => __( 'Alert email', 'amsec-security-scanner' ),
+			'amsec_digest_enabled'               => __( 'Weekly digest', 'amsec-security-scanner' ),
+			'amsec_security_scanner_mcp_enabled' => __( 'Assistant connection', 'amsec-security-scanner' ),
+			'amsec_security_scanner_vulnerability_direct_enabled' => __( 'Direct vulnerability lookup', 'amsec-security-scanner' ),
+			'amsec_security_scanner_kev_enabled' => __( 'CISA list of exploited holes', 'amsec-security-scanner' ),
 		);
 		if ( isset( $names[ $target ] ) ) {
 			return $names[ $target ];
@@ -154,6 +154,9 @@ final class ActivityRenderer {
 				$base = basename( $target, '.php' );
 			}
 			$target = $base;
+		}
+		if ( 'amsec-security-scanner' === $target ) {
+			return 'AmSec Security Scanner';
 		}
 		$words = str_replace( array( '-', '_' ), ' ', $target );
 		return '' === $words ? '' : ucwords( $words );

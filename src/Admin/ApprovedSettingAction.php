@@ -50,10 +50,10 @@ final class ApprovedSettingAction {
 		try {
 			( new LocalHardeningScanService() )->run();
 		} catch ( Throwable ) {
-			wp_safe_redirect( admin_url( 'admin.php?page=amazing-security#amsec-start-title' ) );
+			wp_safe_redirect( admin_url( 'admin.php?page=amsec-security-scanner#amsec-start-title' ) );
 			exit;
 		}
-		wp_safe_redirect( admin_url( 'admin.php?page=amazing-security#amsec-start-title' ) );
+		wp_safe_redirect( admin_url( 'admin.php?page=amsec-security-scanner#amsec-start-title' ) );
 		exit;
 	}
 

@@ -82,11 +82,11 @@ for pair in 'amsec-next-wp wordpress 66' 'amsec-next-wp69 wordpress69 69'; do
 import sys
 from pathlib import Path
 s=(Path(sys.argv[2])/('common-frontend'+sys.argv[1]+'.html')).read_text()
-assert 'wpcf7-form' in s and 'Amazing Security dummy product' in s and 'add-to-cart' in s
+assert 'wpcf7-form' in s and 'AmSec Security Scanner dummy product' in s and 'add-to-cart' in s
 assert 'Fatal error' not in s
 print('Real Apache HTTP page renders Contact Form 7 and WooCommerce product/cart controls.')
 PYTEST
- wp plugin check amazing-security --format=table | tee "$evidence/plugin-check$tag.log"
+ wp plugin check amsec-security-scanner --format=table | tee "$evidence/plugin-check$tag.log"
  python3 - "$evidence/plugin-check$tag.log" <<'PYCHECK'
 import re,sys
 from pathlib import Path

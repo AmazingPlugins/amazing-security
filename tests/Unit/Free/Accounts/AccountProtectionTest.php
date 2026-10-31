@@ -122,10 +122,10 @@ final class AccountProtectionTest extends TestCase {
 		$saved = Settings::fromPost( array( 'amsec_common_passwords' => '1' ) );
 		self::assertSame(
 			array(
-				'amsec_idle_minutes'          => '0',
-				'amsec_approve_registrations' => '0',
-				'amsec_email_factor'          => '0',
-				'amsec_login_challenge'       => '0',
+				'amsec_idle_minutes'             => '0',
+				'amsec_approve_registrations'    => '0',
+				'amsec_email_factor'             => '0',
+				'amsec_login_challenge'          => '0',
 				'amsec_login_erase_on_uninstall' => '0',
 			),
 			$saved

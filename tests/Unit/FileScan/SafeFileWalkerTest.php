@@ -71,7 +71,7 @@ final class SafeFileWalkerTest extends TestCase {
 	}
 
 	public function test_skips_directory_symlink_without_reading_target(): void {
-		$root = $this->root();
+		$root    = $this->root();
 		$outside = $this->root();
 		file_put_contents( $outside . '/outside.php', 'secret' );
 		symlink( $outside, $root . '/linked' );
@@ -87,7 +87,7 @@ final class SafeFileWalkerTest extends TestCase {
 		}
 		$target = $this->target( $root, 'uploads' );
 		$walker = new SafeFileWalker();
-		$first = $walker->step( array( $target ), new FileScanCursor( 'scan-1' ), new ScanContext( null, 250 ) );
+		$first  = $walker->step( array( $target ), new FileScanCursor( 'scan-1' ), new ScanContext( null, 250 ) );
 		$second = ( new SafeFileWalker() )->step( array( $target ), $first->cursor, new ScanContext() );
 		self::assertFalse( $first->finished );
 		self::assertTrue( $second->finished );
@@ -108,7 +108,7 @@ final class SafeFileWalkerTest extends TestCase {
 		file_put_contents( $root . '/two.php', 'x' );
 		$target = $this->target( $root, 'uploads' );
 		$walker = new SafeFileWalker();
-		$first = $walker->step( array( $target ), new FileScanCursor( 'scan-1' ), new ScanContext( null, 1 ) );
+		$first  = $walker->step( array( $target ), new FileScanCursor( 'scan-1' ), new ScanContext( null, 1 ) );
 		file_put_contents( $root . '/three.php', 'x' );
 		$second = $walker->step( array( $target ), $first->cursor, new ScanContext() );
 		self::assertTrue( $second->cursor->partial );
@@ -119,10 +119,10 @@ final class SafeFileWalkerTest extends TestCase {
 		$root = $this->root();
 		file_put_contents( $root . '/one.php', 'x' );
 		file_put_contents( $root . '/two.php', 'x' );
-		$firstTarget = $this->target( $root, 'plugin', array( 'one.php' => array( hash( 'sha256', 'x' ) ) ) );
-		$first = ( new SafeFileWalker() )->step( array( $firstTarget ), new FileScanCursor( 'scan-1' ), new ScanContext( null, 1 ) );
+		$firstTarget   = $this->target( $root, 'plugin', array( 'one.php' => array( hash( 'sha256', 'x' ) ) ) );
+		$first         = ( new SafeFileWalker() )->step( array( $firstTarget ), new FileScanCursor( 'scan-1' ), new ScanContext( null, 1 ) );
 		$changedTarget = $this->target( $root, 'plugin', array( 'one.php' => array( hash( 'sha256', 'changed' ) ) ) );
-		$second = ( new SafeFileWalker() )->step( array( $changedTarget ), $first->cursor, new ScanContext() );
+		$second        = ( new SafeFileWalker() )->step( array( $changedTarget ), $first->cursor, new ScanContext() );
 		self::assertTrue( $second->cursor->partial );
 		self::assertSame( array(), $second->observations );
 	}
@@ -132,7 +132,7 @@ final class SafeFileWalkerTest extends TestCase {
 		file_put_contents( $root . '/hello.php', '<?php echo 1;' );
 		file_put_contents( $root . '/other.php', '<?php echo 2;' );
 		$target = new FileScanTarget( 'hello.php:1.0', 'plugin', $root, null, 'hello.php' );
-		$first = ( new SafeFileWalker() )->step( array( $target ), new FileScanCursor( 'scan-1' ), new ScanContext( null, 1 ) );
+		$first  = ( new SafeFileWalker() )->step( array( $target ), new FileScanCursor( 'scan-1' ), new ScanContext( null, 1 ) );
 		$second = ( new SafeFileWalker() )->step( array( $target ), $first->cursor, new ScanContext() );
 		self::assertSame( array( 'hello.php' ), array_column( $first->observations, 'path' ) );
 		self::assertSame( array(), $second->observations );

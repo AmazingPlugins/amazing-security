@@ -10,7 +10,7 @@ defined( 'ABSPATH' ) || exit;
 final class Page {
 	public static function menu(): void {
 		add_submenu_page(
-			'amazing-security',
+			'amsec-security-scanner',
 			__( 'Comment checks', 'amsec-security-scanner' ),
 			__( 'Comment checks', 'amsec-security-scanner' ),
 			'manage_options',
@@ -25,7 +25,7 @@ final class Page {
 		}
 		$enabled = self::stored();
 		$on      = '1' === $enabled;
-		echo '<div class="wrap amazing-security-admin amsec-brief">';
+		echo '<div class="wrap amsec-security-scanner-admin amsec-brief">';
 		echo '<h1>' . esc_html__( 'Comment checks', 'amsec-security-scanner' ) . '</h1>';
 		echo '<p class="amsec-brief-status"><span class="amsec-pill' . ( $on ? ' is-on' : ' is-off' ) . '">' . esc_html( $on ? __( 'On', 'amsec-security-scanner' ) : __( 'Off', 'amsec-security-scanner' ) ) . '</span>';
 		echo esc_html( self::status( $enabled ) ) . '</p>';

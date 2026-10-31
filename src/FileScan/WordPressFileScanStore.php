@@ -11,10 +11,10 @@ use RuntimeException;
 use Throwable;
 
 final class WordPressFileScanStore implements FileScanStore {
-	private const ACTIVE    = 'amazing_security_file_scan_active';
-	private const COMPLETED = 'amazing_security_file_scan_completed';
-	private const HISTORY   = 'amazing_security_file_scan_history';
-	private const NOTES     = 'amazing_security_file_scan_notes';
+	private const ACTIVE    = 'amsec_security_scanner_file_scan_active';
+	private const COMPLETED = 'amsec_security_scanner_file_scan_completed';
+	private const HISTORY   = 'amsec_security_scanner_file_scan_history';
+	private const NOTES     = 'amsec_security_scanner_file_scan_notes';
 
 	public function __construct( private readonly OptionGateway $options ) {}
 

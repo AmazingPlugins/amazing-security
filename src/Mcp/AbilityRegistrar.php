@@ -25,7 +25,7 @@ final class AbilityRegistrar {
 	public function registerCategory(): void {
 		if ( function_exists( 'wp_register_ability_category' ) ) {
 			wp_register_ability_category(
-				'amazing-security',
+				'amsec-security-scanner',
 				array(
 					'label'       => 'AmSec Security Scanner',
 					'description' => __( 'Security findings and bounded checks for this site.', 'amsec-security-scanner' ),
@@ -131,10 +131,10 @@ final class AbilityRegistrar {
 		);
 		$out     = array();
 		foreach ( $schemas as $short => $schema ) {
-			$out[ 'amazing-security/' . $short ] = array(
+			$out[ 'amsec-security-scanner/' . $short ] = array(
 				'label'               => $labels[ $short ],
 				'description'         => sprintf( /* translators: %s: short description of the assistant ability. */ __( '%s for an authenticated site administrator.', 'amsec-security-scanner' ), $labels[ $short ] ),
-				'category'            => 'amazing-security',
+				'category'            => 'amsec-security-scanner',
 				'input_schema'        => $schema,
 				'execute_callback'    => fn( $input = array() ): array => $this->execute( $short, $input ),
 				'permission_callback' => fn(): bool => $this->allowed(),

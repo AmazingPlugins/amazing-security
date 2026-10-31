@@ -15,7 +15,7 @@ final class ScanAction {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_die( esc_html__( 'You are not allowed to run a scan.', 'amsec-security-scanner' ), '', array( 'response' => 403 ) );
 		}
-		check_admin_referer( 'amazing_security_scan' );
+		check_admin_referer( 'amsec_security_scanner_scan' );
 		try {
 			if ( ScanOptions::headers() ) {
 				try {
@@ -26,9 +26,9 @@ final class ScanAction {
 				}
 			}
 			( new LocalHardeningScanService() )->run();
-			$url = admin_url( 'admin.php?page=amazing-security' . ( isset( $headerState ) ? '&amazing_security_header_error=1' : '' ) );
+			$url = admin_url( 'admin.php?page=amsec-security-scanner' . ( isset( $headerState ) ? '&amsec_security_scanner_header_error=1' : '' ) );
 		} catch ( Throwable $error ) {
-			$url = admin_url( 'admin.php?page=amazing-security&amazing_security_error=1' );
+			$url = admin_url( 'admin.php?page=amsec-security-scanner&amsec_security_scanner_error=1' );
 		}
 		wp_safe_redirect( $url );
 		exit;

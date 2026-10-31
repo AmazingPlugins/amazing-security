@@ -1,19 +1,230 @@
 <?php
-if(!defined('WP_CLI')||!WP_CLI||DB_HOST!=='amsec-next-db'||!in_array(DB_NAME,['wordpress','wordpress69'],true)){exit(1);}
+if ( ! defined( 'WP_CLI' ) || ! WP_CLI || DB_HOST !== 'amsec-next-db' || ! in_array( DB_NAME, array( 'wordpress', 'wordpress69' ), true ) ) {
+	exit( 1 );}
 use AmazingPlugins\Security\Exposure\WordPressExposureService;
 use AmazingPlugins\Security\Exposure\ExposureAction;
 use AmazingPlugins\Security\Exposure\ExposurePage;
-$service=(new WordPressExposureService())->create();$saved=[];foreach(['amsec_exposure_state','amsec_exposure_lock'] as $key){$saved[$key]=get_option($key,null);delete_option($key);}$token=bin2hex(random_bytes(5));$uploads=wp_upload_dir(null,false);$dir=$uploads['basedir'].'/amsec-exposure-'.$token;$files=[];$outside=sys_get_temp_dir().'/amsec-exposure-outside-'.$token.'.txt';$link=$dir.'/linked-backup.zip';$marker='HARMLESS-EXPOSURE-FIXTURE-'.$token;$die=static fn()=>static function($m,$t,$a){throw new RuntimeException('denied:'.($a['response']??500));};$redirect=static function(){throw new RuntimeException('redirect');};add_filter('wp_die_handler',$die);add_filter('wp_redirect',$redirect);wp_set_current_user(1);$_SERVER['REQUEST_METHOD']='POST';
-try{
-if(!wp_mkdir_p($dir)){throw new RuntimeException('Fixture uploads directory failed.');}$write=static function($p)use(&$files,$marker){if(file_exists($p)){throw new RuntimeException('Refusing fixture overwrite.');}if(file_put_contents($p,$marker)===false){throw new RuntimeException('Fixture write failed.');}$files[$p]=hash_file('sha256',$p);};foreach(['debug.log','export.sql.gz','.env.local','wp-config.php.bak','archive.zip','<img src=x onerror=alert(1)>.zip','portrait.jpg','notes.txt'] as $name){$write($dir.'/'.$name);}$rootFile=ABSPATH.'amsec-exposure-'.$token.'.sql';$contentFile=WP_CONTENT_DIR.'/amsec-exposure-'.$token.'.zip';$write($rootFile);$write($contentFile);file_put_contents($outside,$marker);if(!symlink($outside,$link)){throw new RuntimeException('Symlink fixture failed.');}
-$base=['root'=>'uploads','_wpnonce'=>wp_create_nonce('amsec_exposure_uploads')];foreach(['nonce'=>['_wpnonce'=>'bad'],'root'=>['root'=>'/etc'],'array'=>['root'=>['uploads']]] as $name=>$change){$_POST=array_replace($base,$change);$_REQUEST=$_POST;try{(new ExposureAction())->handle();throw new LogicException('Inventory gate accepted '.$name);}catch(RuntimeException $e){if(!str_starts_with($e->getMessage(),'denied:')){throw $e;}}}foreach(['method','guest'] as $name){$_POST=$base;$_REQUEST=$_POST;if($name==='method'){$_SERVER['REQUEST_METHOD']='GET';}else{wp_set_current_user(0);}try{(new ExposureAction())->handle();throw new LogicException('Inventory gate accepted '.$name);}catch(RuntimeException $e){if($e->getMessage()!=='denied:403'){throw $e;}}$_SERVER['REQUEST_METHOD']='POST';wp_set_current_user(1);}if(get_option('amsec_exposure_state',null)!==null){throw new RuntimeException('Rejected request saved inventory.');}
-$http=static function(){throw new RuntimeException('Unexpected exposure HTTP probe.');};add_filter('pre_http_request',$http);try{foreach(['site','content','uploads'] as $alias){$_POST=['root'=>$alias,'_wpnonce'=>wp_create_nonce('amsec_exposure_'.$alias)];$_REQUEST=$_POST;try{(new ExposureAction())->handle();throw new LogicException('Missing inventory redirect.');}catch(RuntimeException $e){if($e->getMessage()!=='redirect'){throw $e;}}}}finally{remove_filter('pre_http_request',$http);}
-$state=$service->status();$r=$state['reports']['uploads'];$paths=array_column($r['candidates'],'path');foreach(['debug.log','export.sql.gz','.env.local','wp-config.php.bak','archive.zip','<img src=x onerror=alert(1)>.zip'] as $name){if(!in_array(basename($dir).'/'.$name,$paths,true)){throw new RuntimeException('Selected uploads fixture missing.');}}foreach(['portrait.jpg','notes.txt','linked-backup.zip'] as $name){if(in_array(basename($dir).'/'.$name,$paths,true)){throw new RuntimeException('Benign or symlink fixture became candidate.');}}if(!$r['partial']||$r['unknown']<1){throw new RuntimeException('Symlink coverage was shown as complete.');}if(!in_array(basename($rootFile),array_column($state['reports']['site']['candidates'],'path'),true)||!in_array(basename($contentFile),array_column($state['reports']['content']['candidates'],'path'),true)){throw new RuntimeException('Top-level fixture missing.');}
-$raw=get_option('amsec_exposure_state');foreach([$marker,$dir,$outside,ABSPATH] as $text){if(str_contains($raw,$text)){throw new RuntimeException('Contents or absolute server path stored.');}}ob_start();(new ExposurePage())->render();$html=ob_get_clean();foreach(['Local evidence only','Partial or unknown inventory','No public reachability','&lt;img src=x','Inventory this root'] as $text){if(!str_contains($html,$text)){throw new RuntimeException('Exposure report text missing.');}}if(str_contains($html,'<img src=x')||str_contains($html,$marker)||str_contains($html,$outside)){throw new RuntimeException('Unsafe report output.');}foreach($files as $path=>$hash){if(hash_file('sha256',$path)!==$hash){throw new RuntimeException('Candidate contents changed.');}}if(file_get_contents($outside)!==$marker){throw new RuntimeException('Symlink target changed.');}
-foreach([dirname(rtrim(ABSPATH,'/')),WP_CONTENT_DIR,WP_PLUGIN_DIR,WP_PLUGIN_DIR.'/woocommerce',WP_CONTENT_DIR.'/themes',ABSPATH.'wp-admin',ABSPATH.'wp-includes'] as $excludedRoot){$filter=static function($data)use($excludedRoot){$data['basedir']=$excludedRoot;$data['error']=false;return $data;};add_filter('upload_dir',$filter);try{if((new WordPressExposureService())->root('uploads')!==null){throw new RuntimeException('Excluded-tree uploads configuration accepted.');}}finally{remove_filter('upload_dir',$filter);}}
-$oldThemeDirectories=$GLOBALS['wp_theme_directories']??null;$GLOBALS['wp_theme_directories']=[$dir];try{if((new WordPressExposureService())->root('uploads')!==null){throw new RuntimeException('Uploads containing a registered theme root accepted.');}}finally{$GLOBALS['wp_theme_directories']=$oldThemeDirectories;}
-$corrupt=json_decode($raw,true);$corrupt['reports']['site']['entries']=0;$corrupt['reports']['site']['directories']=0;update_option('amsec_exposure_state',wp_json_encode($corrupt),false);if($service->status()!==['invalid'=>true]||$service->scan('site',time())!=='invalid'){throw new RuntimeException('Impossible report counts accepted.');}update_option('amsec_exposure_state',$raw,false);
-$badRoot=static function($data){$data['basedir']=ABSPATH;$data['error']=false;return $data;};add_filter('upload_dir',$badRoot);try{if((new WordPressExposureService())->root('uploads')!==null){throw new RuntimeException('Ancestor uploads configuration accepted.');}}finally{remove_filter('upload_dir',$badRoot);}
-$id=wp_create_user('amsec-exp-sub-'.$token,bin2hex(random_bytes(16)));if(is_wp_error($id)){throw new RuntimeException('Subscriber fixture failed.');}(new WP_User($id))->set_role('subscriber');wp_set_current_user($id);try{$_POST=$base;$_REQUEST=$_POST;try{(new ExposureAction())->handle();throw new LogicException('Subscriber scan accepted.');}catch(RuntimeException $e){if($e->getMessage()!=='denied:403'){throw $e;}}try{(new ExposurePage())->render();throw new LogicException('Subscriber report accepted.');}catch(RuntimeException $e){if($e->getMessage()!=='denied:403'){throw $e;}}}finally{wp_set_current_user(1);require_once ABSPATH.'wp-admin/includes/user.php';wp_delete_user($id);}
-echo 'Local root/content/uploads filename fixtures, nonce/POST/guest/subscriber/fixed-root gates, benign exclusions, symlink unknown, unsafe root refusal, no HTTP probe, escaped hostile path and unchanged contents passed.'.PHP_EOL;
-}finally{remove_filter('wp_die_handler',$die);remove_filter('wp_redirect',$redirect);wp_set_current_user(1);if(is_link($link)){unlink($link);}foreach($files as $path=>$hash){if(is_file($path)){unlink($path);}}if(is_file($outside)){unlink($outside);}if(is_dir($dir)){rmdir($dir);}foreach($saved as $key=>$value){if($value===null){delete_option($key);}else{update_option($key,$value,false);}}}
+$service = ( new WordPressExposureService() )->create();
+$saved   = array();
+foreach ( array( 'amsec_exposure_state', 'amsec_exposure_lock' ) as $key ) {
+	$saved[ $key ] = get_option( $key, null );
+	delete_option( $key );
+}$token    = bin2hex( random_bytes( 5 ) );
+$uploads   = wp_upload_dir( null, false );
+$dir       = $uploads['basedir'] . '/amsec-exposure-' . $token;
+$files     = array();
+$outside   = sys_get_temp_dir() . '/amsec-exposure-outside-' . $token . '.txt';
+$link      = $dir . '/linked-backup.zip';
+$marker    = 'HARMLESS-EXPOSURE-FIXTURE-' . $token;
+$die       = static fn()=>static function ( $m, $t, $a ) {
+throw new RuntimeException( 'denied:' . ( $a['response'] ?? 500 ) );
+}$redirect = static function () {
+	throw new RuntimeException( 'redirect' );
+};
+add_filter( 'wp_die_handler', $die );
+add_filter( 'wp_redirect', $redirect );
+wp_set_current_user( 1 );
+$_SERVER['REQUEST_METHOD'] = 'POST';
+try {
+	if ( ! wp_mkdir_p( $dir ) ) {
+		throw new RuntimeException( 'Fixture uploads directory failed.' );
+	}$write = static function ( $p ) use ( &$files, $marker ) {
+		if ( file_exists( $p ) ) {
+			throw new RuntimeException( 'Refusing fixture overwrite.' );
+		}if ( file_put_contents( $p, $marker ) === false ) {
+			throw new RuntimeException( 'Fixture write failed.' );
+		}$files[ $p ] = hash_file( 'sha256', $p );
+	};
+	foreach ( array( 'debug.log', 'export.sql.gz', '.env.local', 'wp-config.php.bak', 'archive.zip', '<img src=x onerror=alert(1)>.zip', 'portrait.jpg', 'notes.txt' ) as $name ) {
+		$write( $dir . '/' . $name );
+	}$rootFile   = ABSPATH . 'amsec-exposure-' . $token . '.sql';
+	$contentFile = WP_CONTENT_DIR . '/amsec-exposure-' . $token . '.zip';
+	$write( $rootFile );
+	$write( $contentFile );
+	file_put_contents( $outside, $marker );
+	if ( ! symlink( $outside, $link ) ) {
+		throw new RuntimeException( 'Symlink fixture failed.' );}
+	$base = array(
+		'root'     => 'uploads',
+		'_wpnonce' => wp_create_nonce( 'amsec_exposure_uploads' ),
+	);
+	foreach ( array(
+		'nonce' => array( '_wpnonce' => 'bad' ),
+		'root'  => array( 'root' => '/etc' ),
+		'array' => array( 'root' => array( 'uploads' ) ),
+	) as $name => $change ) {
+		$_POST    = array_replace( $base, $change );
+		$_REQUEST = $_POST;
+		try {
+			( new ExposureAction() )->handle();
+			throw new LogicException( 'Inventory gate accepted ' . $name );
+		} catch ( RuntimeException $e ) {
+			if ( ! str_starts_with( $e->getMessage(), 'denied:' ) ) {
+				throw $e;
+			}
+		}
+	}foreach ( array( 'method', 'guest' ) as $name ) {
+		$_POST    = $base;
+		$_REQUEST = $_POST;
+		if ( $name === 'method' ) {
+			$_SERVER['REQUEST_METHOD'] = 'GET';
+		} else {
+			wp_set_current_user( 0 );
+		}try {
+			( new ExposureAction() )->handle();
+			throw new LogicException( 'Inventory gate accepted ' . $name );
+		} catch ( RuntimeException $e ) {
+			if ( $e->getMessage() !== 'denied:403' ) {
+				throw $e;
+			}
+		}$_SERVER['REQUEST_METHOD'] = 'POST';
+		wp_set_current_user( 1 );
+	}if ( get_option( 'amsec_exposure_state', null ) !== null ) {
+		throw new RuntimeException( 'Rejected request saved inventory.' );}
+	$http = static function () {
+		throw new RuntimeException( 'Unexpected exposure HTTP probe.' );
+	};
+	add_filter( 'pre_http_request', $http );
+	try {
+		foreach ( array( 'site', 'content', 'uploads' ) as $alias ) {
+			$_POST    = array(
+				'root'     => $alias,
+				'_wpnonce' => wp_create_nonce( 'amsec_exposure_' . $alias ),
+			);
+			$_REQUEST = $_POST;
+			try {
+				( new ExposureAction() )->handle();
+				throw new LogicException( 'Missing inventory redirect.' );
+			} catch ( RuntimeException $e ) {
+				if ( $e->getMessage() !== 'redirect' ) {
+					throw $e;
+				}
+			}
+		}
+	} finally {
+		remove_filter( 'pre_http_request', $http );}
+	$state = $service->status();
+	$r     = $state['reports']['uploads'];
+	$paths = array_column( $r['candidates'], 'path' );
+	foreach ( array( 'debug.log', 'export.sql.gz', '.env.local', 'wp-config.php.bak', 'archive.zip', '<img src=x onerror=alert(1)>.zip' ) as $name ) {
+		if ( ! in_array( basename( $dir ) . '/' . $name, $paths, true ) ) {
+			throw new RuntimeException( 'Selected uploads fixture missing.' );
+		}
+	}foreach ( array( 'portrait.jpg', 'notes.txt', 'linked-backup.zip' ) as $name ) {
+		if ( in_array( basename( $dir ) . '/' . $name, $paths, true ) ) {
+			throw new RuntimeException( 'Benign or symlink fixture became candidate.' );
+		}
+	}if ( ! $r['partial'] || $r['unknown'] < 1 ) {
+		throw new RuntimeException( 'Symlink coverage was shown as complete.' );
+	}if ( ! in_array( basename( $rootFile ), array_column( $state['reports']['site']['candidates'], 'path' ), true ) || ! in_array( basename( $contentFile ), array_column( $state['reports']['content']['candidates'], 'path' ), true ) ) {
+		throw new RuntimeException( 'Top-level fixture missing.' );}
+	$raw = get_option( 'amsec_exposure_state' );
+	foreach ( array( $marker, $dir, $outside, ABSPATH ) as $text ) {
+		if ( str_contains( $raw, $text ) ) {
+			throw new RuntimeException( 'Contents or absolute server path stored.' );
+		}
+	}ob_start();
+	( new ExposurePage() )->render();
+	$html = ob_get_clean();
+	foreach ( array( 'Local evidence only', 'Partial or unknown inventory', 'No public reachability', '&lt;img src=x', 'Inventory this root' ) as $text ) {
+		if ( ! str_contains( $html, $text ) ) {
+			throw new RuntimeException( 'Exposure report text missing.' );
+		}
+	}if ( str_contains( $html, '<img src=x' ) || str_contains( $html, $marker ) || str_contains( $html, $outside ) ) {
+		throw new RuntimeException( 'Unsafe report output.' );
+	}foreach ( $files as $path => $hash ) {
+		if ( hash_file( 'sha256', $path ) !== $hash ) {
+			throw new RuntimeException( 'Candidate contents changed.' );
+		}
+	}if ( file_get_contents( $outside ) !== $marker ) {
+		throw new RuntimeException( 'Symlink target changed.' );}
+	foreach ( array( dirname( rtrim( ABSPATH, '/' ) ), WP_CONTENT_DIR, WP_PLUGIN_DIR, WP_PLUGIN_DIR . '/woocommerce', WP_CONTENT_DIR . '/themes', ABSPATH . 'wp-admin', ABSPATH . 'wp-includes' ) as $excludedRoot ) {
+		$filter = static function ( $data ) use ( $excludedRoot ) {
+				$data['basedir'] = $excludedRoot;
+				$data['error']   = false;
+				return $data;
+		};
+		add_filter( 'upload_dir', $filter );
+		try {
+			if ( ( new WordPressExposureService() )->root( 'uploads' ) !== null ) {
+				throw new RuntimeException( 'Excluded-tree uploads configuration accepted.' );
+			}
+		} finally {
+			remove_filter( 'upload_dir', $filter );}
+	}
+	$oldThemeDirectories             = $GLOBALS['wp_theme_directories'] ?? null;
+	$GLOBALS['wp_theme_directories'] = array( $dir );
+	try {
+		if ( ( new WordPressExposureService() )->root( 'uploads' ) !== null ) {
+			throw new RuntimeException( 'Uploads containing a registered theme root accepted.' );
+		}
+	} finally {
+		$GLOBALS['wp_theme_directories'] = $oldThemeDirectories;}
+	$corrupt                                   = json_decode( $raw, true );
+	$corrupt['reports']['site']['entries']     = 0;
+	$corrupt['reports']['site']['directories'] = 0;
+	update_option( 'amsec_exposure_state', wp_json_encode( $corrupt ), false );
+	if ( $service->status() !== array( 'invalid' => true ) || $service->scan( 'site', time() ) !== 'invalid' ) {
+		throw new RuntimeException( 'Impossible report counts accepted.' );
+	}update_option( 'amsec_exposure_state', $raw, false );
+	$badRoot = static function ( $data ) {
+		$data['basedir'] = ABSPATH;
+		$data['error']   = false;
+		return $data;
+	};
+	add_filter( 'upload_dir', $badRoot );
+	try {
+		if ( ( new WordPressExposureService() )->root( 'uploads' ) !== null ) {
+			throw new RuntimeException( 'Ancestor uploads configuration accepted.' );
+		}
+	} finally {
+		remove_filter( 'upload_dir', $badRoot );}
+	$id = wp_create_user( 'amsec-exp-sub-' . $token, bin2hex( random_bytes( 16 ) ) );
+	if ( is_wp_error( $id ) ) {
+		throw new RuntimeException( 'Subscriber fixture failed.' );
+	}( new WP_User( $id ) )->set_role( 'subscriber' );
+	wp_set_current_user( $id );
+	try {
+		$_POST    = $base;
+		$_REQUEST = $_POST;
+		try {
+			( new ExposureAction() )->handle();
+			throw new LogicException( 'Subscriber scan accepted.' );
+		} catch ( RuntimeException $e ) {
+			if ( $e->getMessage() !== 'denied:403' ) {
+				throw $e;
+			}
+		}try {
+			( new ExposurePage() )->render();
+			throw new LogicException( 'Subscriber report accepted.' );
+		} catch ( RuntimeException $e ) {
+			if ( $e->getMessage() !== 'denied:403' ) {
+				throw $e;
+			}
+		}
+	} finally {
+		wp_set_current_user( 1 );
+		require_once ABSPATH . 'wp-admin/includes/user.php';
+		wp_delete_user( $id );}
+	echo 'Local root/content/uploads filename fixtures, nonce/POST/guest/subscriber/fixed-root gates, benign exclusions, symlink unknown, unsafe root refusal, no HTTP probe, escaped hostile path and unchanged contents passed.' . PHP_EOL;
+} finally {
+	remove_filter( 'wp_die_handler', $die );
+	remove_filter( 'wp_redirect', $redirect );
+	wp_set_current_user( 1 );
+	if ( is_link( $link ) ) {
+		unlink( $link );
+	}foreach ( $files as $path => $hash ) {
+		if ( is_file( $path ) ) {
+			unlink( $path );
+		}
+	}if ( is_file( $outside ) ) {
+		unlink( $outside );
+	}if ( is_dir( $dir ) ) {
+		rmdir( $dir );
+	}foreach ( $saved as $key => $value ) {
+		if ( $value === null ) {
+			delete_option( $key );
+		} else {
+			update_option( $key, $value, false );}
+	}
+}

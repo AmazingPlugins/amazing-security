@@ -21,7 +21,7 @@ final class NotificationTestAction {
 		}
 		$accepted = false;
 		if ( function_exists( 'wp_mail' ) ) {
-			$body     = "AmSec Security Scanner test notification.\n\nThis confirms WordPress mail accepted a message for the administrator address. It does not prove inbox delivery.\n\nDashboard:\n" . admin_url( 'admin.php?page=amazing-security' );
+			$body     = "AmSec Security Scanner test notification.\n\nThis confirms WordPress mail accepted a message for the administrator address. It does not prove inbox delivery.\n\nDashboard:\n" . admin_url( 'admin.php?page=amsec-security-scanner' );
 			$accepted = (bool) wp_mail( $mail['email'], 'AmSec Security Scanner: test notification', $body );
 		}
 		wp_safe_redirect( admin_url( 'admin.php?page=amsec-settings&amsec_mail=' . ( $accepted ? 'accepted' : 'failed' ) . '#amsec-notifications' ) );

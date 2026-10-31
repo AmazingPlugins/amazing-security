@@ -10,7 +10,15 @@ use PHPUnit\Framework\TestCase;
 
 final class LoginAdminActionsTest extends TestCase {
 	public function test_settings_parser_rejects_unlisted_modes(): void {
-		self::assertSame( array( 'observe', true, false ), LoginSettingsAction::parse( array( 'rate_mode' => 'observe', 'xmlrpc_disabled' => '1' ) ) );
+		self::assertSame(
+			array( 'observe', true, false ),
+			LoginSettingsAction::parse(
+				array(
+					'rate_mode'       => 'observe',
+					'xmlrpc_disabled' => '1',
+				)
+			)
+		);
 		$this->expectException( \InvalidArgumentException::class );
 		LoginSettingsAction::parse( array( 'rate_mode' => 'unlimited' ) );
 	}

@@ -14,7 +14,7 @@ use Closure;
 use Throwable;
 
 final class ScanGateway {
-	private const LOCK = 'amazing_security_mcp_scan_lock';
+	private const LOCK = 'amsec_security_scanner_mcp_scan_lock';
 	private readonly Closure $execute;
 	private readonly Closure $read;
 	private readonly Closure $clock;
@@ -33,7 +33,7 @@ final class ScanGateway {
 			);
 		}
 		$now      = ( $this->clock )();
-		$lastKey  = 'amazing_security_mcp_scan_last_' . $userId;
+		$lastKey  = 'amsec_security_scanner_mcp_scan_last_' . $userId;
 		$lastTime = $this->options->get( $lastKey );
 		if ( is_string( $lastTime ) && ctype_digit( $lastTime ) && (int) $lastTime + 60 > $now ) {
 			return array(

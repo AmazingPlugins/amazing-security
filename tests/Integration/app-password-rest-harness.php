@@ -8,9 +8,9 @@ add_action(
 			'amsec-test/v1',
 			'/approve',
 			array(
-				'methods' => 'POST',
+				'methods'             => 'POST',
 				'permission_callback' => static fn(): bool => current_user_can( 'manage_options' ),
-				'callback' => static function (): never {
+				'callback'            => static function (): never {
 					( new AmazingPlugins\Security\Admin\FixApprovalAction() )->handle();
 				},
 			)

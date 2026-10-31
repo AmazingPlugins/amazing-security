@@ -34,7 +34,7 @@ final class ReviewPage {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_die( esc_html__( 'Administrator access required.', 'amsec-security-scanner' ), '', array( 'response' => 403 ) );
 		}
-		echo '<div class="wrap amazing-security-admin"><h1>' . esc_html__( 'Files', 'amsec-security-scanner' ) . '</h1>';
+		echo '<div class="wrap amsec-security-scanner-admin"><h1>' . esc_html__( 'Files', 'amsec-security-scanner' ) . '</h1>';
 		echo '<p><a href="' . esc_url( admin_url( 'admin.php?page=amsec-files' ) ) . '">' . esc_html__( 'Open Files', 'amsec-security-scanner' ) . '</a></p></div>';
 	}
 }

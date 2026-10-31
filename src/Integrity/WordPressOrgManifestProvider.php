@@ -28,7 +28,7 @@ final class WordPressOrgManifestProvider implements ChecksumManifestProvider {
 	}
 
 	private function fetch( string $type, string $identity, string $url, string $key ): ManifestResult {
-		$cacheKey = 'amazing_security_checksum_' . substr( hash( 'sha256', $type . ':' . $identity ), 0, 40 );
+		$cacheKey = 'amsec_security_scanner_checksum_' . substr( hash( 'sha256', $type . ':' . $identity ), 0, 40 );
 		if ( function_exists( 'get_transient' ) ) {
 			$cached = get_transient( $cacheKey );
 			if ( $cached instanceof Manifest && $cached->identity === $identity && $cached->sourceUrl === $url && $cached->fetchedAt->getTimestamp() >= time() - DAY_IN_SECONDS ) {

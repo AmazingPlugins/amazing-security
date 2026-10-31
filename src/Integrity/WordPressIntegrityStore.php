@@ -10,8 +10,8 @@ use AmazingPlugins\Security\Scan\ScanRun;
 use RuntimeException;
 
 final class WordPressIntegrityStore implements IntegrityStore {
-	private const ACTIVE    = 'amazing_security_integrity_active';
-	private const COMPLETED = 'amazing_security_integrity_completed';
+	private const ACTIVE    = 'amsec_security_scanner_integrity_active';
+	private const COMPLETED = 'amsec_security_scanner_integrity_completed';
 
 	public function __construct( private readonly OptionGateway $options ) {}
 

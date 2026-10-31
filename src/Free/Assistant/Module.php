@@ -18,7 +18,7 @@ final class Module {
 
 	public static function menu(): void {
 		add_submenu_page(
-			'amazing-security',
+			'amsec-security-scanner',
 			__( 'AI & MCP', 'amsec-security-scanner' ),
 			__( 'AI & MCP', 'amsec-security-scanner' ),
 			'manage_options',
@@ -32,7 +32,7 @@ final class Module {
 			wp_die( esc_html__( 'Administrator access required.', 'amsec-security-scanner' ), '', array( 'response' => 403 ) );
 		}
 		$enabled = ( new McpPreferences( new WordPressOptions() ) )->enabled();
-		echo '<div class="wrap amazing-security-admin">';
+		echo '<div class="wrap amsec-security-scanner-admin">';
 		echo '<p class="amsec-brief-status"><span class="amsec-pill is-off">' . esc_html__( 'Coming soon', 'amsec-security-scanner' ) . '</span></p>';
 		echo '<p>' . esc_html__( 'A model should be able to read a scan and help you fix what it finds. That needs an Amazing Plugins server, so it is not in this version.', 'amsec-security-scanner' ) . '</p>';
 		echo '<p>' . esc_html__( 'If that server is required, this may be a paid add-on. The scan, the recommendations, and the other tools stay in this plugin.', 'amsec-security-scanner' ) . '</p>';

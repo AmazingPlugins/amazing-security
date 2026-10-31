@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 final class SecretCipherTest extends TestCase {
 	public function test_encrypt_decrypt_tamper_and_key_change(): void {
-		$cipher = new SecretCipher( str_repeat( 'a', 64 ) );
+		$cipher   = new SecretCipher( str_repeat( 'a', 64 ) );
 		$envelope = $cipher->encrypt( 'private-seed' );
 		self::assertNotSame( 'private-seed', $envelope );
 		self::assertSame( 'private-seed', $cipher->decrypt( $envelope ) );

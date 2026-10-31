@@ -1,5 +1,5 @@
 {
-  "name": "amazingplugins/amazing-security",
+  "name": "amazingplugins/amsec-security-scanner",
   "description": "Evidence-led security checks for WordPress",
   "type": "wordpress-plugin",
   "license": "GPL-2.0-or-later",

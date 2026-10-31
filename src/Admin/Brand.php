@@ -8,7 +8,7 @@ defined( 'ABSPATH' ) || exit;
 
 /** Landing-page frame for AmSec Security Scanner screens. */
 final class Brand {
-	public const DOCS = 'https://amazingplugins.com/plugins/amazing-security/';
+	public const DOCS = 'https://amazingplugins.com/plugins/amsec-security-scanner/';
 
 	public const GUIDE = 'https://amazingplugins.com/wordpress-security/';
 
@@ -49,17 +49,17 @@ final class Brand {
 		if ( ! self::onScreen() ) {
 			return;
 		}
-		wp_enqueue_style( 'amazing-security-admin', plugins_url( 'assets/admin.css', AMAZING_SECURITY_FILE ), array(), '0.1.68' );
+		wp_enqueue_style( 'amsec-security-scanner-admin', plugins_url( 'assets/admin.css', AMSEC_SECURITY_SCANNER_FILE ), array(), '0.1.68' );
 		$page = self::page();
 		if ( in_array( $page, array( 'amsec-accounts', 'amsec-traffic-guard' ), true ) ) {
-			wp_enqueue_script( 'amazing-security-tabs', plugins_url( 'assets/admin-tabs.js', AMAZING_SECURITY_FILE ), array(), '0.1.1', true );
+			wp_enqueue_script( 'amsec-security-scanner-tabs', plugins_url( 'assets/admin-tabs.js', AMSEC_SECURITY_SCANNER_FILE ), array(), '0.1.1', true );
 		}
-		if ( 'amazing-security' !== $page ) {
+		if ( 'amsec-security-scanner' !== $page ) {
 			return;
 		}
-		wp_enqueue_script( 'amazing-security-scan', plugins_url( 'assets/admin-scan.js', AMAZING_SECURITY_FILE ), array(), '0.1.22', true );
+		wp_enqueue_script( 'amsec-security-scanner-scan', plugins_url( 'assets/admin-scan.js', AMSEC_SECURITY_SCANNER_FILE ), array(), '0.1.22', true );
 		wp_localize_script(
-			'amazing-security-scan',
+			'amsec-security-scanner-scan',
 			'amsecScan',
 			array(
 				'error'  => __( 'Scan could not be saved.', 'amsec-security-scanner' ),
@@ -79,10 +79,10 @@ final class Brand {
 		}
 		// WordPress moves notices to just after this marker, which keeps them above the plugin header.
 		echo '<hr class="wp-header-end">';
-		$logo    = plugins_url( 'assets/logo.png', AMAZING_SECURITY_FILE );
-		$docs    = plugins_url( 'assets/icon-docs.svg', AMAZING_SECURITY_FILE );
-		$guide   = plugins_url( 'assets/icon-guide.svg', AMAZING_SECURITY_FILE );
-		$headers = get_file_data( AMAZING_SECURITY_FILE, array( 'Version' => 'Version' ) );
+		$logo    = plugins_url( 'assets/logo.png', AMSEC_SECURITY_SCANNER_FILE );
+		$docs    = plugins_url( 'assets/icon-docs.svg', AMSEC_SECURITY_SCANNER_FILE );
+		$guide   = plugins_url( 'assets/icon-guide.svg', AMSEC_SECURITY_SCANNER_FILE );
+		$headers = get_file_data( AMSEC_SECURITY_SCANNER_FILE, array( 'Version' => 'Version' ) );
 		$version = is_string( $headers['Version'] ?? null ) ? $headers['Version'] : '';
 		echo '<div class="amsec-brand"><div class="amsec-brand-mark">';
 		echo '<img src="' . esc_url( $logo ) . '" alt="' . esc_attr__( 'AmazingPlugins', 'amsec-security-scanner' ) . '" width="44" height="44">';
@@ -95,7 +95,7 @@ final class Brand {
 		echo '<img src="' . esc_url( $docs . '?ver=0.1.18' ) . '" alt="" width="22" height="22">' . esc_html__( 'Docs', 'amsec-security-scanner' ) . '</a>';
 		echo '<a href="' . esc_url( self::GUIDE ) . '" target="_blank" rel="noopener noreferrer">';
 		echo '<img src="' . esc_url( $guide . '?ver=0.1.18' ) . '" alt="" width="22" height="22">' . esc_html__( 'Security guide', 'amsec-security-scanner' ) . '</a></p></div>';
-		if ( 'amazing-security' === self::page() ) {
+		if ( 'amsec-security-scanner' === self::page() ) {
 			return;
 		}
 		$title = function_exists( 'get_admin_page_title' ) ? get_admin_page_title() : '';
@@ -107,7 +107,7 @@ final class Brand {
 
 	public static function onScreen(): bool {
 		$page = self::page();
-		return 'amazing-security' === $page || str_starts_with( $page, 'amsec-' );
+		return 'amsec-security-scanner' === $page || str_starts_with( $page, 'amsec-' );
 	}
 
 	private static function page(): string {

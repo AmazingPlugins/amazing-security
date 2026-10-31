@@ -8,12 +8,12 @@ defined( 'ABSPATH' ) || exit;
 final class HeaderPage {
 	public function __construct( private readonly ?HeaderService $service = null ) {}
 	public function register(): void {
-		$hook = add_submenu_page( 'amazing-security', __( 'Security headers', 'amsec-security-scanner' ), __( 'Security headers', 'amsec-security-scanner' ), 'manage_options', 'amsec-headers', array( $this, 'render' ) );
+		$hook = add_submenu_page( 'amsec-security-scanner', __( 'Security headers', 'amsec-security-scanner' ), __( 'Security headers', 'amsec-security-scanner' ), 'manage_options', 'amsec-headers', array( $this, 'render' ) );
 		add_action(
 			'admin_enqueue_scripts',
 			static function ( string $current ) use ( $hook ): void {
 				if ( $current === $hook ) {
-					wp_enqueue_style( 'amazing-security-admin', plugins_url( 'assets/admin.css', AMAZING_SECURITY_FILE ), array(), '0.1.0' );
+					wp_enqueue_style( 'amsec-security-scanner-admin', plugins_url( 'assets/admin.css', AMSEC_SECURITY_SCANNER_FILE ), array(), '0.1.0' );
 				}}
 		);
 	}
@@ -36,7 +36,7 @@ final class HeaderPage {
 		$s     = $this->service ?? ( new WordPressHeaderService() )->create();
 		$state = $s->status();
 		$fp    = $s->fingerprint();
-		echo '<div class="wrap amazing-security-admin"><header class="amsec-header"><div><h1>' . esc_html__( 'Security headers', 'amsec-security-scanner' ) . '</h1><p>' . esc_html__( 'Review selected response protections without changing site behavior.', 'amsec-security-scanner' ) . '</p></div></header><section class="amsec-overview"><h2>' . esc_html__( 'Server-side HEAD observation', 'amsec-security-scanner' ) . '</h2><p>' . esc_html__( 'An optional anonymous HEAD request checks the configured homepage from this server. Its route and response may differ from a visitor’s browser GET, CDN, login, checkout or other pages. Header presence does not prove an effective policy, safe CSP, browser enforcement or compliance.', 'amsec-security-scanner' ) . '</p><p>' . esc_html__( 'Public IPv4 addresses and standard HTTP and HTTPS ports only. The request goes through the WordPress HTTP API with verified TLS, no cookies and no redirects, and gives up after five seconds. Private, unresolved, error and non-HTML responses stay unknown. No hosted scanning service is used.', 'amsec-security-scanner' ) . '</p><p>' . esc_html__( 'Header enforcement is unchanged. Review any policy rollout with the host administrator and test WooCommerce, forms, embeds and login first.', 'amsec-security-scanner' ) . '</p></section>';
+		echo '<div class="wrap amsec-security-scanner-admin"><header class="amsec-header"><div><h1>' . esc_html__( 'Security headers', 'amsec-security-scanner' ) . '</h1><p>' . esc_html__( 'Review selected response protections without changing site behavior.', 'amsec-security-scanner' ) . '</p></div></header><section class="amsec-overview"><h2>' . esc_html__( 'Server-side HEAD observation', 'amsec-security-scanner' ) . '</h2><p>' . esc_html__( 'An optional anonymous HEAD request checks the configured homepage from this server. Its route and response may differ from a visitor’s browser GET, CDN, login, checkout or other pages. Header presence does not prove an effective policy, safe CSP, browser enforcement or compliance.', 'amsec-security-scanner' ) . '</p><p>' . esc_html__( 'Public IPv4 addresses and standard HTTP and HTTPS ports only. The request goes through the WordPress HTTP API with verified TLS, no cookies and no redirects, and gives up after five seconds. Private, unresolved, error and non-HTML responses stay unknown. No hosted scanning service is used.', 'amsec-security-scanner' ) . '</p><p>' . esc_html__( 'Header enforcement is unchanged. Review any policy rollout with the host administrator and test WooCommerce, forms, embeds and login first.', 'amsec-security-scanner' ) . '</p></section>';
 		if ( ! empty( $state['invalid'] ) ) {
 			echo '<div class="notice notice-error"><p>' . esc_html__( 'Stored assessment is invalid. No response coverage can be established.', 'amsec-security-scanner' ) . '</p></div></div>';
 			return;}

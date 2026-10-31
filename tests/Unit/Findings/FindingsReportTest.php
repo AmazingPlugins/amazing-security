@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
 
 final class FindingsReportTest extends TestCase {
 	public function test_report_omits_evidence_and_redacts_paths_and_mail(): void {
-		$run = new ScanRun(
+		$run  = new ScanRun(
 			new DateTimeImmutable( '2026-10-01T00:00:00Z' ),
 			new DateTimeImmutable( '2026-10-01T00:01:00Z' ),
 			array(
@@ -24,7 +24,10 @@ final class FindingsReportTest extends TestCase {
 					new DateTimeImmutable( '2026-10-01T00:01:00Z' ),
 					'medium',
 					'complete',
-					array( 'path' => '/var/www/html/wp-config.php', 'token' => 'secret-session' )
+					array(
+						'path'  => '/var/www/html/wp-config.php',
+						'token' => 'secret-session',
+					)
 				),
 			),
 			false

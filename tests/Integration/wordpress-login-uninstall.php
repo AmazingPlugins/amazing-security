@@ -10,8 +10,15 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	define( 'WP_UNINSTALL_PLUGIN', 'amsec-security-scanner/amsec-security-scanner.php' );
 }
 $settings = new WordPressLoginSettings( new WordPressOptions() );
-$store = new WordPressTotpStore( $GLOBALS['wpdb'] );
-$userId = wp_insert_user( array( 'user_login' => 'amsec_uninstall_' . wp_generate_password( 8, false ), 'user_pass' => wp_generate_password( 32 ), 'user_email' => 'amsec-uninstall@example.invalid', 'role' => 'administrator' ) );
+$store    = new WordPressTotpStore( $GLOBALS['wpdb'] );
+$userId   = wp_insert_user(
+	array(
+		'user_login' => 'amsec_uninstall_' . wp_generate_password( 8, false ),
+		'user_pass'  => wp_generate_password( 32 ),
+		'user_email' => 'amsec-uninstall@example.invalid',
+		'role'       => 'administrator',
+	)
+);
 if ( is_wp_error( $userId ) ) {
 	throw new RuntimeException( 'Could not create uninstall fixture user.' );
 }
@@ -19,12 +26,12 @@ try {
 	$store->enroll( $userId, 'encrypted-fixture-seed', array() );
 	$settings->setRateMode( 'observe' );
 	$settings->setEraseOnUninstall( false );
-	include WP_PLUGIN_DIR . '/amazing-security/uninstall.php';
+	include WP_PLUGIN_DIR . '/amsec-security-scanner/uninstall.php';
 	if ( 'observe' !== $settings->rateMode() || ! $store->isEnrolled( $userId ) ) {
 		throw new RuntimeException( 'Retain branch erased data.' );
 	}
 	$settings->setEraseOnUninstall( true );
-	include WP_PLUGIN_DIR . '/amazing-security/uninstall.php';
+	include WP_PLUGIN_DIR . '/amsec-security-scanner/uninstall.php';
 	if ( 'off' !== $settings->rateMode() || $store->isEnrolled( $userId ) ) {
 		throw new RuntimeException( 'Erase branch left login data.' );
 	}

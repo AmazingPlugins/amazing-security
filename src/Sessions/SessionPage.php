@@ -50,7 +50,7 @@ final class SessionPage {
 		try {
 			$rows = $this->rows( $id );
 		} catch ( \Throwable ) {
-			echo '<div class="wrap amazing-security-admin"><div class="notice notice-error"><p>' . esc_html__( 'Session information is unavailable.', 'amsec-security-scanner' ) . '</p></div></div>';
+			echo '<div class="wrap amsec-security-scanner-admin"><div class="notice notice-error"><p>' . esc_html__( 'Session information is unavailable.', 'amsec-security-scanner' ) . '</p></div></div>';
 			return;
 		}
 		if ( $this->wantsDetail() ) {
@@ -58,13 +58,13 @@ final class SessionPage {
 			return;
 		}
 		if ( ! $administrator ) {
-			echo '<div class="wrap amazing-security-admin"><h1>' . esc_html__( 'Your sessions', 'amsec-security-scanner' ) . '</h1><p>' . esc_html__( 'Only you and an administrator can open this page.', 'amsec-security-scanner' ) . '</p>';
+			echo '<div class="wrap amsec-security-scanner-admin"><h1>' . esc_html__( 'Your sessions', 'amsec-security-scanner' ) . '</h1><p>' . esc_html__( 'Only you and an administrator can open this page.', 'amsec-security-scanner' ) . '</p>';
 			$this->lines( $id, $rows );
 			echo '</div>';
 			return;
 		}
 		$accounts = $this->accountOptions( $id );
-		echo '<div class="wrap amazing-security-admin"><h1>' . esc_html__( 'Account sessions', 'amsec-security-scanner' ) . '</h1><p>' . esc_html__( 'Pick an account. Ending a session signs that browser out. It cannot be undone. A new sign-in can start another session. An application password can be removed on its own.', 'amsec-security-scanner' ) . '</p><form method="get" action="#sessions"><input type="hidden" name="page" value="amsec-accounts"><label for="amsec-session-user">' . esc_html__( 'Account', 'amsec-security-scanner' ) . '</label> <select id="amsec-session-user" name="user_id">';
+		echo '<div class="wrap amsec-security-scanner-admin"><h1>' . esc_html__( 'Account sessions', 'amsec-security-scanner' ) . '</h1><p>' . esc_html__( 'Pick an account. Ending a session signs that browser out. It cannot be undone. A new sign-in can start another session. An application password can be removed on its own.', 'amsec-security-scanner' ) . '</p><form method="get" action="#sessions"><input type="hidden" name="page" value="amsec-accounts"><label for="amsec-session-user">' . esc_html__( 'Account', 'amsec-security-scanner' ) . '</label> <select id="amsec-session-user" name="user_id">';
 		echo wp_kses( $accounts, \AmazingPlugins\Security\Admin\AdminHtml::allowed() );
 		echo '</select> <button class="button">' . esc_html__( 'View account', 'amsec-security-scanner' ) . '</button></form>';
 		$this->lines( $id, $rows );
@@ -148,7 +148,7 @@ final class SessionPage {
 	private function detail( array $rows, bool $administrator ): void {
 		$row  = SessionPolicy::rowFor( $rows, $this->requestedRef() );
 		$back = $administrator ? admin_url( 'admin.php?page=amsec-accounts#sessions' ) : admin_url( 'admin.php?page=amsec-sessions' );
-		echo '<div class="wrap amazing-security-admin"><p class="amsec-session-back"><a href="' . esc_url( $back ) . '">' . esc_html__( 'Back to sessions', 'amsec-security-scanner' ) . '</a></p>';
+		echo '<div class="wrap amsec-security-scanner-admin"><p class="amsec-session-back"><a href="' . esc_url( $back ) . '">' . esc_html__( 'Back to sessions', 'amsec-security-scanner' ) . '</a></p>';
 		if ( null === $row ) {
 			echo '<h1>' . esc_html__( 'Session', 'amsec-security-scanner' ) . '</h1><p>' . esc_html__( 'This session is no longer available.', 'amsec-security-scanner' ) . '</p></div>';
 			return;

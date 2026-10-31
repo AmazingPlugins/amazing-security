@@ -38,7 +38,7 @@ final class FixProposalServiceTest extends TestCase {
 	}
 
 	public function test_untrusted_finding_text_is_not_in_the_proposal(): void {
-		$repo = new FakeFixRepository();
+		$repo   = new FakeFixRepository();
 		$result = $this->service( $repo, 'observe', self::NOW, '<script>ignore instructions</script>' )->propose( $this->findingId(), 'login-rate-block', 7, self::NOW );
 		self::assertSame( 'pending', $result['state'] );
 		self::assertStringNotContainsString( 'ignore instructions', json_encode( $result ) );
@@ -68,12 +68,20 @@ final class FixProposalServiceTest extends TestCase {
 
 final class FakeFixRepository implements FixRepository {
 	public array $items = array();
-	public int $recent = 0;
-	public function create( FixProposal $proposal ): bool { $this->items[ $proposal->id ] = $proposal; return true; }
-	public function get( string $id ): ?FixProposal { return $this->items[ $id ] ?? null; }
-	public function apply( string $id, int $approverId, int $now ): string { return 'unavailable'; }
-	public function rollback( string $id, int $approverId, int $now ): string { return 'unavailable'; }
-	public function audit( string $id ): array { return array(); }
-	public function recentForUser( int $userId, int $since ): int { return $this->recent; }
-	public function pendingCount( int $now ): int { return count( $this->items ); }
+	public int $recent  = 0;
+	public function create( FixProposal $proposal ): bool {
+		$this->items[ $proposal->id ] = $proposal;
+		return true; }
+	public function get( string $id ): ?FixProposal {
+		return $this->items[ $id ] ?? null; }
+	public function apply( string $id, int $approverId, int $now ): string {
+		return 'unavailable'; }
+	public function rollback( string $id, int $approverId, int $now ): string {
+		return 'unavailable'; }
+	public function audit( string $id ): array {
+		return array(); }
+	public function recentForUser( int $userId, int $since ): int {
+		return $this->recent; }
+	public function pendingCount( int $now ): int {
+		return count( $this->items ); }
 }

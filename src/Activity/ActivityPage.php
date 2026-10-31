@@ -8,7 +8,7 @@ defined( 'ABSPATH' ) || exit;
 
 final class ActivityPage {
 	public function register(): void {
-		add_submenu_page( 'amazing-security', __( 'Security activity', 'amsec-security-scanner' ), __( 'Activity', 'amsec-security-scanner' ), 'manage_options', 'amsec-activity', array( $this, 'render' ) );
+		add_submenu_page( 'amsec-security-scanner', __( 'Security activity', 'amsec-security-scanner' ), __( 'Activity', 'amsec-security-scanner' ), 'manage_options', 'amsec-activity', array( $this, 'render' ) );
 	}
 
 	public function render(): void {
@@ -29,7 +29,7 @@ final class ActivityPage {
 			$enabled = '1' === get_option( 'amsec_activity_enabled', '0' );
 			echo wp_kses( ( new ActivityRenderer() )->render( $rows, $page, $event, $pages, $this->switchForm( $enabled ) ), \AmazingPlugins\Security\Admin\AdminHtml::allowed() );
 		} catch ( \RuntimeException ) {
-			echo '<div class="wrap amazing-security-admin"><h1>' . esc_html__( 'Security activity', 'amsec-security-scanner' ) . '</h1><div class="notice notice-error"><p>' . esc_html__( 'Activity storage is unavailable. No complete history can be shown.', 'amsec-security-scanner' ) . '</p></div></div>';
+			echo '<div class="wrap amsec-security-scanner-admin"><h1>' . esc_html__( 'Security activity', 'amsec-security-scanner' ) . '</h1><div class="notice notice-error"><p>' . esc_html__( 'Activity storage is unavailable. No complete history can be shown.', 'amsec-security-scanner' ) . '</p></div></div>';
 		}
 	}
 

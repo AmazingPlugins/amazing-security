@@ -1,29 +1,261 @@
 <?php
-if(!defined('WP_CLI')||!WP_CLI||DB_HOST!=='amsec-next-db'||!in_array(DB_NAME,['wordpress','wordpress69'],true)){exit(1);}
+if ( ! defined( 'WP_CLI' ) || ! WP_CLI || DB_HOST !== 'amsec-next-db' || ! in_array( DB_NAME, array( 'wordpress', 'wordpress69' ), true ) ) {
+	exit( 1 );}
 use AmazingPlugins\Security\Bots\BotCounterStore;
 use AmazingPlugins\Security\Bots\BotSettings;
 use AmazingPlugins\Security\Login\AddressKey;
-BotCounterStore::install();$store=new BotCounterStore($GLOBALS['wpdb']);$table=$GLOBALS['wpdb']->prefix.'amsec_bot_rate';$slug='amsec-bot-fixture-'.bin2hex(random_bytes(4));$mu=WPMU_PLUGIN_DIR.'/'.$slug.'.php';$muCreated=!is_dir(WPMU_PLUGIN_DIR);if($muCreated){mkdir(WPMU_PLUGIN_DIR,0755,true);}file_put_contents($mu,"<?php\nadd_filter('pre_wp_mail','__return_true');add_filter('comment_flood_filter','__return_false',100);\n");
-$oldMode=get_option('amsec_bot_mode',null);$oldRegister=get_option('users_can_register');update_option('amsec_bot_mode','off',false);update_option('users_can_register',1,false);wp_set_current_user(1);$password=bin2hex(random_bytes(20));$actor=wp_insert_user(['user_login'=>$slug,'user_pass'=>$password,'role'=>'administrator']);$postId=wp_insert_post(['post_title'=>'Dummy bot-control post','post_content'=>'Harmless test post','post_status'=>'publish','comment_status'=>'open']);$users=[];$keys=[];$renamed=false;
-if(is_wp_error($actor)||is_wp_error($postId)){throw new RuntimeException('Fixture failed.');}
-try{
-wp_set_current_user($actor);$manager=WP_Session_Tokens::get_instance($actor);$token=$manager->create(time()+3600);$other=$manager->create(time()+3600);$_SERVER['HTTPS']='on';$_SERVER['REQUEST_METHOD']='POST';$_COOKIE[SECURE_AUTH_COOKIE]=wp_generate_auth_cookie($actor,time()+3600,'secure_auth',$token);$_COOKIE[LOGGED_IN_COOKIE]=wp_generate_auth_cookie($actor,time()+3600,'logged_in',$token);
-$die=static fn()=>static function($m,$t,$a){throw new RuntimeException('denied:'.($a['response']??500));};add_filter('wp_die_handler',$die);$redirect=static function(){throw new RuntimeException('redirect');};add_filter('wp_redirect',$redirect);$base=['mode'=>'observe','password'=>$password,'confirm'=>'1','_wpnonce'=>wp_create_nonce('amsec_bot_settings')];
-foreach(['nonce'=>['_wpnonce'=>'bad'],'password'=>['password'=>'bad'],'consent'=>['confirm'=>'0'],'mode'=>['mode'=>'bad']] as $name=>$change){$_POST=array_replace($base,$change);$_REQUEST=$_POST;try{(new BotSettings())->handle();throw new LogicException('Gate accepted '.$name);}catch(RuntimeException $e){if(!str_starts_with($e->getMessage(),'denied:')){throw $e;}}if(get_option('amsec_bot_mode')!=='off'){throw new RuntimeException('Rejected request changed mode.');}}
-foreach(['https','cookie','mismatch','role','method'] as $name){$_POST=$base;$_REQUEST=$_POST;if($name==='https'){$_SERVER['HTTPS']='off';}if($name==='cookie'){unset($_COOKIE[SECURE_AUTH_COOKIE]);}if($name==='mismatch'){$_COOKIE[SECURE_AUTH_COOKIE]=wp_generate_auth_cookie($actor,time()+3600,'secure_auth',$other);}if($name==='role'){wp_set_current_user(0);}if($name==='method'){$_SERVER['REQUEST_METHOD']='GET';}try{(new BotSettings())->handle();throw new LogicException('Gate accepted '.$name);}catch(RuntimeException $e){if(!str_starts_with($e->getMessage(),'denied:')){throw $e;}}$_SERVER['HTTPS']='on';$_SERVER['REQUEST_METHOD']='POST';wp_set_current_user($actor);$_COOKIE[SECURE_AUTH_COOKIE]=wp_generate_auth_cookie($actor,time()+3600,'secure_auth',$token);}
-$approve=static function($mode)use($base){$_POST=array_replace($base,['mode'=>$mode]);$_REQUEST=$_POST;try{(new BotSettings())->handle();throw new LogicException('No redirect.');}catch(RuntimeException $e){if($e->getMessage()!=='redirect'){throw $e;}}};$approve('observe');
-$host=DB_NAME==='wordpress'?'amsec-next-wp':'amsec-next-wp69';$commentKey=(new AddressKey(wp_salt('auth').':bot:comment'))->fromServer(['REMOTE_ADDR'=>gethostbyname(gethostname())]);$registrationKey=(new AddressKey(wp_salt('auth').':bot:registration'))->fromServer(['REMOTE_ADDR'=>gethostbyname(gethostname())]);if($commentKey===null||$registrationKey===null){throw new RuntimeException('Dummy client address unavailable.');}$keys=[$commentKey,$registrationKey];
-$clear=static function($key)use($table){global $wpdb;$wpdb->query($wpdb->prepare("DELETE FROM {$table} WHERE address_key=%s",$key));};$clear($commentKey);$clear($registrationKey);
-$http=static function($path,$body)use($host){$r=wp_remote_post('http://'.$host.'/'.$path,['timeout'=>20,'redirection'=>0,'body'=>$body]);if(is_wp_error($r)){throw new RuntimeException('Dummy HTTP transport failed.');}return $r;};
-$comment=static function($trap=null,$cookies=[])use($http,$postId,$slug){$body=['comment_post_ID'=>$postId,'author'=>'Dummy visitor','email'=>'visitor@amsec.invalid','comment'=>$slug.' '.bin2hex(random_bytes(4))];if($trap!==null){$body['amsec_contact_hint']=$trap;}return $http('wp-comments-post.php',$body);};
-if(wp_remote_retrieve_response_code($comment('filled'))!==302){throw new RuntimeException('Observe rejected comment.');}$approve('block');if(wp_remote_retrieve_response_code($comment('filled'))!==403||wp_remote_retrieve_response_code($comment(['filled']))!==403){throw new RuntimeException('Filled/malformed trap accepted.');}
-$clear($commentKey);for($i=0;$i<20;$i++){if(wp_remote_retrieve_response_code($comment())!==302){throw new RuntimeException('Native comment boundary rejected early.');}}if(wp_remote_retrieve_response_code($comment())!==403){throw new RuntimeException('Native comment rate excess accepted.');}
-$body=['comment_post_ID'=>$postId,'comment'=>$slug.' authenticated '.bin2hex(random_bytes(4)),'amsec_contact_hint'=>'filled'];$cookie=new WP_Http_Cookie(['name'=>LOGGED_IN_COOKIE,'value'=>$_COOKIE[LOGGED_IN_COOKIE]]);$r=wp_remote_post('http://'.$host.'/wp-comments-post.php',['timeout'=>20,'redirection'=>0,'cookies'=>[$cookie],'body'=>$body]);if(is_wp_error($r)||wp_remote_retrieve_response_code($r)!==302){throw new RuntimeException('Authenticated native comment was blocked.');}
-$register=static function($trap=null)use($http,$slug,&$users){$name=$slug.'-'.bin2hex(random_bytes(3));$body=['user_login'=>$name,'user_email'=>$name.'@amsec.invalid'];if($trap!==null){$body['amsec_contact_hint']=$trap;}$r=$http('wp-login.php?action=register',$body);$user=get_user_by('login',$name);if($user){$users[]=$user->ID;}return [$r,$user];};
-$clear($registrationKey);for($i=0;$i<5;$i++){list($r,$user)=$register();if(!$user||wp_remote_retrieve_response_code($r)!==302){throw new RuntimeException('Native registration boundary rejected early.');}}list($r,$user)=$register();if($user||!str_contains(wp_remote_retrieve_body($r),'registration could not be accepted')){throw new RuntimeException('Native registration rate excess accepted.');}
-$GLOBALS['wpdb']->query($GLOBALS['wpdb']->prepare('RENAME TABLE %i TO %i',$table,$table.'_fixture'));$renamed=true;ob_start();(new BotSettings())->render();$html=ob_get_clean();if(false===stripos($html,'unavailable')){throw new RuntimeException('Outage presented as available.');}if(wp_remote_retrieve_response_code($comment())!==302){throw new RuntimeException('Storage outage blocked legitimate empty/missing trap.');}$GLOBALS['wpdb']->query($GLOBALS['wpdb']->prepare('RENAME TABLE %i TO %i',$table.'_fixture',$table));$renamed=false;
-$r=wp_remote_get('http://'.$host.'/wp-login.php?action=register',['timeout'=>20]);$html=wp_remote_retrieve_body($r);foreach(['amsec_contact_hint','aria-hidden="true"','autocomplete="off"','tabindex="-1"'] as $text){if(!str_contains($html,$text)){throw new RuntimeException('Accessible fallback markup missing.');}}
-$key=hash('sha256',$slug);$keys[]=$key;if($store->record($key,300,1000)!==1||$store->record($key,300,1001)!==2||$store->record($key,300,1300)!==1){throw new RuntimeException('Atomic counter/window boundary failed.');}
-WP_CLI::runcommand('amazing-security bots disable',['return'=>true,'launch'=>false]);if(get_option('amsec_bot_mode')!=='off'||wp_remote_retrieve_response_code($comment('filled'))!==302){throw new RuntimeException('CLI/off recovery failed.');}
-remove_filter('wp_redirect',$redirect);remove_filter('wp_die_handler',$die);echo 'Native bot controls: actual HTTP comment/registration boundaries, observe/block/off, malformed trap, outage fallback, accessible markup, approval gates, window reset and CLI recovery passed.'.PHP_EOL;
-}finally{if($renamed){$GLOBALS['wpdb']->query($GLOBALS['wpdb']->prepare('RENAME TABLE %i TO %i',$table.'_fixture',$table));}foreach($keys as $key){$GLOBALS['wpdb']->query($GLOBALS['wpdb']->prepare("DELETE FROM {$table} WHERE address_key=%s",$key));}wp_set_current_user(1);$_COOKIE=[];wp_delete_user($actor);foreach($users as $id){wp_delete_user($id);}wp_delete_post($postId,true);unlink($mu);if($muCreated){rmdir(WPMU_PLUGIN_DIR);}update_option('users_can_register',$oldRegister,false);if($oldMode===null){delete_option('amsec_bot_mode');}else{update_option('amsec_bot_mode',$oldMode,false);}}
+BotCounterStore::install();
+$store     = new BotCounterStore( $GLOBALS['wpdb'] );
+$table     = $GLOBALS['wpdb']->prefix . 'amsec_bot_rate';
+$slug      = 'amsec-bot-fixture-' . bin2hex( random_bytes( 4 ) );
+$mu        = WPMU_PLUGIN_DIR . '/' . $slug . '.php';
+$muCreated = ! is_dir( WPMU_PLUGIN_DIR );
+if ( $muCreated ) {
+	mkdir( WPMU_PLUGIN_DIR, 0755, true );
+}file_put_contents( $mu, "<?php\nadd_filter('pre_wp_mail','__return_true');add_filter('comment_flood_filter','__return_false',100);\n" );
+$oldMode     = get_option( 'amsec_bot_mode', null );
+$oldRegister = get_option( 'users_can_register' );
+update_option( 'amsec_bot_mode', 'off', false );
+update_option( 'users_can_register', 1, false );
+wp_set_current_user( 1 );
+$password = bin2hex( random_bytes( 20 ) );
+$actor    = wp_insert_user(
+	array(
+		'user_login' => $slug,
+		'user_pass'  => $password,
+		'role'       => 'administrator',
+	)
+);
+$postId   = wp_insert_post(
+	array(
+		'post_title'     => 'Dummy bot-control post',
+		'post_content'   => 'Harmless test post',
+		'post_status'    => 'publish',
+		'comment_status' => 'open',
+	)
+);
+$users    = array();
+$keys     = array();
+$renamed  = false;
+if ( is_wp_error( $actor ) || is_wp_error( $postId ) ) {
+	throw new RuntimeException( 'Fixture failed.' );}
+try {
+	wp_set_current_user( $actor );
+	$manager                       = WP_Session_Tokens::get_instance( $actor );
+	$token                         = $manager->create( time() + 3600 );
+	$other                         = $manager->create( time() + 3600 );
+	$_SERVER['HTTPS']              = 'on';
+	$_SERVER['REQUEST_METHOD']     = 'POST';
+	$_COOKIE[ SECURE_AUTH_COOKIE ] = wp_generate_auth_cookie( $actor, time() + 3600, 'secure_auth', $token );
+	$_COOKIE[ LOGGED_IN_COOKIE ]   = wp_generate_auth_cookie( $actor, time() + 3600, 'logged_in', $token );
+	$die                           = static fn()=>static function ( $m, $t, $a ) {
+throw new RuntimeException( 'denied:' . ( $a['response'] ?? 500 ) );
+}add_filter( 'wp_die_handler', $die );
+	$redirect                      = static function () {
+		throw new RuntimeException( 'redirect' );
+	};
+	add_filter( 'wp_redirect', $redirect );
+	$base = array(
+		'mode'     => 'observe',
+		'password' => $password,
+		'confirm'  => '1',
+		'_wpnonce' => wp_create_nonce( 'amsec_bot_settings' ),
+	);
+	foreach ( array(
+		'nonce'    => array( '_wpnonce' => 'bad' ),
+		'password' => array( 'password' => 'bad' ),
+		'consent'  => array( 'confirm' => '0' ),
+		'mode'     => array( 'mode' => 'bad' ),
+	) as $name => $change ) {
+		$_POST    = array_replace( $base, $change );
+		$_REQUEST = $_POST;
+		try {
+			( new BotSettings() )->handle();
+			throw new LogicException( 'Gate accepted ' . $name );
+		} catch ( RuntimeException $e ) {
+			if ( ! str_starts_with( $e->getMessage(), 'denied:' ) ) {
+				throw $e;
+			}
+		}if ( get_option( 'amsec_bot_mode' ) !== 'off' ) {
+			throw new RuntimeException( 'Rejected request changed mode.' );}
+	}
+	foreach ( array( 'https', 'cookie', 'mismatch', 'role', 'method' ) as $name ) {
+		$_POST    = $base;
+		$_REQUEST = $_POST;
+		if ( $name === 'https' ) {
+			$_SERVER['HTTPS'] = 'off';
+		}if ( $name === 'cookie' ) {
+			unset( $_COOKIE[ SECURE_AUTH_COOKIE ] );
+		}if ( $name === 'mismatch' ) {
+			$_COOKIE[ SECURE_AUTH_COOKIE ] = wp_generate_auth_cookie( $actor, time() + 3600, 'secure_auth', $other );
+		}if ( $name === 'role' ) {
+			wp_set_current_user( 0 );
+		}if ( $name === 'method' ) {
+			$_SERVER['REQUEST_METHOD'] = 'GET';
+		}try {
+			( new BotSettings() )->handle();
+			throw new LogicException( 'Gate accepted ' . $name );
+		} catch ( RuntimeException $e ) {
+			if ( ! str_starts_with( $e->getMessage(), 'denied:' ) ) {
+				throw $e;
+			}
+		}$_SERVER['HTTPS']         = 'on';
+		$_SERVER['REQUEST_METHOD'] = 'POST';
+		wp_set_current_user( $actor );
+		$_COOKIE[ SECURE_AUTH_COOKIE ] = wp_generate_auth_cookie( $actor, time() + 3600, 'secure_auth', $token );}
+	$approve = static function ( $mode ) use ( $base ) {
+		$_POST    = array_replace( $base, array( 'mode' => $mode ) );
+		$_REQUEST = $_POST;
+		try {
+			( new BotSettings() )->handle();
+			throw new LogicException( 'No redirect.' );
+		} catch ( RuntimeException $e ) {
+			if ( $e->getMessage() !== 'redirect' ) {
+				throw $e;
+			}
+		}};
+	$approve( 'observe' );
+	$host            = DB_NAME === 'WordPress' ? 'amsec-next-wp' : 'amsec-next-wp69';
+	$commentKey      = ( new AddressKey( wp_salt( 'auth' ) . ':bot:comment' ) )->fromServer( array( 'REMOTE_ADDR' => gethostbyname( gethostname() ) ) );
+	$registrationKey = ( new AddressKey( wp_salt( 'auth' ) . ':bot:registration' ) )->fromServer( array( 'REMOTE_ADDR' => gethostbyname( gethostname() ) ) );
+	if ( $commentKey === null || $registrationKey === null ) {
+		throw new RuntimeException( 'Dummy client address unavailable.' );
+	}$keys = array( $commentKey, $registrationKey );
+	$clear = static function ( $key ) use ( $table ) {
+		global $wpdb;
+		$wpdb->query( $wpdb->prepare( "DELETE FROM {$table} WHERE address_key=%s", $key ) );
+	};
+	$clear( $commentKey );
+	$clear( $registrationKey );
+	$http    = static function ( $path, $body ) use ( $host ) {
+		$r = wp_remote_post(
+			'http://' . $host . '/' . $path,
+			array(
+				'timeout'     => 20,
+				'redirection' => 0,
+				'body'        => $body,
+			)
+		);
+		if ( is_wp_error( $r ) ) {
+			throw new RuntimeException( 'Dummy HTTP transport failed.' );
+		}return $r;
+	};
+	$comment = static function ( $trap = null, $cookies = array() ) use ( $http, $postId, $slug ) {
+		$body = array(
+			'comment_post_ID' => $postId,
+			'author'          => 'Dummy visitor',
+			'email'           => 'visitor@amsec.invalid',
+			'comment'         => $slug . ' ' . bin2hex( random_bytes( 4 ) ),
+		);
+		if ( $trap !== null ) {
+			$body['amsec_contact_hint'] = $trap;
+		}return $http( 'wp-comments-post.php', $body );
+	};
+	if ( wp_remote_retrieve_response_code( $comment( 'filled' ) ) !== 302 ) {
+		throw new RuntimeException( 'Observe rejected comment.' );
+	}$approve( 'block' );
+	if ( wp_remote_retrieve_response_code( $comment( 'filled' ) ) !== 403 || wp_remote_retrieve_response_code( $comment( array( 'filled' ) ) ) !== 403 ) {
+		throw new RuntimeException( 'Filled/malformed trap accepted.' );}
+	$clear( $commentKey );for ( $i = 0;$i < 20;$i++ ) {
+		if ( wp_remote_retrieve_response_code( $comment() ) !== 302 ) {
+			throw new RuntimeException( 'Native comment boundary rejected early.' );
+		}
+	}if ( wp_remote_retrieve_response_code( $comment() ) !== 403 ) {
+		throw new RuntimeException( 'Native comment rate excess accepted.' );}
+	$body   = array(
+		'comment_post_ID'    => $postId,
+		'comment'            => $slug . ' authenticated ' . bin2hex( random_bytes( 4 ) ),
+		'amsec_contact_hint' => 'filled',
+	);
+	$cookie = new WP_Http_Cookie(
+		array(
+			'name'  => LOGGED_IN_COOKIE,
+			'value' => $_COOKIE[ LOGGED_IN_COOKIE ],
+		)
+	);
+	$r      = wp_remote_post(
+		'http://' . $host . '/wp-comments-post.php',
+		array(
+			'timeout'     => 20,
+			'redirection' => 0,
+			'cookies'     => array( $cookie ),
+			'body'        => $body,
+		)
+	);
+	if ( is_wp_error( $r ) || wp_remote_retrieve_response_code( $r ) !== 302 ) {
+		throw new RuntimeException( 'Authenticated native comment was blocked.' );}
+	$register = static function ( $trap = null ) use ( $http, $slug, &$users ) {
+		$name = $slug . '-' . bin2hex( random_bytes( 3 ) );
+		$body = array(
+			'user_login' => $name,
+			'user_email' => $name . '@amsec.invalid',
+		);
+		if ( $trap !== null ) {
+			$body['amsec_contact_hint'] = $trap;
+		}$r   = $http( 'wp-login.php?action=register', $body );
+		$user = get_user_by( 'login', $name );
+		if ( $user ) {
+			$users[] = $user->ID;
+		}return array( $r, $user );
+	};
+	$clear( $registrationKey );for ( $i = 0;$i < 5;$i++ ) {
+		list($r, $user) = $register();
+		if ( ! $user || wp_remote_retrieve_response_code( $r ) !== 302 ) {
+			throw new RuntimeException( 'Native registration boundary rejected early.' );
+		}
+	}list($r, $user) = $register();
+	if ( $user || ! str_contains( wp_remote_retrieve_body( $r ), 'registration could not be accepted' ) ) {
+		throw new RuntimeException( 'Native registration rate excess accepted.' );}
+	$GLOBALS['wpdb']->query( $GLOBALS['wpdb']->prepare( 'RENAME TABLE %i TO %i', $table, $table . '_fixture' ) );
+	$renamed = true;
+	ob_start();
+	( new BotSettings() )->render();
+	$html = ob_get_clean();
+	if ( false === stripos( $html, 'unavailable' ) ) {
+		throw new RuntimeException( 'Outage presented as available.' );
+	}if ( wp_remote_retrieve_response_code( $comment() ) !== 302 ) {
+		throw new RuntimeException( 'Storage outage blocked legitimate empty/missing trap.' );
+	}$GLOBALS['wpdb']->query( $GLOBALS['wpdb']->prepare( 'RENAME TABLE %i TO %i', $table . '_fixture', $table ) );
+	$renamed = false;
+	$r       = wp_remote_get( 'http://' . $host . '/wp-login.php?action=register', array( 'timeout' => 20 ) );
+	$html    = wp_remote_retrieve_body( $r );
+	foreach ( array( 'amsec_contact_hint', 'aria-hidden="true"', 'autocomplete="off"', 'tabindex="-1"' ) as $text ) {
+		if ( ! str_contains( $html, $text ) ) {
+			throw new RuntimeException( 'Accessible fallback markup missing.' );}
+	}
+	$key    = hash( 'sha256', $slug );
+	$keys[] = $key;
+	if ( $store->record( $key, 300, 1000 ) !== 1 || $store->record( $key, 300, 1001 ) !== 2 || $store->record( $key, 300, 1300 ) !== 1 ) {
+		throw new RuntimeException( 'Atomic counter/window boundary failed.' );}
+	WP_CLI::runcommand(
+		'amsec-security-scanner bots disable',
+		array(
+			'return' => true,
+			'launch' => false,
+		)
+	);
+	if ( get_option( 'amsec_bot_mode' ) !== 'off' || wp_remote_retrieve_response_code( $comment( 'filled' ) ) !== 302 ) {
+		throw new RuntimeException( 'CLI/off recovery failed.' );}
+	remove_filter( 'wp_redirect', $redirect );
+	remove_filter( 'wp_die_handler', $die );
+	echo 'Native bot controls: actual HTTP comment/registration boundaries, observe/block/off, malformed trap, outage fallback, accessible markup, approval gates, window reset and CLI recovery passed.' . PHP_EOL;
+} finally {
+	if ( $renamed ) {
+		$GLOBALS['wpdb']->query( $GLOBALS['wpdb']->prepare( 'RENAME TABLE %i TO %i', $table . '_fixture', $table ) );
+	}foreach ( $keys as $key ) {
+		$GLOBALS['wpdb']->query( $GLOBALS['wpdb']->prepare( "DELETE FROM {$table} WHERE address_key=%s", $key ) );
+	}wp_set_current_user( 1 );
+	$_COOKIE = array();
+	wp_delete_user( $actor );
+	foreach ( $users as $id ) {
+		wp_delete_user( $id );
+	}wp_delete_post( $postId, true );
+	unlink( $mu );
+	if ( $muCreated ) {
+		rmdir( WPMU_PLUGIN_DIR );
+	}update_option( 'users_can_register', $oldRegister, false );
+	if ( $oldMode === null ) {
+		delete_option( 'amsec_bot_mode' );
+	} else {
+		update_option( 'amsec_bot_mode', $oldMode, false );}
+}

@@ -49,14 +49,30 @@ final class SuiteCycleTest extends TestCase {
 	}
 
 	private function options(): OptionGateway {
-		return new class implements OptionGateway {
+		return new class() implements OptionGateway {
 			private array $values = array();
-			public function get( string $key ): mixed { return $this->values[ $key ] ?? null; }
-			public function add( string $key, string $value ): bool { if ( isset( $this->values[ $key ] ) ) { return false; } $this->values[ $key ] = $value; return true; }
-			public function set( string $key, string $value ): bool { $this->values[ $key ] = $value; return true; }
-			public function delete( string $key ): void { unset( $this->values[ $key ] ); }
-			public function replaceIfSame( string $key, string $expected, string $replacement ): bool { if ( ( $this->values[ $key ] ?? null ) !== $expected ) { return false; } $this->values[ $key ] = $replacement; return true; }
-			public function deleteIfSame( string $key, string $expected ): bool { if ( ( $this->values[ $key ] ?? null ) !== $expected ) { return false; } unset( $this->values[ $key ] ); return true; }
+			public function get( string $key ): mixed {
+				return $this->values[ $key ] ?? null; }
+			public function add( string $key, string $value ): bool {
+				if ( isset( $this->values[ $key ] ) ) {
+					return false;
+				} $this->values[ $key ] = $value;
+				return true; }
+			public function set( string $key, string $value ): bool {
+				$this->values[ $key ] = $value;
+				return true; }
+			public function delete( string $key ): void {
+				unset( $this->values[ $key ] ); }
+			public function replaceIfSame( string $key, string $expected, string $replacement ): bool {
+				if ( ( $this->values[ $key ] ?? null ) !== $expected ) {
+					return false;
+				} $this->values[ $key ] = $replacement;
+				return true; }
+			public function deleteIfSame( string $key, string $expected ): bool {
+				if ( ( $this->values[ $key ] ?? null ) !== $expected ) {
+					return false;
+				} unset( $this->values[ $key ] );
+				return true; }
 		};
 	}
 }

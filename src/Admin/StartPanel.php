@@ -26,7 +26,7 @@ final class StartPanel {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_die( esc_html__( 'Administrator access required.', 'amsec-security-scanner' ), '', array( 'response' => 403 ) );
 		}
-		echo '<div class="wrap amazing-security-admin">';
+		echo '<div class="wrap amsec-security-scanner-admin">';
 		echo '<h1>' . esc_html__( 'Recommendations', 'amsec-security-scanner' ) . '</h1>';
 		( new AdminPage() )->recommendations();
 		echo '</div>';
@@ -47,7 +47,7 @@ final class StartPanel {
 		foreach ( Module::rows() as $row ) {
 			$on = ! empty( $row['idle'] ) ? in_array( (string) $options['amsec_idle_minutes'], array( '15', '30', '60' ), true ) : '1' === (string) ( $options[ $row['key'] ] ?? '0' );
 			// The scan list already offers the switches that live on the Scan page.
-			if ( ! $on && 'amazing-security' !== $row['page'] ) {
+			if ( ! $on && 'amsec-security-scanner' !== $row['page'] ) {
 				$off[] = $row;
 			}
 		}

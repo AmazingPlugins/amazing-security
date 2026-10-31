@@ -24,10 +24,10 @@ final class FileScanReviewActionTest extends TestCase {
 	}
 
 	public function test_partial_finished_report_still_allows_note_on_its_finding(): void {
-		$id = str_repeat( 'a', 32 );
-		$cursor = new FileScanCursor( 'scan-1' );
-		$cursor->partial = true;
-		$cursor->finished = true;
+		$id                 = str_repeat( 'a', 32 );
+		$cursor             = new FileScanCursor( 'scan-1' );
+		$cursor->partial    = true;
+		$cursor->finished   = true;
 		$cursor->findings[] = array( 'id' => $id );
 		self::assertTrue( FileScanReviewAction::hasCurrentFinding( new FileScanStep( $cursor, true ), null, $id ) );
 		self::assertFalse( FileScanReviewAction::hasCurrentFinding( new FileScanStep( $cursor, true ), null, str_repeat( 'b', 32 ) ) );
