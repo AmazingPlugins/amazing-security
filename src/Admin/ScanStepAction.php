@@ -146,7 +146,7 @@ final class ScanStepAction {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_send_json_error( null, 403 );
 		}
-		check_ajax_referer( 'amazing_security_scan' );
+		check_ajax_referer( 'amsec_security_scanner_scan' );
 		$key = self::SESSION . get_current_user_id();
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce checked above.
 		$step = isset( $_POST['step'] ) ? sanitize_key( wp_unslash( $_POST['step'] ) ) : '';
@@ -228,7 +228,7 @@ final class ScanStepAction {
 			} catch ( Throwable ) {
 				wp_send_json_error( null, 500 );
 			}
-			wp_send_json_success( array( 'done' => admin_url( 'admin.php?page=amazing-security' ) ) );
+			wp_send_json_success( array( 'done' => admin_url( 'admin.php?page=amsec-security-scanner' ) ) );
 		} else {
 			$check = null;
 			foreach ( LocalHardeningScanService::all() as $candidate ) {

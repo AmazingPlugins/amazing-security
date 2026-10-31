@@ -19,12 +19,12 @@ try {
 	$store->enroll( $userId, 'encrypted-fixture-seed', array() );
 	$settings->setRateMode( 'observe' );
 	$settings->setEraseOnUninstall( false );
-	include WP_PLUGIN_DIR . '/amazing-security/uninstall.php';
+	include WP_PLUGIN_DIR . '/amsec-security-scanner/uninstall.php';
 	if ( 'observe' !== $settings->rateMode() || ! $store->isEnrolled( $userId ) ) {
 		throw new RuntimeException( 'Retain branch erased data.' );
 	}
 	$settings->setEraseOnUninstall( true );
-	include WP_PLUGIN_DIR . '/amazing-security/uninstall.php';
+	include WP_PLUGIN_DIR . '/amsec-security-scanner/uninstall.php';
 	if ( 'off' !== $settings->rateMode() || $store->isEnrolled( $userId ) ) {
 		throw new RuntimeException( 'Erase branch left login data.' );
 	}

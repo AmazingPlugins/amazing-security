@@ -10,7 +10,7 @@ defined( 'ABSPATH' ) || exit;
 final class Page {
 	public static function menu(): void {
 		add_submenu_page(
-			'amazing-security',
+			'amsec-security-scanner',
 			__( 'Sign-in email', 'amsec-security-scanner' ),
 			__( 'Sign-in email', 'amsec-security-scanner' ),
 			'manage_options',
@@ -24,7 +24,7 @@ final class Page {
 			wp_die( esc_html__( 'Administrator access required.', 'amsec-security-scanner' ), '', array( 'response' => 403 ) );
 		}
 		$flag = Decision::flag( self::stored() );
-		echo '<div class="wrap amazing-security-admin">';
+		echo '<div class="wrap amsec-security-scanner-admin">';
 		echo '<h1>' . esc_html__( 'Sign-in email', 'amsec-security-scanner' ) . '</h1>';
 		echo '<p>' . esc_html( self::status( $flag ) ) . '</p>';
 		echo '<p>' . esc_html__( 'When it is on, an administrator sign-in can send one email to that account. The next email waits one hour. The message is the site name and the UTC time. If the email cannot be sent, the sign-in still finishes.', 'amsec-security-scanner' ) . '</p>';

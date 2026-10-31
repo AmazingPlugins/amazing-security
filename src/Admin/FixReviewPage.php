@@ -14,7 +14,7 @@ use Throwable;
 
 final class FixReviewPage {
 	public function register(): void {
-		add_submenu_page( 'amazing-security', __( 'Review security change', 'amsec-security-scanner' ), __( 'Review security change', 'amsec-security-scanner' ), 'manage_options', 'amsec-fix-review', array( $this, 'render' ) );
+		add_submenu_page( 'amsec-security-scanner', __( 'Review security change', 'amsec-security-scanner' ), __( 'Review security change', 'amsec-security-scanner' ), 'manage_options', 'amsec-fix-review', array( $this, 'render' ) );
 	}
 
 	public function render(): void {
@@ -25,7 +25,7 @@ final class FixReviewPage {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$id = isset( $_GET['proposal'] ) && is_string( $_GET['proposal'] ) ? sanitize_text_field( wp_unslash( $_GET['proposal'] ) ) : '';
 		if ( ! preg_match( '/^[a-f0-9]{32}$/D', $id ) ) {
-			echo '<div class="wrap amazing-security-admin"><h1>' . esc_html__( 'Review security change', 'amsec-security-scanner' ) . '</h1><p>' . esc_html__( 'There is no saved proposal on this screen. One appears here after a scan offers a single setting change.', 'amsec-security-scanner' ) . '</p><p><a class="button" href="' . esc_url( admin_url( 'admin.php?page=amsec-recommendations' ) ) . '">' . esc_html__( 'Open recommendations', 'amsec-security-scanner' ) . '</a></p></div>';
+			echo '<div class="wrap amsec-security-scanner-admin"><h1>' . esc_html__( 'Review security change', 'amsec-security-scanner' ) . '</h1><p>' . esc_html__( 'There is no saved proposal on this screen. One appears here after a scan offers a single setting change.', 'amsec-security-scanner' ) . '</p><p><a class="button" href="' . esc_url( admin_url( 'admin.php?page=amsec-recommendations' ) ) . '">' . esc_html__( 'Open recommendations', 'amsec-security-scanner' ) . '</a></p></div>';
 			return;
 		}
 		try {
@@ -34,7 +34,7 @@ final class FixReviewPage {
 			$proposal = null;
 		}
 		if ( null === $proposal ) {
-			echo '<div class="wrap amazing-security-admin"><h1>' . esc_html__( 'Review security change', 'amsec-security-scanner' ) . '</h1><p>' . esc_html__( 'Proposal not found.', 'amsec-security-scanner' ) . '</p></div>';
+			echo '<div class="wrap amsec-security-scanner-admin"><h1>' . esc_html__( 'Review security change', 'amsec-security-scanner' ) . '</h1><p>' . esc_html__( 'Proposal not found.', 'amsec-security-scanner' ) . '</p></div>';
 			return;
 		}
 		$enabled = ( new McpPreferences( new WordPressOptions() ) )->enabled();
@@ -54,7 +54,7 @@ final class FixReviewPage {
 		);
 		$before  = $labels[ $proposal->beforeMode ];
 		$after   = $labels[ $proposal->afterMode ];
-		$html    = '<div class="wrap amazing-security-admin"><section class="amsec-fix-review" aria-labelledby="amsec-fix-title"><h1 id="amsec-fix-title">' . esc_html__( 'Review security change', 'amsec-security-scanner' ) . '</h1><p>' . esc_html__( 'AmSec Security Scanner will change one setting on this site. Review it here before anything is applied.', 'amsec-security-scanner' ) . '</p>';
+		$html    = '<div class="wrap amsec-security-scanner-admin"><section class="amsec-fix-review" aria-labelledby="amsec-fix-title"><h1 id="amsec-fix-title">' . esc_html__( 'Review security change', 'amsec-security-scanner' ) . '</h1><p>' . esc_html__( 'AmSec Security Scanner will change one setting on this site. Review it here before anything is applied.', 'amsec-security-scanner' ) . '</p>';
 		$applied = 'applied' === $proposal->status;
 		$current = null === $liveMode ? $proposal->beforeMode : $liveMode;
 		$stale   = 'pending' === $proposal->status && $current !== $proposal->beforeMode;
@@ -64,7 +64,7 @@ final class FixReviewPage {
 			$html .= '<p class="notice notice-warning inline">' . sprintf(
 				/* translators: %s: WP-CLI command that turns off login blocking. */
 				esc_html__( 'Blocking can affect people who share an address. If you cannot sign in, run %s through WP-CLI.', 'amsec-security-scanner' ),
-				'<code>wp amazing-security login disable</code>'
+				'<code>wp amsec-security-scanner login disable</code>'
 			) . '</p>';
 		}
 		if ( 'pending' === $verification && 'applied' === $proposal->status ) {

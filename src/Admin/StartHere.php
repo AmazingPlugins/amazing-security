@@ -406,13 +406,13 @@ final class StartHere {
 			'known-holes' => match ( true ) {
 				'no' === $enabled => array(
 					'label'  => __( 'Enable vulnerability checks', 'amsec-security-scanner' ),
-					'action' => 'amazing_security_vulnerability_enable',
-					'nonce'  => 'amazing_security_vulnerability_enable',
+					'action' => 'amsec_security_scanner_vulnerability_enable',
+					'nonce'  => 'amsec_security_scanner_vulnerability_enable',
 				),
 				'none' === $stored => array(
 					'label'  => __( 'Check installed versions', 'amsec-security-scanner' ),
-					'action' => 'amazing_security_vulnerability_scan',
-					'nonce'  => 'amazing_security_vulnerability_scan',
+					'action' => 'amsec_security_scanner_vulnerability_scan',
+					'nonce'  => 'amsec_security_scanner_vulnerability_scan',
 				),
 				'found' === $stored => array(
 					'label' => __( 'Review vulnerability checks', 'amsec-security-scanner' ),
@@ -424,13 +424,13 @@ final class StartHere {
 			'release-files' => match ( $stored ) {
 				'none' => array(
 					'label'  => __( 'Run integrity scan', 'amsec-security-scanner' ),
-					'action' => 'amazing_security_integrity_start',
-					'nonce'  => 'amazing_security_integrity_start',
+					'action' => 'amsec_security_scanner_integrity_start',
+					'nonce'  => 'amsec_security_scanner_integrity_start',
 				),
 				'partial' => array(
 					'label'  => __( 'Continue integrity scan', 'amsec-security-scanner' ),
-					'action' => 'amazing_security_integrity_resume',
-					'nonce'  => 'amazing_security_integrity_resume',
+					'action' => 'amsec_security_scanner_integrity_resume',
+					'nonce'  => 'amsec_security_scanner_integrity_resume',
 					'scan'   => 'integrity',
 				),
 				'found' => array(
@@ -463,13 +463,13 @@ final class StartHere {
 			'suspicious-files' => match ( $stored ) {
 				'none' => array(
 					'label'  => __( 'Run file scan', 'amsec-security-scanner' ),
-					'action' => 'amazing_security_file_scan_start',
-					'nonce'  => 'amazing_security_file_scan_start',
+					'action' => 'amsec_security_scanner_file_scan_start',
+					'nonce'  => 'amsec_security_scanner_file_scan_start',
 				),
 				'partial' => array(
 					'label'  => __( 'Continue file scan', 'amsec-security-scanner' ),
-					'action' => 'amazing_security_file_scan_resume',
-					'nonce'  => 'amazing_security_file_scan_resume',
+					'action' => 'amsec_security_scanner_file_scan_resume',
+					'nonce'  => 'amsec_security_scanner_file_scan_resume',
 					'scan'   => 'files',
 				),
 				'found' => array(

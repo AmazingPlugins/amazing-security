@@ -10,7 +10,7 @@ use AmazingPlugins\Security\Scan\ScanRun;
 use RuntimeException;
 
 final class FindingsRepository {
-	private const OPTION = 'amazing_security_latest_run';
+	private const OPTION = 'amsec_security_scanner_latest_run';
 
 	public function save( ScanRun $run ): void {
 		$value = wp_json_encode( $run->toArray() );

@@ -7,12 +7,12 @@ defined( 'ABSPATH' ) || exit;
 
 final class ContentPage {
 	public function register(): void {
-		$hook = add_submenu_page( 'amazing-security', __( 'Published content', 'amsec-security-scanner' ), __( 'Content scan', 'amsec-security-scanner' ), 'manage_options', 'amsec-content', array( $this, 'render' ) );
+		$hook = add_submenu_page( 'amsec-security-scanner', __( 'Published content', 'amsec-security-scanner' ), __( 'Content scan', 'amsec-security-scanner' ), 'manage_options', 'amsec-content', array( $this, 'render' ) );
 		add_action(
 			'admin_enqueue_scripts',
 			static function ( string $current ) use ( $hook ): void {
 				if ( $current === $hook ) {
-					wp_enqueue_style( 'amazing-security-admin', plugins_url( 'assets/admin.css', AMAZING_SECURITY_FILE ), array(), '0.1.0' );
+					wp_enqueue_style( 'amsec-security-scanner-admin', plugins_url( 'assets/admin.css', AMSEC_SECURITY_SCANNER_FILE ), array(), '0.1.0' );
 				} }
 		);
 	}
@@ -25,7 +25,7 @@ final class ContentPage {
 		} catch ( \Throwable ) {
 			$state = array( 'invalid' => true );
 		}
-		echo '<div class="wrap amazing-security-admin"><header class="amsec-header"><div><h1>' . esc_html__( 'Published content', 'amsec-security-scanner' ) . '</h1><p>' . esc_html__( 'Review selected hidden-link and redirect patterns in public posts, pages and their approved comments.', 'amsec-security-scanner' ) . '</p></div>';
+		echo '<div class="wrap amsec-security-scanner-admin"><header class="amsec-header"><div><h1>' . esc_html__( 'Published content', 'amsec-security-scanner' ) . '</h1><p>' . esc_html__( 'Review selected hidden-link and redirect patterns in public posts, pages and their approved comments.', 'amsec-security-scanner' ) . '</p></div>';
 		$active  = $state['active'] ?? null;
 		$expired = is_array( $active ) && ! $active['finished'] && time() > $active['started_at'] + 86400;
 		if ( empty( $state['invalid'] ) ) {

@@ -65,8 +65,8 @@ if ( 'prepare-observe' === $case || 'prepare-block' === $case ) {
 	$_SERVER['REQUEST_METHOD'] = 'POST';
 	$_POST = array( 'proposal_id' => $id, '_wpnonce' => wp_create_nonce( 'amsec_fix_approve_' . $id ), 'confirm' => '1' );
 	$_REQUEST = $_POST;
-	update_option( 'amazing_security_latest_run', 'force-recheck-write', false );
-	add_filter( 'pre_update_option_amazing_security_latest_run', static fn( $new, $old ) => $old, 10, 2 );
+	update_option( 'amsec_security_scanner_latest_run', 'force-recheck-write', false );
+	add_filter( 'pre_update_option_amsec_security_scanner_latest_run', static fn( $new, $old ) => $old, 10, 2 );
 	add_filter( 'wp_redirect', static function ( $url ) {
 		if ( false === strpos( $url, 'verification=pending' ) ) {
 			throw new RuntimeException( 'Failed recheck did not report unverified state.' );

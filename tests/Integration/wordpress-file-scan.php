@@ -36,8 +36,8 @@ $store->complete( 'fixture-1', FileScanReport::fromCursor( $cursor ) );
 if ( 'warn' !== $store->latestCompleted()->state || 'warn' !== $store->historicalWarnings()[0]->state ) {
 	throw new RuntimeException( 'Completed warning or history was not saved.' );
 }
-$raw = get_option( 'amazing_security_file_scan_completed' );
-if ( str_contains( $raw, 'ZWNobyAxOw==' ) || str_contains( $raw, $root ) || isset( wp_load_alloptions()['amazing_security_file_scan_completed'] ) ) {
+$raw = get_option( 'amsec_security_scanner_file_scan_completed' );
+if ( str_contains( $raw, 'ZWNobyAxOw==' ) || str_contains( $raw, $root ) || isset( wp_load_alloptions()['amsec_security_scanner_file_scan_completed'] ) ) {
 	throw new RuntimeException( 'Stored report contains content, absolute paths, or autoloaded data.' );
 }
 $partial = new FileScanCursor( 'fixture-2' );
@@ -50,9 +50,9 @@ $store->saveProgress( 'fixture-2', new FileScanStep( $partial, true ) );
 if ( 'warn' !== $store->latestCompleted()->state ) {
 	throw new RuntimeException( 'Partial scan erased prior warning.' );
 }
-delete_option( 'amazing_security_file_scan_active' );
-delete_option( 'amazing_security_file_scan_completed' );
-delete_option( 'amazing_security_file_scan_history' );
+delete_option( 'amsec_security_scanner_file_scan_active' );
+delete_option( 'amsec_security_scanner_file_scan_completed' );
+delete_option( 'amsec_security_scanner_file_scan_history' );
 unlink( $root . '/known.php' );
 unlink( $root . '/extra.php' );
 rmdir( $root );

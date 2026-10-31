@@ -35,7 +35,7 @@ $api=static fn()=>true;add_filter('application_password_is_api_request',$api);$r
 wp_update_user(['ID'=>$target,'display_name'=>'Unrelated change']);if(!$policy->required($target)){throw new RuntimeException('Unrelated profile update cleared requirement.');}
 $newPassword=bin2hex(random_bytes(20));reset_password(get_userdata($target),$newPassword);if($policy->required($target)||is_wp_error(wp_authenticate($user->user_login,$newPassword))){throw new RuntimeException('Native reset recovery failed.');}
 $policy->requireReset($target);wp_update_user(['ID'=>$target,'user_pass'=>bin2hex(random_bytes(20))]);if($policy->required($target)){throw new RuntimeException('Native profile recovery failed.');}
-$policy->requireReset($target);WP_CLI::runcommand('amazing-security accounts clear-reset '.$target,['return'=>true,'launch'=>false]);if($policy->required($target)){throw new RuntimeException('CLI recovery failed.');}
+$policy->requireReset($target);WP_CLI::runcommand('amsec-security-scanner accounts clear-reset '.$target,['return'=>true,'launch'=>false]);if($policy->required($target)){throw new RuntimeException('CLI recovery failed.');}
 $_GET=['user_id'=>(string)$target];ob_start();(new AmazingPlugins\Security\Incident\IncidentPage())->render();$html=ob_get_clean();if(!str_contains($html,'amsec_incident_reset')||str_contains($html,$password)||str_contains($html,$token)){throw new RuntimeException('Incident page safety failed.');}
 $r=new AmazingPlugins\Security\Activity\ActivityRepository($GLOBALS['wpdb']);foreach(['password_reset_required','password_reset_cleared'] as $event){if(!$r->page(1,$event)){throw new RuntimeException('Incident event absent.');}}
 remove_filter('wp_die_handler',$die);

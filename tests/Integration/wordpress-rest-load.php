@@ -64,7 +64,7 @@ try {
 
     if ( class_exists( 'WC_Product_Simple' ) ) {
         $product = new WC_Product_Simple();
-        $product->set_name( 'Disposable Amazing Security cart fixture' );
+        $product->set_name( 'Disposable AmSec Security Scanner cart fixture' );
         $product->set_regular_price( '1' );
         $product->set_virtual( true );
         $product->set_status( 'publish' );

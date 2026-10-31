@@ -37,9 +37,9 @@ final class IntegrityStoreTest extends TestCase {
 		self::assertTrue( $store->latestProgress()->cursor->partial );
 		self::assertSame( $old->finishedAt->format( 'c' ), $store->latestCompleted()->finishedAt->format( 'c' ) );
 		self::assertTrue( $store->begin( 'unfinished', new IntegrityCursor( 'unfinished' ) ) );
-		$active = json_decode( $options->values['amazing_security_integrity_active'], true );
+		$active = json_decode( $options->values['amsec_security_scanner_integrity_active'], true );
 		$active['expires'] = time() - 1;
-		$options->values['amazing_security_integrity_active'] = json_encode( $active );
+		$options->values['amsec_security_scanner_integrity_active'] = json_encode( $active );
 		self::assertTrue( $store->latestProgress()->finished );
 		self::assertTrue( $store->begin( 'recovered', new IntegrityCursor( 'recovered' ) ) );
 	}
@@ -55,7 +55,7 @@ final class IntegrityStoreTest extends TestCase {
 			public function replaceIfSame( string $key, string $expected, string $replacement ): bool { if ( ( $this->values[ $key ] ?? null ) !== $expected ) { return false; } $this->values[ $key ] = $replacement; return true; }
 			public function deleteIfSame( string $key, string $expected ): bool { if ( ( $this->values[ $key ] ?? null ) !== $expected ) { return false; } unset( $this->values[ $key ] ); return true; }
 		};
-		$key = 'amazing_security_integrity_active';
+		$key = 'amsec_security_scanner_integrity_active';
 		$options->values[ $key ] = json_encode( array( 'scan_id' => 'old', 'expires' => time() - 1, 'cursor' => ( new IntegrityCursor( 'old' ) )->toArray(), 'finished' => false ) );
 		$new = json_encode( array( 'scan_id' => 'new', 'expires' => time() + 1800, 'cursor' => ( new IntegrityCursor( 'new' ) )->toArray(), 'finished' => false ) );
 		$options->replaceOnGet = $new;

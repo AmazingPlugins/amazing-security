@@ -1,5 +1,5 @@
 {
-  "provenance": "Original synthetic fixtures authored for Amazing Security; never execute these samples. Known gaps are explicit and not benign verdicts.",
+  "provenance": "Original synthetic fixtures authored for AmSec Security Scanner; never execute these samples. Known gaps are explicit and not benign verdicts.",
   "cases": [
     {
       "name": "eval-decode",

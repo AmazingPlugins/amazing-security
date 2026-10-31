@@ -13,7 +13,7 @@ use AmazingPlugins\Security\Integrity\WordPressOptions;
 use AmazingPlugins\Security\Integrity\WordPressOrgManifestProvider;
 use AmazingPlugins\Security\Scan\ScanContext;
 
-if ( false !== get_option( 'amazing_security_integrity_active', false ) || false !== get_option( 'amazing_security_integrity_completed', false ) ) {
+if ( false !== get_option( 'amsec_security_scanner_integrity_active', false ) || false !== get_option( 'amsec_security_scanner_integrity_completed', false ) ) {
 	throw new RuntimeException( 'Activation performed an integrity scan.' );
 }
 

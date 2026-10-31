@@ -8,7 +8,7 @@ use AmazingPlugins\Security\Scan\ScanRun;
 $mailCount = 0;
 $capture = static function ( mixed $result, array $args ) use ( &$mailCount ): bool {
 	++$mailCount;
-	if ( ! str_contains( $args['message'], 'Finding IDs:' ) || ! str_contains( $args['message'], 'Amazing Security dashboard' ) ) {
+	if ( ! str_contains( $args['message'], 'Finding IDs:' ) || ! str_contains( $args['message'], 'AmSec Security Scanner dashboard' ) ) {
 		throw new RuntimeException( 'Alert body omitted the review path.' );
 	}
 	return 1 < $mailCount;

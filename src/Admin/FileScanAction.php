@@ -26,7 +26,7 @@ use Throwable;
 
 final class FileScanAction {
 	public function start(): void {
-		$this->authorize( 'amazing_security_file_scan_start' );
+		$this->authorize( 'amsec_security_scanner_file_scan_start' );
 		$store  = new WordPressFileScanStore( new WordPressOptions() );
 		$scanId = wp_generate_uuid4();
 		$cursor = new FileScanCursor( $scanId );
@@ -37,7 +37,7 @@ final class FileScanAction {
 	}
 
 	public function resume(): void {
-		$this->authorize( 'amazing_security_file_scan_resume' );
+		$this->authorize( 'amsec_security_scanner_file_scan_resume' );
 		$store    = new WordPressFileScanStore( new WordPressOptions() );
 		$progress = $store->latestProgress();
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce was checked above.
@@ -104,7 +104,7 @@ final class FileScanAction {
 
 	private function execute( WordPressFileScanStore $store, FileScanCursor $cursor, bool $isStart ): bool {
 		$options = new WordPressOptions();
-		$lock    = new WorkerLock( $options, 'amazing_security_file_scan_worker_lock' );
+		$lock    = new WorkerLock( $options, 'amsec_security_scanner_file_scan_worker_lock' );
 		if ( ! $lock->acquire( $cursor->scanId ) ) {
 			return true;
 		}
@@ -208,7 +208,7 @@ final class FileScanAction {
 				'version'    => (string) ( $data['Version'] ?? '' ),
 				'root'       => WP_PLUGIN_DIR . '/' . $slug,
 				'update_uri' => (string) ( $data['UpdateURI'] ?? '' ),
-				'local_only' => plugin_basename( AMAZING_SECURITY_FILE ) === $file,
+				'local_only' => plugin_basename( AMSEC_SECURITY_SCANNER_FILE ) === $file,
 			);
 		}
 		return $plugins;
@@ -233,7 +233,7 @@ final class FileScanAction {
 	}
 
 	private function redirect( bool $error ): never {
-		wp_safe_redirect( admin_url( 'admin.php?page=amsec-file-checks' . ( $error ? '&amazing_security_file_scan_error=1' : '' ) . '#amsec-file-scan' ) );
+		wp_safe_redirect( admin_url( 'admin.php?page=amsec-file-checks' . ( $error ? '&amsec_security_scanner_file_scan_error=1' : '' ) . '#amsec-file-scan' ) );
 		exit;
 	}
 }

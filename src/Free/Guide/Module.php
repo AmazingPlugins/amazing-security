@@ -18,7 +18,7 @@ final class Module {
 	}
 
 	public static function menu(): void {
-		add_submenu_page( 'amazing-security', __( 'Site review', 'amsec-security-scanner' ), __( 'Site review', 'amsec-security-scanner' ), 'manage_options', 'amsec-guide', array( self::class, 'render' ) );
+		add_submenu_page( 'amsec-security-scanner', __( 'Site review', 'amsec-security-scanner' ), __( 'Site review', 'amsec-security-scanner' ), 'manage_options', 'amsec-guide', array( self::class, 'render' ) );
 	}
 
 	public static function render(): void {
@@ -31,7 +31,7 @@ final class Module {
 		}
 		$options['amsec_idle_minutes'] = get_option( 'amsec_idle_minutes', '0' );
 		$score                         = Score::tally( $options );
-		echo '<div class="wrap amazing-security-admin"><h1>' . esc_html__( 'Site review', 'amsec-security-scanner' ) . '</h1>';
+		echo '<div class="wrap amsec-security-scanner-admin"><h1>' . esc_html__( 'Site review', 'amsec-security-scanner' ) . '</h1>';
 		echo '<p>' . esc_html(
 			sprintf(
 			/* translators: 1: number on, 2: number checked */
@@ -71,22 +71,22 @@ final class Module {
 			array(
 				'key'   => 'amsec_login_confirm',
 				'label' => __( 'Login bot trap', 'amsec-security-scanner' ),
-				'page'  => 'amazing-security',
+				'page'  => 'amsec-security-scanner',
 			),
 			array(
 				'key'   => 'amsec_generic_login_errors',
 				'label' => __( 'One login message', 'amsec-security-scanner' ),
-				'page'  => 'amazing-security',
+				'page'  => 'amsec-security-scanner',
 			),
 			array(
 				'key'   => 'amsec_hide_author_archives',
 				'label' => __( 'Author pages closed', 'amsec-security-scanner' ),
-				'page'  => 'amazing-security',
+				'page'  => 'amsec-security-scanner',
 			),
 			array(
 				'key'   => 'amsec_hide_rest_users',
 				'label' => __( 'Public user list closed', 'amsec-security-scanner' ),
-				'page'  => 'amazing-security',
+				'page'  => 'amsec-security-scanner',
 			),
 			array(
 				'key'   => 'amsec_hotlink',

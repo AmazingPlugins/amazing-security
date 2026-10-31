@@ -19,8 +19,8 @@ final class FileScanStoreTest extends TestCase {
 			public bool $failNextCas = false;
 			public bool $failHistoryWrite = false;
 			public function get( string $key ): mixed { return $this->values[ $key ] ?? null; }
-			public function add( string $key, string $value ): bool { if ( $this->failHistoryWrite && 'amazing_security_file_scan_history' === $key ) { return false; } if ( isset( $this->values[ $key ] ) ) { return false; } $this->values[ $key ] = $value; return true; }
-			public function set( string $key, string $value ): bool { if ( $this->failHistoryWrite && 'amazing_security_file_scan_history' === $key ) { return false; } $this->values[ $key ] = $value; return true; }
+			public function add( string $key, string $value ): bool { if ( $this->failHistoryWrite && 'amsec_security_scanner_file_scan_history' === $key ) { return false; } if ( isset( $this->values[ $key ] ) ) { return false; } $this->values[ $key ] = $value; return true; }
+			public function set( string $key, string $value ): bool { if ( $this->failHistoryWrite && 'amsec_security_scanner_file_scan_history' === $key ) { return false; } $this->values[ $key ] = $value; return true; }
 			public function delete( string $key ): void { unset( $this->values[ $key ] ); }
 			public function replaceIfSame( string $key, string $expected, string $replacement ): bool { if ( $this->failNextCas ) { $this->failNextCas = false; return false; } if ( ( $this->values[ $key ] ?? null ) !== $expected || $expected === $replacement ) { return false; } $this->values[ $key ] = $replacement; return true; }
 			public function deleteIfSame( string $key, string $expected ): bool { if ( ( $this->values[ $key ] ?? null ) !== $expected ) { return false; } unset( $this->values[ $key ] ); return true; }

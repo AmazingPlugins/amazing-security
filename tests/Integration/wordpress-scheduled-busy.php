@@ -13,7 +13,7 @@ $cycle = new SuiteCycle( $options );
 if ( ! $cycle->start( time() ) ) {
 	throw new RuntimeException( 'Could not start scheduled suite.' );
 }
-$options->delete( 'amazing_security_integrity_active' );
+$options->delete( 'amsec_security_scanner_integrity_active' );
 $store = new WordPressIntegrityStore( $options );
 $id = wp_generate_uuid4();
 if ( ! $store->begin( $id, new IntegrityCursor( $id ) ) ) {
@@ -24,7 +24,7 @@ if ( null === $progress || $progress->finished ) {
 	throw new RuntimeException( 'Expected unfinished integrity progress.' );
 }
 wp_clear_scheduled_hook( 'amsec_file_tick' );
-$lock = 'amazing_security_integrity_worker_lock';
+$lock = 'amsec_security_scanner_integrity_worker_lock';
 $options->set( $lock, json_encode( array( 'scan_id' => 'other-worker', 'expires' => time() + 60 ) ) );
 try {
 	( new IntegrityScanAction() )->scheduled();

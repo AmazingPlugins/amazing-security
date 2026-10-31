@@ -26,11 +26,11 @@ if ( 'resume' === $case ) {
 		throw new RuntimeException( 'No resumable scan.' );
 	}
 	$_POST['scan_id'] = $progress->cursor->scanId;
-	$_POST['_wpnonce'] = wp_create_nonce( 'amazing_security_integrity_resume' );
+	$_POST['_wpnonce'] = wp_create_nonce( 'amsec_security_scanner_integrity_resume' );
 	$_REQUEST['_wpnonce'] = $_POST['_wpnonce'];
 	( new IntegrityScanAction() )->resume();
 }
 
-$_POST['_wpnonce'] = 'forged' === $case ? 'invalid' : wp_create_nonce( 'amazing_security_integrity_start' );
+$_POST['_wpnonce'] = 'forged' === $case ? 'invalid' : wp_create_nonce( 'amsec_security_scanner_integrity_start' );
 $_REQUEST['_wpnonce'] = $_POST['_wpnonce'];
 ( new IntegrityScanAction() )->start();

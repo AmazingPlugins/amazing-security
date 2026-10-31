@@ -12,10 +12,10 @@ final class HotlinkRuleTest extends TestCase {
 		$snippet = HotlinkRule::snippet( '127.0.0.1' );
 		self::assertStringContainsString( '127\.0\.0\.1', $snippet );
 		self::assertStringContainsString( HotlinkRule::BEGIN, $snippet );
-		$merged = HotlinkRule::apply( "# Begin Amazing Security uploads\nkeep\n", '127.0.0.1', true );
+		$merged = HotlinkRule::apply( "# Begin AmSec Security Scanner uploads\nkeep\n", '127.0.0.1', true );
 		self::assertStringContainsString( 'keep', $merged );
 		self::assertStringContainsString( HotlinkRule::BEGIN, $merged );
-		self::assertSame( "# Begin Amazing Security uploads\nkeep\n", HotlinkRule::apply( $merged, '127.0.0.1', false ) );
+		self::assertSame( "# Begin AmSec Security Scanner uploads\nkeep\n", HotlinkRule::apply( $merged, '127.0.0.1', false ) );
 	}
 
 	public function test_a_blank_host_does_not_write_a_rule(): void {

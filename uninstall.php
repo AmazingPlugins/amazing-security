@@ -56,9 +56,9 @@ wp_clear_scheduled_hook( 'amsec_bot_cleanup' );
 // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Explicit erase preference removes only plugin-owned opaque counters.
 $wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %i', $wpdb->prefix . 'amsec_bot_rate' ) );
 
-delete_option( 'amazing_security_kev_enabled' );
-delete_option( 'amazing_security_kev_ids' );
-delete_option( 'amazing_security_kev_fetched' );
+delete_option( 'amsec_security_scanner_kev_enabled' );
+delete_option( 'amsec_security_scanner_kev_ids' );
+delete_option( 'amsec_security_scanner_kev_fetched' );
 
 delete_option( 'amsec_digest_enabled' );
 delete_option( 'amsec_digest_state' );

@@ -69,7 +69,7 @@ final class AiReadinessCheck implements SecurityCheck {
 	public static function wordpressSnapshot(): array {
 		$paused    = function_exists( 'get_option' ) && '1' === get_option( 'amsec_disable_application_passwords', '0' );
 		$available = function_exists( 'wp_is_application_passwords_available' ) ? wp_is_application_passwords_available() : null;
-		$setting   = get_option( 'amazing_security_mcp_enabled', null );
+		$setting   = get_option( 'amsec_security_scanner_mcp_enabled', null );
 		return array(
 			'app_passwords'   => $paused ? 'plugin-off' : ( true === $available ? 'open' : ( false === $available ? 'closed' : 'unknown' ) ),
 			'assistant'       => self::assistant( $setting ),

@@ -207,7 +207,7 @@ final class RateLimiter {
 		$lines = isset( $_GET['amsec_rate_lines'] ) ? array_map( 'intval', explode( ',', sanitize_text_field( wp_unslash( $_GET['amsec_rate_lines'] ) ) ) ) : array();
 		// phpcs:enable
 		$count = self::recentCount( time() );
-		echo '<div class="wrap amazing-security-admin amsec-brief" id="amsec-rate">';
+		echo '<div class="wrap amsec-security-scanner-admin amsec-brief" id="amsec-rate">';
 		echo '<details class="amsec-more"' . ( '' !== $error ? ' open' : '' ) . '><summary>' . esc_html__( 'Advanced: rate limiting', 'amsec-security-scanner' ) . '</summary>';
 		if ( 'lines' === $error ) {
 			/* translators: %s: comma-separated line numbers. */

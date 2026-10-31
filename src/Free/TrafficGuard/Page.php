@@ -20,7 +20,7 @@ use AmazingPlugins\Security\Traffic\TrafficSettings;
 final class Page {
 	public function register(): void {
 		add_submenu_page(
-			'amazing-security',
+			'amsec-security-scanner',
 			__( 'Traffic', 'amsec-security-scanner' ),
 			__( 'Traffic', 'amsec-security-scanner' ),
 			'manage_options',
@@ -36,9 +36,9 @@ final class Page {
 		if ( 'amsec-traffic-guard' !== $page ) {
 			return;
 		}
-		wp_enqueue_script( 'amazing-security-traffic', plugins_url( 'assets/admin-traffic.js', AMAZING_SECURITY_FILE ), array(), '0.1.0', true );
+		wp_enqueue_script( 'amsec-security-scanner-traffic', plugins_url( 'assets/admin-traffic.js', AMSEC_SECURITY_SCANNER_FILE ), array(), '0.1.0', true );
 		wp_localize_script(
-			'amazing-security-traffic',
+			'amsec-security-scanner-traffic',
 			'amsecTrafficExamples',
 			array(
 				'fields'   => array(
@@ -66,7 +66,7 @@ final class Page {
 		$live      = $this->stored( Options::LIVE );
 		$hotlink   = $this->stored( Options::HOTLINK );
 		$notice    = $this->notice();
-		echo '<div class="wrap amazing-security-admin">';
+		echo '<div class="wrap amsec-security-scanner-admin">';
 		if ( '' !== $notice ) {
 			echo '<div class="notice notice-info"><p>' . esc_html( $notice ) . '</p></div>';
 		}

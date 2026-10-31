@@ -13,7 +13,7 @@ use AmazingPlugins\Security\Sessions\SessionPolicy;
 
 final class BotSettings {
 	public function register(): void {
-		add_submenu_page( 'amazing-security', __( 'Native bot controls', 'amsec-security-scanner' ), __( 'Bot controls', 'amsec-security-scanner' ), 'manage_options', 'amsec-bots', array( $this, 'render' ) );
+		add_submenu_page( 'amsec-security-scanner', __( 'Native bot controls', 'amsec-security-scanner' ), __( 'Bot controls', 'amsec-security-scanner' ), 'manage_options', 'amsec-bots', array( $this, 'render' ) );
 	}
 
 	public function handle(): void {
@@ -51,7 +51,7 @@ final class BotSettings {
 			'block' => __( 'Limit', 'amsec-security-scanner' ),
 			default => __( 'Off', 'amsec-security-scanner' ),
 		};
-		echo '<div class="wrap amazing-security-admin amsec-brief">';
+		echo '<div class="wrap amsec-security-scanner-admin amsec-brief">';
 		echo '<h1>' . esc_html__( 'Comments and registration', 'amsec-security-scanner' ) . '</h1>';
 		echo '<p class="amsec-brief-status"><span class="amsec-pill' . ( 'off' === $mode ? ' is-off' : ' is-on' ) . '">' . esc_html( $label ) . '</span>';
 		echo esc_html__( 'Guest comments and new accounts.', 'amsec-security-scanner' ) . ' ';
@@ -67,7 +67,7 @@ final class BotSettings {
 		echo '<details class="amsec-more"><summary>' . esc_html__( 'See more', 'amsec-security-scanner' ) . '</summary>';
 		echo '<p>' . esc_html__( 'This covers the WordPress comment form and registration on wp-login.php. People who are already signed in are left alone. WooCommerce, Contact Form 7, and custom forms are outside this.', 'amsec-security-scanner' ) . '</p>';
 		echo '<p>' . esc_html__( 'The site stores a salted key for the address, not the address, the name, or the comment. Forwarded headers are ignored unless trusted proxies are on. A shared network can group visitors. Storage holds 10,000 keys, and old rows are removed after a day.', 'amsec-security-scanner' ) . '</p>';
-		echo '<p>' . esc_html__( 'Recovery command: wp amazing-security bots disable', 'amsec-security-scanner' ) . '</p></details>';
+		echo '<p>' . esc_html__( 'Recovery command: wp amsec-security-scanner bots disable', 'amsec-security-scanner' ) . '</p></details>';
 		if ( ! is_ssl() ) {
 			echo '<p class="amsec-brief-note">' . esc_html__( 'Use HTTPS to change this mode.', 'amsec-security-scanner' ) . '</p></div>';
 			return;

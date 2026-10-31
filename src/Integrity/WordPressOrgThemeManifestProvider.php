@@ -25,7 +25,7 @@ final class WordPressOrgThemeManifestProvider implements ThemeManifestProvider {
 			return new ManifestResult( null, 'unsupported_identity' );
 		}
 		$url = 'https://downloads.wordpress.org/theme/' . $slug . '.' . $version . '.zip';
-		$key = 'amazing_security_theme_' . substr( hash( 'sha256', $slug . ':' . $version ), 0, 40 );
+		$key = 'amsec_security_scanner_theme_' . substr( hash( 'sha256', $slug . ':' . $version ), 0, 40 );
 		if ( function_exists( 'get_transient' ) ) {
 			$cached = get_transient( $key );
 			if ( $cached instanceof Manifest && $cached->identity === $slug . ':' . $version && $cached->sourceUrl === $url && $cached->fetchedAt->getTimestamp() >= time() - DAY_IN_SECONDS ) {

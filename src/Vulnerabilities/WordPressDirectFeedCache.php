@@ -7,7 +7,7 @@ namespace AmazingPlugins\Security\Vulnerabilities;
 defined( 'ABSPATH' ) || exit;
 
 final class WordPressDirectFeedCache implements DirectFeedCache {
-	private const INDEX = 'amazing_security_vulnerability_cache_index';
+	private const INDEX = 'amsec_security_scanner_vulnerability_cache_index';
 
 	public function get( string $key ): ?array {
 		$value = get_transient( $this->name( $key ) );

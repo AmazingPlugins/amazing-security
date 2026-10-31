@@ -22,7 +22,7 @@ final class RequiredTotpPage {
 		}
 		$factor = AuthFactorDetector::fromWordPress()->totp( get_current_user_id() );
 		$url    = self::directoryUrl( (string) ( $factor['suggest_slug'] ?? 'two-factor' ) );
-		echo '<div class="wrap amazing-security-admin">';
+		echo '<div class="wrap amsec-security-scanner-admin">';
 		echo '<p>' . esc_html__( 'AmSec Security Scanner reports whether an authenticator-app plugin is present. It does not enroll devices or store backup codes.', 'amsec-security-scanner' ) . '</p>';
 		echo wp_kses( AuthFactorPanel::html( __( 'Authenticator app (TOTP)', 'amsec-security-scanner' ), $factor, $url, 'totp' ), \AmazingPlugins\Security\Admin\AdminHtml::allowed() );
 		echo '</div>';

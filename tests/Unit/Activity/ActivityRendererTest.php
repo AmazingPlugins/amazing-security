@@ -61,7 +61,7 @@ final class ActivityRendererTest extends TestCase {
 		self::assertStringContainsString( 'Account 4', $html );
 		self::assertStringContainsString( 'is now Editor', $html );
 		self::assertStringContainsString( 'Sign-in limit', $html );
-		self::assertStringContainsString( 'Amsec Security Scanner', $html );
+		self::assertStringContainsString( 'AmSec Security Scanner', $html );
 		self::assertStringNotContainsString( 'amsec_login_rate_mode', $html );
 	}
 

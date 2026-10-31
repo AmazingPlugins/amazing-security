@@ -18,7 +18,7 @@ final class WordPressAlertNotifier {
 			new WordPressOptions(),
 			static fn( string $to, string $subject, string $message ): bool => wp_mail( $to, $subject, $message ),
 			(string) get_option( 'admin_email', '' ),
-			admin_url( 'admin.php?page=amazing-security' )
+			admin_url( 'admin.php?page=amsec-security-scanner' )
 		);
 	}
 }

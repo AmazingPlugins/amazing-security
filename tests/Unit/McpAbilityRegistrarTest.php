@@ -30,8 +30,8 @@ final class McpAbilityRegistrarTest extends TestCase {
 		$prefs->setEnabled( true );
 		self::assertTrue( $registrar->allowed() );
 		$definitions = $registrar->definitions();
-		self::assertSame( array( 'amazing-security/list-findings', 'amazing-security/get-finding', 'amazing-security/start-scan', 'amazing-security/get-scan', 'amazing-security/propose-fix', 'amazing-security/get-fix-status' ), array_keys( $definitions ) );
-		self::assertFalse( $definitions['amazing-security/propose-fix']['input_schema']['additionalProperties'] );
+		self::assertSame( array( 'amsec-security-scanner/list-findings', 'amsec-security-scanner/get-finding', 'amsec-security-scanner/start-scan', 'amsec-security-scanner/get-scan', 'amsec-security-scanner/propose-fix', 'amsec-security-scanner/get-fix-status' ), array_keys( $definitions ) );
+		self::assertFalse( $definitions['amsec-security-scanner/propose-fix']['input_schema']['additionalProperties'] );
 		foreach ( $definitions as $definition ) {
 			self::assertTrue( $definition['meta']['mcp']['public'] );
 			self::assertArrayNotHasKey( 'public', $definition['meta'] );

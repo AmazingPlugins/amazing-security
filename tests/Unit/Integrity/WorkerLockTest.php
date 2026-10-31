@@ -22,13 +22,13 @@ final class WorkerLockTest extends TestCase {
 		};
 		$lock = new WorkerLock( $options );
 		self::assertTrue( $lock->acquire( 'scan-1' ) );
-		$fileLock = new WorkerLock( $options, 'amazing_security_file_scan_worker_lock' );
+		$fileLock = new WorkerLock( $options, 'amsec_security_scanner_file_scan_worker_lock' );
 		self::assertTrue( $fileLock->acquire( 'file-scan-1' ) );
 		$fileLock->release();
 		self::assertFalse( ( new WorkerLock( $options ) )->acquire( 'scan-2' ) );
 		$lock->release();
 		self::assertTrue( ( new WorkerLock( $options ) )->acquire( 'scan-2' ) );
-		$key = 'amazing_security_integrity_worker_lock';
+		$key = 'amsec_security_scanner_integrity_worker_lock';
 		$options->values[ $key ] = json_encode( array( 'scan_id' => 'stale', 'expires' => time() - 1 ) );
 		$new = json_encode( array( 'scan_id' => 'new', 'expires' => time() + 60 ) );
 		$options->replaceOnGet = $new;

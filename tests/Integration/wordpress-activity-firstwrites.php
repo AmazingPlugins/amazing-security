@@ -6,7 +6,7 @@ use AmazingPlugins\Security\Mcp\McpPreferences;
 use AmazingPlugins\Security\Login\WordPressLoginSettings;
 use AmazingPlugins\Security\Vulnerabilities\VulnerabilityPreferences;
 global $wpdb;wp_set_current_user(1);update_option('amsec_activity_enabled','1',false);
-$keys=['amazing_security_mcp_enabled','amazing_security_vulnerability_direct_enabled','amsec_login_rate_mode','amsec_alerts_enabled'];
+$keys=['amsec_security_scanner_mcp_enabled','amsec_security_scanner_vulnerability_direct_enabled','amsec_login_rate_mode','amsec_alerts_enabled'];
 foreach($keys as $key){delete_option($key);}
 $options=new WordPressOptions();
 (new McpPreferences($options))->setEnabled(true);

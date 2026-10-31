@@ -4,7 +4,7 @@ use AmazingPlugins\Security\Digest\DigestDelivery;
 use PHPUnit\Framework\TestCase;
 final class DeliveryTest extends TestCase {
  private function options():MemoryOptions{$o=new MemoryOptions();$o->values['amsec_digest_enabled']='1';return $o;}
- private function delivery($o,$send):DigestDelivery{return new DigestDelivery($o,$send,'owner@example.test','https://example.test/wp-admin/admin.php?page=amazing-security');}
+ private function delivery($o,$send):DigestDelivery{return new DigestDelivery($o,$send,'owner@example.test','https://example.test/wp-admin/admin.php?page=amsec-security-scanner');}
  public function test_default_off_and_first_interval_do_not_send():void{
   $o=new MemoryOptions();$d=$this->delivery($o,static function(){throw new \LogicException('must not mail');});self::assertSame('off',$d->tick([],[],1000));$o->values['amsec_digest_enabled']='1';self::assertSame('waiting',$d->tick([],[],1000));self::assertSame('waiting',$d->tick([],[],605799));
  }

@@ -370,8 +370,8 @@ final class StartSuggestionsTest extends TestCase {
 				'found'  => 0,
 			)
 		) )->run( new ScanContext() )[0];
-		self::assertSame( 'amazing_security_vulnerability_enable', StartHere::control( $off )['action'] );
-		self::assertSame( 'amazing_security_integrity_start', StartHere::control( $files )['action'] );
+		self::assertSame( 'amsec_security_scanner_vulnerability_enable', StartHere::control( $off )['action'] );
+		self::assertSame( 'amsec_security_scanner_integrity_start', StartHere::control( $files )['action'] );
 		self::assertSame( 'amsec-repository', StartHere::control( $plugins )['page'] );
 		self::assertSame( 'amsec_content_scan', StartHere::control( $content )['action'] );
 		$filescan = ( new FollowUpCheck(
@@ -381,7 +381,7 @@ final class StartSuggestionsTest extends TestCase {
 				'found'  => 0,
 			)
 		) )->run( new ScanContext() )[0];
-		self::assertSame( 'amazing_security_file_scan_start', StartHere::control( $filescan )['action'] );
+		self::assertSame( 'amsec_security_scanner_file_scan_start', StartHere::control( $filescan )['action'] );
 		$update     = new CheckResult( 'core-updates', 'warn', 'A WordPress update is waiting.', 'https://developer.wordpress.org/advanced-administration/security/hardening/', new DateTimeImmutable( '2026-10-01T00:00:00Z' ), 'high', 'complete', array() );
 		$updateDone = new CheckResult( 'core-updates', 'pass', 'WordPress does not report a core update waiting.', 'https://developer.wordpress.org/advanced-administration/security/hardening/', new DateTimeImmutable( '2026-10-01T00:00:00Z' ), 'high', 'complete', array() );
 		$login      = new CheckResult( 'login-rate-mode', 'warn', 'Login monitoring is off.', 'https://developer.wordpress.org/advanced-administration/security/brute-force/', new DateTimeImmutable( '2026-10-01T00:00:00Z' ), 'high', 'complete', array( 'mode' => 'off' ) );

@@ -19,7 +19,7 @@ $path = WP_PLUGIN_DIR . '/akismet/akismet.php';
 $version = get_plugin_data( $path, false, false )['Version'];
 $cursor = new IntegrityCursor( wp_generate_uuid4() );
 $cursor->findings[] = new CheckResult( 'integrity-file', 'warn', 'Synthetic repair preview fixture.', 'https://downloads.wordpress.org/plugin-checksums/akismet/' . $version . '.json', new DateTimeImmutable(), 'high', 'complete', array( 'package_type' => 'plugin', 'package' => 'akismet:' . $version, 'path' => 'akismet.php', 'reason' => 'ok', 'observed_sha256' => hash_file( 'sha256', $path ) ), str_repeat( 'd', 32 ) );
-delete_option( 'amazing_security_integrity_active' );
+delete_option( 'amsec_security_scanner_integrity_active' );
 $store = new WordPressIntegrityStore( $options );
 $store->begin( $cursor->scanId, $cursor );
 $store->saveProgress( $cursor->scanId, new IntegrityStep( $cursor, true ) );

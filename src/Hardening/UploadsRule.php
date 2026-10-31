@@ -8,9 +8,9 @@ defined( 'ABSPATH' ) || exit;
 
 /** Apache uploads rule text. Writing the file is a separate, confirmed step. */
 final class UploadsRule {
-	public const BEGIN = '# Begin Amazing Security uploads';
+	public const BEGIN = '# Begin AmSec Security Scanner uploads';
 
-	public const END = '# End Amazing Security uploads';
+	public const END = '# End AmSec Security Scanner uploads';
 
 	public static function snippet(): string {
 		return self::BEGIN . "\n<FilesMatch \"\\.(?:php|phtml|php[0-9])$\">\nRequire all denied\n</FilesMatch>\n" . self::END . "\n";

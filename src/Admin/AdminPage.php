@@ -28,7 +28,7 @@ use AmazingPlugins\Security\Vulnerabilities\WordPressVulnerabilityReportStore;
 
 final class AdminPage {
 	public function register(): void {
-		add_menu_page( __( 'AmSec Security Scanner', 'amsec-security-scanner' ), __( 'Security Scanner', 'amsec-security-scanner' ), 'manage_options', 'amazing-security', array( $this, 'render' ), 'dashicons-shield-alt', 81 );
+		add_menu_page( __( 'AmSec Security Scanner', 'amsec-security-scanner' ), __( 'AmSec Security Scanner', 'amsec-security-scanner' ), 'manage_options', 'amsec-security-scanner', array( $this, 'render' ), 'dashicons-shield-alt', 81 );
 		add_action( 'admin_menu', array( new FilesPage(), 'register' ), 20 );
 		add_action( 'admin_menu', array( new FollowUpPages(), 'register' ), 20 );
 		add_action( 'admin_menu', array( new RecordsPage(), 'register' ), 20 );
@@ -41,10 +41,10 @@ final class AdminPage {
 	}
 
 	private function renderFirstScan(): void {
-		echo '<div class="wrap amazing-security-admin amsec-scan amsec-scan-first"><div class="amsec-stage">';
+		echo '<div class="wrap amsec-security-scanner-admin amsec-scan amsec-scan-first"><div class="amsec-stage">';
 		echo '<h1 class="screen-reader-text">' . esc_html__( 'Scan', 'amsec-security-scanner' ) . '</h1>';
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only notice after a failed scan redirect.
-		if ( isset( $_GET['amazing_security_error'] ) ) {
+		if ( isset( $_GET['amsec_security_scanner_error'] ) ) {
 			echo '<div class="notice notice-error" data-amsec-scan-error><p>' . esc_html__( 'Scan could not be saved.', 'amsec-security-scanner' ) . '</p></div>';
 		}
 		$this->scanForm( __( 'Scan', 'amsec-security-scanner' ) );
@@ -56,8 +56,8 @@ final class AdminPage {
 	 */
 	private function scanForm( string $label, bool $rescan = false ): void {
 		echo '<form class="amsec-scan-form' . ( $rescan ? ' amsec-rescan-center' : '' ) . '" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" method="post">';
-		echo '<input type="hidden" name="action" value="amazing_security_scan">';
-		wp_nonce_field( 'amazing_security_scan' );
+		echo '<input type="hidden" name="action" value="amsec_security_scanner_scan">';
+		wp_nonce_field( 'amsec_security_scanner_scan' );
 		echo '<button type="submit" class="amsec-scan-button' . ( $rescan ? ' amsec-rescan-button' : '' ) . '">' . esc_html( $label ) . '</button>';
 		echo '<div class="amsec-scan-progress" hidden><p class="amsec-scan-status">' . esc_html__( 'Scanning', 'amsec-security-scanner' ) . ' <span class="amsec-scan-percent" aria-hidden="true"></span></p>';
 		echo '<p class="amsec-scan-step"></p>';
@@ -118,12 +118,12 @@ final class AdminPage {
 			$this->renderFirstScan();
 			return;
 		}
-		echo '<div class="wrap amazing-security-admin amsec-scan"><h1 class="screen-reader-text">' . esc_html__( 'Scan', 'amsec-security-scanner' ) . '</h1>';
+		echo '<div class="wrap amsec-security-scanner-admin amsec-scan"><h1 class="screen-reader-text">' . esc_html__( 'Scan', 'amsec-security-scanner' ) . '</h1>';
 		$this->scanForm( __( 'Rescan', 'amsec-security-scanner' ), true );
 		list( $integrityScanId, $contentScanId, $fileScanId ) = $this->scanIds();
 		// These flags select a static message only.
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		if ( isset( $_GET['amazing_security_error'] ) ) {
+		if ( isset( $_GET['amsec_security_scanner_error'] ) ) {
 			echo '<div class="notice notice-error"><p>' . esc_html__( 'Scan could not be saved. The previous report is still shown.', 'amsec-security-scanner' ) . '</p></div>';
 		}
 		$category = $this->requestedCategory( $run->results );
@@ -170,7 +170,7 @@ final class AdminPage {
 				(string) $total,
 				wp_date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $run->finishedAt->getTimestamp() )
 			)
-		) . ' <a class="button" href="' . esc_url( admin_url( 'admin.php?page=amazing-security' ) ) . '">' . esc_html__( 'Scan again', 'amsec-security-scanner' ) . '</a></p>';
+		) . ' <a class="button" href="' . esc_url( admin_url( 'admin.php?page=amsec-security-scanner' ) ) . '">' . esc_html__( 'Scan again', 'amsec-security-scanner' ) . '</a></p>';
 		$tabs = array( 'overview' => array( __( 'Overview', 'amsec-security-scanner' ), null, '' ) );
 		foreach ( $groups as $key => $group ) {
 			$tabs[ $key ] = array( $group[0], count( $byKey[ $key ] ), $group[2] );
@@ -277,18 +277,18 @@ final class AdminPage {
 			} elseif ( null !== $malware ) {
 				// FileScanReportRenderer escapes dynamic values.
 				echo wp_kses( ( new FileScanReportRenderer( '', '', array(), __( 'Malware scan', 'amsec-security-scanner' ), 'amsec-malware' ) )->render( null, new FileScanStep( $malware, $malware->finished ), array() ), AdminHtml::allowed() );
-				echo '<p><a class="button" href="' . esc_url( admin_url( 'admin.php?page=amazing-security' ) ) . '">' . esc_html__( 'Scan again', 'amsec-security-scanner' ) . '</a></p>';
+				echo '<p><a class="button" href="' . esc_url( admin_url( 'admin.php?page=amsec-security-scanner' ) ) . '">' . esc_html__( 'Scan again', 'amsec-security-scanner' ) . '</a></p>';
 			}
 			// IntegrityReportRenderer escapes all dynamic values.
 			echo wp_kses( ( new IntegrityReportRenderer() )->render( $integrity, $progress ), AdminHtml::allowed() );
 			if ( null === $progress || $progress->finished ) {
-				echo '<form action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" method="post"><input type="hidden" name="action" value="amazing_security_integrity_start">';
-				wp_nonce_field( 'amazing_security_integrity_start' );
+				echo '<form action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" method="post"><input type="hidden" name="action" value="amsec_security_scanner_integrity_start">';
+				wp_nonce_field( 'amsec_security_scanner_integrity_start' );
 				submit_button( __( 'Run integrity scan', 'amsec-security-scanner' ), 'secondary' );
 				echo '</form>';
 			} else {
-				echo '<form action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" method="post"><input type="hidden" name="action" value="amazing_security_integrity_resume"><input type="hidden" name="scan_id" value="' . esc_attr( $progress->cursor->scanId ) . '">';
-				wp_nonce_field( 'amazing_security_integrity_resume' );
+				echo '<form action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" method="post"><input type="hidden" name="action" value="amsec_security_scanner_integrity_resume"><input type="hidden" name="scan_id" value="' . esc_attr( $progress->cursor->scanId ) . '">';
+				wp_nonce_field( 'amsec_security_scanner_integrity_resume' );
 				submit_button( __( 'Continue integrity scan', 'amsec-security-scanner' ), 'secondary' );
 				echo '</form>';
 			}
@@ -296,12 +296,12 @@ final class AdminPage {
 			echo wp_kses( ( new FileScanReportRenderer( admin_url( 'admin-post.php' ), wp_create_nonce( 'amsec_file_scan_note' ), $fileStore->notes() ) )->render( $fileDone, $fileProgress, $fileHistory ), AdminHtml::allowed() );
 			echo '<div class="amsec-file-actionbar"><form action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" method="post">';
 			if ( null === $fileProgress || $fileProgress->finished ) {
-				echo '<input type="hidden" name="action" value="amazing_security_file_scan_start">';
-				wp_nonce_field( 'amazing_security_file_scan_start' );
+				echo '<input type="hidden" name="action" value="amsec_security_scanner_file_scan_start">';
+				wp_nonce_field( 'amsec_security_scanner_file_scan_start' );
 				submit_button( __( 'Run file scan', 'amsec-security-scanner' ), 'primary', 'submit', false );
 			} else {
-				echo '<input type="hidden" name="action" value="amazing_security_file_scan_resume"><input type="hidden" name="scan_id" value="' . esc_attr( $fileProgress->cursor->scanId ) . '">';
-				wp_nonce_field( 'amazing_security_file_scan_resume' );
+				echo '<input type="hidden" name="action" value="amsec_security_scanner_file_scan_resume"><input type="hidden" name="scan_id" value="' . esc_attr( $fileProgress->cursor->scanId ) . '">';
+				wp_nonce_field( 'amsec_security_scanner_file_scan_resume' );
 				submit_button( __( 'Continue file scan', 'amsec-security-scanner' ), 'primary', 'submit', false );
 			}
 			echo '</form></div>';
@@ -326,8 +326,8 @@ final class AdminPage {
 
 	private function vulnerabilitySection( bool $direct, WordPressVulnerabilityReportStore $vulnStore, mixed $vulnCurrent ): void {
 		if ( $direct ) {
-			echo '<form action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" method="post"><input type="hidden" name="action" value="amazing_security_vulnerability_scan">';
-			wp_nonce_field( 'amazing_security_vulnerability_scan' );
+			echo '<form action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" method="post"><input type="hidden" name="action" value="amsec_security_scanner_vulnerability_scan">';
+			wp_nonce_field( 'amsec_security_scanner_vulnerability_scan' );
 			submit_button( __( 'Check installed versions', 'amsec-security-scanner' ) );
 			echo '</form>';
 			$scanProgress = get_transient( 'amsec_vuln_progress' );
@@ -345,28 +345,28 @@ final class AdminPage {
 			}
 			$kev = '1' === get_option( ExploitedList::ENABLED );
 			echo '<section class="amsec-consent" aria-labelledby="amsec-kev-title"><h3 id="amsec-kev-title">' . esc_html__( 'Holes attackers are using right now', 'amsec-security-scanner' ) . '</h3><p>' . esc_html__( 'Also check the US CISA list of security holes that attackers are using right now. Once a week this site downloads the public list. Nothing about your site is sent, but CISA can see your server’s IP address. A match is marked “Attackers are using this hole.”', 'amsec-security-scanner' ) . ' <a href="https://www.cisa.gov/known-exploited-vulnerabilities-catalog" target="_blank" rel="noopener noreferrer">' . esc_html__( 'About the list', 'amsec-security-scanner' ) . '</a> · <a href="https://www.cisa.gov/privacy-policy" target="_blank" rel="noopener noreferrer">' . esc_html__( 'CISA privacy policy', 'amsec-security-scanner' ) . '</a></p>';
-			echo '<form action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" method="post"><input type="hidden" name="action" value="amazing_security_kev_toggle"><input type="hidden" name="amsec_kev" value="' . ( $kev ? '0' : '1' ) . '">';
-			wp_nonce_field( 'amazing_security_kev_toggle' );
+			echo '<form action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" method="post"><input type="hidden" name="action" value="amsec_security_scanner_kev_toggle"><input type="hidden" name="amsec_kev" value="' . ( $kev ? '0' : '1' ) . '">';
+			wp_nonce_field( 'amsec_security_scanner_kev_toggle' );
 			echo '<p>';
 			submit_button( $kev ? __( 'Turn off the CISA list', 'amsec-security-scanner' ) : __( 'Turn on the CISA list', 'amsec-security-scanner' ), $kev ? 'secondary' : 'primary', 'submit', false );
 			echo '</p></form></section>';
-			echo '<form action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" method="post"><input type="hidden" name="action" value="amazing_security_vulnerability_disable">';
-			wp_nonce_field( 'amazing_security_vulnerability_disable' );
+			echo '<form action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" method="post"><input type="hidden" name="action" value="amsec_security_scanner_vulnerability_disable">';
+			wp_nonce_field( 'amsec_security_scanner_vulnerability_disable' );
 			echo '<p>';
 			submit_button( __( 'Turn off vulnerability checks', 'amsec-security-scanner' ), 'secondary', 'submit', false );
 			echo '</p>';
 			echo '</form>';
 		} else {
 			echo '<section class="amsec-consent" aria-labelledby="amsec-consent-title"><h3 id="amsec-consent-title">' . esc_html__( 'Enable vulnerability checks', 'amsec-security-scanner' ) . '</h3><p>' . esc_html__( 'This WordPress site will contact WPVulnerability directly for its core version and installed plugin and theme slugs. The provider can see this site’s request IP address and requested components. AmazingPlugins receives no inventory. Results are stored on this site. Read the', 'amsec-security-scanner' ) . ' <a href="https://www.wpvulnerability.com/privacy/" target="_blank" rel="noopener noreferrer">' . esc_html__( 'provider privacy policy', 'amsec-security-scanner' ) . '</a> ' . esc_html__( 'and', 'amsec-security-scanner' ) . ' <a href="https://www.wpvulnerability.com/license/" target="_blank" rel="noopener noreferrer">' . esc_html__( 'data license', 'amsec-security-scanner' ) . '</a>.</p>';
-			echo '<form action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" method="post"><input type="hidden" name="action" value="amazing_security_vulnerability_enable">';
-			wp_nonce_field( 'amazing_security_vulnerability_enable' );
+			echo '<form action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" method="post"><input type="hidden" name="action" value="amsec_security_scanner_vulnerability_enable">';
+			wp_nonce_field( 'amsec_security_scanner_vulnerability_enable' );
 			echo '<p>';
 			submit_button( __( 'Enable vulnerability checks', 'amsec-security-scanner' ), 'primary', 'submit', false );
 			echo '</p>';
 			echo '</form></section>';
 		}
-		echo '<form action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" method="post"><input type="hidden" name="action" value="amazing_security_vulnerability_clear">';
-		wp_nonce_field( 'amazing_security_vulnerability_clear' );
+		echo '<form action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" method="post"><input type="hidden" name="action" value="amsec_security_scanner_vulnerability_clear">';
+		wp_nonce_field( 'amsec_security_scanner_vulnerability_clear' );
 		echo '<p>';
 		submit_button( __( 'Clear local vulnerability data', 'amsec-security-scanner' ), 'secondary', 'submit', false );
 		echo '</p>';
@@ -461,7 +461,7 @@ final class AdminPage {
 
 	private function viewUrl( string $category, int $paged = 1 ): string {
 		$args = array(
-			'page'      => 'amazing-security',
+			'page'      => 'amsec-security-scanner',
 			'amsec_cat' => $category,
 		);
 		if ( $paged > 1 ) {
@@ -601,13 +601,13 @@ final class AdminPage {
 			$control = match ( $scan ) {
 				'integrity' => array(
 					'label'  => __( 'Run integrity scan', 'amsec-security-scanner' ),
-					'action' => 'amazing_security_integrity_start',
-					'nonce'  => 'amazing_security_integrity_start',
+					'action' => 'amsec_security_scanner_integrity_start',
+					'nonce'  => 'amsec_security_scanner_integrity_start',
 				),
 				'files' => array(
 					'label'  => __( 'Run file scan', 'amsec-security-scanner' ),
-					'action' => 'amazing_security_file_scan_start',
-					'nonce'  => 'amazing_security_file_scan_start',
+					'action' => 'amsec_security_scanner_file_scan_start',
+					'nonce'  => 'amsec_security_scanner_file_scan_start',
 				),
 				default => array(
 					'label' => __( 'Review content scan', 'amsec-security-scanner' ),

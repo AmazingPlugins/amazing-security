@@ -1,6 +1,6 @@
 # Bundled local code checks
 
-Version `2026.09.29.3` ships with Amazing Security. The rules run on the site during manual and scheduled file scans. They update with the plugin, not from a remote feed. A scan cannot confirm that a file is malware-free.
+Version `2026.09.29.3` ships with AmSec Security Scanner. The rules run on the site during manual and scheduled file scans. They update with the plugin, not from a remote feed. A scan cannot confirm that a file is malware-free.
 
 | Rule | What it looks for | Common false positive |
 | --- | --- | --- |

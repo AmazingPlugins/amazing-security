@@ -24,7 +24,7 @@ final class AlertDeliveryTest extends TestCase {
 	public function test_accepted_alert_is_deduplicated_by_finding_id(): void {
 		$options = $this->options();
 		$sent = array();
-		$delivery = new AlertDelivery( $options, static function ( string $to, string $subject, string $body ) use ( &$sent ): bool { $sent[] = array( $to, $subject, $body ); return true; }, 'owner@example.test', 'https://example.test/wp-admin/admin.php?page=amazing-security' );
+		$delivery = new AlertDelivery( $options, static function ( string $to, string $subject, string $body ) use ( &$sent ): bool { $sent[] = array( $to, $subject, $body ); return true; }, 'owner@example.test', 'https://example.test/wp-admin/admin.php?page=amsec-security-scanner' );
 		self::assertSame( 'accepted', $delivery->sendNew( array( 'finding-one' ), 1000 ) );
 		self::assertSame( 'none', $delivery->sendNew( array( 'finding-one' ), 1001 ) );
 		self::assertCount( 1, $sent );

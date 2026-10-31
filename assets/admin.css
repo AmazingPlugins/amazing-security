@@ -15,7 +15,7 @@
   src: url(fonts/inter-latin.woff2) format("woff2");
 }
 
-.amazing-security-admin {
+.amsec-security-scanner-admin {
   --amsec-ink: #1a1410;
   --amsec-line: rgba(26, 20, 16, 0.12);
   --amsec-muted: #6b5c4f;
@@ -153,14 +153,14 @@
   }
 }
 
-.amazing-security-admin code,
-.amazing-security-admin .widefat td {
+.amsec-security-scanner-admin code,
+.amsec-security-scanner-admin .widefat td {
   overflow-wrap: anywhere;
   white-space: normal;
 }
 
 @media (max-width: 782px) {
-  .amazing-security-admin .amazing-security-table-scroll .amsec-stacked-table {
+  .amsec-security-scanner-admin .amsec-security-scanner-table-scroll .amsec-stacked-table {
     min-width: 0;
     background: transparent;
     border: 0;
@@ -206,7 +206,7 @@
   }
 }
 
-.amazing-security-admin .amsec-header {
+.amsec-security-scanner-admin .amsec-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -372,8 +372,8 @@
   color: #1a1410;
 }
 
-body.amsec-app #wpbody-content > .wrap.amazing-security-admin:not(.amsec-scan) > h1,
-body.amsec-app #wpbody-content > .wrap.amazing-security-admin:not(.amsec-scan) > .amsec-header h1 {
+body.amsec-app #wpbody-content > .wrap.amsec-security-scanner-admin:not(.amsec-scan) > h1,
+body.amsec-app #wpbody-content > .wrap.amsec-security-scanner-admin:not(.amsec-scan) > .amsec-header h1 {
   /* The page bar above already shows this title as the h1; hide the copy from screen readers too. */
   display: none;
 }
@@ -398,7 +398,7 @@ body.amsec-app #wpbody-content > .wrap.amazing-security-admin:not(.amsec-scan) >
   box-shadow: none;
 }
 
-.amazing-security-admin .amsec-overview {
+.amsec-security-scanner-admin .amsec-overview {
   margin: 12px auto 28px;
   padding: 22px 22px 8px;
   background: #fff;
@@ -419,13 +419,13 @@ body.amsec-app #wpbody-content > .wrap.amazing-security-admin:not(.amsec-scan) >
     box-shadow: 0 12px 28px rgba(242, 107, 58, 0.24);
   }
 
-  .amazing-security-admin .amsec-overview {
+  .amsec-security-scanner-admin .amsec-overview {
     padding: 16px 14px 4px;
     border-radius: 16px;
   }
 }
 
-.amazing-security-admin .amsec-header h1 {
+.amsec-security-scanner-admin .amsec-header h1 {
   margin: 0 0 8px;
   font-family: Fraunces, "Times New Roman", serif;
   font-size: 30px;
@@ -434,7 +434,7 @@ body.amsec-app #wpbody-content > .wrap.amazing-security-admin:not(.amsec-scan) >
   color: #1a1410;
 }
 
-.amazing-security-admin .amsec-header p {
+.amsec-security-scanner-admin .amsec-header p {
   max-width: 72ch;
   margin: 0 0 14px;
   color: var(--amsec-muted);
@@ -442,7 +442,7 @@ body.amsec-app #wpbody-content > .wrap.amazing-security-admin:not(.amsec-scan) >
   line-height: 1.55;
 }
 
-.amazing-security-admin .amsec-schedule-status {
+.amsec-security-scanner-admin .amsec-schedule-status {
   display: flex;
   align-items: baseline;
   gap: 12px;
@@ -451,63 +451,63 @@ body.amsec-app #wpbody-content > .wrap.amazing-security-admin:not(.amsec-scan) >
   color: var(--amsec-muted);
 }
 
-.amazing-security-admin .amsec-schedule-status strong {
+.amsec-security-scanner-admin .amsec-schedule-status strong {
   color: var(--amsec-ink);
 }
 
-.amazing-security-admin .amsec-schedule-status small {
+.amsec-security-scanner-admin .amsec-schedule-status small {
   margin-left: auto;
   color: var(--amsec-muted);
 }
 
 @media (max-width: 600px) {
-  .amazing-security-admin .amsec-schedule-status {
+  .amsec-security-scanner-admin .amsec-schedule-status {
     flex-wrap: wrap;
   }
 
-  .amazing-security-admin .amsec-schedule-status small {
+  .amsec-security-scanner-admin .amsec-schedule-status small {
     width: 100%;
     margin-left: 0;
   }
 }
 
-.amazing-security-admin > section {
+.amsec-security-scanner-admin > section {
   margin: 26px 0;
 }
 
-.amazing-security-admin .amsec-firewall-status {
+.amsec-security-scanner-admin .amsec-firewall-status {
   padding: 18px 0;
   border-top: 1px solid var(--amsec-line);
   border-bottom: 1px solid var(--amsec-line);
 }
 
-.amazing-security-admin .amsec-firewall-status h2 {
+.amsec-security-scanner-admin .amsec-firewall-status h2 {
   margin: 0 0 8px;
 }
 
-.amazing-security-admin .amsec-firewall-status p {
+.amsec-security-scanner-admin .amsec-firewall-status p {
   max-width: 70ch;
   margin: 0 0 8px;
   line-height: 1.5;
 }
 
-.amazing-security-admin .amsec-alert-settings {
+.amsec-security-scanner-admin .amsec-alert-settings {
   padding: 0 0 18px;
   border-bottom: 1px solid var(--amsec-line);
 }
 
-.amazing-security-admin .amsec-alert-settings p {
+.amsec-security-scanner-admin .amsec-alert-settings p {
   max-width: 70ch;
   line-height: 1.5;
 }
 
-.amazing-security-admin .amsec-alert-settings fieldset {
+.amsec-security-scanner-admin .amsec-alert-settings fieldset {
   display: flex;
   gap: 18px;
   margin: 12px 0;
 }
 
-.amazing-security-admin .amsec-alert-settings label {
+.amsec-security-scanner-admin .amsec-alert-settings label {
   display: inline-flex;
   align-items: center;
   gap: 5px;
@@ -573,14 +573,14 @@ body.amsec-app #wpbody-content > .wrap.amazing-security-admin:not(.amsec-scan) >
   color: #a63617;
 }
 
-.amazing-security-admin .amsec-overview h2,
-.amazing-security-admin .amsec-group h2 {
+.amsec-security-scanner-admin .amsec-overview h2,
+.amsec-security-scanner-admin .amsec-group h2 {
   margin-bottom: 12px;
   font-family: Fraunces, "Times New Roman", serif;
   font-weight: 650;
 }
 
-body.amsec-app .amazing-security-admin:not(.amsec-scan) {
+body.amsec-app .amsec-security-scanner-admin:not(.amsec-scan) {
   box-sizing: border-box;
   padding: 22px 22px 16px;
   background: #fff;
@@ -588,15 +588,15 @@ body.amsec-app .amazing-security-admin:not(.amsec-scan) {
   border-radius: 20px;
 }
 
-body.amsec-app .amazing-security-admin:not(.amsec-scan):has(.amsec-screen-tabs) {
+body.amsec-app .amsec-security-scanner-admin:not(.amsec-scan):has(.amsec-screen-tabs) {
   padding: 0;
   background: transparent;
   border: 0;
   border-radius: 0;
 }
 
-body.amsec-app .amazing-security-admin:not(.amsec-scan) > h1,
-body.amsec-app .amazing-security-admin:not(.amsec-scan) .amsec-header h1 {
+body.amsec-app .amsec-security-scanner-admin:not(.amsec-scan) > h1,
+body.amsec-app .amsec-security-scanner-admin:not(.amsec-scan) .amsec-header h1 {
   margin-top: 0;
   font-family: Fraunces, "Times New Roman", serif;
   font-size: 30px;
@@ -604,7 +604,7 @@ body.amsec-app .amazing-security-admin:not(.amsec-scan) .amsec-header h1 {
   color: #1a1410;
 }
 
-body.amsec-app .amazing-security-admin:not(.amsec-scan) :is(.amsec-overview, .amsec-login, .amsec-mcp, .amsec-file-scan, .amsec-fix-review, .amsec-consent) {
+body.amsec-app .amsec-security-scanner-admin:not(.amsec-scan) :is(.amsec-overview, .amsec-login, .amsec-mcp, .amsec-file-scan, .amsec-fix-review, .amsec-consent) {
   margin: 12px 0 0;
   padding: 0;
   background: transparent;
@@ -701,7 +701,7 @@ body.amsec-app .amazing-security-admin:not(.amsec-scan) :is(.amsec-overview, .am
   color: #3a2e26;
 }
 
-.amazing-security-admin textarea {
+.amsec-security-scanner-admin textarea {
   width: 100%;
   max-width: 640px;
   border-radius: 12px;
@@ -768,7 +768,7 @@ body.amsec-app .amazing-security-admin:not(.amsec-scan) :is(.amsec-overview, .am
   color: #a63617;
 }
 
-.amazing-security-admin :is(select, textarea, input[type="text"], input[type="number"]) {
+.amsec-security-scanner-admin :is(select, textarea, input[type="text"], input[type="number"]) {
   border-radius: 12px;
   border-color: rgba(26, 20, 16, 0.2);
 }
@@ -850,26 +850,26 @@ body.amsec-app .amazing-security-admin:not(.amsec-scan) :is(.amsec-overview, .am
   line-height: 1.55;
 }
 
-.amazing-security-table-scroll {
+.amsec-security-scanner-table-scroll {
   max-width: 100%;
   overflow-x: auto;
 }
 
-.amazing-security-table-scroll:focus-visible {
+.amsec-security-scanner-table-scroll:focus-visible {
   outline: 2px solid #a63617;
   outline-offset: 2px;
 }
 
-.amazing-security-table-scroll .widefat {
+.amsec-security-scanner-table-scroll .widefat {
   min-width: 640px;
 }
 
 @media (max-width: 782px) {
-  .amazing-security-admin .amsec-header {
+  .amsec-security-scanner-admin .amsec-header {
     display: block;
   }
 
-  .amazing-security-admin .amsec-header h1 {
+  .amsec-security-scanner-admin .amsec-header h1 {
     font-size: 26px;
   }
 
@@ -897,13 +897,13 @@ body.amsec-app .amazing-security-admin:not(.amsec-scan) :is(.amsec-overview, .am
     overflow-x: visible;
   }
 
-  .amazing-security-table-scroll .amazing-security-responsive-table {
+  .amsec-security-scanner-table-scroll .amsec-security-scanner-responsive-table {
     min-width: 0;
     border: 0;
     background: transparent;
   }
 
-  .amazing-security-responsive-table thead {
+  .amsec-security-scanner-responsive-table thead {
     position: absolute;
     width: 1px;
     height: 1px;
@@ -911,12 +911,12 @@ body.amsec-app .amazing-security-admin:not(.amsec-scan) :is(.amsec-overview, .am
     clip-path: inset(50%);
   }
 
-  .amazing-security-responsive-table tbody,
-  .amazing-security-responsive-table td {
+  .amsec-security-scanner-responsive-table tbody,
+  .amsec-security-scanner-responsive-table td {
     display: block;
   }
 
-  .amazing-security-responsive-table tr {
+  .amsec-security-scanner-responsive-table tr {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
     gap: 5px 12px;
@@ -926,19 +926,19 @@ body.amsec-app .amazing-security-admin:not(.amsec-scan) :is(.amsec-overview, .am
     border: 1px solid var(--amsec-line);
   }
 
-  .amazing-security-responsive-table td {
+  .amsec-security-scanner-responsive-table td {
     border: 0;
     padding: 0;
     overflow-wrap: anywhere;
   }
 
-  .amazing-security-responsive-table td[data-label="Package"] {
+  .amsec-security-scanner-responsive-table td[data-label="Package"] {
     grid-column: 1;
     grid-row: 1;
     font-weight: 600;
   }
 
-  .amazing-security-responsive-table td[data-label="State"] {
+  .amsec-security-scanner-responsive-table td[data-label="State"] {
     grid-column: 2;
     grid-row: 1;
     color: #8a4600;
@@ -947,30 +947,30 @@ body.amsec-app .amazing-security-admin:not(.amsec-scan) :is(.amsec-overview, .am
     text-transform: uppercase;
   }
 
-  .amazing-security-responsive-table td[data-label="Finding"] {
+  .amsec-security-scanner-responsive-table td[data-label="Finding"] {
     grid-column: 1 / -1;
     grid-row: 2;
     line-height: 1.45;
   }
 
-  .amazing-security-responsive-table td[data-label="Installed"] {
+  .amsec-security-scanner-responsive-table td[data-label="Installed"] {
     grid-column: 1;
     grid-row: 3;
     color: var(--amsec-muted);
     font-size: 12px;
   }
 
-  .amazing-security-responsive-table td[data-label="Source"] {
+  .amsec-security-scanner-responsive-table td[data-label="Source"] {
     grid-column: 2;
     grid-row: 3;
     font-size: 12px;
   }
 
-  .amazing-security-responsive-table td::before {
+  .amsec-security-scanner-responsive-table td::before {
     content: none;
   }
 
-  .amazing-security-responsive-table td[data-label="Installed"]::before {
+  .amsec-security-scanner-responsive-table td[data-label="Installed"]::before {
     content: 'Installed: ';
   }
 }
@@ -1050,7 +1050,7 @@ body.amsec-app #wpfooter {
 }
 
 body.amsec-app #wpbody-content .wrap,
-body.amsec-app .amazing-security-admin {
+body.amsec-app .amsec-security-scanner-admin {
   box-sizing: border-box;
   max-width: none;
   margin-right: 20px;
@@ -1060,7 +1060,7 @@ body.amsec-app .amazing-security-admin {
 }
 
 body.amsec-app #wpbody-content .wrap > h1,
-body.amsec-app .amazing-security-admin h1,
+body.amsec-app .amsec-security-scanner-admin h1,
 body.amsec-app .amsec-brand-name {
   font-family: Fraunces, "Times New Roman", serif;
   color: #1a1410;
@@ -1220,7 +1220,7 @@ body.amsec-app .amsec-screen-tabs ~ .amsec-tab-panel {
   border-radius: 0 0 20px 20px;
 }
 
-body.amsec-app #wpbody-content .amsec-tab-panel .amazing-security-admin,
+body.amsec-app #wpbody-content .amsec-tab-panel .amsec-security-scanner-admin,
 body.amsec-app #wpbody-content .amsec-tab-panel .wrap {
   margin: 0;
   padding: 0;
@@ -1239,14 +1239,14 @@ body.amsec-app #wpbody-content .amsec-tab-panel .wrap {
   display: none;
 }
 
-.amazing-security-admin h2,
+.amsec-security-scanner-admin h2,
 .amsec-tab-panel h2 {
   font-family: Fraunces, "Times New Roman", serif;
   font-weight: 650;
   color: #1a1410;
 }
 
-body.amsec-app .amazing-security-admin .widefat,
+body.amsec-app .amsec-security-scanner-admin .widefat,
 .amsec-tab-panel .widefat {
   border: 1px solid rgba(26, 20, 16, 0.12);
   border-radius: 14px;
@@ -1254,14 +1254,14 @@ body.amsec-app .amazing-security-admin .widefat,
   box-shadow: none;
 }
 
-body.amsec-app .amazing-security-admin .widefat thead th,
+body.amsec-app .amsec-security-scanner-admin .widefat thead th,
 .amsec-tab-panel .widefat thead th {
   background: #faf5ec;
   color: #1a1410;
   font-weight: 650;
 }
 
-body.amsec-app .amazing-security-admin code,
+body.amsec-app .amsec-security-scanner-admin code,
 .amsec-tab-panel code {
   padding: 1px 5px;
   background: #faf5ec;
@@ -1800,14 +1800,14 @@ html:has(body.amsec-app) {
   box-shadow: 0 0 0 3px #f4a93c, 0 0 20px 4px rgba(217, 75, 38, 0.7);
 }
 
-body.amsec-app .amazing-security-admin fieldset legend {
+body.amsec-app .amsec-security-scanner-admin fieldset legend {
   display: block;
   margin: 0 0 6px;
   padding: 0;
   font-weight: 650;
 }
 
-body.amsec-app .amazing-security-admin fieldset > label {
+body.amsec-app .amsec-security-scanner-admin fieldset > label {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -1876,18 +1876,18 @@ body.amsec-app .amazing-security-admin fieldset > label {
 }
 
 /* Each setting gets its own row; the generic fieldset rule lays labels side by side. */
-body.amsec-app .amazing-security-admin fieldset > label.amsec-check {
+body.amsec-app .amsec-security-scanner-admin fieldset > label.amsec-check {
   display: flex;
   margin-right: 0;
 }
 
 /* Standalone links and disclosure toggles need a 24px tap target on phones (WCAG 2.2 target size). */
 @media screen and (max-width: 782px) {
-  body.amsec-app .amazing-security-admin .amsec-tip-button,
-  body.amsec-app .amazing-security-admin li > a:not(.button, .amsec-settings a),
-  body.amsec-app .amazing-security-admin td > a:not(.button),
-  body.amsec-app .amazing-security-admin p > a:not(.button):only-child,
-  body.amsec-app .amazing-security-admin p > a:not(.button):last-child {
+  body.amsec-app .amsec-security-scanner-admin .amsec-tip-button,
+  body.amsec-app .amsec-security-scanner-admin li > a:not(.button, .amsec-settings a),
+  body.amsec-app .amsec-security-scanner-admin td > a:not(.button),
+  body.amsec-app .amsec-security-scanner-admin p > a:not(.button):only-child,
+  body.amsec-app .amsec-security-scanner-admin p > a:not(.button):last-child {
     display: inline-block;
     min-height: 24px;
     padding: 3px 0;
@@ -1895,7 +1895,7 @@ body.amsec-app .amazing-security-admin fieldset > label.amsec-check {
   }
 
   /* Keep the disclosure triangle; list-item is what draws it. */
-  body.amsec-app .amazing-security-admin summary {
+  body.amsec-app .amsec-security-scanner-admin summary {
     display: list-item;
     min-height: 24px;
     padding: 3px 0;
@@ -1911,11 +1911,11 @@ body.amsec-app .amsec-scan.is-scanning .amsec-scan-button {
 
 /* Polish layer: one look for buttons, links, controls and notices on every screen. */
 /* WordPress fills checked boxes and radios with this variable. */
-body.amsec-app .amazing-security-admin {
+body.amsec-app .amsec-security-scanner-admin {
   --wp-admin-theme-color: #a63617;
 }
 
-body.amsec-app .amazing-security-admin .button:not(.button-link) {
+body.amsec-app .amsec-security-scanner-admin .button:not(.button-link) {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1928,40 +1928,40 @@ body.amsec-app .amazing-security-admin .button:not(.button-link) {
 }
 
 /* :where() keeps this at element weight, so it only replaces WordPress's default link blue. */
-:where(body.amsec-app .amazing-security-admin) a {
+:where(body.amsec-app .amsec-security-scanner-admin) a {
   color: #a63617;
 }
 
-:where(body.amsec-app .amazing-security-admin) a:hover {
+:where(body.amsec-app .amsec-security-scanner-admin) a:hover {
   color: #1a1410;
 }
 
-body.amsec-app .amazing-security-admin :is(input[type="checkbox"], input[type="radio"], select, input[type="text"], input[type="number"], input[type="email"], input[type="url"], textarea):focus {
+body.amsec-app .amsec-security-scanner-admin :is(input[type="checkbox"], input[type="radio"], select, input[type="text"], input[type="number"], input[type="email"], input[type="url"], textarea):focus {
   border-color: #a63617;
   box-shadow: 0 0 0 1px #a63617;
 }
 
-body.amsec-app .amazing-security-admin select {
+body.amsec-app .amsec-security-scanner-admin select {
   padding-right: 28px;
   background-position: right 8px top 55%;
 }
 
-body.amsec-app .amazing-security-admin .notice-info {
+body.amsec-app .amsec-security-scanner-admin .notice-info {
   border-left-color: #f4a93c;
   background: #faf5ec;
 }
 
-body.amsec-app .amazing-security-admin h3 {
+body.amsec-app .amsec-security-scanner-admin h3 {
   font-family: Fraunces, "Times New Roman", serif;
   font-weight: 650;
   color: #1a1410;
 }
 
-body.amsec-app .amazing-security-admin dl:not([class]) dd {
+body.amsec-app .amsec-security-scanner-admin dl:not([class]) dd {
   margin: 0 0 12px;
 }
 
-body.amsec-app .amazing-security-admin pre {
+body.amsec-app .amsec-security-scanner-admin pre {
   padding: 12px 14px;
   overflow-x: auto;
   border: 1px solid rgba(26, 20, 16, 0.12);
@@ -1971,24 +1971,24 @@ body.amsec-app .amazing-security-admin pre {
 }
 
 /* A checkbox label that wraps keeps its text indented beside the box. */
-body.amsec-app .amazing-security-admin label:has(> input[type="checkbox"]:first-child) {
+body.amsec-app .amsec-security-scanner-admin label:has(> input[type="checkbox"]:first-child) {
   display: flex;
   gap: 8px;
   align-items: flex-start;
 }
 
-body.amsec-app .amazing-security-admin label:has(> input[type="checkbox"]:first-child) > input {
+body.amsec-app .amsec-security-scanner-admin label:has(> input[type="checkbox"]:first-child) > input {
   flex: none;
   margin: 2px 0 0;
 }
 
 /* Table cells wrap between words; only long paths break inside a word. */
-body.amsec-app .amazing-security-admin .widefat td {
+body.amsec-app .amsec-security-scanner-admin .widefat td {
   overflow-wrap: break-word;
 }
 
 @media screen and (max-width: 782px) {
-  body.amsec-app .amazing-security-admin .button:not(.button-link) {
+  body.amsec-app .amsec-security-scanner-admin .button:not(.button-link) {
     min-height: 40px;
   }
 }
@@ -2023,7 +2023,7 @@ body.amsec-app .amazing-security-admin .widefat td {
   margin-top: 28px;
 }
 
-.amazing-security-admin caption {
+.amsec-security-scanner-admin caption {
   text-align: left;
 }
 

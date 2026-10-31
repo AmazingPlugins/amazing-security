@@ -7,9 +7,9 @@ use AmazingPlugins\Security\FileScan\FileScanReport;
 
 require_once ABSPATH . 'wp-admin/includes/template.php';
 wp_set_current_user( 1 );
-$key = 'amazing_security_file_scan_active';
+$key = 'amsec_security_scanner_file_scan_active';
 $previous = get_option( $key, null );
-$completedKey = 'amazing_security_file_scan_completed';
+$completedKey = 'amsec_security_scanner_file_scan_completed';
 $previousCompleted = get_option( $completedKey, null );
 $cursor = new FileScanCursor( 'attention-fixture' );
 $cursor->findings[] = array( 'id' => str_repeat( 'a', 32 ), 'state' => 'warn', 'kind' => 'suspected', 'package' => 'fixture', 'path' => 'demo/loader.php', 'rule_id' => 'AS-PHP-001', 'version' => '2026.09.29.1', 'line' => 1, 'summary' => 'Decoded input is evaluated as PHP code.', 'reason' => '', 'tested_at' => gmdate( 'c' ) );
@@ -42,7 +42,7 @@ if ( null === $previousCompleted ) {
 if ( ! $preserved ) {
 	throw new RuntimeException( 'Partial scan hid a prior warning or displayed a stale state.' );
 }
-$historyKey = 'amazing_security_file_scan_history';
+$historyKey = 'amsec_security_scanner_file_scan_history';
 $previousHistory = get_option( $historyKey, null );
 $partial = new FileScanReport( 'partial-fixture', 'inconclusive', new DateTimeImmutable( '2026-09-29T00:00:00Z' ), true, 2, 20, 1, 0, 0, 0, 1, 0, array() );
 delete_option( $key );

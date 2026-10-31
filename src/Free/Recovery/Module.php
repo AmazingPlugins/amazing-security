@@ -14,7 +14,7 @@ final class Module {
 	}
 
 	public static function menu(): void {
-		add_submenu_page( 'amazing-security', __( 'Recovery', 'amsec-security-scanner' ), __( 'Recovery', 'amsec-security-scanner' ), 'manage_options', 'amsec-recovery', array( self::class, 'render' ) );
+		add_submenu_page( 'amsec-security-scanner', __( 'Recovery', 'amsec-security-scanner' ), __( 'Recovery', 'amsec-security-scanner' ), 'manage_options', 'amsec-recovery', array( self::class, 'render' ) );
 	}
 
 	public static function render(): void {
@@ -22,7 +22,7 @@ final class Module {
 			wp_die( esc_html__( 'You do not have permission to run recovery tools.', 'amsec-security-scanner' ), '', array( 'response' => 403 ) );
 		}
 		$https = is_ssl();
-		echo '<div class="wrap amazing-security-admin"><h1>' . esc_html__( 'Recovery', 'amsec-security-scanner' ) . '</h1>';
+		echo '<div class="wrap amsec-security-scanner-admin"><h1>' . esc_html__( 'Recovery', 'amsec-security-scanner' ) . '</h1>';
 		echo '<p>' . esc_html__( 'Directory modes are shown for review. Change them in your hosting file manager or over SFTP.', 'amsec-security-scanner' ) . '</p>';
 		if ( ! $https ) {
 			echo '<div class="notice notice-error inline"><p>' . esc_html( ( new Approval( false, true, true ) )->denial() ?? '' ) . '</p></div>';

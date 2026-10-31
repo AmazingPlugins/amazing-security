@@ -13,7 +13,7 @@ use AmazingPlugins\Security\Hardening\UploadsRule;
 final class UploadsRulePage {
 	public function register(): void {
 		add_submenu_page(
-			'amazing-security',
+			'amsec-security-scanner',
 			__( 'PHP in uploads', 'amsec-security-scanner' ),
 			__( 'PHP in uploads', 'amsec-security-scanner' ),
 			'manage_options',
@@ -27,7 +27,7 @@ final class UploadsRulePage {
 			wp_die( esc_html__( 'Administrator access required.', 'amsec-security-scanner' ), '', array( 'response' => 403 ) );
 		}
 		$rule = UploadsExecutionCheck::classify( $this->current() );
-		echo '<div class="wrap amazing-security-admin">';
+		echo '<div class="wrap amsec-security-scanner-admin">';
 		echo '<h1>' . esc_html__( 'PHP in the uploads folder', 'amsec-security-scanner' ) . '</h1>';
 		echo '<p>' . esc_html__( 'WordPress stores pictures and documents in uploads. Some servers will also run a PHP file that lands there. This plugin does not write a test file, and it cannot prove what this server will do.', 'amsec-security-scanner' ) . '</p>';
 		echo '<p>' . esc_html__( 'If the site uses Apache, you can add the rule below. Nginx and some hosts ignore that file. Ask the host if you are not sure.', 'amsec-security-scanner' ) . '</p>';

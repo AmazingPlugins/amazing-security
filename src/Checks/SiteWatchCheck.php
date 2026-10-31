@@ -218,11 +218,11 @@ final class SiteWatchCheck implements SecurityCheck {
 
 	/** @return array{status: string} */
 	public static function ruleReview(): array {
-		if ( ! defined( 'AMAZING_SECURITY_FILE' ) ) {
+		if ( ! defined( 'AMSEC_SECURITY_SCANNER_FILE' ) ) {
 			return array( 'status' => 'unknown' );
 		}
 		try {
-			$packs = ( new RuleCatalog( dirname( AMAZING_SECURITY_FILE ) ) )->status( time() );
+			$packs = ( new RuleCatalog( dirname( AMSEC_SECURITY_SCANNER_FILE ) ) )->status( time() );
 		} catch ( Throwable ) {
 			return array( 'status' => 'unknown' );
 		}

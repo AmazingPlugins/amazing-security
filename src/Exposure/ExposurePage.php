@@ -7,12 +7,12 @@ defined( 'ABSPATH' ) || exit;
 
 final class ExposurePage {
 	public function register(): void {
-		$hook = add_submenu_page( 'amazing-security', __( 'Local exposure inventory', 'amsec-security-scanner' ), __( 'Local inventory', 'amsec-security-scanner' ), 'manage_options', 'amsec-exposure', array( $this, 'render' ) );
+		$hook = add_submenu_page( 'amsec-security-scanner', __( 'Local exposure inventory', 'amsec-security-scanner' ), __( 'Local inventory', 'amsec-security-scanner' ), 'manage_options', 'amsec-exposure', array( $this, 'render' ) );
 		add_action(
 			'admin_enqueue_scripts',
 			static function ( string $current ) use ( $hook ): void {
 				if ( $current === $hook ) {
-					wp_enqueue_style( 'amazing-security-admin', plugins_url( 'assets/admin.css', AMAZING_SECURITY_FILE ), array(), '0.1.0' );
+					wp_enqueue_style( 'amsec-security-scanner-admin', plugins_url( 'assets/admin.css', AMSEC_SECURITY_SCANNER_FILE ), array(), '0.1.0' );
 				}}
 		);
 	}
@@ -20,7 +20,7 @@ final class ExposurePage {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_die( esc_html__( 'Administrator access required.', 'amsec-security-scanner' ), '', array( 'response' => 403 ) );}
 		$state = ( new WordPressExposureService() )->create()->status();
-		echo '<div class="wrap amazing-security-admin"><header class="amsec-header"><div><h1>' . esc_html__( 'Local exposure inventory', 'amsec-security-scanner' ) . '</h1><p>' . esc_html__( 'Review selected filenames that may need a host access-policy check.', 'amsec-security-scanner' ) . '</p></div></header><section class="amsec-overview"><h2>' . esc_html__( 'Local evidence only', 'amsec-security-scanner' ) . '</h2><p>' . esc_html__( 'This inventory uses filenames and filesystem metadata. Candidate contents are not opened, read, executed or changed. No HTTP request is made to establish public reachability. A log, archive or backup-like filename can be legitimate; it does not prove sensitive contents, public exposure or a vulnerability.', 'amsec-security-scanner' ) . '</p><p>' . esc_html__( 'WordPress and content roots cover top-level entries only. Uploads descends at most three directory levels; plugin/theme/core subtrees and remote storage are outside this slice. Each fresh inventory stops at 1,500 entries, 50 directories, 100 candidates or a five-second work target. Slow filesystem calls may take longer. Limits, depth exclusions and unreadable/changing entries are partial or unknown. Repeating starts fresh; there is no resume cursor. Files and configured roots can change after capture, so stored paths are historical evidence.', 'amsec-security-scanner' ) . '</p></section>';
+		echo '<div class="wrap amsec-security-scanner-admin"><header class="amsec-header"><div><h1>' . esc_html__( 'Local exposure inventory', 'amsec-security-scanner' ) . '</h1><p>' . esc_html__( 'Review selected filenames that may need a host access-policy check.', 'amsec-security-scanner' ) . '</p></div></header><section class="amsec-overview"><h2>' . esc_html__( 'Local evidence only', 'amsec-security-scanner' ) . '</h2><p>' . esc_html__( 'This inventory uses filenames and filesystem metadata. Candidate contents are not opened, read, executed or changed. No HTTP request is made to establish public reachability. A log, archive or backup-like filename can be legitimate; it does not prove sensitive contents, public exposure or a vulnerability.', 'amsec-security-scanner' ) . '</p><p>' . esc_html__( 'WordPress and content roots cover top-level entries only. Uploads descends at most three directory levels; plugin/theme/core subtrees and remote storage are outside this slice. Each fresh inventory stops at 1,500 entries, 50 directories, 100 candidates or a five-second work target. Slow filesystem calls may take longer. Limits, depth exclusions and unreadable/changing entries are partial or unknown. Repeating starts fresh; there is no resume cursor. Files and configured roots can change after capture, so stored paths are historical evidence.', 'amsec-security-scanner' ) . '</p></section>';
 		if ( ! empty( $state['invalid'] ) ) {
 			echo '<div class="notice notice-error"><p>' . esc_html__( 'Stored inventory state is invalid. No coverage can be established; ask the host administrator to review it.', 'amsec-security-scanner' ) . '</p></div></div>';
 			return;}
