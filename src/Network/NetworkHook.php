@@ -26,7 +26,7 @@ final class NetworkHook {
 		$this->observe( $options, $state['revision'] );
 		if ( 'block' === $state['mode'] ) {
 			\AmazingPlugins\Security\Traffic\TrafficHooks::mark( 'network-block' );
-			wp_die( esc_html__( 'This request is not allowed by the site network policy. Contact the site owner.', 'amazingplugins-security-scanner' ), '', array( 'response' => 403 ) );}
+			wp_die( esc_html__( 'This request is not allowed by the site network policy. Contact the site owner.', 'amsec-security-scanner' ), '', array( 'response' => 403 ) );}
 	}
 	private function observe( WordPressOptions $options, string $revision ): void {
 		try {

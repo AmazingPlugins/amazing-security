@@ -9,7 +9,7 @@ defined( 'ABSPATH' ) || exit;
 final class SessionPage {
 	public function register(): void {
 		// Empty parent keeps this off the side menu. Capability is read so the account owner can open it. render() still allows only an administrator or that owner.
-		$hook = add_submenu_page( '', __( 'Account sessions', 'amazingplugins-security-scanner' ), __( 'Sessions', 'amazingplugins-security-scanner' ), 'read', 'amsec-sessions', array( $this, 'render' ) );
+		$hook = add_submenu_page( '', __( 'Account sessions', 'amsec-security-scanner' ), __( 'Sessions', 'amsec-security-scanner' ), 'read', 'amsec-sessions', array( $this, 'render' ) );
 		if ( is_string( $hook ) ) {
 			add_action(
 				'load-' . $hook,
@@ -17,7 +17,7 @@ final class SessionPage {
 					global $title;
 					if ( ! is_string( $title ) || '' === $title ) {
 						// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- An empty menu parent leaves this null, and admin-header.php passes it to strip_tags().
-						$title = __( 'Account sessions', 'amazingplugins-security-scanner' );
+						$title = __( 'Account sessions', 'amsec-security-scanner' );
 					}
 				}
 			);
@@ -37,20 +37,20 @@ final class SessionPage {
 			),
 			admin_url( 'admin.php' )
 		);
-		echo '<h2>' . esc_html__( 'Sessions', 'amazingplugins-security-scanner' ) . '</h2><p>' . esc_html__( 'Only you and an administrator can open this page.', 'amazingplugins-security-scanner' ) . ' <a href="' . esc_url( $url ) . '">' . esc_html__( 'View page', 'amazingplugins-security-scanner' ) . '</a></p>';
+		echo '<h2>' . esc_html__( 'Sessions', 'amsec-security-scanner' ) . '</h2><p>' . esc_html__( 'Only you and an administrator can open this page.', 'amsec-security-scanner' ) . ' <a href="' . esc_url( $url ) . '">' . esc_html__( 'View page', 'amsec-security-scanner' ) . '</a></p>';
 	}
 
 	public function render(): void {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only account selection with permission checks.
 		$id = isset( $_GET['user_id'] ) && is_scalar( $_GET['user_id'] ) ? absint( wp_unslash( (string) $_GET['user_id'] ) ) : get_current_user_id();
 		if ( 1 > $id || ! get_userdata( $id ) || ! SessionPolicy::canView( current_user_can( 'manage_options' ), get_current_user_id(), $id ) ) {
-			wp_die( esc_html__( 'You cannot view this session page.', 'amazingplugins-security-scanner' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'You cannot view this session page.', 'amsec-security-scanner' ), '', array( 'response' => 403 ) );
 		}
 		$administrator = current_user_can( 'manage_options' );
 		try {
 			$rows = $this->rows( $id );
 		} catch ( \Throwable ) {
-			echo '<div class="wrap amazing-security-admin"><div class="notice notice-error"><p>' . esc_html__( 'Session information is unavailable.', 'amazingplugins-security-scanner' ) . '</p></div></div>';
+			echo '<div class="wrap amazing-security-admin"><div class="notice notice-error"><p>' . esc_html__( 'Session information is unavailable.', 'amsec-security-scanner' ) . '</p></div></div>';
 			return;
 		}
 		if ( $this->wantsDetail() ) {
@@ -58,26 +58,26 @@ final class SessionPage {
 			return;
 		}
 		if ( ! $administrator ) {
-			echo '<div class="wrap amazing-security-admin"><h1>' . esc_html__( 'Your sessions', 'amazingplugins-security-scanner' ) . '</h1><p>' . esc_html__( 'Only you and an administrator can open this page.', 'amazingplugins-security-scanner' ) . '</p>';
+			echo '<div class="wrap amazing-security-admin"><h1>' . esc_html__( 'Your sessions', 'amsec-security-scanner' ) . '</h1><p>' . esc_html__( 'Only you and an administrator can open this page.', 'amsec-security-scanner' ) . '</p>';
 			$this->lines( $id, $rows );
 			echo '</div>';
 			return;
 		}
 		$accounts = $this->accountOptions( $id );
-		echo '<div class="wrap amazing-security-admin"><h1>' . esc_html__( 'Account sessions', 'amazingplugins-security-scanner' ) . '</h1><p>' . esc_html__( 'Pick an account. Ending a session signs that browser out. It cannot be undone. A new sign-in can start another session. An application password can be removed on its own.', 'amazingplugins-security-scanner' ) . '</p><form method="get" action="#sessions"><input type="hidden" name="page" value="amsec-accounts"><label for="amsec-session-user">' . esc_html__( 'Account', 'amazingplugins-security-scanner' ) . '</label> <select id="amsec-session-user" name="user_id">';
+		echo '<div class="wrap amazing-security-admin"><h1>' . esc_html__( 'Account sessions', 'amsec-security-scanner' ) . '</h1><p>' . esc_html__( 'Pick an account. Ending a session signs that browser out. It cannot be undone. A new sign-in can start another session. An application password can be removed on its own.', 'amsec-security-scanner' ) . '</p><form method="get" action="#sessions"><input type="hidden" name="page" value="amsec-accounts"><label for="amsec-session-user">' . esc_html__( 'Account', 'amsec-security-scanner' ) . '</label> <select id="amsec-session-user" name="user_id">';
 		echo wp_kses( $accounts, \AmazingPlugins\Security\Admin\AdminHtml::allowed() );
-		echo '</select> <button class="button">' . esc_html__( 'View account', 'amazingplugins-security-scanner' ) . '</button></form>';
+		echo '</select> <button class="button">' . esc_html__( 'View account', 'amsec-security-scanner' ) . '</button></form>';
 		$this->lines( $id, $rows );
 		$this->applicationPasswords( $id );
-		echo '<h2>' . esc_html__( 'Revoke sessions', 'amazingplugins-security-scanner' ) . '</h2><p>' . ( get_current_user_id() === $id ? esc_html__( 'Your current session will be kept. Your other sessions will be revoked.', 'amazingplugins-security-scanner' ) : esc_html__( 'All existing sessions for this selected account will be revoked.', 'amazingplugins-security-scanner' ) ) . '</p>';
+		echo '<h2>' . esc_html__( 'Revoke sessions', 'amsec-security-scanner' ) . '</h2><p>' . ( get_current_user_id() === $id ? esc_html__( 'Your current session will be kept. Your other sessions will be revoked.', 'amsec-security-scanner' ) : esc_html__( 'All existing sessions for this selected account will be revoked.', 'amsec-security-scanner' ) ) . '</p>';
 		if ( ! is_ssl() ) {
-			echo '<p>' . esc_html__( 'Open this page over HTTPS to approve session revocation.', 'amazingplugins-security-scanner' ) . '</p></div>';
+			echo '<p>' . esc_html__( 'Open this page over HTTPS to approve session revocation.', 'amsec-security-scanner' ) . '</p></div>';
 			return;
 		}
 		echo '<form action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" method="post"><input type="hidden" name="action" value="amsec_sessions_revoke"><input type="hidden" name="user_id" value="' . esc_attr( (string) $id ) . '">';
 		wp_nonce_field( 'amsec_sessions_revoke_' . $id );
-		echo '<p><label for="amsec-session-password">' . esc_html__( 'Your password', 'amazingplugins-security-scanner' ) . '</label> <input id="amsec-session-password" type="password" name="password" autocomplete="current-password" required maxlength="1024"></p><p><label><input type="checkbox" name="confirm" value="1" required> ' . esc_html__( 'I understand that revocation cannot be undone.', 'amazingplugins-security-scanner' ) . '</label></p>';
-		submit_button( __( 'Revoke these sessions', 'amazingplugins-security-scanner' ), 'secondary' );
+		echo '<p><label for="amsec-session-password">' . esc_html__( 'Your password', 'amsec-security-scanner' ) . '</label> <input id="amsec-session-password" type="password" name="password" autocomplete="current-password" required maxlength="1024"></p><p><label><input type="checkbox" name="confirm" value="1" required> ' . esc_html__( 'I understand that revocation cannot be undone.', 'amsec-security-scanner' ) . '</label></p>';
+		submit_button( __( 'Revoke these sessions', 'amsec-security-scanner' ), 'secondary' );
 		echo '</form></div>';
 	}
 
@@ -109,7 +109,7 @@ final class SessionPage {
 	/** @param array<int, array{login: int, expiration: int, ip: string, ua: string, current: bool}> $rows */
 	private function lines( int $id, array $rows ): void {
 		if ( array() === $rows ) {
-			echo '<p>' . esc_html__( 'No sessions returned by the account session manager.', 'amazingplugins-security-scanner' ) . '</p>';
+			echo '<p>' . esc_html__( 'No sessions returned by the account session manager.', 'amsec-security-scanner' ) . '</p>';
 			return;
 		}
 		echo '<ul class="amsec-session-lines">';
@@ -120,7 +120,7 @@ final class SessionPage {
 			$place    = SessionDetail::place( $row['ip'] );
 			$parts    = array();
 			if ( $row['current'] ) {
-				$parts[] = __( 'This browser', 'amazingplugins-security-scanner' );
+				$parts[] = __( 'This browser', 'amsec-security-scanner' );
 			}
 			$parts[] = $title;
 			if ( '' !== $place ) {
@@ -138,7 +138,7 @@ final class SessionPage {
 			echo '<li' . ( $row['current'] ? ' class="is-current"' : '' ) . '>';
 			echo '<span class="dashicons ' . esc_attr( SessionDetail::icon( $computer ) ) . '" aria-hidden="true"></span>';
 			echo '<span class="amsec-session-summary">' . esc_html( implode( ' · ', $parts ) ) . '</span>';
-			echo '<a href="' . esc_url( $url ) . '">' . esc_html__( 'View page', 'amazingplugins-security-scanner' ) . '<span class="screen-reader-text">: ' . esc_html( $title ) . '</span></a>';
+			echo '<a href="' . esc_url( $url ) . '">' . esc_html__( 'View page', 'amsec-security-scanner' ) . '<span class="screen-reader-text">: ' . esc_html( $title ) . '</span></a>';
 			echo '</li>';
 		}
 		echo '</ul>';
@@ -148,9 +148,9 @@ final class SessionPage {
 	private function detail( array $rows, bool $administrator ): void {
 		$row  = SessionPolicy::rowFor( $rows, $this->requestedRef() );
 		$back = $administrator ? admin_url( 'admin.php?page=amsec-accounts#sessions' ) : admin_url( 'admin.php?page=amsec-sessions' );
-		echo '<div class="wrap amazing-security-admin"><p class="amsec-session-back"><a href="' . esc_url( $back ) . '">' . esc_html__( 'Back to sessions', 'amazingplugins-security-scanner' ) . '</a></p>';
+		echo '<div class="wrap amazing-security-admin"><p class="amsec-session-back"><a href="' . esc_url( $back ) . '">' . esc_html__( 'Back to sessions', 'amsec-security-scanner' ) . '</a></p>';
 		if ( null === $row ) {
-			echo '<h1>' . esc_html__( 'Session', 'amazingplugins-security-scanner' ) . '</h1><p>' . esc_html__( 'This session is no longer available.', 'amazingplugins-security-scanner' ) . '</p></div>';
+			echo '<h1>' . esc_html__( 'Session', 'amsec-security-scanner' ) . '</h1><p>' . esc_html__( 'This session is no longer available.', 'amsec-security-scanner' ) . '</p></div>';
 			return;
 		}
 		$browser  = SessionDetail::browser( $row['ua'] );
@@ -159,19 +159,19 @@ final class SessionPage {
 		$title    = $this->sessionTitle( $browser, $computer );
 		echo '<article class="amsec-session' . ( $row['current'] ? ' is-current' : '' ) . '">';
 		echo '<p class="amsec-session-kicker"><span class="dashicons ' . esc_attr( SessionDetail::icon( $computer ) ) . '" aria-hidden="true"></span> ';
-		echo esc_html( $row['current'] ? __( 'This browser', 'amazingplugins-security-scanner' ) : __( 'Session', 'amazingplugins-security-scanner' ) ) . '</p>';
+		echo esc_html( $row['current'] ? __( 'This browser', 'amsec-security-scanner' ) : __( 'Session', 'amsec-security-scanner' ) ) . '</p>';
 		echo '<h1>' . esc_html( $title ) . '</h1><dl>';
-		$this->fact( __( 'Browser', 'amazingplugins-security-scanner' ), '' !== $browser ? $browser : __( 'Not recorded', 'amazingplugins-security-scanner' ) );
-		$this->fact( __( 'Computer', 'amazingplugins-security-scanner' ), '' !== $computer ? $computer : __( 'Not recorded', 'amazingplugins-security-scanner' ) );
-		$this->fact( __( 'Location', 'amazingplugins-security-scanner' ), '' !== $place ? $place : __( 'Not recorded', 'amazingplugins-security-scanner' ) );
+		$this->fact( __( 'Browser', 'amsec-security-scanner' ), '' !== $browser ? $browser : __( 'Not recorded', 'amsec-security-scanner' ) );
+		$this->fact( __( 'Computer', 'amsec-security-scanner' ), '' !== $computer ? $computer : __( 'Not recorded', 'amsec-security-scanner' ) );
+		$this->fact( __( 'Location', 'amsec-security-scanner' ), '' !== $place ? $place : __( 'Not recorded', 'amsec-security-scanner' ) );
 		if ( '' !== $row['ip'] && $place !== $row['ip'] ) {
-			$this->fact( __( 'Address', 'amazingplugins-security-scanner' ), $row['ip'] );
+			$this->fact( __( 'Address', 'amsec-security-scanner' ), $row['ip'] );
 		}
-		$this->fact( __( 'Signed in', 'amazingplugins-security-scanner' ), $this->when( $row['login'] ) );
-		$this->fact( __( 'Expires', 'amazingplugins-security-scanner' ), $this->when( $row['expiration'] ) );
+		$this->fact( __( 'Signed in', 'amsec-security-scanner' ), $this->when( $row['login'] ) );
+		$this->fact( __( 'Expires', 'amsec-security-scanner' ), $this->when( $row['expiration'] ) );
 		echo '</dl>';
 		if ( '' !== $row['ua'] ) {
-			echo '<h2>' . esc_html__( 'Browser details', 'amazingplugins-security-scanner' ) . '</h2><p class="amsec-session-agent">' . esc_html( $row['ua'] ) . '</p>';
+			echo '<h2>' . esc_html__( 'Browser details', 'amsec-security-scanner' ) . '</h2><p class="amsec-session-agent">' . esc_html( $row['ua'] ) . '</p>';
 		}
 		echo '</article></div>';
 	}
@@ -186,7 +186,7 @@ final class SessionPage {
 		if ( '' !== $computer ) {
 			return $computer;
 		}
-		return __( 'Session', 'amazingplugins-security-scanner' );
+		return __( 'Session', 'amsec-security-scanner' );
 	}
 
 	private function fact( string $label, string $value ): void {
@@ -195,7 +195,7 @@ final class SessionPage {
 
 	private function when( int $stamp ): string {
 		if ( $stamp < 1 ) {
-			return __( 'Not recorded', 'amazingplugins-security-scanner' );
+			return __( 'Not recorded', 'amsec-security-scanner' );
 		}
 		if ( function_exists( 'wp_date' ) ) {
 			return wp_date( 'j M Y, H:i', $stamp );
@@ -231,28 +231,28 @@ final class SessionPage {
 	}
 
 	private function applicationPasswords( int $id ): void {
-		echo '<h2>' . esc_html__( 'Application passwords', 'amazingplugins-security-scanner' ) . '</h2>';
+		echo '<h2>' . esc_html__( 'Application passwords', 'amsec-security-scanner' ) . '</h2>';
 		if ( ! class_exists( \WP_Application_Passwords::class ) ) {
-			echo '<p>' . esc_html__( 'Application passwords are unavailable on this site.', 'amazingplugins-security-scanner' ) . '</p>';
+			echo '<p>' . esc_html__( 'Application passwords are unavailable on this site.', 'amsec-security-scanner' ) . '</p>';
 			return;
 		}
 		$stored = \WP_Application_Passwords::get_user_application_passwords( $id );
 		$rows   = ApplicationPasswordList::rows( is_array( $stored ) ? $stored : array() );
 		if ( array() === $rows ) {
-			echo '<p>' . esc_html__( 'No application passwords are stored for this account.', 'amazingplugins-security-scanner' ) . '</p>';
+			echo '<p>' . esc_html__( 'No application passwords are stored for this account.', 'amsec-security-scanner' ) . '</p>';
 			return;
 		}
-		echo '<table class="widefat striped"><caption>' . esc_html__( 'Saved application passwords. The password itself is not shown.', 'amazingplugins-security-scanner' ) . '</caption><thead><tr><th scope="col">' . esc_html__( 'Name', 'amazingplugins-security-scanner' ) . '</th><th scope="col">' . esc_html__( 'Created UTC', 'amazingplugins-security-scanner' ) . '</th><th scope="col">' . esc_html__( 'Revoke', 'amazingplugins-security-scanner' ) . '</th></tr></thead><tbody>';
+		echo '<table class="widefat striped"><caption>' . esc_html__( 'Saved application passwords. The password itself is not shown.', 'amsec-security-scanner' ) . '</caption><thead><tr><th scope="col">' . esc_html__( 'Name', 'amsec-security-scanner' ) . '</th><th scope="col">' . esc_html__( 'Created UTC', 'amsec-security-scanner' ) . '</th><th scope="col">' . esc_html__( 'Revoke', 'amsec-security-scanner' ) . '</th></tr></thead><tbody>';
 		foreach ( $rows as $row ) {
-			echo '<tr><td>' . esc_html( $row['name'] ) . '</td><td>' . esc_html( $row['created'] > 0 ? gmdate( 'Y-m-d H:i:s', $row['created'] ) : __( 'Unknown', 'amazingplugins-security-scanner' ) ) . '</td><td>';
+			echo '<tr><td>' . esc_html( $row['name'] ) . '</td><td>' . esc_html( $row['created'] > 0 ? gmdate( 'Y-m-d H:i:s', $row['created'] ) : __( 'Unknown', 'amsec-security-scanner' ) ) . '</td><td>';
 			if ( is_ssl() ) {
 				echo '<form action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" method="post"><input type="hidden" name="action" value="amsec_sessions_revoke"><input type="hidden" name="operation" value="revoke-application-password"><input type="hidden" name="user_id" value="' . esc_attr( (string) $id ) . '"><input type="hidden" name="uuid" value="' . esc_attr( $row['uuid'] ) . '">';
 				wp_nonce_field( 'amsec_sessions_revoke_' . $id );
-				echo '<p><label>' . esc_html__( 'Your password', 'amazingplugins-security-scanner' ) . ' <input type="password" name="password" autocomplete="current-password" required maxlength="1024"></label></p><p><label><input type="checkbox" name="confirm" value="1" required> ' . esc_html__( 'I understand that this application password will be removed.', 'amazingplugins-security-scanner' ) . '</label></p>';
-				submit_button( __( 'Revoke this application password', 'amazingplugins-security-scanner' ), 'secondary', 'submit', false );
+				echo '<p><label>' . esc_html__( 'Your password', 'amsec-security-scanner' ) . ' <input type="password" name="password" autocomplete="current-password" required maxlength="1024"></label></p><p><label><input type="checkbox" name="confirm" value="1" required> ' . esc_html__( 'I understand that this application password will be removed.', 'amsec-security-scanner' ) . '</label></p>';
+				submit_button( __( 'Revoke this application password', 'amsec-security-scanner' ), 'secondary', 'submit', false );
 				echo '</form>';
 			} else {
-				esc_html_e( 'Open this page over HTTPS to revoke it.', 'amazingplugins-security-scanner' );
+				esc_html_e( 'Open this page over HTTPS to revoke it.', 'amsec-security-scanner' );
 			}
 			echo '</td></tr>';
 		}

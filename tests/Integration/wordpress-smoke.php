@@ -1,6 +1,6 @@
 <?php
 
-// Run with: wp eval-file wp-content/plugins/amazingplugins-security-scanner/tests/Integration/wordpress-smoke.php
+// Run with: wp eval-file wp-content/plugins/amsec-security-scanner/tests/Integration/wordpress-smoke.php
 use AmazingPlugins\Security\Checks\AdminAccountsCheck;
 use AmazingPlugins\Security\Checks\DebugDisplayCheck;
 use AmazingPlugins\Security\Checks\FileEditorCheck;

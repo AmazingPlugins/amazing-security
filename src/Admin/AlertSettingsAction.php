@@ -20,19 +20,19 @@ final class AlertSettingsAction {
 
 	public function save(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'You cannot change security alerts.', 'amazingplugins-security-scanner' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'You cannot change security alerts.', 'amsec-security-scanner' ), '', array( 'response' => 403 ) );
 		}
 		check_admin_referer( 'amsec_alert_settings' );
 		try {
 			// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce checked above.
 			$enabled = self::parse( wp_unslash( $_POST ) );
 		} catch ( InvalidArgumentException ) {
-			wp_die( esc_html__( 'Choose an alert setting.', 'amazingplugins-security-scanner' ), '', array( 'response' => 400 ) );
+			wp_die( esc_html__( 'Choose an alert setting.', 'amsec-security-scanner' ), '', array( 'response' => 400 ) );
 		}
 		$options = new WordPressOptions();
 		$value   = $enabled ? '1' : '0';
 		if ( $options->get( 'amsec_alerts_enabled' ) !== $value && ! $options->set( 'amsec_alerts_enabled', $value ) ) {
-			wp_die( esc_html__( 'Alert setting could not be saved.', 'amazingplugins-security-scanner' ), '', array( 'response' => 500 ) );
+			wp_die( esc_html__( 'Alert setting could not be saved.', 'amsec-security-scanner' ), '', array( 'response' => 500 ) );
 		}
 		wp_safe_redirect( \AmazingPlugins\Security\Admin\Brand::saved( admin_url( 'admin.php?page=amsec-settings#amsec-alerts' ) ) );
 		exit;

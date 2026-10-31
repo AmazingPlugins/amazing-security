@@ -34,26 +34,26 @@ final class Module {
 
 	public static function form(): void {
 		$on = '1' === Notice::flag( get_option( Notice::OPTION, '0' ) );
-		echo '<h2 id="amsec-event-mail">' . esc_html__( 'Email for account changes', 'amazingplugins-security-scanner' ) . '</h2>';
-		echo '<p>' . esc_html__( 'Off until you turn it on. The site administrator gets an email when an account is given the administrator role, or when the local repeat check limits a sign-in. The message names the account login. It does not include an address or a password.', 'amazingplugins-security-scanner' ) . '</p>';
+		echo '<h2 id="amsec-event-mail">' . esc_html__( 'Email for account changes', 'amsec-security-scanner' ) . '</h2>';
+		echo '<p>' . esc_html__( 'Off until you turn it on. The site administrator gets an email when an account is given the administrator role, or when the local repeat check limits a sign-in. The message names the account login. It does not include an address or a password.', 'amsec-security-scanner' ) . '</p>';
 		if ( ! is_ssl() ) {
-			echo '<p>' . esc_html__( 'Open this page over HTTPS to change this email.', 'amazingplugins-security-scanner' ) . '</p>';
+			echo '<p>' . esc_html__( 'Open this page over HTTPS to change this email.', 'amsec-security-scanner' ) . '</p>';
 			return;
 		}
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
 		echo '<input type="hidden" name="action" value="amsec_event_mail">';
 		wp_nonce_field( 'amsec_event_mail' );
 		echo '<p><label><input type="checkbox" name="' . esc_attr( Notice::OPTION ) . '" value="1"' . checked( $on, true, false ) . '> ';
-		echo esc_html__( 'Send that email', 'amazingplugins-security-scanner' );
+		echo esc_html__( 'Send that email', 'amsec-security-scanner' );
 		echo '</label></p>';
-		submit_button( __( 'Save event email', 'amazingplugins-security-scanner' ) );
+		submit_button( __( 'Save event email', 'amsec-security-scanner' ) );
 		echo '</form>';
 	}
 
 	public static function save(): void {
 		$method = isset( $_SERVER['REQUEST_METHOD'] ) ? sanitize_key( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) : '';
 		if ( 'post' !== $method || ! current_user_can( 'manage_options' ) || ! is_ssl() ) {
-			wp_die( esc_html__( 'HTTPS and administrator access are required.', 'amazingplugins-security-scanner' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'HTTPS and administrator access are required.', 'amsec-security-scanner' ), '', array( 'response' => 403 ) );
 		}
 		check_admin_referer( 'amsec_event_mail' );
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce checked above.

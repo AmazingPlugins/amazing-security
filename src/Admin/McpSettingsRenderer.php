@@ -8,17 +8,17 @@ defined( 'ABSPATH' ) || exit;
 
 final class McpSettingsRenderer {
 	public function render( bool $enabled, bool $abilitiesAvailable, bool $adapterAvailable, string $actionUrl, string $nonce ): string {
-		$status = $enabled ? __( 'enabled', 'amazingplugins-security-scanner' ) : __( 'disabled', 'amazingplugins-security-scanner' );
-		$html   = '<section id="amsec-mcp" class="amsec-mcp" aria-labelledby="amsec-mcp-title"><h2 id="amsec-mcp-title">' . esc_html__( 'AI assistant access', 'amazingplugins-security-scanner' ) . '</h2><p>' . sprintf(
+		$status = $enabled ? __( 'enabled', 'amsec-security-scanner' ) : __( 'disabled', 'amsec-security-scanner' );
+		$html   = '<section id="amsec-mcp" class="amsec-mcp" aria-labelledby="amsec-mcp-title"><h2 id="amsec-mcp-title">' . esc_html__( 'AI assistant access', 'amsec-security-scanner' ) . '</h2><p>' . sprintf(
 				/* translators: %s: current MCP status, either enabled or disabled. */
-			esc_html__( 'MCP is %s. WordPress 6.9 or newer and the official MCP Adapter are required. Your site continues to work without either one.', 'amazingplugins-security-scanner' ),
+			esc_html__( 'MCP is %s. WordPress 6.9 or newer and the official MCP Adapter are required. Your site continues to work without either one.', 'amsec-security-scanner' ),
 			esc_html( $status )
 		) . '</p>';
 		if ( ! $abilitiesAvailable || ! $adapterAvailable ) {
-			$html .= '<p role="status">' . esc_html__( 'MCP is unavailable here. Install or activate the required WordPress version and MCP Adapter before connecting an assistant.', 'amazingplugins-security-scanner' ) . '</p>';
+			$html .= '<p role="status">' . esc_html__( 'MCP is unavailable here. Install or activate the required WordPress version and MCP Adapter before connecting an assistant.', 'amsec-security-scanner' ) . '</p>';
 		}
-		$html .= '<p>' . esc_html__( 'When enabled, an authenticated administrator can let an assistant list findings, inspect one finding, start a local hardening scan, and read that scan. The assistant cannot approve or apply a fix.', 'amazingplugins-security-scanner' ) . '</p>';
-		$html .= '<form action="' . esc_url( $actionUrl ) . '" method="post"><input type="hidden" name="action" value="amsec_mcp_settings"><input type="hidden" name="_wpnonce" value="' . esc_attr( $nonce ) . '"><label for="amsec-mcp-enabled">' . esc_html__( 'AI assistant access', 'amazingplugins-security-scanner' ) . '</label><select id="amsec-mcp-enabled" name="enabled"><option value="0"' . ( $enabled ? '' : ' selected' ) . '>' . esc_html__( 'Off', 'amazingplugins-security-scanner' ) . '</option><option value="1"' . ( $enabled ? ' selected' : '' ) . '>' . esc_html__( 'On', 'amazingplugins-security-scanner' ) . '</option></select><button type="submit" class="button button-secondary">' . esc_html__( 'Save MCP setting', 'amazingplugins-security-scanner' ) . '</button></form></section>';
+		$html .= '<p>' . esc_html__( 'When enabled, an authenticated administrator can let an assistant list findings, inspect one finding, start a local hardening scan, and read that scan. The assistant cannot approve or apply a fix.', 'amsec-security-scanner' ) . '</p>';
+		$html .= '<form action="' . esc_url( $actionUrl ) . '" method="post"><input type="hidden" name="action" value="amsec_mcp_settings"><input type="hidden" name="_wpnonce" value="' . esc_attr( $nonce ) . '"><label for="amsec-mcp-enabled">' . esc_html__( 'AI assistant access', 'amsec-security-scanner' ) . '</label><select id="amsec-mcp-enabled" name="enabled"><option value="0"' . ( $enabled ? '' : ' selected' ) . '>' . esc_html__( 'Off', 'amsec-security-scanner' ) . '</option><option value="1"' . ( $enabled ? ' selected' : '' ) . '>' . esc_html__( 'On', 'amsec-security-scanner' ) . '</option></select><button type="submit" class="button button-secondary">' . esc_html__( 'Save MCP setting', 'amsec-security-scanner' ) . '</button></form></section>';
 		return $html;
 	}
 }

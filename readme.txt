@@ -1,10 +1,10 @@
-=== AmazingPlugins Security Scanner ===
+=== AmSec Security Scanner ===
 Contributors: amazingplugins
 Tags: security, hardening, malware scan, login security, file integrity
 Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 0.1.3
+Stable tag: 0.1.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -12,7 +12,7 @@ Security checks that show their evidence: hardening, file integrity, suspicious 
 
 == Description ==
 
-AmazingPlugins Security Scanner scans your site and shows what it found, with the evidence. Nothing changes until you approve it. Every protection is off when you install the plugin, so you choose what to turn on. Nothing runs in the background until you press Scan for the first time. After that, the scan repeats once a day.
+AmSec Security Scanner scans your site and shows what it found, with the evidence. Nothing changes until you approve it. Every protection is off when you install the plugin, so you choose what to turn on. Nothing runs in the background until you press Scan for the first time. After that, the scan repeats once a day.
 
 = Scan =
 
@@ -92,7 +92,7 @@ Each scan requests your own homepage once to read its response headers, the same
 
 == Installation ==
 
-1. In wp-admin, go to Plugins, Add New, Upload Plugin, and upload the ZIP. Or search for "AmazingPlugins Security Scanner".
+1. In wp-admin, go to Plugins, Add New, Upload Plugin, and upload the ZIP. Or search for "AmSec Security Scanner".
 2. Activate the plugin and open **Security Scanner** in the admin menu.
 3. Press **Scan**. Then go through Recommendations to choose which protections to turn on.
 
@@ -108,7 +108,7 @@ Local checks stay on your server. See External services for the few lookups that
 
 = What happens when I delete the plugin? =
 
-By default, your settings are kept in case you reinstall. To remove everything, tick **Erase all AmazingPlugins Security Scanner settings, logs and scan results when the plugin is deleted** under Log In & Register before you delete the plugin.
+By default, your settings are kept in case you reinstall. To remove everything, tick **Erase all AmSec Security Scanner settings, logs and scan results when the plugin is deleted** under Log In & Register before you delete the plugin.
 
 = I'm locked out. What do I do? =
 
@@ -121,8 +121,11 @@ Run `wp amazing-security login disable` on the server. Other controls have their
 
 == Changelog ==
 
+= 0.1.4 =
+* Renamed to AmSec Security Scanner (slug amsec-security-scanner).
+
 = 0.1.3 =
-* Renamed to AmazingPlugins Security Scanner (slug amazingplugins-security-scanner).
+* Renamed to AmazingPlugins Security Scanner.
 
 = 0.1.2 =
 * Renamed to Amazing Security Scanner.

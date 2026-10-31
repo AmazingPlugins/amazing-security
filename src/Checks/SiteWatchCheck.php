@@ -131,7 +131,7 @@ final class SiteWatchCheck implements SecurityCheck {
 			in_array( $status, self::ATTENTION[ $this->checkId ], true ) => State::WARN,
 			default => State::PASS,
 		};
-		$line = self::COPY[ $this->checkId ][ $status ] ?? __( 'The stored setting could not be read.', 'amazingplugins-security-scanner' );
+		$line = self::COPY[ $this->checkId ][ $status ] ?? __( 'The stored setting could not be read.', 'amsec-security-scanner' );
 		return array(
 			new CheckResult(
 				$this->id(),

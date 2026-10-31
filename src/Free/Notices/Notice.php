@@ -24,21 +24,21 @@ final class Notice {
 		if ( 'administrator' === $kind ) {
 			$login = trim( $login );
 			if ( '' === $login || strlen( $login ) > 60 || 1 !== preg_match( '/^[A-Za-z0-9 _.@-]+$/', $login ) ) {
-				$login = __( 'an account', 'amazingplugins-security-scanner' );
+				$login = __( 'an account', 'amsec-security-scanner' );
 			}
 			return array(
-				'subject' => __( 'Administrator role added', 'amazingplugins-security-scanner' ),
+				'subject' => __( 'Administrator role added', 'amsec-security-scanner' ),
 				'body'    => sprintf(
 					/* translators: %s: account login name, or "an account" when the name is not safe to show. */
-					__( 'An account was given the administrator role: %s.', 'amazingplugins-security-scanner' ),
+					__( 'An account was given the administrator role: %s.', 'amsec-security-scanner' ),
 					$login
 				),
 			);
 		}
 		if ( 'limited' === $kind ) {
 			return array(
-				'subject' => __( 'Sign-in limited', 'amazingplugins-security-scanner' ),
-				'body'    => __( 'A sign-in was limited by the local repeat check.', 'amazingplugins-security-scanner' ),
+				'subject' => __( 'Sign-in limited', 'amsec-security-scanner' ),
+				'body'    => __( 'A sign-in was limited by the local repeat check.', 'amsec-security-scanner' ),
 			);
 		}
 		return null;

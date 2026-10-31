@@ -11,8 +11,8 @@ final class Page {
 	public static function menu(): void {
 		add_submenu_page(
 			'amazing-security',
-			__( 'Sign-in email', 'amazingplugins-security-scanner' ),
-			__( 'Sign-in email', 'amazingplugins-security-scanner' ),
+			__( 'Sign-in email', 'amsec-security-scanner' ),
+			__( 'Sign-in email', 'amsec-security-scanner' ),
 			'manage_options',
 			'amsec-login-notice',
 			array( self::class, 'render' )
@@ -21,32 +21,32 @@ final class Page {
 
 	public static function render(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'Administrator access required.', 'amazingplugins-security-scanner' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'Administrator access required.', 'amsec-security-scanner' ), '', array( 'response' => 403 ) );
 		}
 		$flag = Decision::flag( self::stored() );
 		echo '<div class="wrap amazing-security-admin">';
-		echo '<h1>' . esc_html__( 'Sign-in email', 'amazingplugins-security-scanner' ) . '</h1>';
+		echo '<h1>' . esc_html__( 'Sign-in email', 'amsec-security-scanner' ) . '</h1>';
 		echo '<p>' . esc_html( self::status( $flag ) ) . '</p>';
-		echo '<p>' . esc_html__( 'When it is on, an administrator sign-in can send one email to that account. The next email waits one hour. The message is the site name and the UTC time. If the email cannot be sent, the sign-in still finishes.', 'amazingplugins-security-scanner' ) . '</p>';
+		echo '<p>' . esc_html__( 'When it is on, an administrator sign-in can send one email to that account. The next email waits one hour. The message is the site name and the UTC time. If the email cannot be sent, the sign-in still finishes.', 'amsec-security-scanner' ) . '</p>';
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
 		echo '<input type="hidden" name="action" value="amsec_login_notice_save">';
 		wp_nonce_field( 'amsec_login_notice_save' );
-		echo '<p><label for="amsec-login-email">' . esc_html__( 'Sign-in email', 'amazingplugins-security-scanner' ) . ' ';
+		echo '<p><label for="amsec-login-email">' . esc_html__( 'Sign-in email', 'amsec-security-scanner' ) . ' ';
 		echo '<select name="' . esc_attr( Decision::OPTION ) . '" id="amsec-login-email">';
-		echo '<option value="0"' . selected( '1' === $flag ? '1' : '0', '0', false ) . '>' . esc_html__( 'Off', 'amazingplugins-security-scanner' ) . '</option>';
-		echo '<option value="1"' . selected( '1' === $flag ? '1' : '0', '1', false ) . '>' . esc_html__( 'On', 'amazingplugins-security-scanner' ) . '</option>';
+		echo '<option value="0"' . selected( '1' === $flag ? '1' : '0', '0', false ) . '>' . esc_html__( 'Off', 'amsec-security-scanner' ) . '</option>';
+		echo '<option value="1"' . selected( '1' === $flag ? '1' : '0', '1', false ) . '>' . esc_html__( 'On', 'amsec-security-scanner' ) . '</option>';
 		echo '</select></label></p>';
-		submit_button( __( 'Save sign-in email', 'amazingplugins-security-scanner' ) );
+		submit_button( __( 'Save sign-in email', 'amsec-security-scanner' ) );
 		echo '</form>';
 		echo '</div>';
 	}
 
 	public static function save(): void {
 		if ( ! self::postRequest() ) {
-			wp_die( esc_html__( 'Open the sign-in email page and use the form.', 'amazingplugins-security-scanner' ), '', array( 'response' => 405 ) );
+			wp_die( esc_html__( 'Open the sign-in email page and use the form.', 'amsec-security-scanner' ), '', array( 'response' => 405 ) );
 		}
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'Administrator access required.', 'amazingplugins-security-scanner' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'Administrator access required.', 'amsec-security-scanner' ), '', array( 'response' => 403 ) );
 		}
 		check_admin_referer( 'amsec_login_notice_save' );
 		update_option( Decision::OPTION, self::postedFlag() );
@@ -56,9 +56,9 @@ final class Page {
 
 	public static function status( string $flag ): string {
 		if ( '1' === $flag ) {
-			return __( 'Sign-in email is on.', 'amazingplugins-security-scanner' );
+			return __( 'Sign-in email is on.', 'amsec-security-scanner' );
 		}
-		return __( 'Sign-in email is off.', 'amazingplugins-security-scanner' );
+		return __( 'Sign-in email is off.', 'amsec-security-scanner' );
 	}
 
 	private static function postedFlag(): string {

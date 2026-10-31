@@ -68,11 +68,11 @@ final class RootExposureCheck implements SecurityCheck {
 		$kind    = (string) ( $this->readKind )();
 		$state   = self::decide( $kind );
 		$summary = match ( $kind ) {
-			'env' => __( 'A .env file is in the site root. This check does not read or delete it.', 'amazingplugins-security-scanner' ),
-			'git' => __( 'A .git directory is in the site root. This check does not read or delete it.', 'amazingplugins-security-scanner' ),
-			'both' => __( 'A .env file and a .git directory are in the site root. This check does not read or delete them.', 'amazingplugins-security-scanner' ),
-			'absent' => __( 'No .env file or .git directory is in the site root. This check does not read or delete them.', 'amazingplugins-security-scanner' ),
-			default => __( 'The site root could not be checked for a .env file or a .git directory. This check does not read or delete them.', 'amazingplugins-security-scanner' ),
+			'env' => __( 'A .env file is in the site root. This check does not read or delete it.', 'amsec-security-scanner' ),
+			'git' => __( 'A .git directory is in the site root. This check does not read or delete it.', 'amsec-security-scanner' ),
+			'both' => __( 'A .env file and a .git directory are in the site root. This check does not read or delete them.', 'amsec-security-scanner' ),
+			'absent' => __( 'No .env file or .git directory is in the site root. This check does not read or delete them.', 'amsec-security-scanner' ),
+			default => __( 'The site root could not be checked for a .env file or a .git directory. This check does not read or delete them.', 'amsec-security-scanner' ),
 		};
 		return array(
 			new CheckResult( $this->id(), 'warn' === $state ? State::WARN : ( 'pass' === $state ? State::PASS : State::UNKNOWN ), $summary, self::SOURCE, new DateTimeImmutable( 'now', new DateTimeZone( 'UTC' ) ), 'medium', 'unknown' === $state ? 'unavailable' : 'complete', array( 'kind' => $kind ) ),

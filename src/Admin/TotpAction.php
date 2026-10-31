@@ -31,6 +31,6 @@ final class TotpAction {
 	}
 
 	private function retired(): void {
-		wp_die( esc_html__( 'AmazingPlugins Security Scanner no longer enrolls authenticator apps. Use a dedicated two-factor plugin.', 'amazingplugins-security-scanner' ), '', array( 'response' => 410 ) );
+		wp_die( esc_html__( 'AmSec Security Scanner no longer enrolls authenticator apps. Use a dedicated two-factor plugin.', 'amsec-security-scanner' ), '', array( 'response' => 410 ) );
 	}
 }

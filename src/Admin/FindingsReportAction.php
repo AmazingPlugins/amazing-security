@@ -13,7 +13,7 @@ use AmazingPlugins\Security\Findings\FindingsRepository;
 final class FindingsReportAction {
 	public function handle(): void {
 		if ( ! current_user_can( 'manage_options' ) || ! FixApprovalAction::cookieAuthenticated() ) {
-			wp_die( esc_html__( 'A current administrator session is required.', 'amazingplugins-security-scanner' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'A current administrator session is required.', 'amsec-security-scanner' ), '', array( 'response' => 403 ) );
 		}
 		check_admin_referer( 'amsec_findings_report' );
 		$report = FindingsReport::text( ( new FindingsRepository() )->latest() );

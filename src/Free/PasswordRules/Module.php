@@ -182,26 +182,26 @@ final class Module {
 		if ( 'length' === $code ) {
 			return sprintf(
 				/* translators: %d: minimum number of characters. */
-				__( 'Use at least %d characters.', 'amazingplugins-security-scanner' ),
+				__( 'Use at least %d characters.', 'amsec-security-scanner' ),
 				Decision::minimum( self::stored() )
 			);
 		}
 		if ( 'number' === $code ) {
-			return __( 'Include a number.', 'amazingplugins-security-scanner' );
+			return __( 'Include a number.', 'amsec-security-scanner' );
 		}
 		if ( 'mixed' === $code ) {
-			return __( 'Include an uppercase letter and a lowercase letter.', 'amazingplugins-security-scanner' );
+			return __( 'Include an uppercase letter and a lowercase letter.', 'amsec-security-scanner' );
 		}
 		if ( 'symbol' === $code ) {
-			return __( 'Include a symbol.', 'amazingplugins-security-scanner' );
+			return __( 'Include a symbol.', 'amsec-security-scanner' );
 		}
 		if ( 'name' === $code ) {
-			return __( 'Do not include the account name or the email name.', 'amazingplugins-security-scanner' );
+			return __( 'Do not include the account name or the email name.', 'amsec-security-scanner' );
 		}
 		if ( 'reuse' === $code ) {
-			return __( 'Choose a password that is different from the current one.', 'amazingplugins-security-scanner' );
+			return __( 'Choose a password that is different from the current one.', 'amsec-security-scanner' );
 		}
-		return __( 'Choose a different password.', 'amazingplugins-security-scanner' );
+		return __( 'Choose a different password.', 'amsec-security-scanner' );
 	}
 
 	/**

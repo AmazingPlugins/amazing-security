@@ -13,7 +13,7 @@ use Throwable;
 final class ScanAction {
 	public function handle(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'You are not allowed to run a scan.', 'amazingplugins-security-scanner' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'You are not allowed to run a scan.', 'amsec-security-scanner' ), '', array( 'response' => 403 ) );
 		}
 		check_admin_referer( 'amazing_security_scan' );
 		try {

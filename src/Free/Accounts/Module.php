@@ -68,7 +68,7 @@ final class Module {
 			return $user;
 		}
 		if ( 'reject' === self::challengeDecision() ) {
-			return new \WP_Error( 'amsec_login_challenge', __( 'Enter the sum of the two numbers and leave the extra field blank.', 'amazingplugins-security-scanner' ) );
+			return new \WP_Error( 'amsec_login_challenge', __( 'Enter the sum of the two numbers and leave the extra field blank.', 'amsec-security-scanner' ) );
 		}
 		return self::pendingError( $user );
 	}
@@ -87,7 +87,7 @@ final class Module {
 
 	public static function loginFields(): void {
 		if ( '1' === self::option( EmailFactor::OPTION ) ) {
-			echo '<p class="amsec-email-factor"><label for="amsec-email-code">' . esc_html__( 'Email code', 'amazingplugins-security-scanner' ) . '</label> ';
+			echo '<p class="amsec-email-factor"><label for="amsec-email-code">' . esc_html__( 'Email code', 'amsec-security-scanner' ) . '</label> ';
 			echo '<input class="input" type="text" id="amsec-email-code" name="amsec_email_code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" value=""></p>';
 		}
 		self::renderChallenge();
@@ -114,7 +114,7 @@ final class Module {
 			}
 		);
 		if ( 'block' === $decision ) {
-			return new \WP_Error( 'amsec_breached_password', __( 'This administrator password matched a breach list. The password itself was not sent.', 'amazingplugins-security-scanner' ) );
+			return new \WP_Error( 'amsec_breached_password', __( 'This administrator password matched a breach list. The password itself was not sent.', 'amsec-security-scanner' ) );
 		}
 		return $user;
 	}
@@ -127,7 +127,7 @@ final class Module {
 		if ( ! RegistrationApproval::blocks( RegistrationApproval::enabled( self::option( RegistrationApproval::OPTION ) ), $meta ) ) {
 			return $user;
 		}
-		return new \WP_Error( 'amsec_registration_pending', __( 'An administrator still needs to approve this account.', 'amazingplugins-security-scanner' ) );
+		return new \WP_Error( 'amsec_registration_pending', __( 'An administrator still needs to approve this account.', 'amsec-security-scanner' ) );
 	}
 
 	private static function emailFactor( mixed $user, string $password ): mixed {
@@ -162,7 +162,7 @@ final class Module {
 		if ( 'send' === $decision ) {
 			return self::sendEmailCode( $user );
 		}
-		return new \WP_Error( 'amsec_email_factor', __( 'Enter the email code and sign in again.', 'amazingplugins-security-scanner' ) );
+		return new \WP_Error( 'amsec_email_factor', __( 'Enter the email code and sign in again.', 'amsec-security-scanner' ) );
 	}
 
 	/** Atomically spends one of the current code's tries, so parallel guesses can't exceed EmailFactor::TRIES. */
@@ -175,7 +175,7 @@ final class Module {
 	}
 
 	private static function sendEmailCode( \WP_User $user ): \WP_Error {
-		$failed = new \WP_Error( 'amsec_email_factor', __( 'The email code could not be sent. Try again.', 'amazingplugins-security-scanner' ) );
+		$failed = new \WP_Error( 'amsec_email_factor', __( 'The email code could not be sent. Try again.', 'amsec-security-scanner' ) );
 		$email  = $user->user_email;
 		if ( ! is_string( $email ) || ! is_email( $email ) ) {
 			return $failed;
@@ -183,10 +183,10 @@ final class Module {
 		$code = EmailFactor::code();
 		$sent = wp_mail(
 			$email,
-			__( 'Sign-in code', 'amazingplugins-security-scanner' ),
+			__( 'Sign-in code', 'amsec-security-scanner' ),
 			sprintf(
 				/* translators: %s: six digit sign-in code */
-				__( 'Your sign-in code is %s. It expires in 10 minutes. If you did not try to sign in, ignore this email.', 'amazingplugins-security-scanner' ),
+				__( 'Your sign-in code is %s. It expires in 10 minutes. If you did not try to sign in, ignore this email.', 'amsec-security-scanner' ),
 				$code
 			)
 		);
@@ -198,7 +198,7 @@ final class Module {
 			return $failed;
 		}
 		update_user_meta( $user->ID, EmailFactor::TRIES_META, '0' );
-		return new \WP_Error( 'amsec_email_factor', __( 'Enter the email code and sign in again.', 'amazingplugins-security-scanner' ) );
+		return new \WP_Error( 'amsec_email_factor', __( 'Enter the email code and sign in again.', 'amsec-security-scanner' ) );
 	}
 
 	private static function challengeDecision(): string {
@@ -274,13 +274,13 @@ final class Module {
 		}
 		$question = sprintf(
 			/* translators: 1: first number, 2: second number */
-			__( 'What is %1$d + %2$d?', 'amazingplugins-security-scanner' ),
+			__( 'What is %1$d + %2$d?', 'amsec-security-scanner' ),
 			self::$challengePair['left'],
 			self::$challengePair['right']
 		);
 		echo '<p class="amsec-login-challenge"><label for="amsec-login-sum">' . esc_html( $question ) . '</label> ';
 		echo '<input class="input" type="text" id="amsec-login-sum" name="' . esc_attr( LoginChallenge::SUM ) . '" inputmode="numeric" autocomplete="off" size="4" value=""></p>';
-		echo '<p style="position:absolute;left:-9999px" aria-hidden="true"><label>' . esc_html__( 'Company', 'amazingplugins-security-scanner' ) . ' <input type="text" name="' . esc_attr( LoginChallenge::HONEYPOT ) . '" value="" tabindex="-1" autocomplete="off"></label></p>';
+		echo '<p style="position:absolute;left:-9999px" aria-hidden="true"><label>' . esc_html__( 'Company', 'amsec-security-scanner' ) . ' <input type="text" name="' . esc_attr( LoginChallenge::HONEYPOT ) . '" value="" tabindex="-1" autocomplete="off"></label></p>';
 	}
 
 	private static function challengeToken(): string {

@@ -33,17 +33,17 @@ final class TotpAuthentication {
 					$redirect = wp_validate_redirect( sanitize_text_field( wp_unslash( $_POST['redirect_to'] ) ), '' ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 				}
 				if ( ( new LoginSecondStep() )->park( $user->ID, $redirect ) ) {
-					return new \WP_Error( LoginSecondStep::ERROR, __( 'Enter the code from your authenticator.', 'amazingplugins-security-scanner' ) );
+					return new \WP_Error( LoginSecondStep::ERROR, __( 'Enter the code from your authenticator.', 'amsec-security-scanner' ) );
 				}
-				return new \WP_Error( 'amsec_verification_failed', __( 'Verification could not be completed.', 'amazingplugins-security-scanner' ) );
+				return new \WP_Error( 'amsec_verification_failed', __( 'Verification could not be completed.', 'amsec-security-scanner' ) );
 			}
 			if ( $this->verifyFactor( $user->ID, $factor, time() ) ) {
 				return $user;
 			}
 		} catch ( RuntimeException ) {
-			return new \WP_Error( 'amsec_verification_failed', __( 'Verification could not be completed.', 'amazingplugins-security-scanner' ) );
+			return new \WP_Error( 'amsec_verification_failed', __( 'Verification could not be completed.', 'amsec-security-scanner' ) );
 		}
-		return new \WP_Error( 'amsec_verification_failed', __( 'Verification could not be completed.', 'amazingplugins-security-scanner' ) );
+		return new \WP_Error( 'amsec_verification_failed', __( 'Verification could not be completed.', 'amsec-security-scanner' ) );
 	}
 	/** Shared one-use verification for password login, passkey removal, and saved enrollment. */
 	public function verifyFactor( int $userId, string $factor, int $now ): bool {
