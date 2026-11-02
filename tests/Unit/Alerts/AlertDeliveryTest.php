@@ -12,7 +12,7 @@ final class AlertDeliveryTest extends TestCase {
 	public function test_partial_history_does_not_drop_sent_or_pending_ids(): void {
 		$options = $this->options();
 		$ids = array_map( static fn( int $n ): string => 'finding-' . $n, range( 1, 1000 ) );
-		$options->set( 'amsec_alert_state', json_encode( array( 'active' => array( 'vulnerabilities' => $ids ), 'pending' => array( 'finding-1000' ) ) ) );
+		$options->set( 'ironlatch_alert_state', json_encode( array( 'active' => array( 'vulnerabilities' => $ids ), 'pending' => array( 'finding-1000' ) ) ) );
 		$messages = array();
 		$delivery = new AlertDelivery( $options, static function ( $to, $subject, $body ) use ( &$messages ): bool { $messages[] = $body; return true; }, 'owner@example.test', 'https://example.test/report' );
 		self::assertSame( 'accepted', $delivery->sendNew( array( 'finding-1001' ), 1000, 'vulnerabilities', false ) );
@@ -24,7 +24,7 @@ final class AlertDeliveryTest extends TestCase {
 	public function test_accepted_alert_is_deduplicated_by_finding_id(): void {
 		$options = $this->options();
 		$sent = array();
-		$delivery = new AlertDelivery( $options, static function ( string $to, string $subject, string $body ) use ( &$sent ): bool { $sent[] = array( $to, $subject, $body ); return true; }, 'owner@example.test', 'https://example.test/wp-admin/admin.php?page=amsec-security-scanner' );
+		$delivery = new AlertDelivery( $options, static function ( string $to, string $subject, string $body ) use ( &$sent ): bool { $sent[] = array( $to, $subject, $body ); return true; }, 'owner@example.test', 'https://example.test/wp-admin/admin.php?page=ironlatch-security-scanner' );
 		self::assertSame( 'accepted', $delivery->sendNew( array( 'finding-one' ), 1000 ) );
 		self::assertSame( 'none', $delivery->sendNew( array( 'finding-one' ), 1001 ) );
 		self::assertCount( 1, $sent );
@@ -43,7 +43,7 @@ final class AlertDeliveryTest extends TestCase {
 
 	public function test_missing_setting_sends_nothing(): void {
 		$options = $this->options();
-		unset( $options->values['amsec_alerts_enabled'] );
+		unset( $options->values['ironlatch_alerts_enabled'] );
 		$delivery = new AlertDelivery( $options, static function (): never { throw new \RuntimeException( 'Should not mail.' ); }, 'owner@example.test', 'https://example.test/report' );
 		self::assertSame( 'off', $delivery->sendNew( array( 'finding-one' ), 1000 ) );
 		self::assertSame( 'off', $delivery->retry( 1001 ) );
@@ -51,7 +51,7 @@ final class AlertDeliveryTest extends TestCase {
 
 	public function test_opt_out_sends_nothing(): void {
 		$options = $this->options();
-		$options->values['amsec_alerts_enabled'] = '0';
+		$options->values['ironlatch_alerts_enabled'] = '0';
 		$delivery = new AlertDelivery( $options, static function (): never { throw new \RuntimeException( 'Should not mail.' ); }, 'owner@example.test', 'https://example.test/report' );
 		self::assertSame( 'off', $delivery->sendNew( array( 'finding-one' ), 1000 ) );
 		self::assertSame( array(), $delivery->status() );
@@ -94,7 +94,7 @@ final class AlertDeliveryTest extends TestCase {
 			public function replaceIfSame( string $key, string $expected, string $replacement ): bool { if ( ( $this->values[ $key ] ?? null ) !== $expected ) { return false; } $this->values[ $key ] = $replacement; return true; }
 			public function deleteIfSame( string $key, string $expected ): bool { if ( ( $this->values[ $key ] ?? null ) !== $expected ) { return false; } unset( $this->values[ $key ] ); return true; }
 		};
-		$options->values['amsec_alerts_enabled'] = '1';
+		$options->values['ironlatch_alerts_enabled'] = '1';
 		return $options;
 	}
 }

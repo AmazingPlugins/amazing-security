@@ -18,5 +18,5 @@ final class TrafficPolicy {
 		return is_array( $s ) && array_keys( $s ) === array( 'version', 'enabled', 'revision' ) && 1 === $s['version'] && is_bool( $s['enabled'] ) && is_string( $s['revision'] ) && 1 === preg_match( '/^[a-f0-9]{32}$/D', $s['revision'] ) ? $s : null;
 	}
 	public function fingerprint( mixed $raw ): string {
-		return hash( 'sha256', is_string( $raw ) ? $raw : 'amsec-traffic-missing' ); }
+		return hash( 'sha256', is_string( $raw ) ? $raw : 'ironlatch-traffic-missing' ); }
 }

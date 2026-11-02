@@ -9,7 +9,7 @@ use AmazingPlugins\Security\Login\WordPressTotpStore;
 $settings = new WordPressLoginSettings( new WordPressOptions() );
 $oldMode = $settings->rateMode();
 $oldXmlRpc = $settings->xmlRpcAuthDisabled();
-$id = wp_insert_user( array( 'user_login' => 'amsec_cli_' . wp_generate_password( 8, false ), 'user_pass' => wp_generate_password( 32 ), 'user_email' => 'amsec-cli@example.invalid', 'role' => 'administrator' ) );
+$id = wp_insert_user( array( 'user_login' => 'ironlatch_cli_' . wp_generate_password( 8, false ), 'user_pass' => wp_generate_password( 32 ), 'user_email' => 'ironlatch-cli@example.invalid', 'role' => 'administrator' ) );
 if ( is_wp_error( $id ) ) {
 	throw new RuntimeException( 'Could not create CLI fixture user.' );
 }
@@ -24,7 +24,7 @@ try {
 		throw new RuntimeException( 'Emergency login disable failed.' );
 	}
 	$command->disableTotp( array(), array( 'user' => (string) $id ) );
-	if ( $store->isEnrolled( $id ) || ! get_user_meta( $id, 'amsec_totp_recovery_at', true ) ) {
+	if ( $store->isEnrolled( $id ) || ! get_user_meta( $id, 'ironlatch_totp_recovery_at', true ) ) {
 		throw new RuntimeException( 'Emergency TOTP disable failed.' );
 	}
 	echo "Login recovery integration passed.\n";

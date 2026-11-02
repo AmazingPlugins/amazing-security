@@ -91,7 +91,7 @@ final class FollowUpCheck implements SecurityCheck {
 			'clean' => State::PASS,
 			default => State::UNKNOWN,
 		};
-		$line = self::COPY[ $this->checkId ][ $stored ] ?? __( 'The stored result could not be read.', 'amsec-security-scanner' );
+		$line = self::COPY[ $this->checkId ][ $stored ] ?? __( 'The stored result could not be read.', 'ironlatch-security-scanner' );
 		return array(
 			new CheckResult(
 				$this->id(),
@@ -111,12 +111,12 @@ final class FollowUpCheck implements SecurityCheck {
 
 	/** @return array{stored: string, found: int} */
 	public static function releaseFiles(): array {
-		return self::integritySnapshot( 'amsec_security_scanner_integrity_completed', 'amsec_security_scanner_integrity_active' );
+		return self::integritySnapshot( 'ironlatch_security_scanner_integrity_completed', 'ironlatch_security_scanner_integrity_active' );
 	}
 
 	/** @return array{stored: string, found: int} */
 	public static function closedPlugins(): array {
-		$raw = get_option( 'amsec_repository_state', null );
+		$raw = get_option( 'ironlatch_repository_state', null );
 		if ( ! is_string( $raw ) || '' === $raw ) {
 			return array(
 				'stored' => 'none',
@@ -166,12 +166,12 @@ final class FollowUpCheck implements SecurityCheck {
 
 	/** @return array{stored: string, found: int} */
 	public static function suspiciousFiles(): array {
-		return self::fileScanSnapshot( 'amsec_security_scanner_file_scan_completed', 'amsec_security_scanner_file_scan_active' );
+		return self::fileScanSnapshot( 'ironlatch_security_scanner_file_scan_completed', 'ironlatch_security_scanner_file_scan_active' );
 	}
 
 	/** @return array{stored: string, found: int} */
 	public static function localInventory(): array {
-		$raw = get_option( 'amsec_exposure_state', null );
+		$raw = get_option( 'ironlatch_exposure_state', null );
 		if ( ! is_string( $raw ) || '' === $raw ) {
 			return array(
 				'stored' => 'none',
@@ -220,7 +220,7 @@ final class FollowUpCheck implements SecurityCheck {
 
 	/** @return array{stored: string, found: int} */
 	public static function securityHeaders(): array {
-		$raw = get_option( 'amsec_headers_state', null );
+		$raw = get_option( 'ironlatch_headers_state', null );
 		if ( ! is_string( $raw ) || '' === $raw ) {
 			return array(
 				'stored' => 'none',
@@ -275,7 +275,7 @@ final class FollowUpCheck implements SecurityCheck {
 
 	/** @return array{stored: string, found: int} */
 	public static function publicContent(): array {
-		$raw = get_option( 'amsec_content_state', null );
+		$raw = get_option( 'ironlatch_content_state', null );
 		if ( ! is_string( $raw ) || '' === $raw ) {
 			return array(
 				'stored' => 'none',

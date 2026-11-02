@@ -52,7 +52,7 @@ final class StartSuggestionsTest extends TestCase {
 		self::assertStringContainsString( 'still allowed', $open->summary );
 		self::assertStringContainsString( 'does not turn that off', $open->summary );
 		self::assertStringNotContainsString( 'safe', $open->summary );
-		self::assertSame( 'amsec-accounts', StartHere::control( $open )['page'] );
+		self::assertSame( 'ironlatch-accounts', StartHere::control( $open )['page'] );
 		self::assertSame( 'sign-in', StartHere::control( $open )['hash'] );
 
 		self::assertSame( 'pass', $closed->state );
@@ -196,9 +196,9 @@ final class StartSuggestionsTest extends TestCase {
 		self::assertSame( 'warn', $on->state );
 		self::assertStringContainsString( 'AI assistant access is on', $on->summary );
 		self::assertStringContainsString( 'llms.txt guide is published', $on->summary );
-		self::assertSame( 'amsec-assistant', StartHere::control( $on )['page'] );
-		self::assertSame( 'amsec-mcp', StartHere::control( $on )['hash'] );
-		self::assertSame( 'amsec-mcp', StartHere::control( $both )['hash'] );
+		self::assertSame( 'ironlatch-assistant', StartHere::control( $on )['page'] );
+		self::assertSame( 'ironlatch-mcp', StartHere::control( $on )['hash'] );
+		self::assertSame( 'ironlatch-mcp', StartHere::control( $both )['hash'] );
 
 		self::assertSame( 'pass', $quiet->state );
 		self::assertStringContainsString( 'turned off', $quiet->summary );
@@ -370,10 +370,10 @@ final class StartSuggestionsTest extends TestCase {
 				'found'  => 0,
 			)
 		) )->run( new ScanContext() )[0];
-		self::assertSame( 'amsec_security_scanner_vulnerability_enable', StartHere::control( $off )['action'] );
-		self::assertSame( 'amsec_security_scanner_integrity_start', StartHere::control( $files )['action'] );
-		self::assertSame( 'amsec-repository', StartHere::control( $plugins )['page'] );
-		self::assertSame( 'amsec_content_scan', StartHere::control( $content )['action'] );
+		self::assertSame( 'ironlatch_security_scanner_vulnerability_enable', StartHere::control( $off )['action'] );
+		self::assertSame( 'ironlatch_security_scanner_integrity_start', StartHere::control( $files )['action'] );
+		self::assertSame( 'ironlatch-repository', StartHere::control( $plugins )['page'] );
+		self::assertSame( 'ironlatch_content_scan', StartHere::control( $content )['action'] );
 		$filescan = ( new FollowUpCheck(
 			'suspicious-files',
 			static fn(): array => array(
@@ -381,21 +381,21 @@ final class StartSuggestionsTest extends TestCase {
 				'found'  => 0,
 			)
 		) )->run( new ScanContext() )[0];
-		self::assertSame( 'amsec_security_scanner_file_scan_start', StartHere::control( $filescan )['action'] );
+		self::assertSame( 'ironlatch_security_scanner_file_scan_start', StartHere::control( $filescan )['action'] );
 		$update     = new CheckResult( 'core-updates', 'warn', 'A WordPress update is waiting.', 'https://developer.wordpress.org/advanced-administration/security/hardening/', new DateTimeImmutable( '2026-10-01T00:00:00Z' ), 'high', 'complete', array() );
 		$updateDone = new CheckResult( 'core-updates', 'pass', 'WordPress does not report a core update waiting.', 'https://developer.wordpress.org/advanced-administration/security/hardening/', new DateTimeImmutable( '2026-10-01T00:00:00Z' ), 'high', 'complete', array() );
 		$login      = new CheckResult( 'login-rate-mode', 'warn', 'Login monitoring is off.', 'https://developer.wordpress.org/advanced-administration/security/brute-force/', new DateTimeImmutable( '2026-10-01T00:00:00Z' ), 'high', 'complete', array( 'mode' => 'off' ) );
 		$ping       = ( new PingbackCheck( static fn(): string => 'open' ) )->run( new ScanContext() )[0];
 		self::assertSame( 'update-core.php', StartHere::control( $update )['screen'] );
 		self::assertNull( StartHere::control( $updateDone ) );
-		self::assertSame( 'amsec-accounts', StartHere::control( $login )['page'] );
+		self::assertSame( 'ironlatch-accounts', StartHere::control( $login )['page'] );
 		self::assertSame( 'sign-in', StartHere::control( $login )['hash'] );
 		self::assertSame( 'close-pingbacks', StartHere::control( $ping )['operation'] );
 		self::assertArrayNotHasKey( 'screen', StartHere::control( $ping ) );
 		$editor = new CheckResult( 'file-editor', 'warn', 'People can edit theme and plugin files in wp-admin.', 'https://developer.wordpress.org/advanced-administration/security/hardening/', new DateTimeImmutable( '2026-10-01T00:00:00Z' ), 'high', 'complete', array( 'fix' => 'plugin' ) );
 		$config = new CheckResult( 'file-editor', 'warn', 'People can edit theme and plugin files because wp-config.php turns the editor on.', 'https://developer.wordpress.org/advanced-administration/security/hardening/', new DateTimeImmutable( '2026-10-01T00:00:00Z' ), 'high', 'complete', array( 'fix' => 'config' ) );
 		self::assertSame( 'disable-file-editor', StartHere::control( $editor )['operation'] );
-		self::assertSame( 'amsec-recovery', StartHere::control( $config )['page'] );
+		self::assertSame( 'ironlatch-recovery', StartHere::control( $config )['page'] );
 		self::assertArrayNotHasKey( 'action', StartHere::control( $config ) );
 		$inventory = ( new FollowUpCheck(
 			'local-inventory',
@@ -411,12 +411,12 @@ final class StartSuggestionsTest extends TestCase {
 				'found'  => 0,
 			)
 		) )->run( new ScanContext() )[0];
-		self::assertSame( 'amsec-exposure', StartHere::control( $inventory )['page'] );
-		self::assertSame( 'amsec-headers', StartHere::control( $headers )['page'] );
+		self::assertSame( 'ironlatch-exposure', StartHere::control( $inventory )['page'] );
+		self::assertSame( 'ironlatch-headers', StartHere::control( $headers )['page'] );
 	}
 
 	public function test_file_modes_bot_controls_and_rest_limits_do_not_change_settings(): void {
-		$dir = sys_get_temp_dir() . '/amsec-modes-' . bin2hex( random_bytes( 4 ) );
+		$dir = sys_get_temp_dir() . '/ironlatch-modes-' . bin2hex( random_bytes( 4 ) );
 		mkdir( $dir, 0700 );
 		$file = $dir . '/config.php';
 		file_put_contents( $file, 'x' );
@@ -436,7 +436,7 @@ final class StartSuggestionsTest extends TestCase {
 		self::assertStringNotContainsString( 'safe', $quiet->summary );
 		self::assertNull( StartHere::control( $quiet ) );
 		self::assertSame( 'warn', $open->state );
-		self::assertSame( 'amsec-recovery', StartHere::control( $open )['page'] );
+		self::assertSame( 'ironlatch-recovery', StartHere::control( $open )['page'] );
 		self::assertStringNotContainsString( $file, $open->summary );
 
 		$bots   = ( new BotModeCheck( static fn(): string => 'off' ) )->run( new ScanContext() )[0];
@@ -444,7 +444,7 @@ final class StartSuggestionsTest extends TestCase {
 		self::assertSame( 'warn', $bots->state );
 		self::assertStringContainsString( 'does not change that setting', $bots->summary );
 		self::assertStringNotContainsString( 'safe', $bots->summary );
-		self::assertSame( 'amsec-bots', StartHere::control( $bots )['page'] );
+		self::assertSame( 'ironlatch-bots', StartHere::control( $bots )['page'] );
 		self::assertSame( 'pass', $botsOn->state );
 		self::assertNull( StartHere::control( $botsOn ) );
 
@@ -464,7 +464,7 @@ final class StartSuggestionsTest extends TestCase {
 		self::assertSame( 'off', $rest->evidence['mode'] );
 		self::assertStringContainsString( 'does not change that policy', $rest->summary );
 		self::assertStringNotContainsString( 'safe', $rest->summary );
-		self::assertSame( 'amsec-rest-rates', StartHere::control( $rest )['page'] );
+		self::assertSame( 'ironlatch-rest-rates', StartHere::control( $rest )['page'] );
 		self::assertSame( 'pass', $blocked->state );
 		self::assertNull( StartHere::control( $blocked ) );
 		self::assertSame( 'unknown', $unread->state );
@@ -480,19 +480,19 @@ final class StartSuggestionsTest extends TestCase {
 		$forwarded = ( new SiteWatchCheck( 'trusted-proxies', static fn(): array => array( 'status' => 'xff' ) ) )->run( new ScanContext() )[0];
 
 		self::assertSame( 'warn', $emails->state );
-		self::assertSame( 'amsec-settings', StartHere::control( $emails )['page'] );
-		self::assertSame( 'amsec-alerts', StartHere::control( $emails )['hash'] );
-		self::assertSame( 'amsec-digest', StartHere::control( $digest )['page'] );
-		self::assertSame( 'amsec-traffic', StartHere::control( $traffic )['page'] );
+		self::assertSame( 'ironlatch-settings', StartHere::control( $emails )['page'] );
+		self::assertSame( 'ironlatch-alerts', StartHere::control( $emails )['hash'] );
+		self::assertSame( 'ironlatch-digest', StartHere::control( $digest )['page'] );
+		self::assertSame( 'ironlatch-traffic', StartHere::control( $traffic )['page'] );
 		self::assertStringContainsString( 'Visitor addresses are not stored', $traffic->summary );
 		self::assertSame( 'pass', $network->state );
 		self::assertNull( StartHere::control( $network ) );
 		self::assertSame( 'warn', $blocked->state );
-		self::assertSame( 'amsec-network', StartHere::control( $blocked )['page'] );
+		self::assertSame( 'ironlatch-network', StartHere::control( $blocked )['page'] );
 		self::assertSame( 'pass', $proxies->state );
 		self::assertNull( StartHere::control( $proxies ) );
 		self::assertSame( 'warn', $forwarded->state );
-		self::assertSame( 'amsec-proxies', StartHere::control( $forwarded )['page'] );
+		self::assertSame( 'ironlatch-proxies', StartHere::control( $forwarded )['page'] );
 		foreach ( array( $emails, $digest, $traffic, $network, $blocked, $proxies, $forwarded ) as $row ) {
 			self::assertStringContainsString( 'does not change that setting', $row->summary );
 			self::assertStringNotContainsString( 'safe', $row->summary );
@@ -523,13 +523,13 @@ final class StartSuggestionsTest extends TestCase {
 		$baseline = ( new SiteWatchCheck( 'code-baselines', static fn(): array => array( 'status' => 'none' ) ) )->run( new ScanContext() )[0];
 		$stored = ( new SiteWatchCheck( 'code-baselines', static fn(): array => array( 'status' => 'stored' ) ) )->run( new ScanContext() )[0];
 		self::assertSame( 'warn', $activity->state );
-		self::assertSame( 'amsec-activity', StartHere::control( $activity )['page'] );
+		self::assertSame( 'ironlatch-activity', StartHere::control( $activity )['page'] );
 		self::assertSame( 'pass', $recording->state );
 		self::assertNull( StartHere::control( $recording ) );
 		self::assertSame( 'warn', $baseline->state );
 		self::assertStringContainsString( 'does not prove that code is clean', $baseline->summary );
 		self::assertStringNotContainsString( 'safe', $baseline->summary );
-		self::assertSame( 'amsec-baselines', StartHere::control( $baseline )['page'] );
+		self::assertSame( 'ironlatch-baselines', StartHere::control( $baseline )['page'] );
 		self::assertSame( 'pass', $stored->state );
 		self::assertNull( StartHere::control( $stored ) );
 		self::assertSame( 'off', SiteWatchCheck::activity( null ) );
@@ -546,13 +546,13 @@ final class StartSuggestionsTest extends TestCase {
 		self::assertSame( 'warn', $extra->state );
 		self::assertStringContainsString( 'does not revoke a session', $extra->summary );
 		self::assertStringNotContainsString( 'safe', $extra->summary );
-		self::assertSame( 'amsec-sessions', StartHere::control( $extra )['page'] );
+		self::assertSame( 'ironlatch-sessions', StartHere::control( $extra )['page'] );
 		self::assertSame( 'pass', $single->state );
 		self::assertNull( StartHere::control( $single ) );
 		self::assertSame( 'warn', $daily->state );
 		self::assertStringContainsString( 'does not start one', $daily->summary );
 		self::assertStringNotContainsString( 'safe', $daily->summary );
-		self::assertSame( 'amsec-schedule', StartHere::control( $daily )['hash'] );
+		self::assertSame( 'ironlatch-schedule', StartHere::control( $daily )['hash'] );
 		self::assertArrayNotHasKey( 'action', StartHere::control( $daily ) );
 		self::assertSame( 'pass', $done->state );
 
@@ -562,14 +562,14 @@ final class StartSuggestionsTest extends TestCase {
 		$rulesOk = ( new SiteWatchCheck( 'rule-review', static fn(): array => array( 'status' => 'recent' ) ) )->run( new ScanContext() )[0];
 		self::assertSame( 'warn', $files->state );
 		self::assertStringContainsString( 'does not start one', $files->summary );
-		self::assertSame( 'amsec-schedule', StartHere::control( $files )['hash'] );
+		self::assertSame( 'ironlatch-schedule', StartHere::control( $files )['hash'] );
 		self::assertArrayNotHasKey( 'action', StartHere::control( $files ) );
 		self::assertSame( 'pass', $filesDone->state );
 		self::assertSame( 'warn', $rules->state );
 		self::assertStringContainsString( 'does not download new rules', $rules->summary );
 		self::assertStringContainsString( 'not a malware feed', $rules->summary );
 		self::assertStringNotContainsString( 'safe', $rules->summary );
-		self::assertSame( 'amsec-rules', StartHere::control( $rules )['page'] );
+		self::assertSame( 'ironlatch-rules', StartHere::control( $rules )['page'] );
 		self::assertSame( 'pass', $rulesOk->state );
 		self::assertNull( StartHere::control( $rulesOk ) );
 	}

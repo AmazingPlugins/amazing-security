@@ -27,7 +27,7 @@ use Throwable;
 
 final class IntegrityScanAction {
 	public function start(): void {
-		$this->authorize( 'amsec_security_scanner_integrity_start' );
+		$this->authorize( 'ironlatch_security_scanner_integrity_start' );
 		$store  = new WordPressIntegrityStore( new WordPressOptions() );
 		$scanId = wp_generate_uuid4();
 		$cursor = new IntegrityCursor( $scanId, startedAt: new DateTimeImmutable() );
@@ -38,7 +38,7 @@ final class IntegrityScanAction {
 	}
 
 	public function resume(): void {
-		$this->authorize( 'amsec_security_scanner_integrity_resume' );
+		$this->authorize( 'ironlatch_security_scanner_integrity_resume' );
 		$store    = new WordPressIntegrityStore( new WordPressOptions() );
 		$progress = $store->latestProgress();
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified above.
@@ -64,7 +64,7 @@ final class IntegrityScanAction {
 			$cursor = new IntegrityCursor( $scanId, startedAt: new DateTimeImmutable() );
 			if ( ! $store->begin( $scanId, $cursor ) ) {
 				if ( $cycle->retry( 'integrity', time() ) ) {
-					$this->schedule( 300, 'amsec_integrity_tick' );
+					$this->schedule( 300, 'ironlatch_integrity_tick' );
 				}
 				return;
 			}
@@ -75,19 +75,19 @@ final class IntegrityScanAction {
 			if ( null !== $progress && $progress->finished ) {
 				$cycle->fail( 'integrity', time() );
 			} elseif ( $cycle->retry( 'integrity', time() ) ) {
-				$this->schedule( 300, 'amsec_integrity_tick' );
+				$this->schedule( 300, 'ironlatch_integrity_tick' );
 			}
 			return;
 		}
 		if ( null === $progress ) {
 			if ( $cycle->advance( 'integrity', 'files', time() ) ) {
-				$this->schedule( 60, 'amsec_file_tick' );
+				$this->schedule( 60, 'ironlatch_file_tick' );
 			}
 			return;
 		}
 		if ( ! $progress->finished ) {
 			if ( $cycle->continueStage( 'integrity', time() ) ) {
-				$this->schedule( 60, 'amsec_integrity_tick' );
+				$this->schedule( 60, 'ironlatch_integrity_tick' );
 			}
 			return;
 		}
@@ -96,13 +96,13 @@ final class IntegrityScanAction {
 			if ( $coverage_gap ) {
 				$cycle->markCoverageGap( time() );
 			}
-			$this->schedule( 60, 'amsec_file_tick' );
+			$this->schedule( 60, 'ironlatch_file_tick' );
 		}
 	}
 
 	private function authorize( string $nonceAction ): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'You are not allowed to run an integrity scan.', 'amsec-security-scanner' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'You are not allowed to run an integrity scan.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );
 		}
 		check_admin_referer( $nonceAction );
 	}
@@ -177,7 +177,7 @@ final class IntegrityScanAction {
 		}
 		$plugins = array();
 		foreach ( get_plugins() as $file => $data ) {
-			if ( str_starts_with( $file, 'amsec-security-scanner/' ) ) {
+			if ( str_starts_with( $file, 'ironlatch-security-scanner/' ) ) {
 				continue;
 			}
 			$slug = dirname( $file );
@@ -215,7 +215,7 @@ final class IntegrityScanAction {
 	}
 
 	private function redirect( bool $error ): never {
-		wp_safe_redirect( admin_url( 'admin.php?page=amsec-file-checks' . ( $error ? '&amsec_security_scanner_integrity_error=1' : '' ) . '#amsec-integrity' ) );
+		wp_safe_redirect( admin_url( 'admin.php?page=ironlatch-file-checks' . ( $error ? '&ironlatch_security_scanner_integrity_error=1' : '' ) . '#ironlatch-integrity' ) );
 		exit;
 	}
 }

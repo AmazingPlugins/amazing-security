@@ -40,7 +40,7 @@ final class LocalScheduleTest extends TestCase {
 			++$runs;
 			return new ScanRun( new DateTimeImmutable( '@1000' ), new DateTimeImmutable( '@1001' ), array(), false );
 		} );
-		$options->values['amsec_schedule_lock'] = json_encode( array( 'scan_id' => 'other', 'expires' => time() + 60 ) );
+		$options->values['ironlatch_schedule_lock'] = json_encode( array( 'scan_id' => 'other', 'expires' => time() + 60 ) );
 		self::assertFalse( $schedule->tick( 1000 ) );
 		self::assertSame( 0, $runs );
 	}

@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
 /** Rate tests. They do not bootstrap WordPress or touch the network. */
 final class RateTest extends TestCase {
 	public function test_the_switch_defaults_off_and_the_gap_is_one_minute(): void {
-		self::assertSame( 'amsec_comment_rate', Rate::OPTION );
+		self::assertSame( 'ironlatch_comment_rate', Rate::OPTION );
 		self::assertSame( 60, Rate::GAP );
 		self::assertSame( '0', Rate::flag( null ) );
 		self::assertSame( '1', Rate::flag( '1' ) );

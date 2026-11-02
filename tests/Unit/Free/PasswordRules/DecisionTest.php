@@ -12,7 +12,7 @@ require_once dirname( __DIR__, 4 ) . '/src/Free/PasswordRules/Decision.php';
 final class DecisionTest extends TestCase {
 	public function test_allowed_on_values_are_only_eight_twelve_and_sixteen(): void {
 		self::assertSame( array( '8', '12', '16' ), Decision::ALLOWED );
-		self::assertSame( 'amsec_password_min_length', Decision::OPTION );
+		self::assertSame( 'ironlatch_password_min_length', Decision::OPTION );
 	}
 
 	public function test_zero_and_other_stored_values_are_off(): void {

@@ -8,7 +8,7 @@ defined( 'ABSPATH' ) || exit;
 
 /** Posted account settings. Does not read or write the common-password switch. */
 final class Settings {
-	public const ERASE = 'amsec_login_erase_on_uninstall';
+	public const ERASE = 'ironlatch_login_erase_on_uninstall';
 
 	/**
 	 * @param array<string, mixed> $post

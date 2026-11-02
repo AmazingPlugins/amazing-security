@@ -16,7 +16,7 @@ final class BoundedContentReaderTest extends TestCase {
 	private array $paths = array();
 
 	private function root(): string {
-		$root = sys_get_temp_dir() . '/amsec-read-' . bin2hex( random_bytes( 6 ) );
+		$root = sys_get_temp_dir() . '/ironlatch-read-' . bin2hex( random_bytes( 6 ) );
 		mkdir( $root );
 		$this->paths[] = $root;
 		return $root;

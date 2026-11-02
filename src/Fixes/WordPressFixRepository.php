@@ -16,8 +16,8 @@ final class WordPressFixRepository implements FixRepository {
 	private readonly ?Closure $beforeAudit;
 
 	public function __construct( private readonly object $db, ?callable $beforeAudit = null ) {
-		$this->proposals   = $db->prefix . 'amsec_fix_proposals';
-		$this->auditTable  = $db->prefix . 'amsec_fix_audit';
+		$this->proposals   = $db->prefix . 'ironlatch_fix_proposals';
+		$this->auditTable  = $db->prefix . 'ironlatch_fix_audit';
 		$this->beforeAudit = null === $beforeAudit ? null : Closure::fromCallable( $beforeAudit );
 	}
 
@@ -25,7 +25,7 @@ final class WordPressFixRepository implements FixRepository {
 		if ( ! $this->transactionalTables() ) {
 			return false;
 		}
-		$lockName = 'amsec_fix_' . substr( hash( 'sha256', $this->proposals ), 0, 32 );
+		$lockName = 'ironlatch_fix_' . substr( hash( 'sha256', $this->proposals ), 0, 32 );
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Serialize proposal quota admission.
 		$locked = $this->db->get_var( $this->db->prepare( 'SELECT GET_LOCK(%s, 0)', $lockName ) );
 		if ( 1 !== (int) $locked || '' !== $this->db->last_error ) {
@@ -133,7 +133,7 @@ final class WordPressFixRepository implements FixRepository {
 			}
 			if ( ! $rollback ) {
 				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Serialize approval with a concurrent MCP opt-out.
-				$permission = $this->db->get_row( $this->db->prepare( "SELECT option_value FROM {$this->db->options} WHERE option_name = %s FOR UPDATE", 'amsec_security_scanner_mcp_enabled' ), ARRAY_A );
+				$permission = $this->db->get_row( $this->db->prepare( "SELECT option_value FROM {$this->db->options} WHERE option_name = %s FOR UPDATE", 'ironlatch_security_scanner_mcp_enabled' ), ARRAY_A );
 				if ( '' !== $this->db->last_error ) {
 					throw new RuntimeException( 'Could not read MCP permission.' );
 				}
@@ -142,7 +142,7 @@ final class WordPressFixRepository implements FixRepository {
 				}
 			}
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Lock the exact option row before compare-and-swap.
-			$option = $this->db->get_row( $this->db->prepare( "SELECT option_value FROM {$this->db->options} WHERE option_name = %s FOR UPDATE", 'amsec_login_rate_mode' ), ARRAY_A );
+			$option = $this->db->get_row( $this->db->prepare( "SELECT option_value FROM {$this->db->options} WHERE option_name = %s FOR UPDATE", 'ironlatch_login_rate_mode' ), ARRAY_A );
 			if ( '' !== $this->db->last_error ) {
 				throw new RuntimeException( 'Could not read login mode.' );
 			}
@@ -158,10 +158,10 @@ final class WordPressFixRepository implements FixRepository {
 			}
 			if ( is_array( $option ) ) {
 				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Exact option CAS inside the transaction.
-				$changed = $this->db->query( $this->db->prepare( "UPDATE {$this->db->options} SET option_value = %s WHERE option_name = %s AND BINARY option_value = BINARY %s", $next, 'amsec_login_rate_mode', $expected ) );
+				$changed = $this->db->query( $this->db->prepare( "UPDATE {$this->db->options} SET option_value = %s WHERE option_name = %s AND BINARY option_value = BINARY %s", $next, 'ironlatch_login_rate_mode', $expected ) );
 			} else {
 				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- The default off option was absent; unique option_name protects insertion.
-				$changed = $this->db->query( $this->db->prepare( "INSERT INTO {$this->db->options} (option_name, option_value, autoload) VALUES (%s, %s, %s)", 'amsec_login_rate_mode', $next, 'off' ) );
+				$changed = $this->db->query( $this->db->prepare( "INSERT INTO {$this->db->options} (option_name, option_value, autoload) VALUES (%s, %s, %s)", 'ironlatch_login_rate_mode', $next, 'off' ) );
 			}
 			if ( 1 !== $changed ) {
 				throw new RuntimeException( 'Could not change login mode.' );
@@ -244,7 +244,7 @@ final class WordPressFixRepository implements FixRepository {
 	}
 
 	private function clearOptionCache(): void {
-		wp_cache_delete( 'amsec_login_rate_mode', 'options' );
+		wp_cache_delete( 'ironlatch_login_rate_mode', 'options' );
 		wp_cache_delete( 'alloptions', 'options' );
 		wp_cache_delete( 'notoptions', 'options' );
 	}

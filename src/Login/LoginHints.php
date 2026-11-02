@@ -28,7 +28,7 @@ final class LoginHints {
 			}
 		}
 		if ( $changed ) {
-			$messages['amsec_generic_login'] = __( 'The username or password is incorrect.', 'amsec-security-scanner' );
+			$messages['ironlatch_generic_login'] = __( 'The username or password is incorrect.', 'ironlatch-security-scanner' );
 		}
 		return $messages;
 	}
@@ -53,8 +53,8 @@ final class LoginHints {
 				$errors->remove( $code );
 			}
 		}
-		if ( isset( $next['amsec_generic_login'] ) ) {
-			$errors->add( 'amsec_generic_login', $next['amsec_generic_login'] );
+		if ( isset( $next['ironlatch_generic_login'] ) ) {
+			$errors->add( 'ironlatch_generic_login', $next['ironlatch_generic_login'] );
 		}
 		return $errors;
 	}

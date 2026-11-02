@@ -15,15 +15,15 @@ final class ScoreTest extends TestCase {
 	}
 
 	public function test_idle_and_flags_count_when_on(): void {
-		$options = array( 'amsec_idle_minutes' => '30', 'amsec_hotlink' => '1' );
+		$options = array( 'ironlatch_idle_minutes' => '30', 'ironlatch_hotlink' => '1' );
 		self::assertSame( 2, Score::tally( $options )['on'] );
 	}
 
 	public function test_preset_stays_local(): void {
 		$preset = Score::preset( 'shop' );
-		self::assertSame( '1', $preset['amsec_login_confirm'] );
-		self::assertArrayNotHasKey( 'amsec_common_passwords', $preset );
-		self::assertArrayNotHasKey( 'amsec_precise_block', $preset );
+		self::assertSame( '1', $preset['ironlatch_login_confirm'] );
+		self::assertArrayNotHasKey( 'ironlatch_common_passwords', $preset );
+		self::assertArrayNotHasKey( 'ironlatch_precise_block', $preset );
 		self::assertSame( array(), Score::preset( 'other' ) );
 	}
 }

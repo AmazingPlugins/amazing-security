@@ -4,7 +4,7 @@ use AmazingPlugins\Security\Exposure\ExposureScanner;
 use PHPUnit\Framework\TestCase;
 final class ScannerTest extends TestCase {
  private string $root;
- protected function setUp():void{$this->root=sys_get_temp_dir().'/amsec-exposure-'.bin2hex(random_bytes(5));mkdir($this->root,0700);}
+ protected function setUp():void{$this->root=sys_get_temp_dir().'/ironlatch-exposure-'.bin2hex(random_bytes(5));mkdir($this->root,0700);}
  protected function tearDown():void{$it=new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->root,\FilesystemIterator::SKIP_DOTS),\RecursiveIteratorIterator::CHILD_FIRST);foreach($it as $f){if($f->isDir()&&!$f->isLink()){rmdir($f->getPathname());}else{unlink($f->getPathname());}}rmdir($this->root);}
  public function test_selected_names_and_counterexamples_without_content_reads():void{
   foreach(['debug.log','error_log','export.sql.gz','.env.local','wp-config.php.bak','archive.zip','portrait.jpg','wp-config.php','notes.txt','backup.zip.jpg'] as $name){file_put_contents($this->root.'/'.$name,'INERT-NONSECRET-CONTENT');}$r=(new ExposureScanner())->scan($this->root,'site',1000);self::assertFalse($r['partial']);self::assertCount(6,$r['candidates']);self::assertStringNotContainsString($this->root,json_encode($r));self::assertStringNotContainsString('INERT-NONSECRET-CONTENT',json_encode($r));foreach($r['candidates'] as $c){self::assertSame('INERT-NONSECRET-CONTENT',file_get_contents($this->root.'/'.$c['path']));}

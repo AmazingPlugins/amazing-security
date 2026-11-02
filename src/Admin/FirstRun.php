@@ -9,29 +9,29 @@ defined( 'ABSPATH' ) || exit;
 /** A short pointer tour of the side menu. Nothing runs or changes; it only labels where things are. */
 final class FirstRun {
 	/** WordPress stores this id in the account's dismissed pointers once the tour ends. */
-	public const POINTER = 'amsec_tour';
+	public const POINTER = 'ironlatch_tour';
 
 	public static function assets(): void {
 		if ( ! Brand::onScreen() || ! current_user_can( 'manage_options' ) || self::dismissed( get_current_user_id() ) ) {
 			return;
 		}
 		wp_enqueue_style( 'wp-pointer' );
-		wp_enqueue_script( 'amsec-security-scanner-tour', plugins_url( 'assets/admin-tour.js', AMSEC_SECURITY_SCANNER_FILE ), array( 'wp-pointer' ), '0.1.5', true );
+		wp_enqueue_script( 'ironlatch-security-scanner-tour', plugins_url( 'assets/admin-tour.js', IRONLATCH_SECURITY_SCANNER_FILE ), array( 'wp-pointer' ), '0.1.6', true );
 		wp_localize_script(
-			'amsec-security-scanner-tour',
-			'amsecTour',
+			'ironlatch-security-scanner-tour',
+			'ironlatchTour',
 			array(
 				'pointer' => self::POINTER,
-				'steps'   => self::steps( false !== get_option( 'amsec_security_scanner_latest_run', false ) ),
+				'steps'   => self::steps( false !== get_option( 'ironlatch_security_scanner_latest_run', false ) ),
 				'phone'   => array(
 					'target' => '#wp-admin-bar-menu-toggle',
 					'edge'   => 'top',
-					'title'  => __( 'Menu', 'amsec-security-scanner' ),
-					'text'   => __( 'Every section of this plugin is in the admin menu, under Security Scanner.', 'amsec-security-scanner' ),
+					'title'  => __( 'Menu', 'ironlatch-security-scanner' ),
+					'text'   => __( 'Every section of this plugin is in the admin menu, under Security Scanner.', 'ironlatch-security-scanner' ),
 				),
-				'next'    => __( 'Next', 'amsec-security-scanner' ),
-				'done'    => __( 'Done', 'amsec-security-scanner' ),
-				'skip'    => __( 'Skip tour', 'amsec-security-scanner' ),
+				'next'    => __( 'Next', 'ironlatch-security-scanner' ),
+				'done'    => __( 'Done', 'ironlatch-security-scanner' ),
+				'skip'    => __( 'Skip tour', 'ironlatch-security-scanner' ),
 			)
 		);
 	}
@@ -48,58 +48,58 @@ final class FirstRun {
 		$link  = static fn ( string $page ): string => '#adminmenu a[href$="page=' . $page . '"]';
 		$steps = array(
 			array(
-				'target' => $link( 'amsec-security-scanner' ),
-				'title'  => __( 'Scan', 'amsec-security-scanner' ),
-				'text'   => __( 'Reads this site and lists what it finds. A scan does not change anything.', 'amsec-security-scanner' ),
+				'target' => $link( 'ironlatch-security-scanner' ),
+				'title'  => __( 'Scan', 'ironlatch-security-scanner' ),
+				'text'   => __( 'Reads this site and lists what it finds. A scan does not change anything.', 'ironlatch-security-scanner' ),
 			),
 			array(
-				'target' => $link( 'amsec-recommendations' ),
-				'title'  => __( 'Recommendations', 'amsec-security-scanner' ),
-				'text'   => __( 'Where to start, and which protections are still off.', 'amsec-security-scanner' ),
+				'target' => $link( 'ironlatch-recommendations' ),
+				'title'  => __( 'Recommendations', 'ironlatch-security-scanner' ),
+				'text'   => __( 'Where to start, and which protections are still off.', 'ironlatch-security-scanner' ),
 			),
 			array(
-				'target' => $link( 'amsec-accounts' ),
-				'title'  => __( 'Log In & Register', 'amsec-security-scanner' ),
-				'text'   => __( 'Sign-in checks and authenticator status. Each one stays off until you turn it on.', 'amsec-security-scanner' ),
+				'target' => $link( 'ironlatch-accounts' ),
+				'title'  => __( 'Log In & Register', 'ironlatch-security-scanner' ),
+				'text'   => __( 'Sign-in checks and authenticator status. Each one stays off until you turn it on.', 'ironlatch-security-scanner' ),
 			),
 			array(
-				'target' => $link( 'amsec-traffic-guard' ),
-				'title'  => __( 'Traffic', 'amsec-security-scanner' ),
-				'text'   => __( 'Request limits and rules. Each one stays off until you turn it on.', 'amsec-security-scanner' ),
+				'target' => $link( 'ironlatch-traffic-guard' ),
+				'title'  => __( 'Traffic', 'ironlatch-security-scanner' ),
+				'text'   => __( 'Request limits and rules. Each one stays off until you turn it on.', 'ironlatch-security-scanner' ),
 			),
 			array(
-				'target' => $link( 'amsec-files' ),
-				'title'  => __( 'Files', 'amsec-security-scanner' ),
-				'text'   => __( 'File checks. A fix only happens after you approve it.', 'amsec-security-scanner' ),
+				'target' => $link( 'ironlatch-files' ),
+				'title'  => __( 'Files', 'ironlatch-security-scanner' ),
+				'text'   => __( 'File checks. A fix only happens after you approve it.', 'ironlatch-security-scanner' ),
 			),
 			array(
-				'target' => $link( 'amsec-records' ),
-				'title'  => __( 'Records', 'amsec-security-scanner' ),
-				'text'   => __( 'The local record of sign-ins and account changes.', 'amsec-security-scanner' ),
+				'target' => $link( 'ironlatch-records' ),
+				'title'  => __( 'Records', 'ironlatch-security-scanner' ),
+				'text'   => __( 'The local record of sign-ins and account changes.', 'ironlatch-security-scanner' ),
 			),
 			array(
-				'target' => $link( 'amsec-settings' ),
-				'title'  => __( 'Settings', 'amsec-security-scanner' ),
-				'text'   => __( 'Email notices and the weekly digest. Both are off by default.', 'amsec-security-scanner' ),
+				'target' => $link( 'ironlatch-settings' ),
+				'title'  => __( 'Settings', 'ironlatch-security-scanner' ),
+				'text'   => __( 'Email notices and the weekly digest. Both are off by default.', 'ironlatch-security-scanner' ),
 			),
 			array(
-				'target' => $link( 'amsec-assistant' ),
-				'title'  => __( 'AI & MCP', 'amsec-security-scanner' ),
-				'text'   => __( 'Optional access for an AI assistant.', 'amsec-security-scanner' ),
+				'target' => $link( 'ironlatch-assistant' ),
+				'title'  => __( 'AI & MCP', 'ironlatch-security-scanner' ),
+				'text'   => __( 'Optional access for an AI assistant.', 'ironlatch-security-scanner' ),
 			),
 			array(
-				'target' => '.amsec-scan-button',
+				'target' => '.ironlatch-scan-button',
 				'edge'   => 'top',
-				'title'  => $scanned ? __( 'Rescan button', 'amsec-security-scanner' ) : __( 'Scan button', 'amsec-security-scanner' ),
-				'text'   => $scanned ? __( 'Runs the checks again after you change something. It does not change the site.', 'amsec-security-scanner' ) : __( 'Nothing runs until you press this.', 'amsec-security-scanner' ),
+				'title'  => $scanned ? __( 'Rescan button', 'ironlatch-security-scanner' ) : __( 'Scan button', 'ironlatch-security-scanner' ),
+				'text'   => $scanned ? __( 'Runs the checks again after you change something. It does not change the site.', 'ironlatch-security-scanner' ) : __( 'Nothing runs until you press this.', 'ironlatch-security-scanner' ),
 			),
 		);
 		if ( $scanned ) {
 			$steps[] = array(
-				'target' => '.amsec-scan .amsec-cats',
+				'target' => '.ironlatch-scan .ironlatch-cats',
 				'edge'   => 'top',
-				'title'  => __( 'Results', 'amsec-security-scanner' ),
-				'text'   => __( 'Findings are sorted into these tabs. The number is how many are in each.', 'amsec-security-scanner' ),
+				'title'  => __( 'Results', 'ironlatch-security-scanner' ),
+				'text'   => __( 'Findings are sorted into these tabs. The number is how many are in each.', 'ironlatch-security-scanner' ),
 			);
 		}
 		return $steps;

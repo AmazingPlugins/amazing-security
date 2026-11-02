@@ -8,7 +8,7 @@ defined( 'ABSPATH' ) || exit;
 final class SecurityApprovalLock {
 	public function __construct( private readonly object $db ) {}
 	public function run( callable $operation ): string {
-		$lock = 'amsec_net_policy_' . substr( hash( 'sha256', $this->db->prefix . ( defined( 'DB_NAME' ) ? DB_NAME : '' ) ), 0, 32 );
+		$lock = 'ironlatch_net_policy_' . substr( hash( 'sha256', $this->db->prefix . ( defined( 'DB_NAME' ) ? DB_NAME : '' ) ), 0, 32 );
 		$old  = $this->db->suppress_errors( true );
 		try {
 		 // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Zero-wait lock serializes the two related approved policy edits.

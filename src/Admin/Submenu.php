@@ -8,7 +8,7 @@ defined( 'ABSPATH' ) || exit;
 
 /** Scan stays first. Recommendations, Log In & Register, Traffic, Files, and Records stay beside it. */
 final class Submenu {
-	public const PARENT = 'amsec-security-scanner';
+	public const PARENT = 'ironlatch-security-scanner';
 
 	/**
 	 * Side-menu slugs after Scan.
@@ -17,13 +17,13 @@ final class Submenu {
 	 */
 	public static function visible(): array {
 		return array(
-			'amsec-recommendations',
-			'amsec-accounts',
-			'amsec-traffic-guard',
-			'amsec-files',
-			'amsec-records',
-			'amsec-settings',
-			'amsec-assistant',
+			'ironlatch-recommendations',
+			'ironlatch-accounts',
+			'ironlatch-traffic-guard',
+			'ironlatch-files',
+			'ironlatch-records',
+			'ironlatch-settings',
+			'ironlatch-assistant',
 		);
 	}
 
@@ -58,7 +58,7 @@ final class Submenu {
 		$ordered = array();
 		if ( isset( $by_slug[ self::PARENT ] ) ) {
 			$scan      = $by_slug[ self::PARENT ];
-			$scan[0]   = __( 'Scan', 'amsec-security-scanner' );
+			$scan[0]   = __( 'Scan', 'ironlatch-security-scanner' );
 			$ordered[] = $scan;
 		}
 		$shown = array_fill_keys( self::visible(), true );
@@ -68,13 +68,13 @@ final class Submenu {
 			}
 			$item   = $by_slug[ $slug ];
 			$labels = array(
-				'amsec-recommendations' => __( 'Recommendations', 'amsec-security-scanner' ),
-				'amsec-accounts'        => __( 'Log In & Register', 'amsec-security-scanner' ),
-				'amsec-traffic-guard'   => __( 'Traffic', 'amsec-security-scanner' ),
-				'amsec-files'           => __( 'Files', 'amsec-security-scanner' ),
-				'amsec-records'         => __( 'Records', 'amsec-security-scanner' ),
-				'amsec-settings'        => __( 'Settings', 'amsec-security-scanner' ),
-				'amsec-assistant'       => __( 'AI & MCP', 'amsec-security-scanner' ),
+				'ironlatch-recommendations' => __( 'Recommendations', 'ironlatch-security-scanner' ),
+				'ironlatch-accounts'        => __( 'Log In & Register', 'ironlatch-security-scanner' ),
+				'ironlatch-traffic-guard'   => __( 'Traffic', 'ironlatch-security-scanner' ),
+				'ironlatch-files'           => __( 'Files', 'ironlatch-security-scanner' ),
+				'ironlatch-records'         => __( 'Records', 'ironlatch-security-scanner' ),
+				'ironlatch-settings'        => __( 'Settings', 'ironlatch-security-scanner' ),
+				'ironlatch-assistant'       => __( 'AI & MCP', 'ironlatch-security-scanner' ),
 			);
 			if ( isset( $labels[ $slug ] ) ) {
 				$item[0] = $labels[ $slug ];
@@ -85,11 +85,11 @@ final class Submenu {
 			if ( self::PARENT === $slug || isset( $shown[ $slug ] ) ) {
 				continue;
 			}
-			$item[4]   = 'amsec-menu-hidden';
+			$item[4]   = 'ironlatch-menu-hidden';
 			$ordered[] = $item;
 		}
 		if ( array() !== $ordered ) {
-			// Scan stays first so the AmSec Security Scanner menu opens it. Hidden rows stay registered.
+			// Scan stays first so the Ironlatch Security Scanner menu opens it. Hidden rows stay registered.
 			$submenu[ self::PARENT ] = $ordered; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 		}
 		add_action( 'admin_enqueue_scripts', array( self::class, 'hide' ) );
@@ -97,6 +97,6 @@ final class Submenu {
 
 	public static function hide(): void {
 		// Core's admin-menu stylesheet loads on every admin screen, like the menu itself.
-		wp_add_inline_style( 'admin-menu', '#adminmenu .amsec-menu-hidden{display:none}' );
+		wp_add_inline_style( 'admin-menu', '#adminmenu .ironlatch-menu-hidden{display:none}' );
 	}
 }

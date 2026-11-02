@@ -8,9 +8,9 @@ defined( 'ABSPATH' ) || exit;
 
 /** Holds a later comment from an email that was already marked spam. No visitor address. */
 final class SpamHold {
-	public const OPTION = 'amsec_comment_spam_hold';
+	public const OPTION = 'ironlatch_comment_spam_hold';
 
-	public const LIST = 'amsec_comment_spam_hashes';
+	public const LIST = 'ironlatch_comment_spam_hashes';
 
 	public static function flag( mixed $value ): string {
 		return '1' === $value ? '1' : '0';

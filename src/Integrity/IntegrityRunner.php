@@ -84,7 +84,7 @@ final class IntegrityRunner {
 				$cursor->findings[] = new CheckResult(
 					'integrity-file',
 					$state,
-					'ok' === $result->state ? __( 'Release file differs from the published checksum.', 'amsec-security-scanner' ) : ( 'missing' === $result->state ? __( 'Release file is missing.', 'amsec-security-scanner' ) : __( 'Release file could not be checked.', 'amsec-security-scanner' ) ),
+					'ok' === $result->state ? __( 'Release file differs from the published checksum.', 'ironlatch-security-scanner' ) : ( 'missing' === $result->state ? __( 'Release file is missing.', 'ironlatch-security-scanner' ) : __( 'Release file could not be checked.', 'ironlatch-security-scanner' ) ),
 					$target->manifest->sourceUrl,
 					new DateTimeImmutable(),
 					'high',

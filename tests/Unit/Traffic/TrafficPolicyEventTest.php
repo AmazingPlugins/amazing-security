@@ -20,6 +20,6 @@ final class TrafficPolicyEventTest extends TestCase {
  self::assertSame('other',TrafficEvent::capture(['SCRIPT_NAME'=>str_repeat('x',3000)],null,200,'unclassified',1)->row()['category']);
  }
  public function testApprovalRechecksStateAndRecoveryNeverEnablesCorruption():void {
- $o=new MemoryOptions();$s=new TrafficSettingsService($o);$fp=$s->fingerprint();self::assertSame('saved',$s->apply($fp,true));self::assertTrue($s->status()['enabled']);self::assertSame('changed',$s->apply($fp,false));$fp=$s->fingerprint();$o->failWrites=true;self::assertSame('failed',$s->apply($fp,false));self::assertTrue($s->status()['enabled']);$o->failWrites=false;$o->values['amsec_traffic_policy']='broken';self::assertSame('invalid',$s->apply($s->fingerprint(),true));self::assertTrue($s->disable());self::assertFalse($s->status()['enabled']);
+ $o=new MemoryOptions();$s=new TrafficSettingsService($o);$fp=$s->fingerprint();self::assertSame('saved',$s->apply($fp,true));self::assertTrue($s->status()['enabled']);self::assertSame('changed',$s->apply($fp,false));$fp=$s->fingerprint();$o->failWrites=true;self::assertSame('failed',$s->apply($fp,false));self::assertTrue($s->status()['enabled']);$o->failWrites=false;$o->values['ironlatch_traffic_policy']='broken';self::assertSame('invalid',$s->apply($s->fingerprint(),true));self::assertTrue($s->disable());self::assertFalse($s->status()['enabled']);
  }
 }

@@ -11,52 +11,52 @@ use AmazingPlugins\Security\Login\LoginFormFields;
 final class Module {
 	public static function boot(): void {
 		add_action( 'admin_menu', array( self::class, 'menu' ) );
-		add_action( 'admin_post_amsec_guide_preset', array( self::class, 'applyPreset' ) );
+		add_action( 'admin_post_ironlatch_guide_preset', array( self::class, 'applyPreset' ) );
 		add_action( 'woocommerce_login_form', array( self::class, 'wooLogin' ) );
 		add_action( 'woocommerce_account_dashboard', array( self::class, 'wooAccount' ) );
-		add_action( 'amsec_custom_login_form', array( self::class, 'customLogin' ) );
+		add_action( 'ironlatch_custom_login_form', array( self::class, 'customLogin' ) );
 	}
 
 	public static function menu(): void {
-		add_submenu_page( 'amsec-security-scanner', __( 'Site review', 'amsec-security-scanner' ), __( 'Site review', 'amsec-security-scanner' ), 'manage_options', 'amsec-guide', array( self::class, 'render' ) );
+		add_submenu_page( 'ironlatch-security-scanner', __( 'Site review', 'ironlatch-security-scanner' ), __( 'Site review', 'ironlatch-security-scanner' ), 'manage_options', 'ironlatch-guide', array( self::class, 'render' ) );
 	}
 
 	public static function render(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'Administrator access required.', 'amsec-security-scanner' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'Administrator access required.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );
 		}
 		$options = array();
 		foreach ( array_keys( Score::FLAGS ) as $key ) {
 			$options[ $key ] = get_option( $key, '0' );
 		}
-		$options['amsec_idle_minutes'] = get_option( 'amsec_idle_minutes', '0' );
-		$score                         = Score::tally( $options );
-		echo '<div class="wrap amsec-security-scanner-admin"><h1>' . esc_html__( 'Site review', 'amsec-security-scanner' ) . '</h1>';
+		$options['ironlatch_idle_minutes'] = get_option( 'ironlatch_idle_minutes', '0' );
+		$score                             = Score::tally( $options );
+		echo '<div class="wrap ironlatch-security-scanner-admin"><h1>' . esc_html__( 'Site review', 'ironlatch-security-scanner' ) . '</h1>';
 		echo '<p>' . esc_html(
 			sprintf(
 			/* translators: 1: number on, 2: number checked */
-				__( '%1$d of %2$d local protections are on. This review does not mean the site is clean.', 'amsec-security-scanner' ),
+				__( '%1$d of %2$d local protections are on. This review does not mean the site is clean.', 'ironlatch-security-scanner' ),
 				$score['on'],
 				$score['total']
 			)
 		) . '</p>';
-		echo '<ul class="amsec-start amsec-guide">';
+		echo '<ul class="ironlatch-start ironlatch-guide">';
 		foreach ( self::rows() as $row ) {
 			$on = ! empty( $row['idle'] )
-				? in_array( (string) $options['amsec_idle_minutes'], array( '15', '30', '60' ), true )
+				? in_array( (string) $options['ironlatch_idle_minutes'], array( '15', '30', '60' ), true )
 				: (string) ( $options[ $row['key'] ] ?? '0' ) === '1';
-			echo '<li class="amsec-start-item" data-state="' . esc_attr( $on ? 'pass' : 'none' ) . '"><span class="amsec-start-badge">' . esc_html( $on ? __( 'On', 'amsec-security-scanner' ) : __( 'Off', 'amsec-security-scanner' ) ) . '</span><span class="amsec-start-copy"><strong>' . esc_html( $row['label'] ) . '</strong></span>';
-			echo '<a class="button" href="' . esc_url( admin_url( 'admin.php?page=' . $row['page'] ) . ( isset( $row['hash'] ) ? '#' . $row['hash'] : '' ) ) . '">' . esc_html__( 'Open', 'amsec-security-scanner' ) . '</a></li>';
+			echo '<li class="ironlatch-start-item" data-state="' . esc_attr( $on ? 'pass' : 'none' ) . '"><span class="ironlatch-start-badge">' . esc_html( $on ? __( 'On', 'ironlatch-security-scanner' ) : __( 'Off', 'ironlatch-security-scanner' ) ) . '</span><span class="ironlatch-start-copy"><strong>' . esc_html( $row['label'] ) . '</strong></span>';
+			echo '<a class="button" href="' . esc_url( admin_url( 'admin.php?page=' . $row['page'] ) . ( isset( $row['hash'] ) ? '#' . $row['hash'] : '' ) ) . '">' . esc_html__( 'Open', 'ironlatch-security-scanner' ) . '</a></li>';
 		}
 		echo '</ul>';
-		echo '<p>' . esc_html__( 'A preset turns on local checks only. It does not start a breach lookup, a vulnerability lookup, or request blocking.', 'amsec-security-scanner' ) . '</p>';
-		echo '<div class="amsec-file-actionbar">';
+		echo '<p>' . esc_html__( 'A preset turns on local checks only. It does not start a breach lookup, a vulnerability lookup, or request blocking.', 'ironlatch-security-scanner' ) . '</p>';
+		echo '<div class="ironlatch-file-actionbar">';
 		foreach ( array( 'blog', 'shop' ) as $name ) {
 			echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
-			echo '<input type="hidden" name="action" value="amsec_guide_preset">';
+			echo '<input type="hidden" name="action" value="ironlatch_guide_preset">';
 			echo '<input type="hidden" name="preset" value="' . esc_attr( $name ) . '">';
-			wp_nonce_field( 'amsec_guide_preset_' . $name );
-			submit_button( 'blog' === $name ? __( 'Apply the blog preset', 'amsec-security-scanner' ) : __( 'Apply the shop preset', 'amsec-security-scanner' ), 'primary', 'submit', false );
+			wp_nonce_field( 'ironlatch_guide_preset_' . $name );
+			submit_button( 'blog' === $name ? __( 'Apply the blog preset', 'ironlatch-security-scanner' ) : __( 'Apply the shop preset', 'ironlatch-security-scanner' ), 'primary', 'submit', false );
 			echo '</form>';
 		}
 		echo '</div>';
@@ -69,49 +69,49 @@ final class Module {
 	public static function rows(): array {
 		return array(
 			array(
-				'key'   => 'amsec_login_confirm',
-				'label' => __( 'Login bot trap', 'amsec-security-scanner' ),
-				'page'  => 'amsec-security-scanner',
+				'key'   => 'ironlatch_login_confirm',
+				'label' => __( 'Login bot trap', 'ironlatch-security-scanner' ),
+				'page'  => 'ironlatch-security-scanner',
 			),
 			array(
-				'key'   => 'amsec_generic_login_errors',
-				'label' => __( 'One login message', 'amsec-security-scanner' ),
-				'page'  => 'amsec-security-scanner',
+				'key'   => 'ironlatch_generic_login_errors',
+				'label' => __( 'One login message', 'ironlatch-security-scanner' ),
+				'page'  => 'ironlatch-security-scanner',
 			),
 			array(
-				'key'   => 'amsec_hide_author_archives',
-				'label' => __( 'Author pages closed', 'amsec-security-scanner' ),
-				'page'  => 'amsec-security-scanner',
+				'key'   => 'ironlatch_hide_author_archives',
+				'label' => __( 'Author pages closed', 'ironlatch-security-scanner' ),
+				'page'  => 'ironlatch-security-scanner',
 			),
 			array(
-				'key'   => 'amsec_hide_rest_users',
-				'label' => __( 'Public user list closed', 'amsec-security-scanner' ),
-				'page'  => 'amsec-security-scanner',
+				'key'   => 'ironlatch_hide_rest_users',
+				'label' => __( 'Public user list closed', 'ironlatch-security-scanner' ),
+				'page'  => 'ironlatch-security-scanner',
 			),
 			array(
-				'key'   => 'amsec_hotlink',
-				'label' => __( 'Hotlink check', 'amsec-security-scanner' ),
-				'page'  => 'amsec-traffic-guard',
+				'key'   => 'ironlatch_hotlink',
+				'label' => __( 'Hotlink check', 'ironlatch-security-scanner' ),
+				'page'  => 'ironlatch-traffic-guard',
 			),
 			array(
-				'key'   => 'amsec_approve_registrations',
-				'label' => __( 'Registration approval', 'amsec-security-scanner' ),
-				'page'  => 'amsec-accounts',
+				'key'   => 'ironlatch_approve_registrations',
+				'label' => __( 'Registration approval', 'ironlatch-security-scanner' ),
+				'page'  => 'ironlatch-accounts',
 			),
 			array(
-				'key'   => 'amsec_email_factor',
-				'label' => __( 'Email sign-in code', 'amsec-security-scanner' ),
-				'page'  => 'amsec-accounts',
+				'key'   => 'ironlatch_email_factor',
+				'label' => __( 'Email sign-in code', 'ironlatch-security-scanner' ),
+				'page'  => 'ironlatch-accounts',
 			),
 			array(
-				'key'   => 'amsec_login_challenge',
-				'label' => __( 'Sign-in question', 'amsec-security-scanner' ),
-				'page'  => 'amsec-accounts',
+				'key'   => 'ironlatch_login_challenge',
+				'label' => __( 'Sign-in question', 'ironlatch-security-scanner' ),
+				'page'  => 'ironlatch-accounts',
 			),
 			array(
-				'key'   => 'amsec_idle_minutes',
-				'label' => __( 'Idle logout', 'amsec-security-scanner' ),
-				'page'  => 'amsec-accounts',
+				'key'   => 'ironlatch_idle_minutes',
+				'label' => __( 'Idle logout', 'ironlatch-security-scanner' ),
+				'page'  => 'ironlatch-accounts',
 				'idle'  => true,
 			),
 		);
@@ -119,14 +119,14 @@ final class Module {
 
 	public static function applyPreset(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'Administrator access required.', 'amsec-security-scanner' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'Administrator access required.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );
 		}
 		$name = isset( $_POST['preset'] ) ? sanitize_text_field( wp_unslash( (string) $_POST['preset'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- The nonce is checked on the next line for this preset name.
-		check_admin_referer( 'amsec_guide_preset_' . $name );
+		check_admin_referer( 'ironlatch_guide_preset_' . $name );
 		foreach ( Score::preset( $name ) as $key => $value ) {
 			update_option( $key, $value );
 		}
-		wp_safe_redirect( \AmazingPlugins\Security\Admin\Brand::saved( admin_url( 'admin.php?page=amsec-guide' ) ) );
+		wp_safe_redirect( \AmazingPlugins\Security\Admin\Brand::saved( admin_url( 'admin.php?page=ironlatch-guide' ) ) );
 		exit;
 	}
 
@@ -135,7 +135,7 @@ final class Module {
 	}
 
 	public static function wooAccount(): void {
-		echo '<p><a href="' . esc_url( admin_url( 'admin.php?page=amsec-accounts#passkeys' ) ) . '">' . esc_html__( 'Check passkey status', 'amsec-security-scanner' ) . '</a></p>';
+		echo '<p><a href="' . esc_url( admin_url( 'admin.php?page=ironlatch-accounts#passkeys' ) ) . '">' . esc_html__( 'Check passkey status', 'ironlatch-security-scanner' ) . '</a></p>';
 	}
 
 	public static function customLogin(): void {

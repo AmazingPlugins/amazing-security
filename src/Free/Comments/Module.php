@@ -16,7 +16,7 @@ final class Module {
 		add_action( 'comment_form', array( self::class, 'field' ) );
 		add_filter( 'pre_comment_approved', array( self::class, 'gate' ), 10, 2 );
 		add_action( 'admin_menu', array( Page::class, 'menu' ) );
-		add_action( 'admin_post_amsec_comments_save', array( Page::class, 'save' ) );
+		add_action( 'admin_post_ironlatch_comments_save', array( Page::class, 'save' ) );
 	}
 
 	public static function field( mixed $post_id = null ): void {
@@ -24,8 +24,8 @@ final class Module {
 		if ( '1' !== self::stored() ) {
 			return;
 		}
-		echo '<p class="amsec-comment-check" style="position:absolute;left:-9999px" aria-hidden="true">';
-		echo '<label>' . esc_html__( 'Company', 'amsec-security-scanner' ) . ' ';
+		echo '<p class="ironlatch-comment-check" style="position:absolute;left:-9999px" aria-hidden="true">';
+		echo '<label>' . esc_html__( 'Company', 'ironlatch-security-scanner' ) . ' ';
 		echo '<input type="text" name="' . esc_attr( Decision::FIELD ) . '" value="" tabindex="-1" autocomplete="off">';
 		echo '</label></p>';
 	}
@@ -52,8 +52,8 @@ final class Module {
 		$posted  = '1' === $enabled ? self::honeypot() : '';
 		if ( 'reject' === Decision::outcome( $enabled, $posted ) ) {
 			return new \WP_Error(
-				'amsec_comment_honeypot',
-				__( 'Leave the extra field empty.', 'amsec-security-scanner' ),
+				'ironlatch_comment_honeypot',
+				__( 'Leave the extra field empty.', 'ironlatch-security-scanner' ),
 				403
 			);
 		}
@@ -64,8 +64,8 @@ final class Module {
 		$last    = isset( self::$allowed[ $once ] ) ? null : self::last( $subject );
 		if ( 'wait' === Rate::decide( $rate, $exempt, $last, time() ) ) {
 			return new \WP_Error(
-				'amsec_comment_rate',
-				__( 'Wait a minute before another comment.', 'amsec-security-scanner' ),
+				'ironlatch_comment_rate',
+				__( 'Wait a minute before another comment.', 'ironlatch-security-scanner' ),
 				403
 			);
 		}
@@ -78,8 +78,8 @@ final class Module {
 		$list  = get_option( SpamHold::LIST, array() );
 		if ( 'hold' === SpamHold::decide( self::holdStored(), $exempt, $hash, is_array( $list ) ? $list : array() ) ) {
 			return new \WP_Error(
-				'amsec_comment_spam_hold',
-				__( 'This email is held after a spam comment.', 'amsec-security-scanner' ),
+				'ironlatch_comment_spam_hold',
+				__( 'This email is held after a spam comment.', 'ironlatch-security-scanner' ),
 				403
 			);
 		}
@@ -170,6 +170,6 @@ final class Module {
 	}
 
 	private static function transient( string $subject ): string {
-		return 'amsec_cr_' . substr( hash( 'sha256', $subject ), 0, 32 );
+		return 'ironlatch_cr_' . substr( hash( 'sha256', $subject ), 0, 32 );
 	}
 }

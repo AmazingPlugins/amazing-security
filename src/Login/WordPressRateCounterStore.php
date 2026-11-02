@@ -10,13 +10,13 @@ final class WordPressRateCounterStore implements RateCounterStore {
 	private string $table;
 
 	public function __construct( private object $db ) {
-		$this->table = $db->prefix . 'amsec_login_rate';
+		$this->table = $db->prefix . 'ironlatch_login_rate';
 	}
 
 	public static function install(): void {
 		global $wpdb;
 		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
-		$table = $wpdb->prefix . 'amsec_login_rate';
+		$table = $wpdb->prefix . 'ironlatch_login_rate';
 		$sql   = "CREATE TABLE {$table} (
 			address_key char(64) NOT NULL,
 			failures smallint unsigned NOT NULL DEFAULT 0,
@@ -27,13 +27,13 @@ final class WordPressRateCounterStore implements RateCounterStore {
 			KEY updated_at (updated_at)
 		) {$wpdb->get_charset_collate()};";
 		dbDelta( $sql );
-		update_option( 'amsec_login_schema_version', '1', false );
+		update_option( 'ironlatch_login_schema_version', '1', false );
 		self::ensureScheduled();
 	}
 
 	public static function ensureScheduled(): void {
-		if ( ! wp_next_scheduled( 'amsec_login_cleanup' ) ) {
-			wp_schedule_event( time() + HOUR_IN_SECONDS, 'hourly', 'amsec_login_cleanup' );
+		if ( ! wp_next_scheduled( 'ironlatch_login_cleanup' ) ) {
+			wp_schedule_event( time() + HOUR_IN_SECONDS, 'hourly', 'ironlatch_login_cleanup' );
 		}
 	}
 
@@ -59,7 +59,7 @@ final class WordPressRateCounterStore implements RateCounterStore {
 		$locked = false;
 		if ( 0 === $prior->failures ) {
 			$database = (string) ( $this->db->dbname ?? ( defined( 'DB_NAME' ) ? DB_NAME : '' ) );
-			$lockName = 'amsec_rate_' . substr( hash( 'sha256', $database . ':' . $this->table ), 0, 32 );
+			$lockName = 'ironlatch_rate_' . substr( hash( 'sha256', $database . ':' . $this->table ), 0, 32 );
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Serialize admission of new counter keys at the capacity boundary.
 			$locked = 1 === (int) $this->db->get_var( $this->db->prepare( 'SELECT GET_LOCK(%s, 0)', $lockName ) );
 			if ( ! $locked || $this->databaseFailed() ) {
@@ -121,7 +121,7 @@ final class WordPressRateCounterStore implements RateCounterStore {
 		if ( false === $deleted ) {
 			$this->markUnavailable();
 		} elseif ( function_exists( 'delete_transient' ) ) {
-			delete_transient( 'amsec_login_counter_fault' );
+			delete_transient( 'ironlatch_login_counter_fault' );
 		}
 	}
 
@@ -130,7 +130,7 @@ final class WordPressRateCounterStore implements RateCounterStore {
 		$cutoff = $now - 86400;
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Aggregate counts only; no address keys leave storage.
 		$row = $this->db->get_row( $this->db->prepare( "SELECT COUNT(*) AS observed, COALESCE(SUM(IF(blocked_until > %d, 1, 0)), 0) AS blocked FROM {$this->table} WHERE updated_at >= %d", $now, $cutoff ), 'ARRAY_A' );
-		if ( ! is_array( $row ) || $this->databaseFailed() || (int) ( $row['observed'] ?? 0 ) >= 10000 || ( function_exists( 'get_transient' ) && get_transient( 'amsec_login_counter_fault' ) ) ) {
+		if ( ! is_array( $row ) || $this->databaseFailed() || (int) ( $row['observed'] ?? 0 ) >= 10000 || ( function_exists( 'get_transient' ) && get_transient( 'ironlatch_login_counter_fault' ) ) ) {
 			return array(
 				'available' => false,
 				'observed'  => 0,
@@ -150,7 +150,7 @@ final class WordPressRateCounterStore implements RateCounterStore {
 
 	private function markUnavailable(): void {
 		if ( function_exists( 'set_transient' ) ) {
-			set_transient( 'amsec_login_counter_fault', '1', 15 * MINUTE_IN_SECONDS );
+			set_transient( 'ironlatch_login_counter_fault', '1', 15 * MINUTE_IN_SECONDS );
 		}
 	}
 }

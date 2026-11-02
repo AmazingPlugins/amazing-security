@@ -43,10 +43,10 @@ final class RestRateCheck implements SecurityCheck {
 			default => State::UNKNOWN,
 		};
 		$summary = match ( $mode ) {
-			'off' => __( 'REST user and comment limits are off.', 'amsec-security-scanner' ),
-			'observe' => __( 'REST user and comment limits are recording only.', 'amsec-security-scanner' ),
-			'block' => __( 'REST user and comment limits can reject excess unauthenticated requests.', 'amsec-security-scanner' ),
-			default => __( 'The REST rate policy could not be read.', 'amsec-security-scanner' ),
+			'off' => __( 'REST user and comment limits are off.', 'ironlatch-security-scanner' ),
+			'observe' => __( 'REST user and comment limits are recording only.', 'ironlatch-security-scanner' ),
+			'block' => __( 'REST user and comment limits can reject excess unauthenticated requests.', 'ironlatch-security-scanner' ),
+			default => __( 'The REST rate policy could not be read.', 'ironlatch-security-scanner' ),
 		};
 		return array(
 			new CheckResult(

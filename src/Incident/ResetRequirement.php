@@ -10,7 +10,7 @@ use AmazingPlugins\Security\Activity\ActivityHooks;
 use AmazingPlugins\Security\Activity\ActivityRepository;
 
 final class ResetRequirement {
-	public const KEY = 'amsec_password_reset_required';
+	public const KEY = 'ironlatch_password_reset_required';
 
 	public function required( int $id ): bool {
 		return '1' === get_user_meta( $id, self::KEY, true );
@@ -39,7 +39,7 @@ final class ResetRequirement {
 
 	public function authenticate( mixed $user, string $username, string $password ): mixed {
 		if ( $user instanceof \WP_User && $this->required( $user->ID ) && '' !== $password && wp_check_password( $password, $user->user_pass, $user->ID ) ) {
-			return new \WP_Error( 'amsec_reset_required', __( 'Reset your password before signing in. Use the WordPress lost-password page or contact the site administrator.', 'amsec-security-scanner' ) );
+			return new \WP_Error( 'ironlatch_reset_required', __( 'Reset your password before signing in. Use the WordPress lost-password page or contact the site administrator.', 'ironlatch-security-scanner' ) );
 		}
 		return $user;
 	}

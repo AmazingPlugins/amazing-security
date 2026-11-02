@@ -15,7 +15,7 @@ final class ContentService {
 		$this->runner = new ContentRunner( $inventory, $detector, $clock );
 	}
 	public function status(): array {
-		$this->raw = $this->options->get( 'amsec_content_state' );
+		$this->raw = $this->options->get( 'ironlatch_content_state' );
 		if ( null === $this->raw ) {
 			return array(
 				'version'  => 1,
@@ -37,7 +37,7 @@ final class ContentService {
 		return $state;
 	}
 	public function start( int $now ): string {
-		$lock = new WorkerLock( $this->options, 'amsec_content_lock' );
+		$lock = new WorkerLock( $this->options, 'ironlatch_content_lock' );
 		if ( ! $lock->acquire( 'content-start' ) ) {
 			return 'busy';
 		}
@@ -69,7 +69,7 @@ final class ContentService {
 		}
 	}
 	public function step( int $now, ?string $expectedId = null ): string {
-		$lock = new WorkerLock( $this->options, 'amsec_content_lock' );
+		$lock = new WorkerLock( $this->options, 'ironlatch_content_lock' );
 		if ( ! $lock->acquire( 'content-step' ) ) {
 			return 'busy';
 		}
@@ -117,7 +117,7 @@ final class ContentService {
 		if ( strlen( $encoded ) > 262144 ) {
 			return false;
 		}
-		$saved = null === $this->raw ? $this->options->add( 'amsec_content_state', $encoded ) : ( is_string( $this->raw ) && $this->options->replaceIfSame( 'amsec_content_state', $this->raw, $encoded ) );
+		$saved = null === $this->raw ? $this->options->add( 'ironlatch_content_state', $encoded ) : ( is_string( $this->raw ) && $this->options->replaceIfSame( 'ironlatch_content_state', $this->raw, $encoded ) );
 		if ( $saved ) {
 			$this->raw = $encoded;
 		}

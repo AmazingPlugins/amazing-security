@@ -8,9 +8,9 @@ defined( 'ABSPATH' ) || exit;
 
 /** Code screen after the password is accepted for an account that already has verification. */
 final class LoginSecondStep {
-	public const COOKIE = 'amsec_login_step';
+	public const COOKIE = 'ironlatch_login_step';
 
-	public const ERROR = 'amsec_verification_step';
+	public const ERROR = 'ironlatch_verification_step';
 
 	private const TTL = 300;
 
@@ -61,7 +61,7 @@ final class LoginSecondStep {
 		if ( headers_sent() || ! in_array( self::ERROR, $error->get_error_codes(), true ) ) {
 			return;
 		}
-		wp_safe_redirect( add_query_arg( 'action', 'amsec_verify', wp_login_url() ) );
+		wp_safe_redirect( add_query_arg( 'action', 'ironlatch_verify', wp_login_url() ) );
 		exit;
 	}
 
@@ -78,12 +78,12 @@ final class LoginSecondStep {
 				$error = $finished;
 			}
 		}
-		login_header( __( 'Verification', 'amsec-security-scanner' ), '', $error );
-		echo '<p>' . esc_html__( 'Enter the code from the authenticator app you set up, or a recovery code.', 'amsec-security-scanner' ) . '</p>';
-		echo '<form method="post" action="' . esc_url( add_query_arg( 'action', 'amsec_verify', wp_login_url() ) ) . '">';
-		wp_nonce_field( 'amsec_login_step', 'amsec_login_step_nonce' );
+		login_header( __( 'Verification', 'ironlatch-security-scanner' ), '', $error );
+		echo '<p>' . esc_html__( 'Enter the code from the authenticator app you set up, or a recovery code.', 'ironlatch-security-scanner' ) . '</p>';
+		echo '<form method="post" action="' . esc_url( add_query_arg( 'action', 'ironlatch_verify', wp_login_url() ) ) . '">';
+		wp_nonce_field( 'ironlatch_login_step', 'ironlatch_login_step_nonce' );
 		( new LoginFormFields() )->step();
-		echo '<p class="submit"><input type="submit" class="button button-primary button-large" value="' . esc_attr__( 'Continue', 'amsec-security-scanner' ) . '"></p></form>';
+		echo '<p class="submit"><input type="submit" class="button button-primary button-large" value="' . esc_attr__( 'Continue', 'ironlatch-security-scanner' ) . '"></p></form>';
 		login_footer();
 		exit;
 	}
@@ -92,17 +92,17 @@ final class LoginSecondStep {
 	 * @param array{user: int, tries: int, redirect: string, token: string} $record
 	 */
 	private function finish( array $record ): ?\WP_Error {
-		$nonce = isset( $_POST['amsec_login_step_nonce'] ) ? sanitize_text_field( wp_unslash( (string) $_POST['amsec_login_step_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Verified on the next line for this logged-out code screen.
-		if ( ! wp_verify_nonce( $nonce, 'amsec_login_step' ) ) {
-			return new \WP_Error( 'amsec_verification_failed', __( 'Verification could not be completed. Start the sign-in again.', 'amsec-security-scanner' ) );
+		$nonce = isset( $_POST['ironlatch_login_step_nonce'] ) ? sanitize_text_field( wp_unslash( (string) $_POST['ironlatch_login_step_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Verified on the next line for this logged-out code screen.
+		if ( ! wp_verify_nonce( $nonce, 'ironlatch_login_step' ) ) {
+			return new \WP_Error( 'ironlatch_verification_failed', __( 'Verification could not be completed. Start the sign-in again.', 'ironlatch-security-scanner' ) );
 		}
-		$factor = isset( $_POST['amsec_otp'] ) && is_string( $_POST['amsec_otp'] ) ? sanitize_text_field( wp_unslash( $_POST['amsec_otp'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce checked above.
+		$factor = isset( $_POST['ironlatch_otp'] ) && is_string( $_POST['ironlatch_otp'] ) ? sanitize_text_field( wp_unslash( $_POST['ironlatch_otp'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce checked above.
 		$totp   = new TotpAuthentication( new WordPressTotpStore( $GLOBALS['wpdb'] ), new SecretCipher( wp_salt( 'auth' ) ), new Totp() );
 		if ( $totp->verifyFactor( $record['user'], $factor, time() ) ) {
 			$this->clear( $record['token'] );
 			$user = get_userdata( $record['user'] );
 			if ( ! $user instanceof \WP_User ) {
-				return new \WP_Error( 'amsec_verification_failed', __( 'Verification could not be completed.', 'amsec-security-scanner' ) );
+				return new \WP_Error( 'ironlatch_verification_failed', __( 'Verification could not be completed.', 'ironlatch-security-scanner' ) );
 			}
 			wp_set_current_user( $user->ID );
 			wp_set_auth_cookie( $user->ID, false );
@@ -126,7 +126,7 @@ final class LoginSecondStep {
 			),
 			self::TTL
 		);
-		return new \WP_Error( 'amsec_verification_failed', __( 'That code did not match. Try again.', 'amsec-security-scanner' ) );
+		return new \WP_Error( 'ironlatch_verification_failed', __( 'That code did not match. Try again.', 'ironlatch-security-scanner' ) );
 	}
 
 	/**
@@ -172,6 +172,6 @@ final class LoginSecondStep {
 	}
 
 	private function key( string $token ): string {
-		return 'amsec_ls_' . hash_hmac( 'sha256', $token, wp_salt( 'auth' ) );
+		return 'ironlatch_ls_' . hash_hmac( 'sha256', $token, wp_salt( 'auth' ) );
 	}
 }

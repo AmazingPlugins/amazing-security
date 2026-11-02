@@ -8,17 +8,17 @@ defined( 'ABSPATH' ) || exit;
 
 /** Local password rules for a new or reset password. No WordPress calls. */
 final class Decision {
-	public const OPTION = 'amsec_password_min_length';
+	public const OPTION = 'ironlatch_password_min_length';
 
-	public const NUMBER = 'amsec_password_require_number';
+	public const NUMBER = 'ironlatch_password_require_number';
 
-	public const MIXED = 'amsec_password_require_mixed';
+	public const MIXED = 'ironlatch_password_require_mixed';
 
-	public const SYMBOL = 'amsec_password_require_symbol';
+	public const SYMBOL = 'ironlatch_password_require_symbol';
 
-	public const NAME = 'amsec_password_block_name';
+	public const NAME = 'ironlatch_password_block_name';
 
-	public const REUSE = 'amsec_password_block_reuse';
+	public const REUSE = 'ironlatch_password_block_reuse';
 
 	/** @var list<string> */
 	public const ALLOWED = array( '8', '12', '16' );

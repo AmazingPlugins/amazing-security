@@ -14,7 +14,7 @@ final class DirectoryService {
 	public function __construct( private readonly OptionGateway $options, private readonly DirectoryClient $client, callable $inventory ) {
 		$this->inventory = Closure::fromCallable( $inventory );}
 	public function status(): array {
-		$this->raw = $this->options->get( 'amsec_repository_state' );
+		$this->raw = $this->options->get( 'ironlatch_repository_state' );
 		if ( null === $this->raw ) {
 			return array(
 				'version' => 1,
@@ -43,7 +43,7 @@ final class DirectoryService {
 	public function lookup( string $key, string $fingerprint, int $now ): string {
 		if ( ! preg_match( '/^[a-f0-9]{32}$/D', $key ) || ! preg_match( '/^[a-f0-9]{64}$/D', $fingerprint ) || $now < 0 ) {
 			return 'changed';}
-		$lock = new WorkerLock( $this->options, 'amsec_repository_lock' );
+		$lock = new WorkerLock( $this->options, 'ironlatch_repository_lock' );
 		if ( ! $lock->acquire( 'repository-lookup' ) ) {
 			return 'busy';}
 		try {
@@ -91,7 +91,7 @@ final class DirectoryService {
 			$encoded = json_encode( $state, JSON_THROW_ON_ERROR );
 			if ( strlen( $encoded ) > 131072 ) {
 				return 'full';}
-			$saved = null === $this->raw ? $this->options->add( 'amsec_repository_state', $encoded ) : $this->options->replaceIfSame( 'amsec_repository_state', $this->raw, $encoded );
+			$saved = null === $this->raw ? $this->options->add( 'ironlatch_repository_state', $encoded ) : $this->options->replaceIfSame( 'ironlatch_repository_state', $this->raw, $encoded );
 			return $saved ? 'saved' : 'failed';
 		} finally {
 			$lock->release();}

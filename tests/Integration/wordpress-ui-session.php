@@ -1,9 +1,9 @@
 <?php
 // Disposable site only. Redirect stdout to a mode-0600 temporary file; it contains session cookies.
-$login = 'amsec-ui-' . bin2hex( random_bytes( 5 ) );
+$login = 'ironlatch-ui-' . bin2hex( random_bytes( 5 ) );
 $id = wp_insert_user( array( 'user_login' => $login, 'user_pass' => wp_generate_password( 40, true ), 'user_email' => $login . '@example.test', 'role' => 'administrator' ) );
 if ( is_wp_error( $id ) ) { throw new RuntimeException( 'Could not create UI reviewer.' ); }
-add_option( 'amsec_ui_original_urls', array( 'home' => get_option( 'home' ), 'siteurl' => get_option( 'siteurl' ) ), '', false );
+add_option( 'ironlatch_ui_original_urls', array( 'home' => get_option( 'home' ), 'siteurl' => get_option( 'siteurl' ) ), '', false );
 update_option( 'home', 'http://127.0.0.1:18889' );
 update_option( 'siteurl', 'http://127.0.0.1:18889' );
 $expires = time() + 7200;

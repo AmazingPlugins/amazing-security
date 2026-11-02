@@ -13,7 +13,7 @@ final class ReleaseProvenanceTest extends TestCase {
 	private string $root;
 
 	protected function setUp(): void {
-		$this->root = sys_get_temp_dir() . '/amsec-provenance-' . bin2hex( random_bytes( 5 ) );
+		$this->root = sys_get_temp_dir() . '/ironlatch-provenance-' . bin2hex( random_bytes( 5 ) );
 		mkdir( $this->root );
 		file_put_contents( $this->root . '/main.php', '<?php echo 1;' );
 	}

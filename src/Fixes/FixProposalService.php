@@ -19,8 +19,8 @@ final class FixProposalService {
 
 	public function __construct( private readonly FixRepository $repository, ?callable $latestRun = null, ?callable $readMode = null, ?callable $reviewUrl = null ) {
 		$this->latestRun = Closure::fromCallable( $latestRun ?? static fn(): ?ScanRun => ( new FindingsRepository() )->latest() );
-		$this->readMode  = Closure::fromCallable( $readMode ?? static fn(): mixed => get_option( 'amsec_login_rate_mode', null ) );
-		$this->reviewUrl = Closure::fromCallable( $reviewUrl ?? static fn( string $id ): string => admin_url( 'admin.php?page=amsec-fix-review&proposal=' . $id ) );
+		$this->readMode  = Closure::fromCallable( $readMode ?? static fn(): mixed => get_option( 'ironlatch_login_rate_mode', null ) );
+		$this->reviewUrl = Closure::fromCallable( $reviewUrl ?? static fn( string $id ): string => admin_url( 'admin.php?page=ironlatch-fix-review&proposal=' . $id ) );
 	}
 
 	public function propose( string $findingId, string $recipeId, int $requesterId, int $now ): array {

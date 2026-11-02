@@ -17,13 +17,13 @@ final class LiveTraffic {
 		if ( ! $enabled ) {
 			return false;
 		}
-		if ( '1' === $this->serverString( $server, 'AMSEC_CLI' ) ) {
+		if ( '1' === $this->serverString( $server, 'IRONLATCH_CLI' ) ) {
 			return false;
 		}
-		if ( '1' === $this->serverString( $server, 'AMSEC_CRON' ) ) {
+		if ( '1' === $this->serverString( $server, 'IRONLATCH_CRON' ) ) {
 			return false;
 		}
-		if ( '1' === $this->serverString( $server, 'AMSEC_REST' ) ) {
+		if ( '1' === $this->serverString( $server, 'IRONLATCH_REST' ) ) {
 			return false;
 		}
 		$uri    = $this->serverString( $server, 'REQUEST_URI' );

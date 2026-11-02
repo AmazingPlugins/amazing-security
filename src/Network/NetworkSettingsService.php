@@ -10,7 +10,7 @@ final class NetworkSettingsService {
 	private mixed $raw = null;
 	public function __construct( private readonly OptionGateway $options ) {}
 	public function status(): array {
-		$this->raw = $this->options->get( 'amsec_network_policy' );
+		$this->raw = $this->options->get( 'ironlatch_network_policy' );
 		return ( new NetworkPolicy() )->read( $this->raw ) ?? array( 'invalid' => true );}
 	public function fingerprint(): string {
 		$this->status();
@@ -48,8 +48,8 @@ final class NetworkSettingsService {
 					return 'self-lockout';}
 			}
 		}
-		$ok = null === $this->raw ? $this->options->add( 'amsec_network_policy', $encoded ) : $this->options->replaceIfSame( 'amsec_network_policy', $this->raw, $encoded );
-		return $ok && $this->options->get( 'amsec_network_policy' ) === $encoded ? 'saved' : 'failed';
+		$ok = null === $this->raw ? $this->options->add( 'ironlatch_network_policy', $encoded ) : $this->options->replaceIfSame( 'ironlatch_network_policy', $this->raw, $encoded );
+		return $ok && $this->options->get( 'ironlatch_network_policy' ) === $encoded ? 'saved' : 'failed';
 	}
 	public function disable(): bool {
 	 // phpcs:ignore WordPress.WP.AlternativeFunctions.json_encode_json_encode -- Explicit host recovery resets corrupt policy to off.
@@ -63,8 +63,8 @@ final class NetworkSettingsService {
 			),
 			JSON_THROW_ON_ERROR
 		);
-		$this->options->set( 'amsec_network_policy', $encoded );
-		$this->options->delete( 'amsec_network_observation' );
-		return $this->options->get( 'amsec_network_policy' ) === $encoded;
+		$this->options->set( 'ironlatch_network_policy', $encoded );
+		$this->options->delete( 'ironlatch_network_observation' );
+		return $this->options->get( 'ironlatch_network_policy' ) === $encoded;
 	}
 }

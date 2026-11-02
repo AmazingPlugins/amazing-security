@@ -18,10 +18,10 @@ final class LoginRecoveryCommand {
 		( new WordPressRateCounterStore( $GLOBALS['wpdb'] ) )->purge();
 		$settings->setXmlRpcAuthDisabled( false );
 		// Every sign-in check that can refuse a correct password. Pending approvals stay as they are.
-		foreach ( array( 'amsec_email_factor', 'amsec_login_challenge', 'amsec_login_confirm', 'amsec_common_passwords', 'amsec_idle_minutes' ) as $option ) {
+		foreach ( array( 'ironlatch_email_factor', 'ironlatch_login_challenge', 'ironlatch_login_confirm', 'ironlatch_common_passwords', 'ironlatch_idle_minutes' ) as $option ) {
 			update_option( $option, '0' );
 		}
-		\WP_CLI::success( 'AmSec Security Scanner sign-in limits, XML-RPC restriction, email code, sum question, hidden field, breached-password block and idle sign-out are off.' );
+		\WP_CLI::success( 'Ironlatch Security Scanner sign-in limits, XML-RPC restriction, email code, sum question, hidden field, breached-password block and idle sign-out are off.' );
 	}
 
 	public function disableTotp( array $args, array $assocArgs ): void {
@@ -33,7 +33,7 @@ final class LoginRecoveryCommand {
 		if ( ! $store->disable( (int) $userId ) ) {
 			\WP_CLI::error( 'Could not disable TOTP for this user.' );
 		}
-		update_user_meta( (int) $userId, 'amsec_totp_recovery_at', gmdate( 'Y-m-d H:i:s' ) );
-		\WP_CLI::success( 'AmSec Security Scanner TOTP is off for the selected user. Re-enroll after signing in.' );
+		update_user_meta( (int) $userId, 'ironlatch_totp_recovery_at', gmdate( 'Y-m-d H:i:s' ) );
+		\WP_CLI::success( 'Ironlatch Security Scanner TOTP is off for the selected user. Re-enroll after signing in.' );
 	}
 }

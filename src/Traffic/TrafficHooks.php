@@ -7,10 +7,10 @@ defined( 'ABSPATH' ) || exit;
 
 final class TrafficHooks {
 	public static function register(): void {
-		if ( ( defined( 'AMSEC_DISABLE_TRAFFIC' ) && AMSEC_DISABLE_TRAFFIC ) || ( defined( 'WP_CLI' ) && WP_CLI ) || ( defined( 'DOING_CRON' ) && DOING_CRON ) ) {
+		if ( ( defined( 'IRONLATCH_DISABLE_TRAFFIC' ) && IRONLATCH_DISABLE_TRAFFIC ) || ( defined( 'WP_CLI' ) && WP_CLI ) || ( defined( 'DOING_CRON' ) && DOING_CRON ) ) {
 			return; }
 		try {
-			$policy = ( new TrafficPolicy() )->read( get_option( 'amsec_traffic_policy', null ) );
+			$policy = ( new TrafficPolicy() )->read( get_option( 'ironlatch_traffic_policy', null ) );
 		} catch ( \Throwable ) {
 			return; }
 		if ( null === $policy || ! $policy['enabled'] ) {
@@ -27,7 +27,7 @@ final class TrafficHooks {
 			},
 			1
 		);
-		add_action( 'amsec_traffic_decision', array( $collector, 'decision' ) );
+		add_action( 'ironlatch_traffic_decision', array( $collector, 'decision' ) );
 		add_filter(
 			'rest_pre_dispatch',
 			static function ( mixed $result, mixed $rest_server, mixed $request ) use ( $collector ): mixed {
@@ -57,7 +57,7 @@ final class TrafficHooks {
 	}
 	public static function mark( string $label ): void {
 		try {
-			do_action( 'amsec_traffic_decision', $label );
+			do_action( 'ironlatch_traffic_decision', $label );
 		} catch ( \Throwable ) {
 			return; /* Logging callbacks must not interrupt security decisions. */ }
 	}

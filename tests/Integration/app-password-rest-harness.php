@@ -5,7 +5,7 @@ add_action(
 	'rest_api_init',
 	static function (): void {
 		register_rest_route(
-			'amsec-test/v1',
+			'ironlatch-test/v1',
 			'/approve',
 			array(
 				'methods' => 'POST',

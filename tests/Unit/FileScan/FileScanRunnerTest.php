@@ -16,7 +16,7 @@ final class FileScanRunnerTest extends TestCase {
 	private array $roots = array();
 
 	private function root(): string {
-		$root = sys_get_temp_dir() . '/amsec-run-' . bin2hex( random_bytes( 6 ) );
+		$root = sys_get_temp_dir() . '/ironlatch-run-' . bin2hex( random_bytes( 6 ) );
 		mkdir( $root );
 		$this->roots[] = $root;
 		return $root;

@@ -14,7 +14,7 @@ final class ExposureService {
 	public function __construct( private readonly OptionGateway $options, private readonly ExposureScanner $scanner, callable $roots ) {
 		$this->roots = Closure::fromCallable( $roots );}
 	public function status(): array {
-		$this->raw = $this->options->get( 'amsec_exposure_state' );
+		$this->raw = $this->options->get( 'ironlatch_exposure_state' );
 		if ( null === $this->raw ) {
 			return array(
 				'version' => 1,
@@ -33,7 +33,7 @@ final class ExposureService {
 	public function scan( string $alias, int $now ): string {
 		if ( ! in_array( $alias, array( 'site', 'content', 'uploads' ), true ) || $now < 0 ) {
 			return 'unsupported';}
-		$lock = new WorkerLock( $this->options, 'amsec_exposure_lock' );
+		$lock = new WorkerLock( $this->options, 'ironlatch_exposure_lock' );
 		if ( ! $lock->acquire( 'exposure-inventory' ) ) {
 			return 'busy';}
 		try {
@@ -49,7 +49,7 @@ final class ExposureService {
 			$encoded = json_encode( $state, JSON_THROW_ON_ERROR );
 			if ( strlen( $encoded ) > 262144 ) {
 				return 'failed';}
-			$saved = null === $this->raw ? $this->options->add( 'amsec_exposure_state', $encoded ) : $this->options->replaceIfSame( 'amsec_exposure_state', $this->raw, $encoded );
+			$saved = null === $this->raw ? $this->options->add( 'ironlatch_exposure_state', $encoded ) : $this->options->replaceIfSame( 'ironlatch_exposure_state', $this->raw, $encoded );
 			return $saved ? 'saved' : 'failed';
 		} finally {
 			$lock->release();}

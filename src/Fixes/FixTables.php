@@ -10,8 +10,8 @@ final class FixTables {
 	public static function install(): void {
 		global $wpdb;
 		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
-		$proposals = $wpdb->prefix . 'amsec_fix_proposals';
-		$audit     = $wpdb->prefix . 'amsec_fix_audit';
+		$proposals = $wpdb->prefix . 'ironlatch_fix_proposals';
+		$audit     = $wpdb->prefix . 'ironlatch_fix_audit';
 		$collate   = $wpdb->get_charset_collate();
 		$schema    = "CREATE TABLE {$proposals} (
 			id char(32) NOT NULL,
@@ -46,13 +46,13 @@ final class FixTables {
 		) {$collate} ENGINE=InnoDB;";
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange -- Versioned plugin-owned audit table.
 		dbDelta( $schema );
-		update_option( 'amsec_fix_schema_version', '1', false );
+		update_option( 'ironlatch_fix_schema_version', '1', false );
 		self::ensureScheduled();
 	}
 
 	public static function ensureScheduled(): void {
-		if ( ! wp_next_scheduled( 'amsec_fix_cleanup' ) ) {
-			wp_schedule_event( time() + HOUR_IN_SECONDS, 'hourly', 'amsec_fix_cleanup' );
+		if ( ! wp_next_scheduled( 'ironlatch_fix_cleanup' ) ) {
+			wp_schedule_event( time() + HOUR_IN_SECONDS, 'hourly', 'ironlatch_fix_cleanup' );
 		}
 	}
 }

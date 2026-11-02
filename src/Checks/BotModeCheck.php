@@ -41,10 +41,10 @@ final class BotModeCheck implements SecurityCheck {
 			default => State::UNKNOWN,
 		};
 		$summary = match ( $mode ) {
-			'off' => __( 'Native comment and registration controls are off.', 'amsec-security-scanner' ),
-			'observe' => __( 'Native comment and registration controls are recording only.', 'amsec-security-scanner' ),
-			'block' => __( 'Native comment and registration controls can reject excess unauthenticated requests.', 'amsec-security-scanner' ),
-			default => __( 'The bot control mode could not be read.', 'amsec-security-scanner' ),
+			'off' => __( 'Native comment and registration controls are off.', 'ironlatch-security-scanner' ),
+			'observe' => __( 'Native comment and registration controls are recording only.', 'ironlatch-security-scanner' ),
+			'block' => __( 'Native comment and registration controls can reject excess unauthenticated requests.', 'ironlatch-security-scanner' ),
+			default => __( 'The bot control mode could not be read.', 'ironlatch-security-scanner' ),
 		};
 		return array(
 			new CheckResult(

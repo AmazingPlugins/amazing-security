@@ -22,7 +22,7 @@ final class WordPressDirectoryClient implements DirectoryClient {
 				'sslverify'           => true,
 				'reject_unsafe_urls'  => true,
 				'limit_response_size' => 65537,
-				'user-agent'          => 'AmSecSecurityScanner-directory-advisory/0.1',
+				'user-agent'          => 'IronlatchSecurityScanner-directory-advisory/0.1',
 				'cookies'             => array(),
 			)
 		);

@@ -18,29 +18,29 @@ final class Module {
 
 	public static function menu(): void {
 		add_submenu_page(
-			'amsec-security-scanner',
-			__( 'AI & MCP', 'amsec-security-scanner' ),
-			__( 'AI & MCP', 'amsec-security-scanner' ),
+			'ironlatch-security-scanner',
+			__( 'AI & MCP', 'ironlatch-security-scanner' ),
+			__( 'AI & MCP', 'ironlatch-security-scanner' ),
 			'manage_options',
-			'amsec-assistant',
+			'ironlatch-assistant',
 			array( self::class, 'render' )
 		);
 	}
 
 	public static function render(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'Administrator access required.', 'amsec-security-scanner' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'Administrator access required.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );
 		}
 		$enabled = ( new McpPreferences( new WordPressOptions() ) )->enabled();
-		echo '<div class="wrap amsec-security-scanner-admin">';
-		echo '<p class="amsec-brief-status"><span class="amsec-pill is-off">' . esc_html__( 'Coming soon', 'amsec-security-scanner' ) . '</span></p>';
-		echo '<p>' . esc_html__( 'A model should be able to read a scan and help you fix what it finds. That needs an Amazing Plugins server, so it is not in this version.', 'amsec-security-scanner' ) . '</p>';
-		echo '<p>' . esc_html__( 'If that server is required, this may be a paid add-on. The scan, the recommendations, and the other tools stay in this plugin.', 'amsec-security-scanner' ) . '</p>';
+		echo '<div class="wrap ironlatch-security-scanner-admin">';
+		echo '<p class="ironlatch-brief-status"><span class="ironlatch-pill is-off">' . esc_html__( 'Coming soon', 'ironlatch-security-scanner' ) . '</span></p>';
+		echo '<p>' . esc_html__( 'A model should be able to read a scan and help you fix what it finds. That needs an Amazing Plugins server, so it is not in this version.', 'ironlatch-security-scanner' ) . '</p>';
+		echo '<p>' . esc_html__( 'If that server is required, this may be a paid add-on. The scan, the recommendations, and the other tools stay in this plugin.', 'ironlatch-security-scanner' ) . '</p>';
 		if ( $enabled ) {
-			echo '<p>' . esc_html__( 'Assistant access is already on for this site. You can turn it off here.', 'amsec-security-scanner' ) . '</p>';
+			echo '<p>' . esc_html__( 'Assistant access is already on for this site. You can turn it off here.', 'ironlatch-security-scanner' ) . '</p>';
 			$adapter = function_exists( 'is_plugin_active' ) && is_plugin_active( 'mcp-adapter/mcp-adapter.php' );
 			// The renderer escapes its own values.
-			echo wp_kses( ( new McpSettingsRenderer() )->render( true, function_exists( 'wp_register_ability' ), $adapter, admin_url( 'admin-post.php' ), wp_create_nonce( 'amsec_mcp_settings' ) ), \AmazingPlugins\Security\Admin\AdminHtml::allowed() );
+			echo wp_kses( ( new McpSettingsRenderer() )->render( true, function_exists( 'wp_register_ability' ), $adapter, admin_url( 'admin-post.php' ), wp_create_nonce( 'ironlatch_mcp_settings' ) ), \AmazingPlugins\Security\Admin\AdminHtml::allowed() );
 		}
 		echo '</div>';
 	}

@@ -25,7 +25,7 @@ final class ThemeManifestProviderTest extends TestCase {
 	}
 
 	public function test_downloads_exact_archive_and_deletes_it(): void {
-		$path = tempnam( sys_get_temp_dir(), 'amsec-provider-' );
+		$path = tempnam( sys_get_temp_dir(), 'ironlatch-provider-' );
 		$zip  = new ZipArchive();
 		self::assertTrue( $zip->open( $path, ZipArchive::OVERWRITE ) );
 		$zip->addFromString( 'sample/style.css', 'css' );

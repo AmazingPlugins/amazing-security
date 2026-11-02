@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 if ( ! defined( 'ABSPATH' ) ) {
-	define( 'ABSPATH', sys_get_temp_dir() . '/amsec-no-wordpress/' );
+	define( 'ABSPATH', sys_get_temp_dir() . '/ironlatch-no-wordpress/' );
 }
 
 require dirname(__DIR__) . '/vendor/autoload.php';

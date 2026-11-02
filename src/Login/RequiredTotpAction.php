@@ -9,6 +9,6 @@ defined( 'ABSPATH' ) || exit;
 /** Required TOTP policy UI retired — use a dedicated two-factor plugin. */
 final class RequiredTotpAction {
 	public function handle(): void {
-		wp_die( esc_html__( 'AmSec Security Scanner no longer manages required authenticator policy. Use a dedicated two-factor plugin.', 'amsec-security-scanner' ), '', array( 'response' => 410 ) );
+		wp_die( esc_html__( 'Ironlatch Security Scanner no longer manages required authenticator policy. Use a dedicated two-factor plugin.', 'ironlatch-security-scanner' ), '', array( 'response' => 410 ) );
 	}
 }

@@ -8,12 +8,12 @@ use AmazingPlugins\Security\Integrity\WordPressOptions;
 use AmazingPlugins\Security\Schedule\SuiteCycle;
 
 $options = new WordPressOptions();
-$options->delete( 'amsec_suite_cycle' );
+$options->delete( 'ironlatch_suite_cycle' );
 $cycle = new SuiteCycle( $options );
 if ( ! $cycle->start( time() ) ) {
 	throw new RuntimeException( 'Could not start scheduled suite.' );
 }
-$options->delete( 'amsec_security_scanner_integrity_active' );
+$options->delete( 'ironlatch_security_scanner_integrity_active' );
 $store = new WordPressIntegrityStore( $options );
 $id = wp_generate_uuid4();
 if ( ! $store->begin( $id, new IntegrityCursor( $id ) ) ) {
@@ -23,15 +23,15 @@ $progress = $store->latestProgress();
 if ( null === $progress || $progress->finished ) {
 	throw new RuntimeException( 'Expected unfinished integrity progress.' );
 }
-wp_clear_scheduled_hook( 'amsec_file_tick' );
-$lock = 'amsec_security_scanner_integrity_worker_lock';
+wp_clear_scheduled_hook( 'ironlatch_file_tick' );
+$lock = 'ironlatch_security_scanner_integrity_worker_lock';
 $options->set( $lock, json_encode( array( 'scan_id' => 'other-worker', 'expires' => time() + 60 ) ) );
 try {
 	( new IntegrityScanAction() )->scheduled();
-	if ( false !== wp_next_scheduled( 'amsec_file_tick' ) ) {
+	if ( false !== wp_next_scheduled( 'ironlatch_file_tick' ) ) {
 		throw new RuntimeException( 'File scan started while integrity worker was busy.' );
 	}
-	if ( false === wp_next_scheduled( 'amsec_integrity_tick' ) ) {
+	if ( false === wp_next_scheduled( 'ironlatch_integrity_tick' ) ) {
 		throw new RuntimeException( 'Busy integrity worker has no retry.' );
 	}
 } finally {

@@ -1,16 +1,16 @@
 <?php
 
-// Run with AMSEC_CASE=editor|forged|start|inspect|resume and wp-load.php on a disposable site.
+// Run with IRONLATCH_CASE=editor|forged|start|inspect|resume and wp-load.php on a disposable site.
 use AmazingPlugins\Security\Admin\AdminPage;
 use AmazingPlugins\Security\Admin\FileScanAction;
 use AmazingPlugins\Security\FileScan\WordPressFileScanStore;
 use AmazingPlugins\Security\Integrity\WordPressOptions;
 
-$case = getenv( 'AMSEC_CASE' );
+$case = getenv( 'IRONLATCH_CASE' );
 if ( 'editor' === $case ) {
-	$editor = get_user_by( 'login', 'amsec_file_fixture_editor' );
+	$editor = get_user_by( 'login', 'ironlatch_file_fixture_editor' );
 	if ( ! $editor ) {
-		$id = wp_insert_user( array( 'user_login' => 'amsec_file_fixture_editor', 'user_pass' => wp_generate_password( 32 ), 'user_email' => 'amsec-file-editor@example.invalid', 'role' => 'editor' ) );
+		$id = wp_insert_user( array( 'user_login' => 'ironlatch_file_fixture_editor', 'user_pass' => wp_generate_password( 32 ), 'user_email' => 'ironlatch-file-editor@example.invalid', 'role' => 'editor' ) );
 		if ( is_wp_error( $id ) ) {
 			throw new RuntimeException( 'Could not make editor fixture.' );
 		}
@@ -21,15 +21,15 @@ if ( 'editor' === $case ) {
 	wp_set_current_user( 1 );
 }
 
-add_filter( 'pre_http_request', static fn() => new WP_Error( 'amsec_fixture_offline', 'Fixture keeps outbound requests offline.' ) );
+add_filter( 'pre_http_request', static fn() => new WP_Error( 'ironlatch_fixture_offline', 'Fixture keeps outbound requests offline.' ) );
 
 if ( 'plan' === $case ) {
 	require_once ABSPATH . 'wp-admin/includes/plugin.php';
-	$fixtureDirectory = WP_PLUGIN_DIR . '/amsec_fixture_plugin';
+	$fixtureDirectory = WP_PLUGIN_DIR . '/ironlatch_fixture_plugin';
 	if ( ! is_dir( $fixtureDirectory ) ) {
 		mkdir( $fixtureDirectory );
 	}
-	file_put_contents( $fixtureDirectory . '/main.php', '<?php /* Plugin Name: AmSec Security Scanner scan fixture */' );
+	file_put_contents( $fixtureDirectory . '/main.php', '<?php /* Plugin Name: Ironlatch Security Scanner scan fixture */' );
 	wp_clean_plugins_cache();
 	$method = new ReflectionMethod( FileScanAction::class, 'plugins' );
 	$plugins = $method->invoke( new FileScanAction() );
@@ -37,15 +37,15 @@ if ( 'plan' === $case ) {
 	rmdir( $fixtureDirectory );
 	wp_clean_plugins_cache();
 	$slugs = array_column( $plugins, 'slug' );
-	if ( ! in_array( 'amsec-security-scanner', $slugs, true ) || ! in_array( 'hello.php', array_column( $plugins, 'single_file' ), true ) || ! in_array( 'amsec_fixture_plugin', $slugs, true ) ) {
+	if ( ! in_array( 'ironlatch-security-scanner', $slugs, true ) || ! in_array( 'hello.php', array_column( $plugins, 'single_file' ), true ) || ! in_array( 'ironlatch_fixture_plugin', $slugs, true ) ) {
 		throw new RuntimeException( 'The file scan omitted its own package or a local plugin.' );
 	}
-	$folder = $plugins[ array_search( 'amsec_fixture_plugin', $slugs, true ) ];
-	if ( WP_PLUGIN_DIR . '/amsec_fixture_plugin' !== $folder['root'] || ! $folder['local_only'] ) {
+	$folder = $plugins[ array_search( 'ironlatch_fixture_plugin', $slugs, true ) ];
+	if ( WP_PLUGIN_DIR . '/ironlatch_fixture_plugin' !== $folder['root'] || ! $folder['local_only'] ) {
 		throw new RuntimeException( 'The nonrepository plugin lacked a bounded local root.' );
 	}
 	$candidates = ( new ReflectionMethod( FileScanAction::class, 'manifestPlugins' ) )->invoke( new FileScanAction(), $plugins );
-	if ( in_array( 'amsec-security-scanner', array_column( $candidates, 'slug' ), true ) || in_array( 'hello.php', array_column( $candidates, 'slug' ), true ) || in_array( 'amsec_fixture_plugin', array_column( $candidates, 'slug' ), true ) ) {
+	if ( in_array( 'ironlatch-security-scanner', array_column( $candidates, 'slug' ), true ) || in_array( 'hello.php', array_column( $candidates, 'slug' ), true ) || in_array( 'ironlatch_fixture_plugin', array_column( $candidates, 'slug' ), true ) ) {
 		throw new RuntimeException( 'Local-only plugins consumed repository manifest slots.' );
 	}
 	echo 'File action: own and single-file plugins are in the local scan plan.' . PHP_EOL;
@@ -74,7 +74,7 @@ if ( 'start' === $case ) {
 		mkdir( $uploads['basedir'], 0775, true );
 	}
 	for ( $i = 0; $i < 251; ++$i ) {
-		file_put_contents( $uploads['basedir'] . '/amsec-fixture-' . sprintf( '%03d', $i ) . '.php', '<?php echo 1;' );
+		file_put_contents( $uploads['basedir'] . '/ironlatch-fixture-' . sprintf( '%03d', $i ) . '.php', '<?php echo 1;' );
 	}
 }
 
@@ -84,11 +84,11 @@ if ( 'resume' === $case ) {
 		throw new RuntimeException( 'No resumable file scan.' );
 	}
 	$_POST['scan_id'] = $progress->cursor->scanId;
-	$_POST['_wpnonce'] = wp_create_nonce( 'amsec_security_scanner_file_scan_resume' );
+	$_POST['_wpnonce'] = wp_create_nonce( 'ironlatch_security_scanner_file_scan_resume' );
 	$_REQUEST['_wpnonce'] = $_POST['_wpnonce'];
 	( new FileScanAction() )->resume();
 }
 
-$_POST['_wpnonce'] = 'forged' === $case ? 'invalid' : wp_create_nonce( 'amsec_security_scanner_file_scan_start' );
+$_POST['_wpnonce'] = 'forged' === $case ? 'invalid' : wp_create_nonce( 'ironlatch_security_scanner_file_scan_start' );
 $_REQUEST['_wpnonce'] = $_POST['_wpnonce'];
 ( new FileScanAction() )->start();

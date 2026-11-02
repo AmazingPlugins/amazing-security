@@ -12,7 +12,7 @@ final class ThemeArchiveParserTest extends TestCase {
 	private array $paths = array();
 
 	private function archive( array $entries, bool $symlink = false ): string {
-		$path = tempnam( sys_get_temp_dir(), 'amsec-zip-' );
+		$path = tempnam( sys_get_temp_dir(), 'ironlatch-zip-' );
 		$zip = new ZipArchive();
 		self::assertTrue( $zip->open( $path, ZipArchive::OVERWRITE ) );
 		foreach ( $entries as $name => $body ) {
@@ -50,7 +50,7 @@ final class ThemeArchiveParserTest extends TestCase {
 	}
 
 	public function test_invalid_archive_returns_unknown_without_throwing(): void {
-		$path = tempnam( sys_get_temp_dir(), 'amsec-bad-' );
+		$path = tempnam( sys_get_temp_dir(), 'ironlatch-bad-' );
 		file_put_contents( $path, 'not a zip' );
 		$this->paths[] = $path;
 		$result = ( new ThemeArchiveParser() )->parse( 'theme', '1.0', $path, 'https://downloads.wordpress.org/theme/theme.1.0.zip' );
@@ -70,7 +70,7 @@ final class ThemeArchiveParserTest extends TestCase {
 	}
 
 	public function test_rejects_more_than_ten_thousand_entries(): void {
-		$path = tempnam( sys_get_temp_dir(), 'amsec-many-' );
+		$path = tempnam( sys_get_temp_dir(), 'ironlatch-many-' );
 		$zip = new ZipArchive();
 		self::assertTrue( $zip->open( $path, ZipArchive::OVERWRITE ) );
 		for ( $i = 0; $i <= 10000; ++$i ) {
@@ -83,7 +83,7 @@ final class ThemeArchiveParserTest extends TestCase {
 	}
 
 	public function test_rejects_more_than_sixty_four_megabytes_expanded(): void {
-		$path = tempnam( sys_get_temp_dir(), 'amsec-expanded-' );
+		$path = tempnam( sys_get_temp_dir(), 'ironlatch-expanded-' );
 		$zip = new ZipArchive();
 		self::assertTrue( $zip->open( $path, ZipArchive::OVERWRITE ) );
 		$body = str_repeat( random_bytes( 10000 ), 50 );

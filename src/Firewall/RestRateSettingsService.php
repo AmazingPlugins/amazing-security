@@ -10,7 +10,7 @@ final class RestRateSettingsService {
 	private mixed $raw = null;
 	public function __construct( private readonly OptionGateway $options ) {}
 	public function status(): array {
-		$this->raw = $this->options->get( 'amsec_rest_rate_policy' );
+		$this->raw = $this->options->get( 'ironlatch_rest_rate_policy' );
 		return ( new RestRatePolicy() )->read( $this->raw ) ?? array( 'invalid' => true );}
 	public function fingerprint(): string {
 		$this->status();
@@ -31,8 +31,8 @@ final class RestRateSettingsService {
 		$encoded = json_encode( $candidate, JSON_THROW_ON_ERROR );
 		if ( null === ( new RestRatePolicy() )->read( $encoded ) ) {
 			return 'unsupported';}
-		$ok = null === $this->raw ? $this->options->add( 'amsec_rest_rate_policy', $encoded ) : $this->options->replaceIfSame( 'amsec_rest_rate_policy', $this->raw, $encoded );
-		return $ok && $this->options->get( 'amsec_rest_rate_policy' ) === $encoded ? 'saved' : 'failed';
+		$ok = null === $this->raw ? $this->options->add( 'ironlatch_rest_rate_policy', $encoded ) : $this->options->replaceIfSame( 'ironlatch_rest_rate_policy', $this->raw, $encoded );
+		return $ok && $this->options->get( 'ironlatch_rest_rate_policy' ) === $encoded ? 'saved' : 'failed';
 	}
 	public function disable(): bool {
 	 // phpcs:ignore WordPress.WP.AlternativeFunctions.json_encode_json_encode -- Explicit host recovery sets a fresh off policy, including corrupt state.
@@ -45,7 +45,7 @@ final class RestRateSettingsService {
 			),
 			JSON_THROW_ON_ERROR
 		);
-		$this->options->set( 'amsec_rest_rate_policy', $encoded );
-		return $this->options->get( 'amsec_rest_rate_policy' ) === $encoded;
+		$this->options->set( 'ironlatch_rest_rate_policy', $encoded );
+		return $this->options->get( 'ironlatch_rest_rate_policy' ) === $encoded;
 	}
 }

@@ -13,8 +13,8 @@ use AmazingPlugins\Security\Proxy\WordPressClientAddress;
 
 /** Counts guest requests per minute and can pause an address that sends too many. */
 final class RateLimiter {
-	public const OPTION = 'amsec_rate_limits';
-	public const RECENT = 'amsec_rate_limit_recent';
+	public const OPTION = 'ironlatch_rate_limits';
+	public const RECENT = 'ironlatch_rate_limit_recent';
 	/** Block key shared with the scanner guard, so both features give one answer for an address. */
 	public const BLOCK_SALT = ':bot:block';
 	private const WINDOW    = 60;
@@ -30,7 +30,7 @@ final class RateLimiter {
 		if ( ! is_array( $stored ) || ! in_array( $stored['mode'] ?? null, array( 'watch', 'block' ), true ) ) {
 			return;
 		}
-		if ( is_user_logged_in() || wp_doing_cron() || ( defined( 'WP_CLI' ) && WP_CLI ) || ( defined( 'AMSEC_DISABLE_FIREWALL' ) && AMSEC_DISABLE_FIREWALL ) ) {
+		if ( is_user_logged_in() || wp_doing_cron() || ( defined( 'WP_CLI' ) && WP_CLI ) || ( defined( 'IRONLATCH_DISABLE_FIREWALL' ) && IRONLATCH_DISABLE_FIREWALL ) ) {
 			return;
 		}
 		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Only the path is compared against a fixed prefix.
@@ -123,8 +123,8 @@ final class RateLimiter {
 			return $store->record( $key, self::WINDOW, $now, 7000 );
 		}
 		$bucket = $key . ':' . intdiv( $now, self::WINDOW );
-		wp_cache_add( $bucket, 0, 'amsec_rate', 2 * self::WINDOW );
-		$count = wp_cache_incr( $bucket, 1, 'amsec_rate' );
+		wp_cache_add( $bucket, 0, 'ironlatch_rate', 2 * self::WINDOW );
+		$count = wp_cache_incr( $bucket, 1, 'ironlatch_rate' );
 		return false === $count ? null : (int) $count;
 	}
 
@@ -160,37 +160,37 @@ final class RateLimiter {
 		nocache_headers();
 		header( 'Retry-After: ' . max( 1, $seconds ) );
 		header( 'Content-Type: text/plain; charset=utf-8' );
-		echo esc_html__( 'Too many requests from your address. Please wait a few minutes and try again.', 'amsec-security-scanner' );
+		echo esc_html__( 'Too many requests from your address. Please wait a few minutes and try again.', 'ironlatch-security-scanner' );
 		exit;
 	}
 
 	public function handle(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'Administrator access required.', 'amsec-security-scanner' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'Administrator access required.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );
 		}
-		check_admin_referer( 'amsec_rate_limits' );
+		check_admin_referer( 'ironlatch_rate_limits' );
 		$raw = array();
 		foreach ( array( 'mode', 'page', 'rest', 'login', 'block', 'allow' ) as $field ) {
-			$key           = 'amsec_rate_' . $field;
+			$key           = 'ironlatch_rate_' . $field;
 			$raw[ $field ] = isset( $_POST[ $key ] ) && is_string( $_POST[ $key ] ) ? sanitize_textarea_field( wp_unslash( $_POST[ $key ] ) ) : null;
 		}
 		list( $settings, $errors ) = RatePolicy::validate( $raw );
-		$url                       = admin_url( 'admin.php?page=amsec-traffic-guard' );
+		$url                       = admin_url( 'admin.php?page=ironlatch-traffic-guard' );
 		if ( null === $settings ) {
-			$args = array( 'amsec_rate_error' => isset( $errors['lines'] ) ? 'lines' : ( isset( $errors['too_many'] ) ? 'too_many' : 'numbers' ) );
+			$args = array( 'ironlatch_rate_error' => isset( $errors['lines'] ) ? 'lines' : ( isset( $errors['too_many'] ) ? 'too_many' : 'numbers' ) );
 			if ( isset( $errors['lines'] ) ) {
-				$args['amsec_rate_lines'] = implode( ',', array_slice( $errors['lines'], 0, 20 ) );
+				$args['ironlatch_rate_lines'] = implode( ',', array_slice( $errors['lines'], 0, 20 ) );
 			}
-			wp_safe_redirect( add_query_arg( $args, $url ) . '#amsec-rate' );
+			wp_safe_redirect( add_query_arg( $args, $url ) . '#ironlatch-rate' );
 			exit;
 		}
 		if ( 'block' === $settings['mode'] && self::proxyUnresolved() ) {
-			wp_safe_redirect( add_query_arg( 'amsec_rate_error', 'proxy', $url ) . '#amsec-rate' );
+			wp_safe_redirect( add_query_arg( 'ironlatch_rate_error', 'proxy', $url ) . '#ironlatch-rate' );
 			exit;
 		}
 		update_option( self::OPTION, $settings, true );
 		( new ActivityHooks( new ActivityRepository( $GLOBALS['wpdb'] ) ) )->record( 'security_setting_changed', 0, 'rate-limits-' . $settings['mode'] );
-		wp_safe_redirect( \AmazingPlugins\Security\Admin\Brand::saved( $url ) . '#amsec-rate' );
+		wp_safe_redirect( \AmazingPlugins\Security\Admin\Brand::saved( $url ) . '#ironlatch-rate' );
 		exit;
 	}
 
@@ -198,55 +198,55 @@ final class RateLimiter {
 		$settings = self::settings();
 		$mode     = $settings['mode'];
 		$choices  = array(
-			'off'   => __( 'Off', 'amsec-security-scanner' ),
-			'watch' => __( 'Watch', 'amsec-security-scanner' ),
-			'block' => __( 'Block', 'amsec-security-scanner' ),
+			'off'   => __( 'Off', 'ironlatch-security-scanner' ),
+			'watch' => __( 'Watch', 'ironlatch-security-scanner' ),
+			'block' => __( 'Block', 'ironlatch-security-scanner' ),
 		);
 		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- Read-only flash values after a nonce-checked save.
-		$error = isset( $_GET['amsec_rate_error'] ) ? sanitize_key( wp_unslash( $_GET['amsec_rate_error'] ) ) : '';
-		$lines = isset( $_GET['amsec_rate_lines'] ) ? array_map( 'intval', explode( ',', sanitize_text_field( wp_unslash( $_GET['amsec_rate_lines'] ) ) ) ) : array();
+		$error = isset( $_GET['ironlatch_rate_error'] ) ? sanitize_key( wp_unslash( $_GET['ironlatch_rate_error'] ) ) : '';
+		$lines = isset( $_GET['ironlatch_rate_lines'] ) ? array_map( 'intval', explode( ',', sanitize_text_field( wp_unslash( $_GET['ironlatch_rate_lines'] ) ) ) ) : array();
 		// phpcs:enable
 		$count = self::recentCount( time() );
-		echo '<div class="wrap amsec-security-scanner-admin amsec-brief" id="amsec-rate">';
-		echo '<details class="amsec-more"' . ( '' !== $error ? ' open' : '' ) . '><summary>' . esc_html__( 'Advanced: rate limiting', 'amsec-security-scanner' ) . '</summary>';
+		echo '<div class="wrap ironlatch-security-scanner-admin ironlatch-brief" id="ironlatch-rate">';
+		echo '<details class="ironlatch-more"' . ( '' !== $error ? ' open' : '' ) . '><summary>' . esc_html__( 'Advanced: rate limiting', 'ironlatch-security-scanner' ) . '</summary>';
 		if ( 'lines' === $error ) {
 			/* translators: %s: comma-separated line numbers. */
-			echo '<div class="notice notice-error inline"><p>' . esc_html( sprintf( __( 'Nothing was saved. These never-limit lines are not valid IP addresses or ranges: %s.', 'amsec-security-scanner' ), implode( ', ', array_filter( $lines ) ) ) ) . '</p></div>';
+			echo '<div class="notice notice-error inline"><p>' . esc_html( sprintf( __( 'Nothing was saved. These never-limit lines are not valid IP addresses or ranges: %s.', 'ironlatch-security-scanner' ), implode( ', ', array_filter( $lines ) ) ) ) . '</p></div>';
 		} elseif ( 'too_many' === $error ) {
 			/* translators: %d: maximum number of entries. */
-			echo '<div class="notice notice-error inline"><p>' . esc_html( sprintf( __( 'Nothing was saved. The never-limit list holds up to %d entries.', 'amsec-security-scanner' ), RatePolicy::MAX_ALLOW ) ) . '</p></div>';
+			echo '<div class="notice notice-error inline"><p>' . esc_html( sprintf( __( 'Nothing was saved. The never-limit list holds up to %d entries.', 'ironlatch-security-scanner' ), RatePolicy::MAX_ALLOW ) ) . '</p></div>';
 		} elseif ( 'proxy' === $error || self::proxyUnresolved() ) {
-			echo '<div class="notice notice-' . ( 'proxy' === $error ? 'error' : 'warning' ) . ' inline"><p>' . esc_html__( 'This site seems to sit behind a proxy or CDN that is not set up under Trusted proxies. Every visitor would share its address, so Block is not allowed until trusted proxies are set up.', 'amsec-security-scanner' ) . '</p></div>';
+			echo '<div class="notice notice-' . ( 'proxy' === $error ? 'error' : 'warning' ) . ' inline"><p>' . esc_html__( 'This site seems to sit behind a proxy or CDN that is not set up under Trusted proxies. Every visitor would share its address, so Block is not allowed until trusted proxies are set up.', 'ironlatch-security-scanner' ) . '</p></div>';
 		} elseif ( '' !== $error ) {
-			echo '<div class="notice notice-error inline"><p>' . esc_html__( 'Nothing was saved. Use numbers inside the ranges shown.', 'amsec-security-scanner' ) . '</p></div>';
+			echo '<div class="notice notice-error inline"><p>' . esc_html__( 'Nothing was saved. Use numbers inside the ranges shown.', 'ironlatch-security-scanner' ) . '</p></div>';
 		}
-		echo '<p class="amsec-brief-status"><span class="amsec-pill' . ( 'off' === $mode ? ' is-off' : ' is-on' ) . '">' . esc_html( $choices[ $mode ] ) . '</span>';
-		echo esc_html__( 'Limits how many requests one guest address can send each minute.', 'amsec-security-scanner' ) . '</p>';
-		echo '<ul class="amsec-facts"><li><strong>' . esc_html( number_format_i18n( $count ) ) . '</strong> ';
-		echo esc_html( _n( 'address went over a limit in the last 24 hours', 'addresses went over a limit in the last 24 hours', $count, 'amsec-security-scanner' ) ) . '</li></ul>';
-		echo '<p>' . esc_html__( 'Watch writes one line to the activity log when an address goes over a limit. Block also answers that address with a "too many requests" error until the block ends. Signed-in people, cron, WP-CLI, the server itself and the never-limit list are not counted. Blocks are shared with the scanner guard.', 'amsec-security-scanner' ) . '</p>';
-		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '"><input type="hidden" name="action" value="amsec_rate_limits">';
-		wp_nonce_field( 'amsec_rate_limits' );
-		echo '<p><label for="amsec-rate-mode">' . esc_html__( 'Rate limiting', 'amsec-security-scanner' ) . '</label> <select id="amsec-rate-mode" name="amsec_rate_mode">';
+		echo '<p class="ironlatch-brief-status"><span class="ironlatch-pill' . ( 'off' === $mode ? ' is-off' : ' is-on' ) . '">' . esc_html( $choices[ $mode ] ) . '</span>';
+		echo esc_html__( 'Limits how many requests one guest address can send each minute.', 'ironlatch-security-scanner' ) . '</p>';
+		echo '<ul class="ironlatch-facts"><li><strong>' . esc_html( number_format_i18n( $count ) ) . '</strong> ';
+		echo esc_html( _n( 'address went over a limit in the last 24 hours', 'addresses went over a limit in the last 24 hours', $count, 'ironlatch-security-scanner' ) ) . '</li></ul>';
+		echo '<p>' . esc_html__( 'Watch writes one line to the activity log when an address goes over a limit. Block also answers that address with a "too many requests" error until the block ends. Signed-in people, cron, WP-CLI, the server itself and the never-limit list are not counted. Blocks are shared with the scanner guard.', 'ironlatch-security-scanner' ) . '</p>';
+		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '"><input type="hidden" name="action" value="ironlatch_rate_limits">';
+		wp_nonce_field( 'ironlatch_rate_limits' );
+		echo '<p><label for="ironlatch-rate-mode">' . esc_html__( 'Rate limiting', 'ironlatch-security-scanner' ) . '</label> <select id="ironlatch-rate-mode" name="ironlatch_rate_mode">';
 		foreach ( $choices as $value => $choice ) {
 			echo '<option value="' . esc_attr( $value ) . '"' . selected( $mode, $value, false ) . '>' . esc_html( $choice ) . '</option>';
 		}
 		echo '</select></p>';
 		$labels = array(
-			'page'  => __( 'Page requests per minute', 'amsec-security-scanner' ),
-			'rest'  => __( 'REST and XML-RPC requests per minute', 'amsec-security-scanner' ),
-			'login' => __( 'wp-login.php and admin-ajax.php posts per minute', 'amsec-security-scanner' ),
-			'block' => __( 'Block length in minutes', 'amsec-security-scanner' ),
+			'page'  => __( 'Page requests per minute', 'ironlatch-security-scanner' ),
+			'rest'  => __( 'REST and XML-RPC requests per minute', 'ironlatch-security-scanner' ),
+			'login' => __( 'wp-login.php and admin-ajax.php posts per minute', 'ironlatch-security-scanner' ),
+			'block' => __( 'Block length in minutes', 'ironlatch-security-scanner' ),
 		);
 		foreach ( $labels as $field => $label ) {
 			$bound = RatePolicy::BOUNDS[ $field ];
-			echo '<p><label for="amsec-rate-' . esc_attr( $field ) . '">' . esc_html( $label ) . '</label> <input type="number" class="small-text" id="amsec-rate-' . esc_attr( $field ) . '" name="amsec_rate_' . esc_attr( $field ) . '" value="' . esc_attr( (string) $settings[ $field ] ) . '" min="' . esc_attr( (string) $bound[1] ) . '" max="' . esc_attr( (string) $bound[2] ) . '" required> ';
+			echo '<p><label for="ironlatch-rate-' . esc_attr( $field ) . '">' . esc_html( $label ) . '</label> <input type="number" class="small-text" id="ironlatch-rate-' . esc_attr( $field ) . '" name="ironlatch_rate_' . esc_attr( $field ) . '" value="' . esc_attr( (string) $settings[ $field ] ) . '" min="' . esc_attr( (string) $bound[1] ) . '" max="' . esc_attr( (string) $bound[2] ) . '" required> ';
 			/* translators: 1: smallest allowed number, 2: largest allowed number. */
-			echo '<span class="description">' . esc_html( sprintf( __( '%1$d to %2$d', 'amsec-security-scanner' ), $bound[1], $bound[2] ) ) . '</span></p>';
+			echo '<span class="description">' . esc_html( sprintf( __( '%1$d to %2$d', 'ironlatch-security-scanner' ), $bound[1], $bound[2] ) ) . '</span></p>';
 		}
-		echo '<p><label for="amsec-rate-allow">' . esc_html__( 'Never limit these addresses (one IP or CIDR range per line, up to 50)', 'amsec-security-scanner' ) . '</label><br><textarea id="amsec-rate-allow" name="amsec_rate_allow" rows="4" class="large-text code" maxlength="4096">' . esc_html( implode( "\n", $settings['allow'] ) ) . '</textarea></p>';
+		echo '<p><label for="ironlatch-rate-allow">' . esc_html__( 'Never limit these addresses (one IP or CIDR range per line, up to 50)', 'ironlatch-security-scanner' ) . '</label><br><textarea id="ironlatch-rate-allow" name="ironlatch_rate_allow" rows="4" class="large-text code" maxlength="4096">' . esc_html( implode( "\n", $settings['allow'] ) ) . '</textarea></p>';
 		echo '<p>';
-		submit_button( __( 'Save rate limiting', 'amsec-security-scanner' ), 'secondary', 'amsec-rate-save', false );
+		submit_button( __( 'Save rate limiting', 'ironlatch-security-scanner' ), 'secondary', 'ironlatch-rate-save', false );
 		echo '</p></form></details></div>';
 	}
 }

@@ -1,10 +1,10 @@
 <?php
 // Read-only corpus on the named disposable Docker databases; never executes scanned file contents.
-if ( ! defined( 'WP_CLI' ) || ! WP_CLI || 'amsec-next-db' !== DB_HOST || ! in_array( DB_NAME, array( 'wordpress', 'wordpress69' ), true ) ) { exit( 1 ); }
+if ( ! defined( 'WP_CLI' ) || ! WP_CLI || 'ironlatch-next-db' !== DB_HOST || ! in_array( DB_NAME, array( 'wordpress', 'wordpress69' ), true ) ) { exit( 1 ); }
 use AmazingPlugins\Security\FileScan\BundledRulePack;
 use AmazingPlugins\Security\FileScan\RuleMatcher;
 $matcher = new RuleMatcher( new BundledRulePack() );
-$roots = array( ABSPATH . 'wp-admin', ABSPATH . 'wp-includes', WP_PLUGIN_DIR . '/akismet', WP_PLUGIN_DIR . '/amsec-security-scanner', WP_PLUGIN_DIR . '/contact-form-7', WP_PLUGIN_DIR . '/classic-editor', WP_CONTENT_DIR . '/themes' );
+$roots = array( ABSPATH . 'wp-admin', ABSPATH . 'wp-includes', WP_PLUGIN_DIR . '/akismet', WP_PLUGIN_DIR . '/ironlatch-security-scanner', WP_PLUGIN_DIR . '/contact-form-7', WP_PLUGIN_DIR . '/classic-editor', WP_CONTENT_DIR . '/themes' );
 if ( is_dir( WP_PLUGIN_DIR . '/woocommerce' ) ) { $roots[] = WP_PLUGIN_DIR . '/woocommerce'; }
 $paths = glob( ABSPATH . '*.php' );
 foreach ( $roots as $root ) {

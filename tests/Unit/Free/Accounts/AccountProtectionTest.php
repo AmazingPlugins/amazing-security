@@ -119,17 +119,17 @@ final class AccountProtectionTest extends TestCase {
 	}
 
 	public function test_settings_stay_off_and_ignore_the_common_password_switch(): void {
-		$saved = Settings::fromPost( array( 'amsec_common_passwords' => '1' ) );
+		$saved = Settings::fromPost( array( 'ironlatch_common_passwords' => '1' ) );
 		self::assertSame(
 			array(
-				'amsec_idle_minutes'          => '0',
-				'amsec_approve_registrations' => '0',
-				'amsec_email_factor'          => '0',
-				'amsec_login_challenge'       => '0',
-				'amsec_login_erase_on_uninstall' => '0',
+				'ironlatch_idle_minutes'          => '0',
+				'ironlatch_approve_registrations' => '0',
+				'ironlatch_email_factor'          => '0',
+				'ironlatch_login_challenge'       => '0',
+				'ironlatch_login_erase_on_uninstall' => '0',
 			),
 			$saved
 		);
-		self::assertArrayNotHasKey( 'amsec_common_passwords', $saved );
+		self::assertArrayNotHasKey( 'ironlatch_common_passwords', $saved );
 	}
 }

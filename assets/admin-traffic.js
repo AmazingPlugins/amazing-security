@@ -1,10 +1,10 @@
 (function () {
-  var button = document.getElementById('amsec-put-examples');
-  if (!button || !window.amsecTrafficExamples) {
+  var button = document.getElementById('ironlatch-put-examples');
+  if (!button || !window.ironlatchTrafficExamples) {
     return;
   }
-  var note = document.getElementById('amsec-example-note');
-  var packs = window.amsecTrafficExamples;
+  var note = document.getElementById('ironlatch-example-note');
+  var packs = window.ironlatchTrafficExamples;
 
   button.addEventListener('click', function () {
     var added = 0;

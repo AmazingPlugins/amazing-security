@@ -75,22 +75,22 @@ final class LocalHardeningScanService {
 	 */
 	public static function all(): array {
 		$values   = new WordPressValues();
-		$checks   = self::checks( $values, static fn(): mixed => get_option( 'amsec_login_rate_mode', null ) );
+		$checks   = self::checks( $values, static fn(): mixed => get_option( 'ironlatch_login_rate_mode', null ) );
 		$paths    = FilesystemPermissionsCheck::wordpressPaths();
 		$checks[] = new FilesystemPermissionsCheck( $paths );
 		$checks[] = new FileModesCheck( $paths );
 		$checks[] = new UploadsExecutionCheck();
 		$checks[] = new PingbackCheck( static fn(): mixed => get_option( 'default_ping_status', null ) );
-		$checks[] = new XmlRpcAuthCheck( static fn(): mixed => get_option( 'amsec_login_xmlrpc_disabled', null ) );
+		$checks[] = new XmlRpcAuthCheck( static fn(): mixed => get_option( 'ironlatch_login_xmlrpc_disabled', null ) );
 		$checks[] = new AuthFactorCheck( 'authenticator-app' );
 		$checks[] = new AuthFactorCheck( 'passkeys-status' );
-		$checks[] = new GapCheck( 'captcha-login', static fn(): string => self::gateOption( 'amsec_login_confirm' ) );
-		$checks[] = new GapCheck( 'compromised-passwords', static fn(): string => self::gateOption( 'amsec_common_passwords' ) );
-		$checks[] = new GapCheck( 'login-hints', static fn(): string => self::gateOption( 'amsec_generic_login_errors' ) );
-		$checks[] = new GapCheck( 'author-archives', static fn(): string => self::gateOption( 'amsec_hide_author_archives' ) );
-		$checks[] = new GapCheck( 'rest-user-list', static fn(): string => self::gateOption( 'amsec_hide_rest_users' ) );
-		$checks[] = new GapCheck( 'version-tag', static fn(): string => self::gateOption( 'amsec_hide_generator' ) );
-		$checks[] = new GapCheck( 'discovery-links', static fn(): string => self::gateOption( 'amsec_hide_discovery_links' ) );
+		$checks[] = new GapCheck( 'captcha-login', static fn(): string => self::gateOption( 'ironlatch_login_confirm' ) );
+		$checks[] = new GapCheck( 'compromised-passwords', static fn(): string => self::gateOption( 'ironlatch_common_passwords' ) );
+		$checks[] = new GapCheck( 'login-hints', static fn(): string => self::gateOption( 'ironlatch_generic_login_errors' ) );
+		$checks[] = new GapCheck( 'author-archives', static fn(): string => self::gateOption( 'ironlatch_hide_author_archives' ) );
+		$checks[] = new GapCheck( 'rest-user-list', static fn(): string => self::gateOption( 'ironlatch_hide_rest_users' ) );
+		$checks[] = new GapCheck( 'version-tag', static fn(): string => self::gateOption( 'ironlatch_hide_generator' ) );
+		$checks[] = new GapCheck( 'discovery-links', static fn(): string => self::gateOption( 'ironlatch_hide_discovery_links' ) );
 		$checks[] = new ReadmeFileCheck();
 		$checks[] = new LicenseFileCheck();
 		$checks[] = new DebugLogCheck();
@@ -105,8 +105,8 @@ final class LocalHardeningScanService {
 		$checks[] = new InactiveThemesCheck();
 		$checks[] = new UploadsPhpFilesCheck();
 		$checks[] = new RootExposureCheck();
-		$checks[] = new BotModeCheck( static fn(): mixed => get_option( 'amsec_bot_mode', 'off' ) );
-		$checks[] = new RestRateCheck( static fn(): mixed => get_option( 'amsec_rest_rate_policy', null ) );
+		$checks[] = new BotModeCheck( static fn(): mixed => get_option( 'ironlatch_bot_mode', 'off' ) );
+		$checks[] = new RestRateCheck( static fn(): mixed => get_option( 'ironlatch_rest_rate_policy', null ) );
 		$checks[] = new RestWatchCheck();
 		$checks[] = new SiteWatchCheck( 'finding-emails', array( SiteWatchCheck::class, 'findingEmails' ) );
 		$checks[] = new SiteWatchCheck( 'weekly-digest', array( SiteWatchCheck::class, 'weeklyDigest' ) );

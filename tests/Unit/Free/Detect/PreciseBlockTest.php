@@ -26,8 +26,8 @@ final class PreciseBlockTest extends TestCase {
 		self::assertFalse( Module::shouldBlock( array( 'q' => 'UNION SELECT' ), '1', false ) );
 		self::assertFalse( Module::shouldBlock( array( 'q' => '../' ), '1', false ) );
 		self::assertFalse( Module::shouldBlock( array( 'q' => 'SELECT * FROM posts' ), '1', false ) );
-		self::assertFalse( Module::shouldBlock( array( 'AMSEC_BLOCK_PROBE' => '1' ), '1', false ) );
-		self::assertFalse( Module::shouldBlock( array( 'q' => 'amsec_webshell_marker_<?PHP' ), '1', false ) );
+		self::assertFalse( Module::shouldBlock( array( 'IRONLATCH_BLOCK_PROBE' => '1' ), '1', false ) );
+		self::assertFalse( Module::shouldBlock( array( 'q' => 'ironlatch_webshell_marker_<?PHP' ), '1', false ) );
 		self::assertFalse( Module::shouldBlock( array( Module::VALUE_NEEDLE => '1' ), '1', false ) );
 		self::assertFalse( Module::shouldBlock( array( 'list' => array( Module::VALUE_NEEDLE ) ), '1', false ) );
 		self::assertFalse( Module::shouldBlock( array( 0 => Module::VALUE_NEEDLE ), '1', false ) );

@@ -14,15 +14,15 @@ final class AuthFactorPanel {
 	public static function html( string $title, array $factor, string $directoryUrl, string $domId = 'factor' ): string {
 		$state = $factor['state'] ?? AuthFactorStatus::MISSING;
 		$label = match ( $state ) {
-			AuthFactorStatus::ACTIVE    => __( 'Active', 'amsec-security-scanner' ),
-			AuthFactorStatus::AVAILABLE => __( 'Available, off', 'amsec-security-scanner' ),
-			default                     => __( 'Not on this site', 'amsec-security-scanner' ),
+			AuthFactorStatus::ACTIVE    => __( 'Active', 'ironlatch-security-scanner' ),
+			AuthFactorStatus::AVAILABLE => __( 'Available, off', 'ironlatch-security-scanner' ),
+			default                     => __( 'Not on this site', 'ironlatch-security-scanner' ),
 		};
 		$safe  = preg_replace( '/[^a-z0-9\-]+/', '-', strtolower( $domId ) );
 		$id    = is_string( $safe ) && '' !== $safe ? $safe : 'factor';
-		$html  = '<section class="amsec-auth-factor" aria-labelledby="amsec-auth-factor-' . esc_attr( $id ) . '">';
-		$html .= '<h2 id="amsec-auth-factor-' . esc_attr( $id ) . '">' . esc_html( $title ) . '</h2>';
-		$html .= '<p><strong class="amsec-auth-factor-state">' . esc_html( $label ) . '</strong></p>';
+		$html  = '<section class="ironlatch-auth-factor" aria-labelledby="ironlatch-auth-factor-' . esc_attr( $id ) . '">';
+		$html .= '<h2 id="ironlatch-auth-factor-' . esc_attr( $id ) . '">' . esc_html( $title ) . '</h2>';
+		$html .= '<p><strong class="ironlatch-auth-factor-state">' . esc_html( $label ) . '</strong></p>';
 		if ( AuthFactorStatus::MISSING === $state ) {
 			$name     = (string) ( $factor['suggest_name'] ?? 'Two Factor' );
 			$install  = str_contains( $directoryUrl, 'plugin-install.php' );
@@ -31,21 +31,21 @@ final class AuthFactorPanel {
 				$activate
 					? sprintf(
 						/* translators: %s: suggested plugin name */
-						__( 'AmSec Security Scanner does not provide this itself. %1$s is installed but not active. Click Activate %1$s, then Activate on the Plugins screen. Set it up under Users > Profile, then come back here to check the status.', 'amsec-security-scanner' ),
+						__( 'Ironlatch Security Scanner does not provide this itself. %1$s is installed but not active. Click Activate %1$s, then Activate on the Plugins screen. Set it up under Users > Profile, then come back here to check the status.', 'ironlatch-security-scanner' ),
 						$name
 					)
 					: ( $install
 					? sprintf(
 						/* translators: %s: suggested plugin name */
-						__( 'AmSec Security Scanner does not provide this itself. Click Find %s, then Install Now and Activate on the search page. Set it up under Users > Profile, then come back here to check the status.', 'amsec-security-scanner' ),
+						__( 'Ironlatch Security Scanner does not provide this itself. Click Find %s, then Install Now and Activate on the search page. Set it up under Users > Profile, then come back here to check the status.', 'ironlatch-security-scanner' ),
 						$name
 					)
-					: __( 'AmSec Security Scanner does not provide this itself. Ask a network administrator to install a dedicated plugin, then set it up under Users > Profile.', 'amsec-security-scanner' ) )
+					: __( 'Ironlatch Security Scanner does not provide this itself. Ask a network administrator to install a dedicated plugin, then set it up under Users > Profile.', 'ironlatch-security-scanner' ) )
 			) . '</p>';
 			$html .= '<p><a class="button" href="' . esc_url( $directoryUrl ) . '">' . esc_html(
 				sprintf(
 					/* translators: %s: suggested plugin name */
-					$activate ? __( 'Activate %s', 'amsec-security-scanner' ) : ( $install ? __( 'Find %s', 'amsec-security-scanner' ) : __( 'View %s on WordPress.org', 'amsec-security-scanner' ) ),
+					$activate ? __( 'Activate %s', 'ironlatch-security-scanner' ) : ( $install ? __( 'Find %s', 'ironlatch-security-scanner' ) : __( 'View %s on WordPress.org', 'ironlatch-security-scanner' ) ),
 					$name
 				)
 			) . '</a></p>';
@@ -54,7 +54,7 @@ final class AuthFactorPanel {
 			$html    .= '<p>' . esc_html(
 				sprintf(
 					/* translators: %s: installed plugin name */
-					__( '%s is installed. Turn it on and enroll from that plugin’s screens. AmSec Security Scanner only reports the status.', 'amsec-security-scanner' ),
+					__( '%s is installed. Turn it on and enroll from that plugin’s screens. Ironlatch Security Scanner only reports the status.', 'ironlatch-security-scanner' ),
 					$provider
 				)
 			) . '</p>';
@@ -63,7 +63,7 @@ final class AuthFactorPanel {
 			$html    .= '<p>' . esc_html(
 				sprintf(
 					/* translators: %s: installed plugin name */
-					__( '%s is handling this factor. Manage enrollment and backup codes there.', 'amsec-security-scanner' ),
+					__( '%s is handling this factor. Manage enrollment and backup codes there.', 'ironlatch-security-scanner' ),
 					$provider
 				)
 			) . '</p>';

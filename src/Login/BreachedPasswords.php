@@ -42,7 +42,7 @@ final class BreachedPasswords {
 			array(
 				'timeout'     => 2,
 				'redirection' => 0,
-				'user-agent'  => 'AmSec-Security-Scanner',
+				'user-agent'  => 'Ironlatch-Security-Scanner',
 				'headers'     => array( 'Add-Padding' => 'true' ),
 			)
 		);

@@ -1,21 +1,21 @@
 <?php
 // Disposable Redis test only. Invoked by wordpress-persistent-cache-lock.sh in independent processes.
-if ( ! defined( 'WP_CLI' ) || ! WP_CLI || DB_HOST !== 'amsec-next-db' || DB_NAME !== 'wordpress' || ! wp_using_ext_object_cache() ) { throw new RuntimeException( 'Expected disposable WordPress with persistent cache.' ); }
+if ( ! defined( 'WP_CLI' ) || ! WP_CLI || DB_HOST !== 'ironlatch-next-db' || DB_NAME !== 'wordpress' || ! wp_using_ext_object_cache() ) { throw new RuntimeException( 'Expected disposable WordPress with persistent cache.' ); }
 use AmazingPlugins\Security\Integrity\WordPressOptions;
 use AmazingPlugins\Security\Integrity\WorkerLock;
-$id = getenv( 'AMSEC_CACHE_TEST_ID' );
-$mode = getenv( 'AMSEC_CACHE_TEST_MODE' );
+$id = getenv( 'IRONLATCH_CACHE_TEST_ID' );
+$mode = getenv( 'IRONLATCH_CACHE_TEST_MODE' );
 if ( ! is_string( $id ) || ! preg_match( '/^[a-f0-9]{16}$/D', $id ) ) { throw new RuntimeException( 'Invalid fixture identity.' ); }
-$key = 'amsec_cache_test_' . $id;
-$directory = WP_CONTENT_DIR . '/amsec-cache-test-' . $id;
+$key = 'ironlatch_cache_test_' . $id;
+$directory = WP_CONTENT_DIR . '/ironlatch-cache-test-' . $id;
 $options = new WordPressOptions();
 if ( 'seed' === $mode ) {
-    if ( ! wp_cache_set( $key, 'persisted', 'amsec-integration', 120 ) ) { throw new RuntimeException( 'Could not seed persistent cache.' ); }
+    if ( ! wp_cache_set( $key, 'persisted', 'ironlatch-integration', 120 ) ) { throw new RuntimeException( 'Could not seed persistent cache.' ); }
     return;
 }
 if ( 'read' === $mode ) {
-    if ( 'persisted' !== wp_cache_get( $key, 'amsec-integration' ) ) { throw new RuntimeException( 'Cache value did not survive independent process.' ); }
-    wp_cache_delete( $key, 'amsec-integration' );
+    if ( 'persisted' !== wp_cache_get( $key, 'ironlatch-integration' ) ) { throw new RuntimeException( 'Cache value did not survive independent process.' ); }
+    wp_cache_delete( $key, 'ironlatch-integration' );
     echo 'Persistent cache survives independent process.' . PHP_EOL;
     return;
 }

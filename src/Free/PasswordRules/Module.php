@@ -11,7 +11,7 @@ final class Module {
 	public static function boot(): void {
 		$page = new Page();
 		add_action( 'admin_menu', array( $page, 'register' ) );
-		add_action( 'admin_post_amsec_password_rules', array( $page, 'save' ) );
+		add_action( 'admin_post_ironlatch_password_rules', array( $page, 'save' ) );
 		add_action( 'validate_password_reset', array( self::class, 'reset' ), 10, 2 );
 		add_action( 'user_profile_update_errors', array( self::class, 'profile' ), 10, 3 );
 		add_filter( 'rest_request_before_callbacks', array( self::class, 'rest' ), 10, 3 );
@@ -113,7 +113,7 @@ final class Module {
 		if ( null === $code ) {
 			return $response;
 		}
-		return new \WP_Error( 'amsec_password_' . $code, self::message( $code ), array( 'status' => 400 ) );
+		return new \WP_Error( 'ironlatch_password_' . $code, self::message( $code ), array( 'status' => 400 ) );
 	}
 
 	private static function addError( \WP_Error $errors, string $password, string $when, string $username, string $email, int $user_id ): void {
@@ -122,7 +122,7 @@ final class Module {
 		if ( null === $code ) {
 			return;
 		}
-		$errors->add( 'amsec_password_' . $code, self::message( $code ) );
+		$errors->add( 'ironlatch_password_' . $code, self::message( $code ) );
 	}
 
 	private static function codeFor( string $password, string $when, string $username, string $email, int $user_id ): ?string {
@@ -182,26 +182,26 @@ final class Module {
 		if ( 'length' === $code ) {
 			return sprintf(
 				/* translators: %d: minimum number of characters. */
-				__( 'Use at least %d characters.', 'amsec-security-scanner' ),
+				__( 'Use at least %d characters.', 'ironlatch-security-scanner' ),
 				Decision::minimum( self::stored() )
 			);
 		}
 		if ( 'number' === $code ) {
-			return __( 'Include a number.', 'amsec-security-scanner' );
+			return __( 'Include a number.', 'ironlatch-security-scanner' );
 		}
 		if ( 'mixed' === $code ) {
-			return __( 'Include an uppercase letter and a lowercase letter.', 'amsec-security-scanner' );
+			return __( 'Include an uppercase letter and a lowercase letter.', 'ironlatch-security-scanner' );
 		}
 		if ( 'symbol' === $code ) {
-			return __( 'Include a symbol.', 'amsec-security-scanner' );
+			return __( 'Include a symbol.', 'ironlatch-security-scanner' );
 		}
 		if ( 'name' === $code ) {
-			return __( 'Do not include the account name or the email name.', 'amsec-security-scanner' );
+			return __( 'Do not include the account name or the email name.', 'ironlatch-security-scanner' );
 		}
 		if ( 'reuse' === $code ) {
-			return __( 'Choose a password that is different from the current one.', 'amsec-security-scanner' );
+			return __( 'Choose a password that is different from the current one.', 'ironlatch-security-scanner' );
 		}
-		return __( 'Choose a different password.', 'amsec-security-scanner' );
+		return __( 'Choose a different password.', 'ironlatch-security-scanner' );
 	}
 
 	/**

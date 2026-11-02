@@ -12,7 +12,7 @@ final class FileReaderTest extends TestCase {
 	private string $root;
 
 	protected function setUp(): void {
-		$this->root = sys_get_temp_dir() . '/amsec-' . bin2hex( random_bytes( 5 ) );
+		$this->root = sys_get_temp_dir() . '/ironlatch-' . bin2hex( random_bytes( 5 ) );
 		mkdir( $this->root );
 		file_put_contents( $this->root . '/safe.php', 'safe' );
 	}

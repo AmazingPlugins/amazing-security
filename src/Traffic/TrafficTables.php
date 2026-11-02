@@ -9,7 +9,7 @@ final class TrafficTables {
 	public static function install(): void {
 		global $wpdb;
 		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
-		$table   = $wpdb->prefix . 'amsec_traffic';
+		$table   = $wpdb->prefix . 'ironlatch_traffic';
 		$collate = $wpdb->get_charset_collate();
 	 // phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange -- Versioned bounded plugin-owned history table.
 		dbDelta(
@@ -26,10 +26,10 @@ final class TrafficTables {
   ) {$collate} ENGINE=InnoDB;"
 		);
 		if ( '' === $wpdb->last_error ) {
-			update_option( 'amsec_traffic_schema_version', '1', false ); }
+			update_option( 'ironlatch_traffic_schema_version', '1', false ); }
 		self::ensureScheduled();
 	}
 	public static function ensureScheduled(): void {
-		if ( ! wp_next_scheduled( 'amsec_traffic_cleanup' ) ) {
-			wp_schedule_event( time() + HOUR_IN_SECONDS, 'hourly', 'amsec_traffic_cleanup' ); } }
+		if ( ! wp_next_scheduled( 'ironlatch_traffic_cleanup' ) ) {
+			wp_schedule_event( time() + HOUR_IN_SECONDS, 'hourly', 'ironlatch_traffic_cleanup' ); } }
 }

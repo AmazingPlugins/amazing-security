@@ -22,7 +22,7 @@ final class LoginHooks {
 		}
 		$decision = $this->limiter->beforePassword( $this->addresses->fromServer( $_SERVER ), time() );
 		if ( $decision->blocked ) {
-			return new \WP_Error( 'amsec_rate_limited', __( 'Please try again shortly.', 'amsec-security-scanner' ) );
+			return new \WP_Error( 'ironlatch_rate_limited', __( 'Please try again shortly.', 'ironlatch-security-scanner' ) );
 		}
 		return $user;
 	}
@@ -30,7 +30,7 @@ final class LoginHooks {
 	public function failed( string $username, \WP_Error $error ): void {
 		// WordPress requires the username argument; never retain it in rate-limit storage.
 		// phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
-		$ignored = array( 'amsec_rate_limited', 'amsec_login_confirm', 'amsec_login_challenge', 'amsec_email_factor', 'amsec_registration_pending' );
+		$ignored = array( 'ironlatch_rate_limited', 'ironlatch_login_confirm', 'ironlatch_login_challenge', 'ironlatch_email_factor', 'ironlatch_registration_pending' );
 		if ( ! $this->interactive() || array_intersect( $ignored, $error->get_error_codes() ) ) {
 			return;
 		}

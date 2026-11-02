@@ -11,7 +11,7 @@ use AmazingPlugins\Security\Integrity\WorkerLock;
 use Closure;
 
 final class DigestDelivery {
-	private const STATE = 'amsec_digest_state';
+	private const STATE = 'ironlatch_digest_state';
 	private readonly Closure $send;
 	private mixed $raw = null;
 	public function __construct( private readonly OptionGateway $options, callable $send, private readonly string $email, private readonly string $dashboardUrl ) {
@@ -52,10 +52,10 @@ final class DigestDelivery {
 	}
 
 	public function tick( array $sources, array $activity, int $now ): string {
-		if ( '1' !== $this->options->get( 'amsec_digest_enabled' ) ) {
+		if ( '1' !== $this->options->get( 'ironlatch_digest_enabled' ) ) {
 			return 'off';
 		}
-		$lock = new WorkerLock( $this->options, 'amsec_digest_lock' );
+		$lock = new WorkerLock( $this->options, 'ironlatch_digest_lock' );
 		if ( ! $lock->acquire( 'digest-' . bin2hex( random_bytes( 8 ) ) ) ) {
 			return 'busy';
 		}
@@ -106,7 +106,7 @@ final class DigestDelivery {
 			$accepted = false;
 			if ( false !== filter_var( $this->email, FILTER_VALIDATE_EMAIL ) ) {
 				try {
-					$accepted = (bool) ( $this->send )( $this->email, 'AmSec Security Scanner: weekly security digest', $pending['body'] . "\n\nOpen AmSec Security Scanner in WordPress:\n" . $this->dashboardUrl );
+					$accepted = (bool) ( $this->send )( $this->email, 'Ironlatch Security Scanner: weekly security digest', $pending['body'] . "\n\nOpen Ironlatch Security Scanner in WordPress:\n" . $this->dashboardUrl );
 				} catch ( \Throwable ) {
 					return 'uncertain';
 				}

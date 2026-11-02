@@ -17,7 +17,7 @@ final class ScheduleHooksTest extends TestCase {
 			static function () use ( &$existing ): bool { return $existing; },
 			static function ( int $when, string $recurrence, string $hook ) use ( &$existing, &$scheduled ): bool {
 				self::assertSame( 'daily', $recurrence );
-				self::assertSame( 'amsec_local_daily_scan', $hook );
+				self::assertSame( 'ironlatch_local_daily_scan', $hook );
 				self::assertGreaterThan( 0, $when );
 				$existing = true;
 				++$scheduled;
@@ -34,6 +34,6 @@ final class ScheduleHooksTest extends TestCase {
 		$hooks->ensure();
 		self::assertSame( 1, $scheduled );
 		$hooks->clear();
-		self::assertSame( array( 'amsec_local_daily_scan', 'amsec_integrity_tick', 'amsec_file_tick', 'amsec_local_code_tick', 'amsec_vuln_tick', 'amsec_alert_retry' ), $cleared );
+		self::assertSame( array( 'ironlatch_local_daily_scan', 'ironlatch_integrity_tick', 'ironlatch_file_tick', 'ironlatch_local_code_tick', 'ironlatch_vuln_tick', 'ironlatch_alert_retry' ), $cleared );
 	}
 }

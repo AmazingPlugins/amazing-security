@@ -11,10 +11,10 @@ final class ToolIndex {
 	public function register(): void {
 		$hook = add_submenu_page(
 			Submenu::PARENT,
-			__( 'Advanced', 'amsec-security-scanner' ),
-			__( 'Advanced', 'amsec-security-scanner' ),
+			__( 'Advanced', 'ironlatch-security-scanner' ),
+			__( 'Advanced', 'ironlatch-security-scanner' ),
 			'manage_options',
-			'amsec-tools',
+			'ironlatch-tools',
 			array( $this, 'render' )
 		);
 		if ( is_string( $hook ) ) {
@@ -26,15 +26,15 @@ final class ToolIndex {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			return;
 		}
-		wp_safe_redirect( SettingList::page( 'amsec-files' ) );
+		wp_safe_redirect( SettingList::page( 'ironlatch-files' ) );
 		exit;
 	}
 
 	public function render(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'Administrator access required.', 'amsec-security-scanner' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'Administrator access required.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );
 		}
-		echo '<div class="wrap amsec-security-scanner-admin"><h1>' . esc_html__( 'Files', 'amsec-security-scanner' ) . '</h1>';
-		echo '<p><a href="' . esc_url( SettingList::page( 'amsec-files' ) ) . '">' . esc_html__( 'Open Files', 'amsec-security-scanner' ) . '</a></p></div>';
+		echo '<div class="wrap ironlatch-security-scanner-admin"><h1>' . esc_html__( 'Files', 'ironlatch-security-scanner' ) . '</h1>';
+		echo '<p><a href="' . esc_url( SettingList::page( 'ironlatch-files' ) ) . '">' . esc_html__( 'Open Files', 'ironlatch-security-scanner' ) . '</a></p></div>';
 	}
 }

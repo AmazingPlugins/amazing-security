@@ -1,5 +1,5 @@
 {
-  "name": "amazingplugins/amsec-security-scanner",
+  "name": "amazingplugins/ironlatch-security-scanner",
   "description": "Evidence-led security checks for WordPress",
   "type": "wordpress-plugin",
   "license": "GPL-2.0-or-later",
@@ -24,7 +24,7 @@
   },
   "scripts": {
     "test": "phpunit -c phpunit.xml.dist",
-    "cs": "phpcs --standard=phpcs.xml.dist src amsec-security-scanner.php"
+    "cs": "phpcs --standard=phpcs.xml.dist src ironlatch-security-scanner.php"
   },
   "config": {
     "allow-plugins": {

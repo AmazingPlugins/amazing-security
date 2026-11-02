@@ -8,11 +8,11 @@ defined( 'ABSPATH' ) || exit;
 
 /** On-site addition question. It does not call another host. */
 final class LoginChallenge {
-	public const OPTION           = 'amsec_login_challenge';
-	public const COOKIE           = 'amsec_login_challenge';
-	public const SUM              = 'amsec_login_sum';
-	public const HONEYPOT         = 'amsec_login_company';
-	public const TRANSIENT_PREFIX = 'amsec_lc_';
+	public const OPTION           = 'ironlatch_login_challenge';
+	public const COOKIE           = 'ironlatch_login_challenge';
+	public const SUM              = 'ironlatch_login_sum';
+	public const HONEYPOT         = 'ironlatch_login_company';
+	public const TRANSIENT_PREFIX = 'ironlatch_lc_';
 
 	public static function validToken( string $token ): bool {
 		return 1 === preg_match( '/\A[a-f0-9]{32}\z/', $token );

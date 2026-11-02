@@ -67,9 +67,9 @@ final class AiReadinessCheck implements SecurityCheck {
 
 	/** @return array{app_passwords: string, assistant: string, assistant_ready: string, guide: string} */
 	public static function wordpressSnapshot(): array {
-		$paused    = function_exists( 'get_option' ) && '1' === get_option( 'amsec_disable_application_passwords', '0' );
+		$paused    = function_exists( 'get_option' ) && '1' === get_option( 'ironlatch_disable_application_passwords', '0' );
 		$available = function_exists( 'wp_is_application_passwords_available' ) ? wp_is_application_passwords_available() : null;
-		$setting   = get_option( 'amsec_security_scanner_mcp_enabled', null );
+		$setting   = get_option( 'ironlatch_security_scanner_mcp_enabled', null );
 		return array(
 			'app_passwords'   => $paused ? 'plugin-off' : ( true === $available ? 'open' : ( false === $available ? 'closed' : 'unknown' ) ),
 			'assistant'       => self::assistant( $setting ),
@@ -117,22 +117,22 @@ final class AiReadinessCheck implements SecurityCheck {
 
 	private static function summary( string $passwords, string $assistant, string $ready, string $guide ): string {
 		$tools = match ( $passwords ) {
-			'open' => __( 'Application passwords are available, so a tool can sign in without the login form. You can pause them here. Saved passwords stay stored.', 'amsec-security-scanner' ),
-			'plugin-off' => __( 'Application passwords are paused by this plugin. Saved passwords stay stored and work again if you allow them.', 'amsec-security-scanner' ),
-			'closed' => __( 'Application passwords are turned off.', 'amsec-security-scanner' ),
-			default => __( 'Application password availability could not be read.', 'amsec-security-scanner' ),
+			'open' => __( 'Application passwords are available, so a tool can sign in without the login form. You can pause them here. Saved passwords stay stored.', 'ironlatch-security-scanner' ),
+			'plugin-off' => __( 'Application passwords are paused by this plugin. Saved passwords stay stored and work again if you allow them.', 'ironlatch-security-scanner' ),
+			'closed' => __( 'Application passwords are turned off.', 'ironlatch-security-scanner' ),
+			default => __( 'Application password availability could not be read.', 'ironlatch-security-scanner' ),
 		};
 		$access = match ( true ) {
-			'on' === $assistant => __( 'AI assistant access is on.', 'amsec-security-scanner' ),
-			'off' === $assistant && 'yes' === $ready => __( 'AI assistant access is off. This site can connect an assistant when you turn that on.', 'amsec-security-scanner' ),
-			'off' === $assistant && 'no' === $ready => __( 'AI assistant access is off. This site is not ready to connect an assistant yet.', 'amsec-security-scanner' ),
-			'off' === $assistant => __( 'AI assistant access is off. Assistant readiness could not be read.', 'amsec-security-scanner' ),
-			default => __( 'AI assistant access could not be read.', 'amsec-security-scanner' ),
+			'on' === $assistant => __( 'AI assistant access is on.', 'ironlatch-security-scanner' ),
+			'off' === $assistant && 'yes' === $ready => __( 'AI assistant access is off. This site can connect an assistant when you turn that on.', 'ironlatch-security-scanner' ),
+			'off' === $assistant && 'no' === $ready => __( 'AI assistant access is off. This site is not ready to connect an assistant yet.', 'ironlatch-security-scanner' ),
+			'off' === $assistant => __( 'AI assistant access is off. Assistant readiness could not be read.', 'ironlatch-security-scanner' ),
+			default => __( 'AI assistant access could not be read.', 'ironlatch-security-scanner' ),
 		};
 		$file = match ( $guide ) {
-			'present' => __( 'An llms.txt guide is published for AI readers.', 'amsec-security-scanner' ),
-			'absent' => __( 'No llms.txt guide is published.', 'amsec-security-scanner' ),
-			default => __( 'The llms.txt guide could not be read.', 'amsec-security-scanner' ),
+			'present' => __( 'An llms.txt guide is published for AI readers.', 'ironlatch-security-scanner' ),
+			'absent' => __( 'No llms.txt guide is published.', 'ironlatch-security-scanner' ),
+			default => __( 'The llms.txt guide could not be read.', 'ironlatch-security-scanner' ),
 		};
 		return $tools . ' ' . $access . ' ' . $file . ' This check does not change those settings and does not send the site to a model.';
 	}

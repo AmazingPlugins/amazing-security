@@ -12,14 +12,14 @@ final class LoginFormFieldsTest extends TestCase {
 		ob_start();
 		( new LoginFormFields() )->render();
 		$html = ob_get_clean();
-		self::assertStringNotContainsString( 'name="amsec_otp"', $html );
+		self::assertStringNotContainsString( 'name="ironlatch_otp"', $html );
 	}
 
 	public function test_code_screen_asks_after_the_password(): void {
 		ob_start();
 		( new LoginFormFields() )->step();
 		$html = ob_get_clean();
-		self::assertStringContainsString( 'name="amsec_otp"', $html );
+		self::assertStringContainsString( 'name="ironlatch_otp"', $html );
 		self::assertStringContainsString( 'Verification or recovery code', $html );
 	}
 }

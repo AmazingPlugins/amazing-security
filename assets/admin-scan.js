@@ -1,16 +1,16 @@
 (function () {
-	var settings = window.amsecScan || {};
+	var settings = window.ironlatchScan || {};
 
 	var row = function (tag, number, label) {
 		var item = document.createElement(tag);
 		var dot = document.createElement('span');
 		var num = document.createElement('span');
 		var name = document.createElement('span');
-		dot.className = 'amsec-scan-dot';
+		dot.className = 'ironlatch-scan-dot';
 		dot.setAttribute('aria-hidden', 'true');
-		num.className = 'amsec-scan-num';
+		num.className = 'ironlatch-scan-num';
 		num.textContent = number;
-		name.className = 'amsec-scan-name';
+		name.className = 'ironlatch-scan-name';
 		name.textContent = label;
 		item.setAttribute('data-state', 'pending');
 		item.appendChild(dot);
@@ -29,13 +29,13 @@
 			var toggle = row('button', String.fromCharCode(65 + g) + '.', group.name);
 			var count = document.createElement('span');
 			var items = document.createElement('ol');
-			head.className = 'amsec-scan-group';
+			head.className = 'ironlatch-scan-group';
 			head.setAttribute('data-state', 'pending');
-			toggle.className = 'amsec-scan-toggle';
+			toggle.className = 'ironlatch-scan-toggle';
 			toggle.type = 'button';
 			toggle.setAttribute('aria-expanded', 'false');
-			count.className = 'amsec-scan-count';
-			items.className = 'amsec-scan-items';
+			count.className = 'ironlatch-scan-count';
+			items.className = 'ironlatch-scan-items';
 			items.hidden = true;
 			toggle.appendChild(count);
 			head.appendChild(toggle);
@@ -56,7 +56,7 @@
 			groups.push({ head: head, toggle: toggle, items: items, count: count, first: first, size: group.steps.length, state: 'pending' });
 		});
 		var save = row('li', '', data.save);
-		save.className = 'amsec-scan-group';
+		save.className = 'ironlatch-scan-group';
 		list.appendChild(save);
 		rows.push(save);
 		return { rows: rows, groups: groups };
@@ -64,7 +64,7 @@
 
 	var post = function (form, fields, signal) {
 		var body = new FormData();
-		body.append('action', 'amsec_scan_step');
+		body.append('action', 'ironlatch_scan_step');
 		body.append('_ajax_nonce', form.querySelector('input[name="_wpnonce"]').value);
 		Object.keys(fields).forEach(function (key) {
 			body.append(key, fields[key]);
@@ -79,22 +79,22 @@
 		});
 	};
 
-	document.querySelectorAll('.amsec-scan-form').forEach(function (form) {
+	document.querySelectorAll('.ironlatch-scan-form').forEach(function (form) {
 		form.addEventListener('submit', function (event) {
-			if (!window.fetch || !window.FormData || !settings.ajax || form.getAttribute('data-amsec-fallback')) {
+			if (!window.fetch || !window.FormData || !settings.ajax || form.getAttribute('data-ironlatch-fallback')) {
 				return;
 			}
 			event.preventDefault();
-			var button = form.querySelector('.amsec-scan-button');
-			var progress = form.querySelector('.amsec-scan-progress');
-			var fill = form.querySelector('.amsec-scan-fill');
-			var percent = form.querySelector('.amsec-scan-percent');
-			var track = form.querySelector('.amsec-scan-track');
-			var list = form.querySelector('.amsec-scan-list');
-			var step = form.querySelector('.amsec-scan-step');
-			var stop = form.querySelector('.amsec-scan-stop');
+			var button = form.querySelector('.ironlatch-scan-button');
+			var progress = form.querySelector('.ironlatch-scan-progress');
+			var fill = form.querySelector('.ironlatch-scan-fill');
+			var percent = form.querySelector('.ironlatch-scan-percent');
+			var track = form.querySelector('.ironlatch-scan-track');
+			var list = form.querySelector('.ironlatch-scan-list');
+			var step = form.querySelector('.ironlatch-scan-step');
+			var stop = form.querySelector('.ironlatch-scan-stop');
 			// While a scan runs, only its progress shows. The new results appear when the page reloads with them.
-			var screen = form.closest('.amsec-scan');
+			var screen = form.closest('.ironlatch-scan');
 			var controller = window.AbortController ? new AbortController() : null;
 			var signal = controller ? controller.signal : undefined;
 			var rows = [];
@@ -163,13 +163,13 @@
 					var current = rows[Math.min(done, rows.length - 1)];
 					var group = groups[activeGroup];
 					step.textContent = group
-						? (settings.group || 'Category %1$s of %2$s').replace('%1$s', String.fromCharCode(65 + activeGroup)).replace('%2$s', String(groups.length)) + ' · ' + (settings.step || 'Step %1$s of %2$s').replace('%1$s', String(done - group.first + 1)).replace('%2$s', String(group.size)) + ': ' + current.querySelector('.amsec-scan-name').textContent
-						: current.querySelector('.amsec-scan-name').textContent;
+						? (settings.group || 'Category %1$s of %2$s').replace('%1$s', String.fromCharCode(65 + activeGroup)).replace('%2$s', String(groups.length)) + ' · ' + (settings.step || 'Step %1$s of %2$s').replace('%1$s', String(done - group.first + 1)).replace('%2$s', String(group.size)) + ': ' + current.querySelector('.ironlatch-scan-name').textContent
+						: current.querySelector('.ironlatch-scan-name').textContent;
 				}
 			};
 			// Any failure falls back to the plain form post, which runs the whole scan in one request.
 			var fallback = function () {
-				form.setAttribute('data-amsec-fallback', '1');
+				form.setAttribute('data-ironlatch-fallback', '1');
 				if (step) {
 					step.textContent = settings.saving || 'Saving the results';
 				}
@@ -201,7 +201,7 @@
 					}).then(function (result) {
 						if (result.note && rows[index]) {
 							var note = document.createElement('span');
-							note.className = 'amsec-scan-note';
+							note.className = 'ironlatch-scan-note';
 							note.textContent = ' · ' + result.note;
 							rows[index].appendChild(note);
 						}

@@ -14,9 +14,9 @@ use Throwable;
 final class ApprovedSettingAction {
 	public function handle(): void {
 		if ( ! current_user_can( 'manage_options' ) || ! FixApprovalAction::cookieAuthenticated() ) {
-			wp_die( esc_html__( 'A current administrator session is required.', 'amsec-security-scanner' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'A current administrator session is required.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );
 		}
-		check_admin_referer( 'amsec_approved_setting' );
+		check_admin_referer( 'ironlatch_approved_setting' );
 		// The nonce is verified above before the operation is applied.
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing
 		$operation = isset( $_POST['operation'] ) && is_string( $_POST['operation'] ) ? sanitize_key( wp_unslash( $_POST['operation'] ) ) : '';
@@ -26,34 +26,34 @@ final class ApprovedSettingAction {
 			'restore-file-editor' => $this->restoreFileEditor(),
 			'hide-debug-display' => $this->hideDebugDisplay(),
 			'restore-debug-display' => $this->restoreDebugDisplay(),
-			'enable-login-confirm' => $this->writeGate( 'amsec_login_confirm', ApprovedSetting::gateOn( $this->gateValue( 'amsec_login_confirm' ) ) ),
-			'disable-login-confirm' => $this->writeGate( 'amsec_login_confirm', ApprovedSetting::gateOff( $this->gateValue( 'amsec_login_confirm' ) ) ),
-			'enable-common-passwords' => $this->writeGate( 'amsec_common_passwords', ApprovedSetting::gateOn( $this->gateValue( 'amsec_common_passwords' ) ) ),
-			'disable-common-passwords' => $this->writeGate( 'amsec_common_passwords', ApprovedSetting::gateOff( $this->gateValue( 'amsec_common_passwords' ) ) ),
-			'enable-login-hints' => $this->writeGate( 'amsec_generic_login_errors', ApprovedSetting::gateOn( $this->gateValue( 'amsec_generic_login_errors' ) ) ),
-			'disable-login-hints' => $this->writeGate( 'amsec_generic_login_errors', ApprovedSetting::gateOff( $this->gateValue( 'amsec_generic_login_errors' ) ) ),
-			'enable-author-archives' => $this->writeGate( 'amsec_hide_author_archives', ApprovedSetting::gateOn( $this->gateValue( 'amsec_hide_author_archives' ) ) ),
-			'disable-author-archives' => $this->writeGate( 'amsec_hide_author_archives', ApprovedSetting::gateOff( $this->gateValue( 'amsec_hide_author_archives' ) ) ),
-			'enable-rest-users' => $this->writeGate( 'amsec_hide_rest_users', ApprovedSetting::gateOn( $this->gateValue( 'amsec_hide_rest_users' ) ) ),
-			'disable-rest-users' => $this->writeGate( 'amsec_hide_rest_users', ApprovedSetting::gateOff( $this->gateValue( 'amsec_hide_rest_users' ) ) ),
-			'enable-version-tag' => $this->writeGate( 'amsec_hide_generator', ApprovedSetting::gateOn( $this->gateValue( 'amsec_hide_generator' ) ) ),
-			'disable-version-tag' => $this->writeGate( 'amsec_hide_generator', ApprovedSetting::gateOff( $this->gateValue( 'amsec_hide_generator' ) ) ),
-			'enable-discovery-links' => $this->writeGate( 'amsec_hide_discovery_links', ApprovedSetting::gateOn( $this->gateValue( 'amsec_hide_discovery_links' ) ) ),
-			'disable-discovery-links' => $this->writeGate( 'amsec_hide_discovery_links', ApprovedSetting::gateOff( $this->gateValue( 'amsec_hide_discovery_links' ) ) ),
-			'disable-application-passwords' => $this->writeGate( 'amsec_disable_application_passwords', ApprovedSetting::gateOn( $this->gateValue( 'amsec_disable_application_passwords' ) ) ),
-			'enable-application-passwords' => $this->writeGate( 'amsec_disable_application_passwords', ApprovedSetting::gateOff( $this->gateValue( 'amsec_disable_application_passwords' ) ) ),
+			'enable-login-confirm' => $this->writeGate( 'ironlatch_login_confirm', ApprovedSetting::gateOn( $this->gateValue( 'ironlatch_login_confirm' ) ) ),
+			'disable-login-confirm' => $this->writeGate( 'ironlatch_login_confirm', ApprovedSetting::gateOff( $this->gateValue( 'ironlatch_login_confirm' ) ) ),
+			'enable-common-passwords' => $this->writeGate( 'ironlatch_common_passwords', ApprovedSetting::gateOn( $this->gateValue( 'ironlatch_common_passwords' ) ) ),
+			'disable-common-passwords' => $this->writeGate( 'ironlatch_common_passwords', ApprovedSetting::gateOff( $this->gateValue( 'ironlatch_common_passwords' ) ) ),
+			'enable-login-hints' => $this->writeGate( 'ironlatch_generic_login_errors', ApprovedSetting::gateOn( $this->gateValue( 'ironlatch_generic_login_errors' ) ) ),
+			'disable-login-hints' => $this->writeGate( 'ironlatch_generic_login_errors', ApprovedSetting::gateOff( $this->gateValue( 'ironlatch_generic_login_errors' ) ) ),
+			'enable-author-archives' => $this->writeGate( 'ironlatch_hide_author_archives', ApprovedSetting::gateOn( $this->gateValue( 'ironlatch_hide_author_archives' ) ) ),
+			'disable-author-archives' => $this->writeGate( 'ironlatch_hide_author_archives', ApprovedSetting::gateOff( $this->gateValue( 'ironlatch_hide_author_archives' ) ) ),
+			'enable-rest-users' => $this->writeGate( 'ironlatch_hide_rest_users', ApprovedSetting::gateOn( $this->gateValue( 'ironlatch_hide_rest_users' ) ) ),
+			'disable-rest-users' => $this->writeGate( 'ironlatch_hide_rest_users', ApprovedSetting::gateOff( $this->gateValue( 'ironlatch_hide_rest_users' ) ) ),
+			'enable-version-tag' => $this->writeGate( 'ironlatch_hide_generator', ApprovedSetting::gateOn( $this->gateValue( 'ironlatch_hide_generator' ) ) ),
+			'disable-version-tag' => $this->writeGate( 'ironlatch_hide_generator', ApprovedSetting::gateOff( $this->gateValue( 'ironlatch_hide_generator' ) ) ),
+			'enable-discovery-links' => $this->writeGate( 'ironlatch_hide_discovery_links', ApprovedSetting::gateOn( $this->gateValue( 'ironlatch_hide_discovery_links' ) ) ),
+			'disable-discovery-links' => $this->writeGate( 'ironlatch_hide_discovery_links', ApprovedSetting::gateOff( $this->gateValue( 'ironlatch_hide_discovery_links' ) ) ),
+			'disable-application-passwords' => $this->writeGate( 'ironlatch_disable_application_passwords', ApprovedSetting::gateOn( $this->gateValue( 'ironlatch_disable_application_passwords' ) ) ),
+			'enable-application-passwords' => $this->writeGate( 'ironlatch_disable_application_passwords', ApprovedSetting::gateOff( $this->gateValue( 'ironlatch_disable_application_passwords' ) ) ),
 			default => false,
 		};
 		if ( ! $changed ) {
-			wp_die( esc_html__( 'That setting was not changed.', 'amsec-security-scanner' ), '', array( 'response' => 409 ) );
+			wp_die( esc_html__( 'That setting was not changed.', 'ironlatch-security-scanner' ), '', array( 'response' => 409 ) );
 		}
 		try {
 			( new LocalHardeningScanService() )->run();
 		} catch ( Throwable ) {
-			wp_safe_redirect( admin_url( 'admin.php?page=amsec-security-scanner#amsec-start-title' ) );
+			wp_safe_redirect( admin_url( 'admin.php?page=ironlatch-security-scanner#ironlatch-start-title' ) );
 			exit;
 		}
-		wp_safe_redirect( admin_url( 'admin.php?page=amsec-security-scanner#amsec-start-title' ) );
+		wp_safe_redirect( admin_url( 'admin.php?page=ironlatch-security-scanner#ironlatch-start-title' ) );
 		exit;
 	}
 
@@ -69,7 +69,7 @@ final class ApprovedSettingAction {
 		if ( '' === ApprovedSetting::fileEditorOption( defined( 'DISALLOW_FILE_EDIT' ) ) ) {
 			return false;
 		}
-		if ( true !== update_option( 'amsec_disallow_file_edit', '1' ) && '1' !== get_option( 'amsec_disallow_file_edit', '0' ) ) {
+		if ( true !== update_option( 'ironlatch_disallow_file_edit', '1' ) && '1' !== get_option( 'ironlatch_disallow_file_edit', '0' ) ) {
 			return false;
 		}
 		if ( ! defined( 'DISALLOW_FILE_EDIT' ) ) {
@@ -79,20 +79,20 @@ final class ApprovedSettingAction {
 	}
 
 	private function restoreFileEditor(): bool {
-		$current = get_option( 'amsec_disallow_file_edit', '0' );
+		$current = get_option( 'ironlatch_disallow_file_edit', '0' );
 		$next    = ApprovedSetting::fileEditorRestore( is_string( $current ) ? $current : '' );
-		return '' !== $next && true === update_option( 'amsec_disallow_file_edit', $next );
+		return '' !== $next && true === update_option( 'ironlatch_disallow_file_edit', $next );
 	}
 
 	private function hideDebugDisplay(): bool {
 		if ( ! defined( 'WP_DEBUG' ) || ! WP_DEBUG || ! defined( 'WP_DEBUG_DISPLAY' ) || ! WP_DEBUG_DISPLAY ) {
 			return false;
 		}
-		$current = get_option( 'amsec_hide_debug_display', '0' );
+		$current = get_option( 'ironlatch_hide_debug_display', '0' );
 		if ( '' === ApprovedSetting::debugHide( is_string( $current ) ? $current : '0' ) ) {
 			return false;
 		}
-		if ( true !== update_option( 'amsec_hide_debug_display', '1' ) && '1' !== get_option( 'amsec_hide_debug_display', '0' ) ) {
+		if ( true !== update_option( 'ironlatch_hide_debug_display', '1' ) && '1' !== get_option( 'ironlatch_hide_debug_display', '0' ) ) {
 			return false;
 		}
 		// phpcs:ignore WordPress.PHP.IniSet.display_errors_Disallowed, PluginCheck.CodeAnalysis.PHPErrorReporting.IniDirectiveDisplay_errors, Squiz.PHP.DiscouragedFunctions.Discouraged -- Approved display hide. This does not edit wp-config.php.
@@ -101,9 +101,9 @@ final class ApprovedSettingAction {
 	}
 
 	private function restoreDebugDisplay(): bool {
-		$current = get_option( 'amsec_hide_debug_display', '0' );
+		$current = get_option( 'ironlatch_hide_debug_display', '0' );
 		$next    = ApprovedSetting::debugRestore( is_string( $current ) ? $current : '' );
-		return '' !== $next && true === update_option( 'amsec_hide_debug_display', $next );
+		return '' !== $next && true === update_option( 'ironlatch_hide_debug_display', $next );
 	}
 
 	private function gateValue( string $option ): string {

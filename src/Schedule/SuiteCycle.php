@@ -9,7 +9,7 @@ defined( 'ABSPATH' ) || exit;
 use AmazingPlugins\Security\Integrity\OptionGateway;
 
 final class SuiteCycle {
-	private const OPTION = 'amsec_suite_cycle';
+	private const OPTION = 'ironlatch_suite_cycle';
 
 	public function __construct( private readonly OptionGateway $options ) {}
 

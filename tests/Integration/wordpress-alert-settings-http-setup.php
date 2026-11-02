@@ -1,8 +1,8 @@
 <?php
 
 // Run only with wp eval-file on a disposable WordPress site.
-$login = getenv( 'AMSEC_TEST_LOGIN' );
-$password = getenv( 'AMSEC_TEST_PASSWORD' );
+$login = getenv( 'IRONLATCH_TEST_LOGIN' );
+$password = getenv( 'IRONLATCH_TEST_PASSWORD' );
 if ( ! is_string( $login ) || ! is_string( $password ) || '' === $login || '' === $password ) {
 	throw new RuntimeException( 'Missing test credentials.' );
 }

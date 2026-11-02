@@ -50,8 +50,8 @@ final class AccountExposure {
 			return $result;
 		}
 		return new \WP_Error(
-			'amsec_rest_users',
-			__( 'You must be logged in to list accounts.', 'amsec-security-scanner' ),
+			'ironlatch_rest_users',
+			__( 'You must be logged in to list accounts.', 'ironlatch-security-scanner' ),
 			array( 'status' => 401 )
 		);
 	}

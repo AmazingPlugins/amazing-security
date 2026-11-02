@@ -36,9 +36,9 @@ final class FileModesCheck implements SecurityCheck {
 		}
 		$state   = $warn > 0 ? State::WARN : ( $unknown > 0 || array() === $rows ? State::UNKNOWN : State::PASS );
 		$summary = match ( $state ) {
-			State::WARN => __( 'A listed location is world-writable, or the configuration file is world-readable. Ask the host before changing modes.', 'amsec-security-scanner' ),
-			State::UNKNOWN => __( 'A listed location could not be read. Ask the host to review it.', 'amsec-security-scanner' ),
-			default => __( 'No selected world-write or configuration world-read mode was found.', 'amsec-security-scanner' ),
+			State::WARN => __( 'A listed location is world-writable, or the configuration file is world-readable. Ask the host before changing modes.', 'ironlatch-security-scanner' ),
+			State::UNKNOWN => __( 'A listed location could not be read. Ask the host to review it.', 'ironlatch-security-scanner' ),
+			default => __( 'No selected world-write or configuration world-read mode was found.', 'ironlatch-security-scanner' ),
 		};
 		return array(
 			new CheckResult(

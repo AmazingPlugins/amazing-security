@@ -13,57 +13,57 @@ use AmazingPlugins\Security\Hardening\UploadsRule;
 final class UploadsRulePage {
 	public function register(): void {
 		add_submenu_page(
-			'amsec-security-scanner',
-			__( 'PHP in uploads', 'amsec-security-scanner' ),
-			__( 'PHP in uploads', 'amsec-security-scanner' ),
+			'ironlatch-security-scanner',
+			__( 'PHP in uploads', 'ironlatch-security-scanner' ),
+			__( 'PHP in uploads', 'ironlatch-security-scanner' ),
 			'manage_options',
-			'amsec-uploads',
+			'ironlatch-uploads',
 			array( $this, 'render' )
 		);
 	}
 
 	public function render(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'Administrator access required.', 'amsec-security-scanner' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'Administrator access required.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );
 		}
 		$rule = UploadsExecutionCheck::classify( $this->current() );
-		echo '<div class="wrap amsec-security-scanner-admin">';
-		echo '<h1>' . esc_html__( 'PHP in the uploads folder', 'amsec-security-scanner' ) . '</h1>';
-		echo '<p>' . esc_html__( 'WordPress stores pictures and documents in uploads. Some servers will also run a PHP file that lands there. This plugin does not write a test file, and it cannot prove what this server will do.', 'amsec-security-scanner' ) . '</p>';
-		echo '<p>' . esc_html__( 'If the site uses Apache, you can add the rule below. Nginx and some hosts ignore that file. Ask the host if you are not sure.', 'amsec-security-scanner' ) . '</p>';
+		echo '<div class="wrap ironlatch-security-scanner-admin">';
+		echo '<h1>' . esc_html__( 'PHP in the uploads folder', 'ironlatch-security-scanner' ) . '</h1>';
+		echo '<p>' . esc_html__( 'WordPress stores pictures and documents in uploads. Some servers will also run a PHP file that lands there. This plugin does not write a test file, and it cannot prove what this server will do.', 'ironlatch-security-scanner' ) . '</p>';
+		echo '<p>' . esc_html__( 'If the site uses Apache, you can add the rule below. Nginx and some hosts ignore that file. Ask the host if you are not sure.', 'ironlatch-security-scanner' ) . '</p>';
 		if ( '' !== $rule ) {
-			echo '<p>' . esc_html__( 'A local uploads rule is already there. That still does not prove the server refuses PHP.', 'amsec-security-scanner' ) . '</p>';
+			echo '<p>' . esc_html__( 'A local uploads rule is already there. That still does not prove the server refuses PHP.', 'ironlatch-security-scanner' ) . '</p>';
 		}
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only result after the confirmed write.
-		$notice = isset( $_GET['amsec_uploads'] ) ? sanitize_key( wp_unslash( $_GET['amsec_uploads'] ) ) : '';
+		$notice = isset( $_GET['ironlatch_uploads'] ) ? sanitize_key( wp_unslash( $_GET['ironlatch_uploads'] ) ) : '';
 		if ( 'added' === $notice ) {
-			echo '<div class="notice notice-success"><p>' . esc_html__( 'The Apache rule was added. Ask the host whether this server reads it.', 'amsec-security-scanner' ) . '</p></div>';
+			echo '<div class="notice notice-success"><p>' . esc_html__( 'The Apache rule was added. Ask the host whether this server reads it.', 'ironlatch-security-scanner' ) . '</p></div>';
 		} elseif ( 'present' === $notice ) {
-			echo '<div class="notice notice-info"><p>' . esc_html__( 'A rule was already present. Nothing was written.', 'amsec-security-scanner' ) . '</p></div>';
+			echo '<div class="notice notice-info"><p>' . esc_html__( 'A rule was already present. Nothing was written.', 'ironlatch-security-scanner' ) . '</p></div>';
 		} elseif ( 'failed' === $notice ) {
-			echo '<div class="notice notice-error"><p>' . esc_html__( 'The rule could not be written. Ask the host to add it.', 'amsec-security-scanner' ) . '</p></div>';
+			echo '<div class="notice notice-error"><p>' . esc_html__( 'The rule could not be written. Ask the host to add it.', 'ironlatch-security-scanner' ) . '</p></div>';
 		}
 		echo '<pre>' . esc_html( UploadsRule::snippet() ) . '</pre>';
 		if ( ! is_ssl() ) {
-			echo '<p>' . esc_html__( 'Open this page over HTTPS to add the rule.', 'amsec-security-scanner' ) . '</p></div>';
+			echo '<p>' . esc_html__( 'Open this page over HTTPS to add the rule.', 'ironlatch-security-scanner' ) . '</p></div>';
 			return;
 		}
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
-		echo '<input type="hidden" name="action" value="amsec_uploads_rule">';
-		wp_nonce_field( 'amsec_uploads_rule' );
-		echo '<p><label><input type="checkbox" name="confirm" value="1" required> ' . esc_html__( 'Add this Apache rule to the uploads folder.', 'amsec-security-scanner' ) . '</label></p>';
-		submit_button( __( 'Add the Apache rule', 'amsec-security-scanner' ) );
+		echo '<input type="hidden" name="action" value="ironlatch_uploads_rule">';
+		wp_nonce_field( 'ironlatch_uploads_rule' );
+		echo '<p><label><input type="checkbox" name="confirm" value="1" required> ' . esc_html__( 'Add this Apache rule to the uploads folder.', 'ironlatch-security-scanner' ) . '</label></p>';
+		submit_button( __( 'Add the Apache rule', 'ironlatch-security-scanner' ) );
 		echo '</form></div>';
 	}
 
 	public function save(): void {
 		if ( ! current_user_can( 'manage_options' ) || ! is_ssl() ) {
-			wp_die( esc_html__( 'HTTPS and administrator access are required.', 'amsec-security-scanner' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'HTTPS and administrator access are required.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );
 		}
-		check_admin_referer( 'amsec_uploads_rule' );
+		check_admin_referer( 'ironlatch_uploads_rule' );
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce checked above.
 		if ( '1' !== ( isset( $_POST['confirm'] ) ? sanitize_text_field( wp_unslash( $_POST['confirm'] ) ) : '' ) ) {
-			wp_die( esc_html__( 'Confirm the rule before it is written.', 'amsec-security-scanner' ), '', array( 'response' => 400 ) );
+			wp_die( esc_html__( 'Confirm the rule before it is written.', 'ironlatch-security-scanner' ), '', array( 'response' => 400 ) );
 		}
 		$path   = $this->path();
 		$result = 'failed';
@@ -78,7 +78,7 @@ final class UploadsRulePage {
 				$result = 'added';
 			}
 		}
-		wp_safe_redirect( admin_url( 'admin.php?page=amsec-uploads&amsec_uploads=' . $result ) );
+		wp_safe_redirect( admin_url( 'admin.php?page=ironlatch-uploads&ironlatch_uploads=' . $result ) );
 		exit;
 	}
 

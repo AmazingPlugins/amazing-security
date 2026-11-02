@@ -9,7 +9,7 @@ use RuntimeException;
 final class TrafficRepository {
 	private readonly string $table;
 	public function __construct( private readonly object $db ) {
-		$this->table = $db->prefix . 'amsec_traffic'; }
+		$this->table = $db->prefix . 'ironlatch_traffic'; }
 	public function append( TrafficEvent $event, string $revision ): bool {
 		try {
 			return $this->quiet( fn(): bool=>$this->appendQuiet( $event, $revision ) );
@@ -17,7 +17,7 @@ final class TrafficRepository {
 			return false; }
 	}
 	private function appendQuiet( TrafficEvent $event, string $revision ): bool {
-		$lock = 'amsec_traffic_' . substr( hash( 'sha256', $this->table . ( defined( 'DB_NAME' ) ? DB_NAME : '' ) ), 0, 32 );
+		$lock = 'ironlatch_traffic_' . substr( hash( 'sha256', $this->table . ( defined( 'DB_NAME' ) ? DB_NAME : '' ) ), 0, 32 );
 	 // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Zero-wait lock bounds concurrent quota admission.
 		if ( '1' !== (string) $this->db->get_var( $this->db->prepare( 'SELECT GET_LOCK(%s, 0)', $lock ) ) ) {
 			return false; }
@@ -38,7 +38,7 @@ final class TrafficRepository {
 				return false; }
 			$row = $event->row();
 		 // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Exact fresh-policy guard in the same insert prevents stale revision admission after another request disables collection.
-			$written = $this->db->query( $this->db->prepare( "INSERT INTO {$this->table} (created_at,method,category,status,decision) SELECT %d,%s,%s,%d,%s FROM {$this->db->options} WHERE option_name=%s AND BINARY option_value=BINARY %s", $row['created_at'], $row['method'], $row['category'], $row['status'], $row['decision'], 'amsec_traffic_policy', $raw ) );
+			$written = $this->db->query( $this->db->prepare( "INSERT INTO {$this->table} (created_at,method,category,status,decision) SELECT %d,%s,%s,%d,%s FROM {$this->db->options} WHERE option_name=%s AND BINARY option_value=BINARY %s", $row['created_at'], $row['method'], $row['category'], $row['status'], $row['decision'], 'ironlatch_traffic_policy', $raw ) );
 			$this->checkError();
 			return 1 === $written;
 		} finally {
@@ -54,7 +54,7 @@ final class TrafficRepository {
 	}
 	private function freshRaw(): mixed {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Policy revocation must bypass this request's options cache.
-		$raw = $this->db->get_var( $this->db->prepare( "SELECT option_value FROM {$this->db->options} WHERE option_name=%s LIMIT 1", 'amsec_traffic_policy' ) );
+		$raw = $this->db->get_var( $this->db->prepare( "SELECT option_value FROM {$this->db->options} WHERE option_name=%s LIMIT 1", 'ironlatch_traffic_policy' ) );
 		$this->checkError();
 		return $raw;
 	}

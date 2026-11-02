@@ -15,13 +15,13 @@ use RuntimeException;
 use Throwable;
 
 final class LocalSchedule {
-	private const STATE_OPTION = 'amsec_local_schedule_state';
+	private const STATE_OPTION = 'ironlatch_local_schedule_state';
 	private readonly Closure $run;
 	private readonly Closure $nextEvent;
 
 	public function __construct( private readonly OptionGateway $options, ?callable $run = null, ?callable $nextEvent = null ) {
 		$this->run       = Closure::fromCallable( $run ?? static fn(): ScanRun => ( new LocalHardeningScanService() )->run() );
-		$this->nextEvent = Closure::fromCallable( $nextEvent ?? static fn(): int|false => function_exists( 'wp_next_scheduled' ) ? wp_next_scheduled( 'amsec_local_daily_scan' ) : false );
+		$this->nextEvent = Closure::fromCallable( $nextEvent ?? static fn(): int|false => function_exists( 'wp_next_scheduled' ) ? wp_next_scheduled( 'ironlatch_local_daily_scan' ) : false );
 	}
 
 	public function status( int $now ): array {
@@ -54,7 +54,7 @@ final class LocalSchedule {
 	}
 
 	public function tick( int $now ): bool {
-		$lock = new WorkerLock( $this->options, 'amsec_schedule_lock' );
+		$lock = new WorkerLock( $this->options, 'ironlatch_schedule_lock' );
 		if ( ! $lock->acquire( 'local-' . $now ) ) {
 			return false;
 		}

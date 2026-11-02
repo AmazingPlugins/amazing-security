@@ -67,9 +67,9 @@ final class KnownHolesCheck implements SecurityCheck {
 
 	/** @return array{enabled: string, stored: string, found: int} */
 	public static function wordpressSnapshot(): array {
-		$flag    = get_option( 'amsec_security_scanner_vulnerability_direct_enabled', null );
+		$flag    = get_option( 'ironlatch_security_scanner_vulnerability_direct_enabled', null );
 		$enabled = '1' === $flag ? 'yes' : ( in_array( $flag, array( '0', '', false, null ), true ) ? 'no' : 'unknown' );
-		$raw     = get_option( 'amsec_security_scanner_vulnerability_current', null );
+		$raw     = get_option( 'ironlatch_security_scanner_vulnerability_current', null );
 		if ( ! is_string( $raw ) || '' === $raw ) {
 			return array(
 				'enabled' => $enabled,
@@ -103,13 +103,13 @@ final class KnownHolesCheck implements SecurityCheck {
 
 	private static function summary( string $enabled, string $stored ): string {
 		$text = match ( true ) {
-			'unknown' === $enabled => __( 'Vulnerability check status could not be read.', 'amsec-security-scanner' ),
-			'no' === $enabled => __( 'Known holes in installed plugins and themes are not being checked. Turn on vulnerability checks on this page when you want this site to ask the provider.', 'amsec-security-scanner' ),
-			'found' === $stored => __( 'A published issue matches an installed package. Review the vulnerability section on this page.', 'amsec-security-scanner' ),
-			'none' === $stored => __( 'Vulnerability checks are on, and no result is stored yet. Use Check installed versions on this page.', 'amsec-security-scanner' ),
-			'clean' === $stored => __( 'The last stored vulnerability check did not match a published issue to an installed package.', 'amsec-security-scanner' ),
-			'partial' === $stored => __( 'The last vulnerability check did not finish every package. Continue it from this page.', 'amsec-security-scanner' ),
-			default => __( 'The stored vulnerability result could not be read.', 'amsec-security-scanner' ),
+			'unknown' === $enabled => __( 'Vulnerability check status could not be read.', 'ironlatch-security-scanner' ),
+			'no' === $enabled => __( 'Known holes in installed plugins and themes are not being checked. Turn on vulnerability checks on this page when you want this site to ask the provider.', 'ironlatch-security-scanner' ),
+			'found' === $stored => __( 'A published issue matches an installed package. Review the vulnerability section on this page.', 'ironlatch-security-scanner' ),
+			'none' === $stored => __( 'Vulnerability checks are on, and no result is stored yet. Use Check installed versions on this page.', 'ironlatch-security-scanner' ),
+			'clean' === $stored => __( 'The last stored vulnerability check did not match a published issue to an installed package.', 'ironlatch-security-scanner' ),
+			'partial' === $stored => __( 'The last vulnerability check did not finish every package. Continue it from this page.', 'ironlatch-security-scanner' ),
+			default => __( 'The stored vulnerability result could not be read.', 'ironlatch-security-scanner' ),
 		};
 		return $text . ' This check does not contact the provider.';
 	}

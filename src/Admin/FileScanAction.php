@@ -26,7 +26,7 @@ use Throwable;
 
 final class FileScanAction {
 	public function start(): void {
-		$this->authorize( 'amsec_security_scanner_file_scan_start' );
+		$this->authorize( 'ironlatch_security_scanner_file_scan_start' );
 		$store  = new WordPressFileScanStore( new WordPressOptions() );
 		$scanId = wp_generate_uuid4();
 		$cursor = new FileScanCursor( $scanId );
@@ -37,7 +37,7 @@ final class FileScanAction {
 	}
 
 	public function resume(): void {
-		$this->authorize( 'amsec_security_scanner_file_scan_resume' );
+		$this->authorize( 'ironlatch_security_scanner_file_scan_resume' );
 		$store    = new WordPressFileScanStore( new WordPressOptions() );
 		$progress = $store->latestProgress();
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce was checked above.
@@ -97,14 +97,14 @@ final class FileScanAction {
 
 	private function authorize( string $nonceAction ): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'You are not allowed to run a file scan.', 'amsec-security-scanner' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'You are not allowed to run a file scan.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );
 		}
 		check_admin_referer( $nonceAction );
 	}
 
 	private function execute( WordPressFileScanStore $store, FileScanCursor $cursor, bool $isStart ): bool {
 		$options = new WordPressOptions();
-		$lock    = new WorkerLock( $options, 'amsec_security_scanner_file_scan_worker_lock' );
+		$lock    = new WorkerLock( $options, 'ironlatch_security_scanner_file_scan_worker_lock' );
 		if ( ! $lock->acquire( $cursor->scanId ) ) {
 			return true;
 		}
@@ -170,8 +170,8 @@ final class FileScanAction {
 	}
 
 	private function scheduleNext( int $delay = 60 ): void {
-		if ( ! wp_next_scheduled( 'amsec_file_tick' ) ) {
-			wp_schedule_single_event( time() + $delay, 'amsec_file_tick' );
+		if ( ! wp_next_scheduled( 'ironlatch_file_tick' ) ) {
+			wp_schedule_single_event( time() + $delay, 'ironlatch_file_tick' );
 		}
 	}
 
@@ -208,7 +208,7 @@ final class FileScanAction {
 				'version'    => (string) ( $data['Version'] ?? '' ),
 				'root'       => WP_PLUGIN_DIR . '/' . $slug,
 				'update_uri' => (string) ( $data['UpdateURI'] ?? '' ),
-				'local_only' => plugin_basename( AMSEC_SECURITY_SCANNER_FILE ) === $file,
+				'local_only' => plugin_basename( IRONLATCH_SECURITY_SCANNER_FILE ) === $file,
 			);
 		}
 		return $plugins;
@@ -233,7 +233,7 @@ final class FileScanAction {
 	}
 
 	private function redirect( bool $error ): never {
-		wp_safe_redirect( admin_url( 'admin.php?page=amsec-file-checks' . ( $error ? '&amsec_security_scanner_file_scan_error=1' : '' ) . '#amsec-file-scan' ) );
+		wp_safe_redirect( admin_url( 'admin.php?page=ironlatch-file-checks' . ( $error ? '&ironlatch_security_scanner_file_scan_error=1' : '' ) . '#ironlatch-file-scan' ) );
 		exit;
 	}
 }

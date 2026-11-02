@@ -9,7 +9,7 @@ use AmazingPlugins\Security\Integrity\OptionGateway;
 final class FreshSecurityOptions implements OptionGateway {
 	public function __construct( private readonly object $db, private readonly OptionGateway $writes ) {}
 	public function get( string $key ): mixed {
-		if ( ! in_array( $key, array( 'amsec_network_policy', 'amsec_proxy_policy', 'amsec_passkey_policy' ), true ) ) {
+		if ( ! in_array( $key, array( 'ironlatch_network_policy', 'ironlatch_proxy_policy', 'ironlatch_passkey_policy' ), true ) ) {
 			return $this->writes->get( $key ); }
 		$previous = $this->db->suppress_errors( true );
 		try {

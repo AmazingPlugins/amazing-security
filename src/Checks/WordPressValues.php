@@ -34,7 +34,7 @@ final class WordPressValues implements Values {
 	}
 
 	public function debugHiddenByPlugin(): bool {
-		return '1' === get_option( 'amsec_hide_debug_display', '0' );
+		return '1' === get_option( 'ironlatch_hide_debug_display', '0' );
 	}
 
 	public function fileEditorDisabled(): ?bool {
@@ -42,7 +42,7 @@ final class WordPressValues implements Values {
 	}
 
 	public function fileEditorFix(): string {
-		$ours = '1' === get_option( 'amsec_disallow_file_edit', '0' );
+		$ours = '1' === get_option( 'ironlatch_disallow_file_edit', '0' );
 		if ( ! defined( 'DISALLOW_FILE_EDIT' ) ) {
 			return 'plugin';
 		}
