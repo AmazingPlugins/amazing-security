@@ -12,6 +12,6 @@ final class LoginFormFields {
 	}
 
 	public function step(): void {
-		echo '<p class="amsec-login-factor"><label for="amsec-otp">' . esc_html__( 'Verification or recovery code', 'amsec-security-scanner' ) . '</label><input class="input" type="text" id="amsec-otp" name="amsec_otp" inputmode="numeric" autocomplete="one-time-code" maxlength="24"></p>';
+		echo '<p class="ironlatch-login-factor"><label for="ironlatch-otp">' . esc_html__( 'Verification or recovery code', 'ironlatch-security-scanner' ) . '</label><input class="input" type="text" id="ironlatch-otp" name="ironlatch_otp" inputmode="numeric" autocomplete="one-time-code" maxlength="24"></p>';
 	}
 }

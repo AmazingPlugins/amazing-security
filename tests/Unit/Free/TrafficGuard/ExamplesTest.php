@@ -19,7 +19,7 @@ final class ExamplesTest extends TestCase {
 		$current = array(
 			'host'     => '127.0.0.1',
 			'agent'    => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36',
-			'referrer' => 'https://127.0.0.1:18890/wp-admin/admin.php?page=amsec-traffic-guard',
+			'referrer' => 'https://127.0.0.1:18890/wp-admin/admin.php?page=ironlatch-traffic-guard',
 		);
 		foreach ( $packs as $kind => $lines ) {
 			self::assertNotSame( array(), $lines );

@@ -36,8 +36,8 @@ final class FixApprovalActionTest extends TestCase {
 		self::assertStringContainsString( 'applied but could not be verified', $html );
 		self::assertStringContainsString( '<dt>Previous</dt>', $html );
 		self::assertStringContainsString( '<dt>Applied</dt>', $html );
-		self::assertStringContainsString( 'name="action" value="amsec_fix_rollback"', $html );
-		self::assertStringNotContainsString( 'name="action" value="amsec_fix_approve"', $html );
+		self::assertStringContainsString( 'name="action" value="ironlatch_fix_rollback"', $html );
+		self::assertStringNotContainsString( 'name="action" value="ironlatch_fix_approve"', $html );
 	}
 
 	public function test_stale_live_setting_is_visible_and_cannot_be_approved(): void {
@@ -45,6 +45,6 @@ final class FixApprovalActionTest extends TestCase {
 		$html = ( new FixReviewPage() )->html( $proposal, 'abc', 'https://example.test/wp-admin/admin-post.php', true, true, 1100, '', '', 'block' );
 		self::assertStringContainsString( 'The setting changed since this proposal was created', $html );
 		self::assertStringContainsString( '<dt>Current</dt><dd>Block repeated failures</dd>', $html );
-		self::assertStringNotContainsString( 'name="action" value="amsec_fix_approve"', $html );
+		self::assertStringNotContainsString( 'name="action" value="ironlatch_fix_approve"', $html );
 	}
 }

@@ -23,7 +23,7 @@ final class FixProposalServiceTest extends TestCase {
 		self::assertSame( 'pending', $result['state'] );
 		self::assertSame( 'off', $result['before'] );
 		self::assertSame( 'observe', $result['after'] );
-		self::assertSame( 'https://example.test/wp-admin/admin.php?page=amsec-fix-review&proposal=' . $result['proposal_id'], $result['review_url'] );
+		self::assertSame( 'https://example.test/wp-admin/admin.php?page=ironlatch-fix-review&proposal=' . $result['proposal_id'], $result['review_url'] );
 		self::assertCount( 1, $repo->items );
 		self::assertSame( 'not_applicable', $service->propose( str_repeat( 'a', 32 ), 'login-rate-observe', 7, self::NOW )['state'] );
 		self::assertSame( 'invalid_input', $service->propose( $this->findingId(), 'file-delete', 7, self::NOW )['state'] );
@@ -58,7 +58,7 @@ final class FixProposalServiceTest extends TestCase {
 	private function service( FakeFixRepository $repo, string $mode, int $scanTime = self::NOW, string $summary = 'Login rate mode requires review.' ): FixProposalService {
 		$result = new CheckResult( 'login-rate-mode', 'warn', $summary, 'https://developer.wordpress.org/advanced-administration/security/brute-force/', new DateTimeImmutable( '@' . $scanTime ), 'high', 'complete', array( 'mode' => $mode ) );
 		$run    = new ScanRun( new DateTimeImmutable( '@' . $scanTime ), new DateTimeImmutable( '@' . $scanTime ), array( $result ), false );
-		return new FixProposalService( $repo, static fn(): ScanRun => $run, static fn(): string => $mode, static fn( string $id ): string => 'https://example.test/wp-admin/admin.php?page=amsec-fix-review&proposal=' . $id );
+		return new FixProposalService( $repo, static fn(): ScanRun => $run, static fn(): string => $mode, static fn( string $id ): string => 'https://example.test/wp-admin/admin.php?page=ironlatch-fix-review&proposal=' . $id );
 	}
 
 	private function findingId(): string {

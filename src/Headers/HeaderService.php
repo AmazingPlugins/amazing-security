@@ -17,7 +17,7 @@ final class HeaderService {
 		$home = ( $this->home )();
 		return is_string( $home ) ? hash( 'sha256', $home ) : ''; }
 	public function status(): array {
-		$this->raw = $this->options->get( 'amsec_headers_state' );
+		$this->raw = $this->options->get( 'ironlatch_headers_state' );
 		if ( null === $this->raw ) {
 			return array(
 				'version'   => 1,
@@ -39,7 +39,7 @@ final class HeaderService {
 	public function check( string $fingerprint, int $now ): string {
 		if ( 1 !== preg_match( '/^[a-f0-9]{64}$/D', $fingerprint ) || $now < 0 ) {
 			return 'changed';}
-		$lock = new WorkerLock( $this->options, 'amsec_headers_lock' );
+		$lock = new WorkerLock( $this->options, 'ironlatch_headers_lock' );
 		if ( ! $lock->acquire( 'header-assessment' ) ) {
 			return 'busy';}
 		try {
@@ -74,7 +74,7 @@ final class HeaderService {
 			$encoded = json_encode( $s, JSON_THROW_ON_ERROR );
 			if ( strlen( $encoded ) > 8192 ) {
 				return 'failed';}
-			$saved = null === $this->raw ? $this->options->add( 'amsec_headers_state', $encoded ) : $this->options->replaceIfSame( 'amsec_headers_state', $this->raw, $encoded );
+			$saved = null === $this->raw ? $this->options->add( 'ironlatch_headers_state', $encoded ) : $this->options->replaceIfSame( 'ironlatch_headers_state', $this->raw, $encoded );
 			return $saved ? 'saved' : 'failed';
 		} finally {
 			$lock->release();}

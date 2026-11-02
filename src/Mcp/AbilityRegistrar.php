@@ -25,10 +25,10 @@ final class AbilityRegistrar {
 	public function registerCategory(): void {
 		if ( function_exists( 'wp_register_ability_category' ) ) {
 			wp_register_ability_category(
-				'amsec-security-scanner',
+				'ironlatch-security-scanner',
 				array(
-					'label'       => 'AmSec Security Scanner',
-					'description' => __( 'Security findings and bounded checks for this site.', 'amsec-security-scanner' ),
+					'label'       => 'Ironlatch Security Scanner',
+					'description' => __( 'Security findings and bounded checks for this site.', 'ironlatch-security-scanner' ),
 				)
 			);
 		}
@@ -122,19 +122,19 @@ final class AbilityRegistrar {
 			),
 		);
 		$labels  = array(
-			'list-findings'  => __( 'List security findings', 'amsec-security-scanner' ),
-			'get-finding'    => __( 'Get a security finding', 'amsec-security-scanner' ),
-			'start-scan'     => __( 'Run local hardening checks', 'amsec-security-scanner' ),
-			'get-scan'       => __( 'Get a local hardening scan', 'amsec-security-scanner' ),
-			'propose-fix'    => __( 'Propose a login protection setting change', 'amsec-security-scanner' ),
-			'get-fix-status' => __( 'Get a proposed fix status', 'amsec-security-scanner' ),
+			'list-findings'  => __( 'List security findings', 'ironlatch-security-scanner' ),
+			'get-finding'    => __( 'Get a security finding', 'ironlatch-security-scanner' ),
+			'start-scan'     => __( 'Run local hardening checks', 'ironlatch-security-scanner' ),
+			'get-scan'       => __( 'Get a local hardening scan', 'ironlatch-security-scanner' ),
+			'propose-fix'    => __( 'Propose a login protection setting change', 'ironlatch-security-scanner' ),
+			'get-fix-status' => __( 'Get a proposed fix status', 'ironlatch-security-scanner' ),
 		);
 		$out     = array();
 		foreach ( $schemas as $short => $schema ) {
-			$out[ 'amsec-security-scanner/' . $short ] = array(
+			$out[ 'ironlatch-security-scanner/' . $short ] = array(
 				'label'               => $labels[ $short ],
-				'description'         => sprintf( /* translators: %s: short description of the assistant ability. */ __( '%s for an authenticated site administrator.', 'amsec-security-scanner' ), $labels[ $short ] ),
-				'category'            => 'amsec-security-scanner',
+				'description'         => sprintf( /* translators: %s: short description of the assistant ability. */ __( '%s for an authenticated site administrator.', 'ironlatch-security-scanner' ), $labels[ $short ] ),
+				'category'            => 'ironlatch-security-scanner',
 				'input_schema'        => $schema,
 				'execute_callback'    => fn( $input = array() ): array => $this->execute( $short, $input ),
 				'permission_callback' => fn(): bool => $this->allowed(),

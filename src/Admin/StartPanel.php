@@ -14,26 +14,26 @@ final class StartPanel {
 	public static function register(): void {
 		add_submenu_page(
 			Submenu::PARENT,
-			__( 'Recommendations', 'amsec-security-scanner' ),
-			__( 'Recommendations', 'amsec-security-scanner' ),
+			__( 'Recommendations', 'ironlatch-security-scanner' ),
+			__( 'Recommendations', 'ironlatch-security-scanner' ),
 			'manage_options',
-			'amsec-recommendations',
+			'ironlatch-recommendations',
 			array( self::class, 'render' )
 		);
 	}
 
 	public static function render(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'Administrator access required.', 'amsec-security-scanner' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'Administrator access required.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );
 		}
-		echo '<div class="wrap amsec-security-scanner-admin">';
-		echo '<h1>' . esc_html__( 'Recommendations', 'amsec-security-scanner' ) . '</h1>';
+		echo '<div class="wrap ironlatch-security-scanner-admin">';
+		echo '<h1>' . esc_html__( 'Recommendations', 'ironlatch-security-scanner' ) . '</h1>';
 		( new AdminPage() )->recommendations();
 		echo '</div>';
 	}
 
 	public static function incident(): void {
-		echo '<section class="amsec-overview"><h2>' . esc_html__( 'If something looks wrong', 'amsec-security-scanner' ) . '</h2><p>' . esc_html__( 'Review administrators, end other sessions, require a new password, then scan again.', 'amsec-security-scanner' ) . ' <a class="button" href="' . esc_url( admin_url( 'admin.php?page=amsec-incident' ) ) . '">' . esc_html__( 'Open incident steps', 'amsec-security-scanner' ) . '</a></p></section>';
+		echo '<section class="ironlatch-overview"><h2>' . esc_html__( 'If something looks wrong', 'ironlatch-security-scanner' ) . '</h2><p>' . esc_html__( 'Review administrators, end other sessions, require a new password, then scan again.', 'ironlatch-security-scanner' ) . ' <a class="button" href="' . esc_url( admin_url( 'admin.php?page=ironlatch-incident' ) ) . '">' . esc_html__( 'Open incident steps', 'ironlatch-security-scanner' ) . '</a></p></section>';
 	}
 
 	/**
@@ -45,9 +45,9 @@ final class StartPanel {
 		$options = self::options();
 		$off     = array();
 		foreach ( Module::rows() as $row ) {
-			$on = ! empty( $row['idle'] ) ? in_array( (string) $options['amsec_idle_minutes'], array( '15', '30', '60' ), true ) : '1' === (string) ( $options[ $row['key'] ] ?? '0' );
+			$on = ! empty( $row['idle'] ) ? in_array( (string) $options['ironlatch_idle_minutes'], array( '15', '30', '60' ), true ) : '1' === (string) ( $options[ $row['key'] ] ?? '0' );
 			// The scan list already offers the switches that live on the Scan page.
-			if ( ! $on && 'amsec-security-scanner' !== $row['page'] ) {
+			if ( ! $on && 'ironlatch-security-scanner' !== $row['page'] ) {
 				$off[] = $row;
 			}
 		}
@@ -60,26 +60,26 @@ final class StartPanel {
 		foreach ( array_keys( Score::FLAGS ) as $key ) {
 			$options[ $key ] = get_option( $key, '0' );
 		}
-		$options['amsec_idle_minutes'] = get_option( 'amsec_idle_minutes', '0' );
+		$options['ironlatch_idle_minutes'] = get_option( 'ironlatch_idle_minutes', '0' );
 		return $options;
 	}
 
 	/** @param list<array<string, mixed>> $off From offRows(). */
 	public static function protections( array $off ): void {
 		$score = Score::tally( self::options() );
-		echo '<section class="amsec-overview" aria-labelledby="amsec-rec-protections"><h2 id="amsec-rec-protections">' . esc_html( __( 'Protections that are off', 'amsec-security-scanner' ) . ' (' . count( $off ) . ')' ) . '</h2>';
+		echo '<section class="ironlatch-overview" aria-labelledby="ironlatch-rec-protections"><h2 id="ironlatch-rec-protections">' . esc_html( __( 'Protections that are off', 'ironlatch-security-scanner' ) . ' (' . count( $off ) . ')' ) . '</h2>';
 		echo '<p>' . esc_html(
 			sprintf(
 				/* translators: 1: protections on, 2: protections counted */
-				__( '%1$d of %2$d protections are on. Each one stays off until you turn it on.', 'amsec-security-scanner' ),
+				__( '%1$d of %2$d protections are on. Each one stays off until you turn it on.', 'ironlatch-security-scanner' ),
 				$score['on'],
 				$score['total']
 			)
-		) . ' <a href="' . esc_url( admin_url( 'admin.php?page=amsec-guide' ) ) . '">' . esc_html__( 'Apply a blog or shop preset', 'amsec-security-scanner' ) . '</a></p>';
+		) . ' <a href="' . esc_url( admin_url( 'admin.php?page=ironlatch-guide' ) ) . '">' . esc_html__( 'Apply a blog or shop preset', 'ironlatch-security-scanner' ) . '</a></p>';
 		if ( array() !== $off ) {
-			echo '<ul class="amsec-start">';
+			echo '<ul class="ironlatch-start">';
 			foreach ( $off as $row ) {
-				echo '<li class="amsec-start-item" data-state="none"><span class="amsec-start-badge">' . esc_html__( 'Off', 'amsec-security-scanner' ) . '</span><span class="amsec-start-copy"><strong>' . esc_html( $row['label'] ) . '</strong></span> <a class="button" href="' . esc_url( admin_url( 'admin.php?page=' . $row['page'] ) . ( isset( $row['hash'] ) ? '#' . $row['hash'] : '' ) ) . '">' . esc_html__( 'Turn on', 'amsec-security-scanner' ) . '</a></li>';
+				echo '<li class="ironlatch-start-item" data-state="none"><span class="ironlatch-start-badge">' . esc_html__( 'Off', 'ironlatch-security-scanner' ) . '</span><span class="ironlatch-start-copy"><strong>' . esc_html( $row['label'] ) . '</strong></span> <a class="button" href="' . esc_url( admin_url( 'admin.php?page=' . $row['page'] ) . ( isset( $row['hash'] ) ? '#' . $row['hash'] : '' ) ) . '">' . esc_html__( 'Turn on', 'ironlatch-security-scanner' ) . '</a></li>';
 			}
 			echo '</ul>';
 		}

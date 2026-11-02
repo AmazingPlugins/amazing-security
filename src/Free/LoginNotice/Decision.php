@@ -8,8 +8,8 @@ defined( 'ABSPATH' ) || exit;
 
 /** Send or skip an administrator sign-in email. No WordPress calls. */
 final class Decision {
-	public const OPTION = 'amsec_login_email';
-	public const META   = 'amsec_login_email_sent';
+	public const OPTION = 'ironlatch_login_email';
+	public const META   = 'ironlatch_login_email_sent';
 	public const GAP    = 3600;
 
 	public static function flag( mixed $value ): string {

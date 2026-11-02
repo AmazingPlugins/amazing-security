@@ -9,7 +9,7 @@ defined( 'ABSPATH' ) || exit;
 use AmazingPlugins\Security\Integrity\OptionGateway;
 
 final class BaselineRepository {
-	public const KEY = 'amsec_custom_baseline_state';
+	public const KEY = 'ironlatch_custom_baseline_state';
 
 	public function __construct( private readonly OptionGateway $options ) {}
 

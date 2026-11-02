@@ -1,10 +1,10 @@
-=== AmSec Security Scanner ===
+=== Ironlatch Security Scanner ===
 Contributors: amazingplugins
 Tags: security, hardening, malware scan, login security, file integrity
 Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 0.1.5
+Stable tag: 0.1.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -12,7 +12,7 @@ Security checks that show their evidence: hardening, file integrity, suspicious 
 
 == Description ==
 
-AmSec Security Scanner scans your site and shows what it found, with the evidence. Nothing changes until you approve it. Every protection is off when you install the plugin, so you choose what to turn on. Nothing runs in the background until you press Scan for the first time. After that, the scan repeats once a day.
+Ironlatch Security Scanner scans your site and shows what it found, with the evidence. Nothing changes until you approve it. Every protection is off when you install the plugin, so you choose what to turn on. Nothing runs in the background until you press Scan for the first time. After that, the scan repeats once a day.
 
 = Scan =
 
@@ -43,15 +43,15 @@ All of these are off until you turn them on. Most are under **Log In & Register*
 
 You need HTTPS and your password to end sessions or change some Traffic settings.
 
-If you get locked out, run `wp amsec-security-scanner login disable` from WP-CLI on the server. It turns off every sign-in check above. Accounts waiting for approval stay waiting.
+If you get locked out, run `wp ironlatch-security-scanner login disable` from WP-CLI on the server. It turns off every sign-in check above. Accounts waiting for approval stay waiting.
 
 = Traffic =
 
-Hostname, browser and referrer block lists, a live request log, hotlink protection, comment and registration limits, REST rate controls, manual network rules, a security headers check, and trusted proxy settings. Each blocking control stays off until you save it, and each can be turned off from WP-CLI. `wp amsec-security-scanner traffic disable` turns off the block lists, live log, hotlink protection, precise blocks and comment checks. `bots disable`, `rest-rates disable`, `network disable` and `proxies disable` cover the rest.
+Hostname, browser and referrer block lists, a live request log, hotlink protection, comment and registration limits, REST rate controls, manual network rules, a security headers check, and trusted proxy settings. Each blocking control stays off until you save it, and each can be turned off from WP-CLI. `wp ironlatch-security-scanner traffic disable` turns off the block lists, live log, hotlink protection, precise blocks and comment checks. `bots disable`, `rest-rates disable`, `network disable` and `proxies disable` cover the rest.
 
 The security headers check reads your homepage's response headers and lists the missing ones. It doesn't add headers.
 
-The REST request watch is on from the start. It only records matches, on your server, and doesn't block requests. Set `AMSEC_DISABLE_FIREWALL` to `true` in `wp-config.php` to stop it.
+The REST request watch is on from the start. It only records matches, on your server, and doesn't block requests. Set `IRONLATCH_DISABLE_FIREWALL` to `true` in `wp-config.php` to stop it.
 
 = Notifications =
 
@@ -92,7 +92,7 @@ Each scan requests your own homepage once to read its response headers, the same
 
 == Installation ==
 
-1. In wp-admin, go to Plugins, Add New, Upload Plugin, and upload the ZIP. Or search for "AmSec Security Scanner".
+1. In wp-admin, go to Plugins, Add New, Upload Plugin, and upload the ZIP. Or search for "Ironlatch Security Scanner".
 2. Activate the plugin and open **Security Scanner** in the admin menu.
 3. Press **Scan**. Then go through Recommendations to choose which protections to turn on.
 
@@ -108,11 +108,11 @@ Local checks stay on your server. See External services for the few lookups that
 
 = What happens when I delete the plugin? =
 
-By default, your settings are kept in case you reinstall. To remove everything, tick **Erase all AmSec Security Scanner settings, logs and scan results when the plugin is deleted** under Log In & Register before you delete the plugin.
+By default, your settings are kept in case you reinstall. To remove everything, tick **Erase all Ironlatch Security Scanner settings, logs and scan results when the plugin is deleted** under Log In & Register before you delete the plugin.
 
 = I'm locked out. What do I do? =
 
-Run `wp amsec-security-scanner login disable` on the server. Other controls have their own commands, such as `wp amsec-security-scanner traffic disable` and `wp amsec-security-scanner network disable`.
+Run `wp ironlatch-security-scanner login disable` on the server. Other controls have their own commands, such as `wp ironlatch-security-scanner traffic disable` and `wp ironlatch-security-scanner network disable`.
 
 == Credits ==
 
@@ -121,17 +121,10 @@ Run `wp amsec-security-scanner login disable` on the server. Other controls have
 
 == Changelog ==
 
-= 0.1.5 =
-* Finished the rename: menu, settings, commands and emails now use the AmSec Security Scanner name. The command is now wp amsec-security-scanner.
-
-= 0.1.4 =
-* Renamed to AmSec Security Scanner (slug amsec-security-scanner).
-
-= 0.1.3 =
-* Renamed to AmazingPlugins Security Scanner.
+= 0.1.6 =
+* Renamed to Ironlatch Security Scanner (slug ironlatch-security-scanner). The command is now wp ironlatch-security-scanner.
 
 = 0.1.2 =
-* Renamed to AmSec Security Scanner.
 * Removed the file repair and recovery tools that replaced, moved or chmodded site files. Scans still report changed files.
 * Theme release ZIPs are now downloaded with WordPress's download_url().
 

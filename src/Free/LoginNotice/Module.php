@@ -11,7 +11,7 @@ final class Module {
 	public static function boot(): void {
 		add_action( 'wp_login', array( self::class, 'afterLogin' ), 10, 2 );
 		add_action( 'admin_menu', array( Page::class, 'menu' ) );
-		add_action( 'admin_post_amsec_login_notice_save', array( Page::class, 'save' ) );
+		add_action( 'admin_post_ironlatch_login_notice_save', array( Page::class, 'save' ) );
 	}
 
 	public static function afterLogin( string $user_login, mixed $user ): void {
@@ -44,7 +44,7 @@ final class Module {
 		}
 		$sent = wp_mail(
 			$email,
-			__( 'Sign-in email', 'amsec-security-scanner' ),
+			__( 'Sign-in email', 'ironlatch-security-scanner' ),
 			Decision::body( $site, $now )
 		);
 		if ( true !== $sent ) {

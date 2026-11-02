@@ -131,7 +131,7 @@ final class SiteWatchCheck implements SecurityCheck {
 			in_array( $status, self::ATTENTION[ $this->checkId ], true ) => State::WARN,
 			default => State::PASS,
 		};
-		$line = self::COPY[ $this->checkId ][ $status ] ?? __( 'The stored setting could not be read.', 'amsec-security-scanner' );
+		$line = self::COPY[ $this->checkId ][ $status ] ?? __( 'The stored setting could not be read.', 'ironlatch-security-scanner' );
 		return array(
 			new CheckResult(
 				$this->id(),
@@ -148,37 +148,37 @@ final class SiteWatchCheck implements SecurityCheck {
 
 	/** @return array{status: string} */
 	public static function findingEmails(): array {
-		return array( 'status' => self::emails( get_option( 'amsec_alerts_enabled', null ) ) );
+		return array( 'status' => self::emails( get_option( 'ironlatch_alerts_enabled', null ) ) );
 	}
 
 	/** @return array{status: string} */
 	public static function weeklyDigest(): array {
-		return array( 'status' => self::digest( get_option( 'amsec_digest_enabled', '0' ) ) );
+		return array( 'status' => self::digest( get_option( 'ironlatch_digest_enabled', '0' ) ) );
 	}
 
 	/** @return array{status: string} */
 	public static function trafficHistory(): array {
-		return array( 'status' => self::traffic( get_option( 'amsec_traffic_policy', null ) ) );
+		return array( 'status' => self::traffic( get_option( 'ironlatch_traffic_policy', null ) ) );
 	}
 
 	/** @return array{status: string} */
 	public static function networkControls(): array {
-		return array( 'status' => self::network( get_option( 'amsec_network_policy', null ) ) );
+		return array( 'status' => self::network( get_option( 'ironlatch_network_policy', null ) ) );
 	}
 
 	/** @return array{status: string} */
 	public static function trustedProxies(): array {
-		return array( 'status' => self::proxies( get_option( 'amsec_proxy_policy', null ) ) );
+		return array( 'status' => self::proxies( get_option( 'ironlatch_proxy_policy', null ) ) );
 	}
 
 	/** @return array{status: string} */
 	public static function securityActivity(): array {
-		return array( 'status' => self::activity( get_option( 'amsec_activity_enabled', '0' ) ) );
+		return array( 'status' => self::activity( get_option( 'ironlatch_activity_enabled', '0' ) ) );
 	}
 
 	/** @return array{status: string} */
 	public static function codeBaselines(): array {
-		return array( 'status' => self::baselines( get_option( 'amsec_custom_baseline_state', null ) ) );
+		return array( 'status' => self::baselines( get_option( 'ironlatch_custom_baseline_state', null ) ) );
 	}
 
 	/** @return array{status: string} */
@@ -218,11 +218,11 @@ final class SiteWatchCheck implements SecurityCheck {
 
 	/** @return array{status: string} */
 	public static function ruleReview(): array {
-		if ( ! defined( 'AMSEC_SECURITY_SCANNER_FILE' ) ) {
+		if ( ! defined( 'IRONLATCH_SECURITY_SCANNER_FILE' ) ) {
 			return array( 'status' => 'unknown' );
 		}
 		try {
-			$packs = ( new RuleCatalog( dirname( AMSEC_SECURITY_SCANNER_FILE ) ) )->status( time() );
+			$packs = ( new RuleCatalog( dirname( IRONLATCH_SECURITY_SCANNER_FILE ) ) )->status( time() );
 		} catch ( Throwable ) {
 			return array( 'status' => 'unknown' );
 		}

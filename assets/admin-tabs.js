@@ -1,25 +1,25 @@
 (function () {
-  var root = document.querySelector('.amsec-security-scanner-admin [data-amsec-tabs]');
+  var root = document.querySelector('.ironlatch-security-scanner-admin [data-ironlatch-tabs]');
   if (!root) {
     return;
   }
-  var buttons = root.querySelectorAll('[data-amsec-tab]');
-  var panels = document.querySelectorAll('.amsec-security-scanner-admin [data-amsec-panel]');
+  var buttons = root.querySelectorAll('[data-ironlatch-tab]');
+  var panels = document.querySelectorAll('.ironlatch-security-scanner-admin [data-ironlatch-panel]');
 
   function show(id) {
     buttons.forEach(function (button) {
-      var on = button.getAttribute('data-amsec-tab') === id;
+      var on = button.getAttribute('data-ironlatch-tab') === id;
       button.classList.toggle('is-current', on);
       button.setAttribute('aria-selected', on ? 'true' : 'false');
       button.tabIndex = on ? 0 : -1;
     });
     panels.forEach(function (panel) {
-      panel.hidden = panel.getAttribute('data-amsec-panel') !== id;
+      panel.hidden = panel.getAttribute('data-ironlatch-panel') !== id;
     });
   }
 
   function select(button) {
-    var id = button.getAttribute('data-amsec-tab');
+    var id = button.getAttribute('data-ironlatch-tab');
     show(id);
     if (window.history && window.history.replaceState) {
       window.history.replaceState(null, '', '#' + id);
@@ -52,7 +52,7 @@
 
   var hash = window.location.hash.replace(/^#/, '');
   var known = Array.prototype.some.call(buttons, function (button) {
-    return button.getAttribute('data-amsec-tab') === hash;
+    return button.getAttribute('data-ironlatch-tab') === hash;
   });
-  show(known ? hash : buttons[0].getAttribute('data-amsec-tab'));
+  show(known ? hash : buttons[0].getAttribute('data-ironlatch-tab'));
 }());

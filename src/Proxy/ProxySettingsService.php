@@ -11,7 +11,7 @@ final class ProxySettingsService {
 	private mixed $raw = null;
 	public function __construct( private readonly OptionGateway $options ) {}
 	public function status(): array {
-		$this->raw = $this->options->get( 'amsec_proxy_policy' );
+		$this->raw = $this->options->get( 'ironlatch_proxy_policy' );
 		return ( new ProxyPolicy() )->read( $this->raw ) ?? array( 'invalid' => true ); }
 	public function fingerprint(): string {
 		$this->status();
@@ -44,7 +44,7 @@ final class ProxySettingsService {
 		$operator = ( new ProxyResolver() )->resolve( $candidate, $server, $peerConfirmed );
 		if ( 'off' !== $mode && null === $operator ) {
 			return 'unknown-operator'; }
-		$network = ( new NetworkPolicy() )->read( $this->options->get( 'amsec_network_policy' ) );
+		$network = ( new NetworkPolicy() )->read( $this->options->get( 'ironlatch_network_policy' ) );
 		if ( null === $network ) {
 			return 'network-invalid'; }
 		if ( 'block' === $network['mode'] ) {
@@ -55,8 +55,8 @@ final class ProxySettingsService {
 						return 'self-lockout'; }
 			}
 		}
-		$ok = null === $this->raw ? $this->options->add( 'amsec_proxy_policy', $encoded ) : $this->options->replaceIfSame( 'amsec_proxy_policy', $this->raw, $encoded );
-		return $ok && $this->options->get( 'amsec_proxy_policy' ) === $encoded ? 'saved' : 'failed';
+		$ok = null === $this->raw ? $this->options->add( 'ironlatch_proxy_policy', $encoded ) : $this->options->replaceIfSame( 'ironlatch_proxy_policy', $this->raw, $encoded );
+		return $ok && $this->options->get( 'ironlatch_proxy_policy' ) === $encoded ? 'saved' : 'failed';
 	}
 	public function disable(): bool {
 	 // phpcs:ignore WordPress.WP.AlternativeFunctions.json_encode_json_encode -- Explicit host recovery returns to host-provided address semantics.
@@ -69,7 +69,7 @@ final class ProxySettingsService {
 			),
 			JSON_THROW_ON_ERROR
 		);
-		$this->options->set( 'amsec_proxy_policy', $raw );
-		return $this->options->get( 'amsec_proxy_policy' ) === $raw;
+		$this->options->set( 'ironlatch_proxy_policy', $raw );
+		return $this->options->get( 'ironlatch_proxy_policy' ) === $raw;
 	}
 }

@@ -9,39 +9,39 @@ defined( 'ABSPATH' ) || exit;
 /** Integrity, file scan, vulnerability checks, and the daily cycle. Hidden from the side menu. */
 final class FollowUpPages {
 	public function register(): void {
-		add_submenu_page( 'amsec-security-scanner', __( 'Integrity and file scan', 'amsec-security-scanner' ), __( 'Integrity and file scan', 'amsec-security-scanner' ), 'manage_options', 'amsec-file-checks', array( $this, 'files' ) );
-		add_submenu_page( 'amsec-security-scanner', __( 'Published vulnerabilities', 'amsec-security-scanner' ), __( 'Published vulnerabilities', 'amsec-security-scanner' ), 'manage_options', 'amsec-vulnerabilities', array( $this, 'vulnerabilities' ) );
-		add_submenu_page( 'amsec-security-scanner', __( 'Daily checks', 'amsec-security-scanner' ), __( 'Daily checks', 'amsec-security-scanner' ), 'manage_options', 'amsec-schedule', array( $this, 'schedule' ) );
+		add_submenu_page( 'ironlatch-security-scanner', __( 'Integrity and file scan', 'ironlatch-security-scanner' ), __( 'Integrity and file scan', 'ironlatch-security-scanner' ), 'manage_options', 'ironlatch-file-checks', array( $this, 'files' ) );
+		add_submenu_page( 'ironlatch-security-scanner', __( 'Published vulnerabilities', 'ironlatch-security-scanner' ), __( 'Published vulnerabilities', 'ironlatch-security-scanner' ), 'manage_options', 'ironlatch-vulnerabilities', array( $this, 'vulnerabilities' ) );
+		add_submenu_page( 'ironlatch-security-scanner', __( 'Daily checks', 'ironlatch-security-scanner' ), __( 'Daily checks', 'ironlatch-security-scanner' ), 'manage_options', 'ironlatch-schedule', array( $this, 'schedule' ) );
 	}
 
 	public function files(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'You are not allowed to view this report.', 'amsec-security-scanner' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'You are not allowed to view this report.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );
 		}
-		echo '<div class="wrap amsec-security-scanner-admin"><h1>' . esc_html__( 'Integrity and file scan', 'amsec-security-scanner' ) . '</h1>';
-		echo '<p>' . esc_html__( 'Compare installed release files, then review unfamiliar PHP. Each scan starts from its own button.', 'amsec-security-scanner' ) . '</p>';
-		$this->notice( 'amsec_security_scanner_integrity_error', __( 'Integrity scan could not finish. The previous completed report remains available.', 'amsec-security-scanner' ) );
-		$this->notice( 'amsec_security_scanner_file_scan_error', __( 'File scan could not finish. The previous completed report remains available.', 'amsec-security-scanner' ) );
+		echo '<div class="wrap ironlatch-security-scanner-admin"><h1>' . esc_html__( 'Integrity and file scan', 'ironlatch-security-scanner' ) . '</h1>';
+		echo '<p>' . esc_html__( 'Compare installed release files, then review unfamiliar PHP. Each scan starts from its own button.', 'ironlatch-security-scanner' ) . '</p>';
+		$this->notice( 'ironlatch_security_scanner_integrity_error', __( 'Integrity scan could not finish. The previous completed report remains available.', 'ironlatch-security-scanner' ) );
+		$this->notice( 'ironlatch_security_scanner_file_scan_error', __( 'File scan could not finish. The previous completed report remains available.', 'ironlatch-security-scanner' ) );
 		( new AdminPage() )->renderSection( 'files' );
 		echo '</div>';
 	}
 
 	public function vulnerabilities(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'You are not allowed to view this report.', 'amsec-security-scanner' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'You are not allowed to view this report.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );
 		}
-		echo '<div class="wrap amsec-security-scanner-admin" id="amsec-vulnerabilities-page"><h1>' . esc_html__( 'Published vulnerabilities', 'amsec-security-scanner' ) . '</h1>';
-		$this->notice( 'amsec_security_scanner_vulnerability_error', __( 'Vulnerability inventory could not be saved. The previous report remains available.', 'amsec-security-scanner' ) );
+		echo '<div class="wrap ironlatch-security-scanner-admin" id="ironlatch-vulnerabilities-page"><h1>' . esc_html__( 'Published vulnerabilities', 'ironlatch-security-scanner' ) . '</h1>';
+		$this->notice( 'ironlatch_security_scanner_vulnerability_error', __( 'Vulnerability inventory could not be saved. The previous report remains available.', 'ironlatch-security-scanner' ) );
 		( new AdminPage() )->renderSection( 'vulnerabilities' );
 		echo '</div>';
 	}
 
 	public function schedule(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'You are not allowed to view this report.', 'amsec-security-scanner' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'You are not allowed to view this report.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );
 		}
-		echo '<div class="wrap amsec-security-scanner-admin"><h1>' . esc_html__( 'Daily checks', 'amsec-security-scanner' ) . '</h1>';
-		echo '<p>' . esc_html__( 'This page shows whether the local cycle is waiting. It does not start a check.', 'amsec-security-scanner' ) . '</p>';
+		echo '<div class="wrap ironlatch-security-scanner-admin"><h1>' . esc_html__( 'Daily checks', 'ironlatch-security-scanner' ) . '</h1>';
+		echo '<p>' . esc_html__( 'This page shows whether the local cycle is waiting. It does not start a check.', 'ironlatch-security-scanner' ) . '</p>';
 		( new AdminPage() )->renderSection( 'schedule' );
 		echo '</div>';
 	}

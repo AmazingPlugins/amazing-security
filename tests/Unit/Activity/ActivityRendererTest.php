@@ -35,14 +35,14 @@ final class ActivityRendererTest extends TestCase {
 				),
 				array(
 					'event'      => 'security_setting_changed',
-					'target'     => 'amsec_login_rate_mode',
+					'target'     => 'ironlatch_login_rate_mode',
 					'actor_id'   => 1,
 					'user_id'    => 0,
 					'created_at' => 1700000000,
 				),
 				array(
 					'event'      => 'plugin_activated',
-					'target'     => 'amsec-security-scanner/amsec-security-scanner.php',
+					'target'     => 'ironlatch-security-scanner/ironlatch-security-scanner.php',
 					'actor_id'   => 0,
 					'user_id'    => 0,
 					'created_at' => 1700000000,
@@ -61,8 +61,8 @@ final class ActivityRendererTest extends TestCase {
 		self::assertStringContainsString( 'Account 4', $html );
 		self::assertStringContainsString( 'is now Editor', $html );
 		self::assertStringContainsString( 'Sign-in limit', $html );
-		self::assertStringContainsString( 'AmSec Security Scanner', $html );
-		self::assertStringNotContainsString( 'amsec_login_rate_mode', $html );
+		self::assertStringContainsString( 'Ironlatch Security Scanner', $html );
+		self::assertStringNotContainsString( 'ironlatch_login_rate_mode', $html );
 	}
 
 	public function test_one_page_lists_ten_records(): void {

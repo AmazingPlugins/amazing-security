@@ -10,31 +10,31 @@ defined( 'ABSPATH' ) || exit;
 final class Page {
 	public function register(): void {
 		add_submenu_page(
-			'amsec-security-scanner',
-			__( 'Password rules', 'amsec-security-scanner' ),
-			__( 'Password rules', 'amsec-security-scanner' ),
+			'ironlatch-security-scanner',
+			__( 'Password rules', 'ironlatch-security-scanner' ),
+			__( 'Password rules', 'ironlatch-security-scanner' ),
 			'manage_options',
-			'amsec-password-rules',
+			'ironlatch-password-rules',
 			array( $this, 'render' )
 		);
 	}
 
 	public function render(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'Administrator access required.', 'amsec-security-scanner' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'Administrator access required.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );
 		}
 		$current = Module::stored();
 		$notice  = $this->notice();
-		echo '<div class="wrap amsec-security-scanner-admin">';
-		echo '<h1>' . esc_html__( 'Password rules', 'amsec-security-scanner' ) . '</h1>';
+		echo '<div class="wrap ironlatch-security-scanner-admin">';
+		echo '<h1>' . esc_html__( 'Password rules', 'ironlatch-security-scanner' ) . '</h1>';
 		if ( '' !== $notice ) {
 			echo '<div class="notice notice-info"><p>' . esc_html( $notice ) . '</p></div>';
 		}
-		echo '<p>' . esc_html__( 'These rules apply to a new password or a reset password. Off does nothing. Signing in is not checked.', 'amsec-security-scanner' ) . '</p>';
+		echo '<p>' . esc_html__( 'These rules apply to a new password or a reset password. Off does nothing. Signing in is not checked.', 'ironlatch-security-scanner' ) . '</p>';
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
-		echo '<input type="hidden" name="action" value="amsec_password_rules">';
-		wp_nonce_field( 'amsec_password_rules_save' );
-		echo '<p><label for="' . esc_attr( Decision::OPTION ) . '">' . esc_html__( 'Minimum length', 'amsec-security-scanner' ) . ' ';
+		echo '<input type="hidden" name="action" value="ironlatch_password_rules">';
+		wp_nonce_field( 'ironlatch_password_rules_save' );
+		echo '<p><label for="' . esc_attr( Decision::OPTION ) . '">' . esc_html__( 'Minimum length', 'ironlatch-security-scanner' ) . ' ';
 		echo '<select name="' . esc_attr( Decision::OPTION ) . '" id="' . esc_attr( Decision::OPTION ) . '">';
 		foreach ( $this->choices() as $value => $label ) {
 			echo '<option value="' . esc_attr( $value ) . '"' . selected( $current, $value, false ) . '>' . esc_html( $label ) . '</option>';
@@ -43,15 +43,15 @@ final class Page {
 		foreach ( $this->flags() as $option => $label ) {
 			echo '<p><label><input type="checkbox" name="' . esc_attr( $option ) . '" value="1"' . checked( '1', $this->flag( $option ), false ) . '> ' . esc_html( $label ) . '</label></p>';
 		}
-		submit_button( __( 'Update password rules', 'amsec-security-scanner' ) );
+		submit_button( __( 'Update password rules', 'ironlatch-security-scanner' ) );
 		echo '</form></div>';
 	}
 
 	public function save(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'Administrator access required.', 'amsec-security-scanner' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'Administrator access required.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );
 		}
-		check_admin_referer( 'amsec_password_rules_save' );
+		check_admin_referer( 'ironlatch_password_rules_save' );
 		$posted = '0';
 		if ( isset( $_POST[ Decision::OPTION ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing -- check_admin_referer already ran for this save.
 			$posted = sanitize_text_field( wp_unslash( (string) $_POST[ Decision::OPTION ] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing -- check_admin_referer already ran for this save.
@@ -60,7 +60,7 @@ final class Page {
 		foreach ( array_keys( $this->flags() ) as $option ) {
 			update_option( $option, $this->postedFlag( $option ), false );
 		}
-		wp_safe_redirect( admin_url( 'admin.php?page=amsec-accounts&amsec_password_rules=updated#password-rules' ) );
+		wp_safe_redirect( admin_url( 'admin.php?page=ironlatch-accounts&ironlatch_password_rules=updated#password-rules' ) );
 		exit;
 	}
 
@@ -69,10 +69,10 @@ final class Page {
 	 */
 	private function choices(): array {
 		return array(
-			'0'  => __( 'Off', 'amsec-security-scanner' ),
-			'8'  => __( '8 characters', 'amsec-security-scanner' ),
-			'12' => __( '12 characters', 'amsec-security-scanner' ),
-			'16' => __( '16 characters', 'amsec-security-scanner' ),
+			'0'  => __( 'Off', 'ironlatch-security-scanner' ),
+			'8'  => __( '8 characters', 'ironlatch-security-scanner' ),
+			'12' => __( '12 characters', 'ironlatch-security-scanner' ),
+			'16' => __( '16 characters', 'ironlatch-security-scanner' ),
 		);
 	}
 
@@ -81,11 +81,11 @@ final class Page {
 	 */
 	private function flags(): array {
 		return array(
-			Decision::NUMBER => __( 'Require a number', 'amsec-security-scanner' ),
-			Decision::MIXED  => __( 'Require an uppercase letter and a lowercase letter', 'amsec-security-scanner' ),
-			Decision::SYMBOL => __( 'Require a symbol', 'amsec-security-scanner' ),
-			Decision::NAME   => __( 'Reject a password that includes the account name or email name', 'amsec-security-scanner' ),
-			Decision::REUSE  => __( 'Reject the current password when it is changed', 'amsec-security-scanner' ),
+			Decision::NUMBER => __( 'Require a number', 'ironlatch-security-scanner' ),
+			Decision::MIXED  => __( 'Require an uppercase letter and a lowercase letter', 'ironlatch-security-scanner' ),
+			Decision::SYMBOL => __( 'Require a symbol', 'ironlatch-security-scanner' ),
+			Decision::NAME   => __( 'Reject a password that includes the account name or email name', 'ironlatch-security-scanner' ),
+			Decision::REUSE  => __( 'Reject the current password when it is changed', 'ironlatch-security-scanner' ),
 		);
 	}
 
@@ -103,9 +103,9 @@ final class Page {
 	}
 
 	private function notice(): string {
-		$status = isset( $_GET['amsec_password_rules'] ) ? sanitize_key( wp_unslash( (string) $_GET['amsec_password_rules'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only status flag after a verified update redirect.
+		$status = isset( $_GET['ironlatch_password_rules'] ) ? sanitize_key( wp_unslash( (string) $_GET['ironlatch_password_rules'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only status flag after a verified update redirect.
 		if ( 'updated' === $status ) {
-			return __( 'Password rules updated.', 'amsec-security-scanner' );
+			return __( 'Password rules updated.', 'ironlatch-security-scanner' );
 		}
 		return '';
 	}

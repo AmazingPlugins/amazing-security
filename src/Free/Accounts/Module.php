@@ -22,8 +22,8 @@ final class Module {
 		add_action( 'login_form', array( self::class, 'loginFields' ) );
 		add_action( 'woocommerce_login_form', array( self::class, 'loginFields' ) );
 		add_action( 'admin_menu', array( AccountPage::class, 'menu' ) );
-		add_action( 'admin_post_amsec_accounts_save', array( AccountPage::class, 'save' ) );
-		add_action( 'admin_post_amsec_accounts_approve', array( AccountPage::class, 'approve' ) );
+		add_action( 'admin_post_ironlatch_accounts_save', array( AccountPage::class, 'save' ) );
+		add_action( 'admin_post_ironlatch_accounts_approve', array( AccountPage::class, 'approve' ) );
 	}
 
 	public static function idle(): void {
@@ -68,7 +68,7 @@ final class Module {
 			return $user;
 		}
 		if ( 'reject' === self::challengeDecision() ) {
-			return new \WP_Error( 'amsec_login_challenge', __( 'Enter the sum of the two numbers and leave the extra field blank.', 'amsec-security-scanner' ) );
+			return new \WP_Error( 'ironlatch_login_challenge', __( 'Enter the sum of the two numbers and leave the extra field blank.', 'ironlatch-security-scanner' ) );
 		}
 		return self::pendingError( $user );
 	}
@@ -87,8 +87,8 @@ final class Module {
 
 	public static function loginFields(): void {
 		if ( '1' === self::option( EmailFactor::OPTION ) ) {
-			echo '<p class="amsec-email-factor"><label for="amsec-email-code">' . esc_html__( 'Email code', 'amsec-security-scanner' ) . '</label> ';
-			echo '<input class="input" type="text" id="amsec-email-code" name="amsec_email_code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" value=""></p>';
+			echo '<p class="ironlatch-email-factor"><label for="ironlatch-email-code">' . esc_html__( 'Email code', 'ironlatch-security-scanner' ) . '</label> ';
+			echo '<input class="input" type="text" id="ironlatch-email-code" name="ironlatch_email_code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" value=""></p>';
 		}
 		self::renderChallenge();
 	}
@@ -106,7 +106,7 @@ final class Module {
 			return $user;
 		}
 		$decision = AdminBreachBlock::decision(
-			self::option( 'amsec_common_passwords' ),
+			self::option( 'ironlatch_common_passwords' ),
 			self::isAdministrator( $user ),
 			$password,
 			static function ( string $candidate ): bool {
@@ -114,7 +114,7 @@ final class Module {
 			}
 		);
 		if ( 'block' === $decision ) {
-			return new \WP_Error( 'amsec_breached_password', __( 'This administrator password matched a breach list. The password itself was not sent.', 'amsec-security-scanner' ) );
+			return new \WP_Error( 'ironlatch_breached_password', __( 'This administrator password matched a breach list. The password itself was not sent.', 'ironlatch-security-scanner' ) );
 		}
 		return $user;
 	}
@@ -127,7 +127,7 @@ final class Module {
 		if ( ! RegistrationApproval::blocks( RegistrationApproval::enabled( self::option( RegistrationApproval::OPTION ) ), $meta ) ) {
 			return $user;
 		}
-		return new \WP_Error( 'amsec_registration_pending', __( 'An administrator still needs to approve this account.', 'amsec-security-scanner' ) );
+		return new \WP_Error( 'ironlatch_registration_pending', __( 'An administrator still needs to approve this account.', 'ironlatch-security-scanner' ) );
 	}
 
 	private static function emailFactor( mixed $user, string $password ): mixed {
@@ -135,19 +135,19 @@ final class Module {
 			return $user;
 		}
 		$stored = EmailFactor::unpack( get_user_meta( $user->ID, EmailFactor::META, true ) );
-		if ( null !== $stored && '' !== self::posted( 'amsec_email_code' ) ) {
+		if ( null !== $stored && '' !== self::posted( 'ironlatch_email_code' ) ) {
 			$stored['tries'] = self::reserveEmailTry( $user->ID ) ? 0 : EmailFactor::TRIES;
 		}
 		$decision = EmailFactor::decision(
 			RegistrationApproval::enabled( self::option( EmailFactor::OPTION ) ),
 			EmailFactor::enrolled(
-				get_user_meta( $user->ID, 'amsec_totp_seed', true ),
-				get_user_meta( $user->ID, 'amsec_totp_v1', true )
+				get_user_meta( $user->ID, 'ironlatch_totp_seed', true ),
+				get_user_meta( $user->ID, 'ironlatch_totp_v1', true )
 			),
 			self::apiRequest(),
 			$password,
 			true,
-			self::posted( 'amsec_email_code' ),
+			self::posted( 'ironlatch_email_code' ),
 			$stored,
 			time(),
 			wp_salt( 'auth' )
@@ -162,7 +162,7 @@ final class Module {
 		if ( 'send' === $decision ) {
 			return self::sendEmailCode( $user );
 		}
-		return new \WP_Error( 'amsec_email_factor', __( 'Enter the email code and sign in again.', 'amsec-security-scanner' ) );
+		return new \WP_Error( 'ironlatch_email_factor', __( 'Enter the email code and sign in again.', 'ironlatch-security-scanner' ) );
 	}
 
 	/** Atomically spends one of the current code's tries, so parallel guesses can't exceed EmailFactor::TRIES. */
@@ -175,7 +175,7 @@ final class Module {
 	}
 
 	private static function sendEmailCode( \WP_User $user ): \WP_Error {
-		$failed = new \WP_Error( 'amsec_email_factor', __( 'The email code could not be sent. Try again.', 'amsec-security-scanner' ) );
+		$failed = new \WP_Error( 'ironlatch_email_factor', __( 'The email code could not be sent. Try again.', 'ironlatch-security-scanner' ) );
 		$email  = $user->user_email;
 		if ( ! is_string( $email ) || ! is_email( $email ) ) {
 			return $failed;
@@ -183,10 +183,10 @@ final class Module {
 		$code = EmailFactor::code();
 		$sent = wp_mail(
 			$email,
-			__( 'Sign-in code', 'amsec-security-scanner' ),
+			__( 'Sign-in code', 'ironlatch-security-scanner' ),
 			sprintf(
 				/* translators: %s: six digit sign-in code */
-				__( 'Your sign-in code is %s. It expires in 10 minutes. If you did not try to sign in, ignore this email.', 'amsec-security-scanner' ),
+				__( 'Your sign-in code is %s. It expires in 10 minutes. If you did not try to sign in, ignore this email.', 'ironlatch-security-scanner' ),
 				$code
 			)
 		);
@@ -198,7 +198,7 @@ final class Module {
 			return $failed;
 		}
 		update_user_meta( $user->ID, EmailFactor::TRIES_META, '0' );
-		return new \WP_Error( 'amsec_email_factor', __( 'Enter the email code and sign in again.', 'amsec-security-scanner' ) );
+		return new \WP_Error( 'ironlatch_email_factor', __( 'Enter the email code and sign in again.', 'ironlatch-security-scanner' ) );
 	}
 
 	private static function challengeDecision(): string {
@@ -274,13 +274,13 @@ final class Module {
 		}
 		$question = sprintf(
 			/* translators: 1: first number, 2: second number */
-			__( 'What is %1$d + %2$d?', 'amsec-security-scanner' ),
+			__( 'What is %1$d + %2$d?', 'ironlatch-security-scanner' ),
 			self::$challengePair['left'],
 			self::$challengePair['right']
 		);
-		echo '<p class="amsec-login-challenge"><label for="amsec-login-sum">' . esc_html( $question ) . '</label> ';
-		echo '<input class="input" type="text" id="amsec-login-sum" name="' . esc_attr( LoginChallenge::SUM ) . '" inputmode="numeric" autocomplete="off" size="4" value=""></p>';
-		echo '<p style="position:absolute;left:-9999px" aria-hidden="true"><label>' . esc_html__( 'Company', 'amsec-security-scanner' ) . ' <input type="text" name="' . esc_attr( LoginChallenge::HONEYPOT ) . '" value="" tabindex="-1" autocomplete="off"></label></p>';
+		echo '<p class="ironlatch-login-challenge"><label for="ironlatch-login-sum">' . esc_html( $question ) . '</label> ';
+		echo '<input class="input" type="text" id="ironlatch-login-sum" name="' . esc_attr( LoginChallenge::SUM ) . '" inputmode="numeric" autocomplete="off" size="4" value=""></p>';
+		echo '<p style="position:absolute;left:-9999px" aria-hidden="true"><label>' . esc_html__( 'Company', 'ironlatch-security-scanner' ) . ' <input type="text" name="' . esc_attr( LoginChallenge::HONEYPOT ) . '" value="" tabindex="-1" autocomplete="off"></label></p>';
 	}
 
 	private static function challengeToken(): string {

@@ -56,7 +56,7 @@ final class AuthFactorStatusTest extends TestCase {
 		);
 		self::assertStringContainsString( 'Not on this site', $html );
 		self::assertStringContainsString( 'two-factor', $html );
-		self::assertStringNotContainsString( 'amsec_totp_begin', $html );
+		self::assertStringNotContainsString( 'ironlatch_totp_begin', $html );
 		self::assertStringNotContainsString( 'Set up verification codes', $html );
 		self::assertStringContainsString( 'View Two Factor on WordPress.org', $html );
 	}

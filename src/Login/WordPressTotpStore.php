@@ -9,7 +9,7 @@ defined( 'ABSPATH' ) || exit;
 use RuntimeException;
 
 final class WordPressTotpStore implements TotpStore {
-	private const KEY = 'amsec_totp_v1';
+	private const KEY = 'ironlatch_totp_v1';
 
 	public function __construct( private object $db ) {}
 

@@ -18,7 +18,7 @@ use AmazingPlugins\Security\Vulnerabilities\VulnerabilityReport;
 final class AlertNotifierTest extends TestCase {
 	public function test_confirmed_serious_vulnerability_alerts_survive_partial_scans_without_repeats(): void {
 		$options = $this->options();
-		$options->values['amsec_alerts_enabled'] = '1';
+		$options->values['ironlatch_alerts_enabled'] = '1';
 		$messages = array();
 		$notifier = new AlertNotifier( new AlertPolicy(), new AlertDelivery( $options, static function ( $to, $subject, $body ) use ( &$messages ): bool { $messages[] = $body; return true; }, 'owner@example.test', 'https://example.test/report' ) );
 		$finding = static fn ( string $id, string $severity, string $coverage = 'complete' ): CheckResult => new CheckResult( 'vulnerability', 'warn', 'Untrusted issue title', 'https://www.wpvulnerability.com/', new DateTimeImmutable(), 'medium', $coverage, array( 'severity' => $severity ), $id );
@@ -33,13 +33,13 @@ final class AlertNotifierTest extends TestCase {
 		self::assertStringNotContainsString( 'possible', implode( '', $messages ) );
 		self::assertSame( 'none', $notifier->vulnerabilities( new VulnerabilityReport( array(), false, 'Complete' ), 1003 ) );
 		self::assertSame( 'accepted', $notifier->vulnerabilities( new VulnerabilityReport( array( $high ), false, 'Complete' ), 1004 ) );
-		$options->values['amsec_alerts_enabled'] = '0';
+		$options->values['ironlatch_alerts_enabled'] = '0';
 		self::assertSame( 'off', $notifier->vulnerabilities( new VulnerabilityReport( array( $critical ), false, 'Complete' ), 1005 ) );
 	}
 
 	public function test_partial_reports_send_confirmed_findings_and_keep_earlier_ones(): void {
 		$options  = $this->options();
-		$options->values['amsec_alerts_enabled'] = '1';
+		$options->values['ironlatch_alerts_enabled'] = '1';
 		$messages = array();
 		$notifier = new AlertNotifier( new AlertPolicy(), new AlertDelivery( $options, static function ( string $to, string $subject, string $body ) use ( &$messages ): bool { $messages[] = $body; return true; }, 'owner@example.test', 'https://example.test/report' ) );
 		$now      = new DateTimeImmutable( '@1000' );

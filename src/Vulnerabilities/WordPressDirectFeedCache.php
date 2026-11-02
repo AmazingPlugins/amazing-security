@@ -7,7 +7,7 @@ namespace AmazingPlugins\Security\Vulnerabilities;
 defined( 'ABSPATH' ) || exit;
 
 final class WordPressDirectFeedCache implements DirectFeedCache {
-	private const INDEX = 'amsec_security_scanner_vulnerability_cache_index';
+	private const INDEX = 'ironlatch_security_scanner_vulnerability_cache_index';
 
 	public function get( string $key ): ?array {
 		$value = get_transient( $this->name( $key ) );
@@ -35,7 +35,7 @@ final class WordPressDirectFeedCache implements DirectFeedCache {
 	public function clear(): void {
 		$index = get_option( self::INDEX, array() );
 		foreach ( is_array( $index ) ? $index : array() as $name ) {
-			if ( is_string( $name ) && preg_match( '/^amsec_vuln_[a-f0-9]{32}$/D', $name ) ) {
+			if ( is_string( $name ) && preg_match( '/^ironlatch_vuln_[a-f0-9]{32}$/D', $name ) ) {
 				delete_transient( $name );
 			}
 		}
@@ -43,6 +43,6 @@ final class WordPressDirectFeedCache implements DirectFeedCache {
 	}
 
 	private function name( string $key ): string {
-		return 'amsec_vuln_' . substr( hash( 'sha256', $key ), 0, 32 );
+		return 'ironlatch_vuln_' . substr( hash( 'sha256', $key ), 0, 32 );
 	}
 }

@@ -26,5 +26,5 @@ final class ProxyPolicy {
 		return count( array_unique( $s['cidrs'] ) ) === count( $s['cidrs'] ) ? $s : null;
 	}
 	public function fingerprint( mixed $raw ): string {
-		return hash( 'sha256', is_string( $raw ) ? $raw : 'amsec-proxy-missing' ); }
+		return hash( 'sha256', is_string( $raw ) ? $raw : 'ironlatch-proxy-missing' ); }
 }

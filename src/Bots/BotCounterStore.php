@@ -12,13 +12,13 @@ final class BotCounterStore {
 	private string $table;
 
 	public function __construct( private readonly object $db ) {
-		$this->table = $db->prefix . 'amsec_bot_rate';
+		$this->table = $db->prefix . 'ironlatch_bot_rate';
 	}
 
 	public static function install(): void {
 		global $wpdb;
 		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
-		$table = $wpdb->prefix . 'amsec_bot_rate';
+		$table = $wpdb->prefix . 'ironlatch_bot_rate';
 		dbDelta(
 			"CREATE TABLE {$table} (
 			address_key char(64) NOT NULL,
@@ -33,16 +33,16 @@ final class BotCounterStore {
 		) ENGINE=InnoDB {$wpdb->get_charset_collate()};"
 		);
 		if ( self::schemaReady( $wpdb ) ) {
-			update_option( 'amsec_bot_schema_version', self::SCHEMA, false );
+			update_option( 'ironlatch_bot_schema_version', self::SCHEMA, false );
 		} else {
-			delete_option( 'amsec_bot_schema_version' );
+			delete_option( 'ironlatch_bot_schema_version' );
 		}
 		self::ensureScheduled();
 	}
 
 	public static function schemaReady( object $db ): bool {
 		$prior = $db->suppress_errors( true );
-		$table = $db->prefix . 'amsec_bot_rate';
+		$table = $db->prefix . 'ironlatch_bot_rate';
 		try {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Verify required columns before marking installation complete.
 			$result = $db->query( "SELECT address_key,attempts,window_started_at,updated_at,blocked_until,flagged_at FROM {$table} LIMIT 0" );
@@ -55,8 +55,8 @@ final class BotCounterStore {
 	}
 
 	public static function ensureScheduled(): void {
-		if ( ! wp_next_scheduled( 'amsec_bot_cleanup' ) ) {
-			wp_schedule_event( time() + HOUR_IN_SECONDS, 'hourly', 'amsec_bot_cleanup' );
+		if ( ! wp_next_scheduled( 'ironlatch_bot_cleanup' ) ) {
+			wp_schedule_event( time() + HOUR_IN_SECONDS, 'hourly', 'ironlatch_bot_cleanup' );
 		}
 	}
 
@@ -66,7 +66,7 @@ final class BotCounterStore {
 		}
 		$priorErrors = $this->db->suppress_errors( true );
 		$locked      = false;
-		$lock        = 'amsec_bot_' . substr( hash( 'sha256', (string) ( $this->db->dbname ?? DB_NAME ) . ':' . $this->table ), 0, 32 );
+		$lock        = 'ironlatch_bot_' . substr( hash( 'sha256', (string) ( $this->db->dbname ?? DB_NAME ) . ':' . $this->table ), 0, 32 );
 		try {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Uncached bounded counter read.
 			$exists = $this->db->get_var( $this->db->prepare( "SELECT 1 FROM {$this->table} WHERE address_key = %s", $key ) );

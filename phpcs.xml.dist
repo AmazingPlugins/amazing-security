@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
-<ruleset name="AmSec Security Scanner">
+<ruleset name="Ironlatch Security Scanner">
   <file>src</file>
-  <file>amsec-security-scanner.php</file>
+  <file>ironlatch-security-scanner.php</file>
   <!-- PSR-4 class names and public result APIs use camel case. -->
   <rule ref="WordPress-Core">
     <exclude name="WordPress.Files.FileName"/>
@@ -13,5 +13,5 @@
     <exclude name="WordPress.NamingConventions.ValidFunctionName"/>
     <exclude name="WordPress.NamingConventions.ValidVariableName"/>
   </rule>
-  <config name="text_domain" value="amsec-security-scanner"/>
+  <config name="text_domain" value="ironlatch-security-scanner"/>
 </ruleset>

@@ -8,7 +8,7 @@ defined( 'ABSPATH' ) || exit;
 
 /** One comment per minute for the same account or email. No WordPress calls. */
 final class Rate {
-	public const OPTION = 'amsec_comment_rate';
+	public const OPTION = 'ironlatch_comment_rate';
 
 	public const GAP = 60;
 

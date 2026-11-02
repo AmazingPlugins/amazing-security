@@ -8,8 +8,8 @@ defined( 'ABSPATH' ) || exit;
 
 /** New accounts can wait for approval. Missing meta is not pending. */
 final class RegistrationApproval {
-	public const OPTION = 'amsec_approve_registrations';
-	public const META   = 'amsec_registration_pending';
+	public const OPTION = 'ironlatch_approve_registrations';
+	public const META   = 'ironlatch_registration_pending';
 
 	public static function enabled( mixed $option ): bool {
 		return '1' === (string) $option;

@@ -11,53 +11,53 @@ final class RecordsPage {
 	public function register(): void {
 		add_submenu_page(
 			Submenu::PARENT,
-			__( 'Records', 'amsec-security-scanner' ),
-			__( 'Records', 'amsec-security-scanner' ),
+			__( 'Records', 'ironlatch-security-scanner' ),
+			__( 'Records', 'ironlatch-security-scanner' ),
 			'manage_options',
-			'amsec-records',
+			'ironlatch-records',
 			array( $this, 'render' )
 		);
 	}
 
 	public function render(): void {
 		SettingList::render(
-			__( 'Records', 'amsec-security-scanner' ),
-			__( 'Activity is first. Each row opens on its own screen.', 'amsec-security-scanner' ),
+			__( 'Records', 'ironlatch-security-scanner' ),
+			__( 'Activity is first. Each row opens on its own screen.', 'ironlatch-security-scanner' ),
 			array(
 				array(
-					'label' => __( 'Activity', 'amsec-security-scanner' ),
-					'note'  => __( 'Off until you turn recording on. It can store sign-ins, user changes, and plugin changes.', 'amsec-security-scanner' ),
-					'url'   => SettingList::page( 'amsec-activity' ),
+					'label' => __( 'Activity', 'ironlatch-security-scanner' ),
+					'note'  => __( 'Off until you turn recording on. It can store sign-ins, user changes, and plugin changes.', 'ironlatch-security-scanner' ),
+					'url'   => SettingList::page( 'ironlatch-activity' ),
 				),
 				array(
-					'label' => __( 'Settings', 'amsec-security-scanner' ),
-					'note'  => __( 'Notification settings: finding emails, test email, and account-change email. Uses WordPress mail to the admin address.', 'amsec-security-scanner' ),
-					'url'   => SettingList::page( 'amsec-settings' ),
+					'label' => __( 'Settings', 'ironlatch-security-scanner' ),
+					'note'  => __( 'Notification settings: finding emails, test email, and account-change email. Uses WordPress mail to the admin address.', 'ironlatch-security-scanner' ),
+					'url'   => SettingList::page( 'ironlatch-settings' ),
 				),
 				array(
-					'label' => __( 'Weekly digest', 'amsec-security-scanner' ),
-					'note'  => __( 'Off until you turn the email on. It sends a count summary once a week.', 'amsec-security-scanner' ),
-					'url'   => SettingList::page( 'amsec-digest' ),
+					'label' => __( 'Weekly digest', 'ironlatch-security-scanner' ),
+					'note'  => __( 'Off until you turn the email on. It sends a count summary once a week.', 'ironlatch-security-scanner' ),
+					'url'   => SettingList::page( 'ironlatch-digest' ),
 				),
 				array(
-					'label' => __( 'Daily checks', 'amsec-security-scanner' ),
-					'note'  => __( 'Shows whether the local cycle is waiting. Opening it does not start a check.', 'amsec-security-scanner' ),
-					'url'   => SettingList::page( 'amsec-schedule' ),
+					'label' => __( 'Daily checks', 'ironlatch-security-scanner' ),
+					'note'  => __( 'Shows whether the local cycle is waiting. Opening it does not start a check.', 'ironlatch-security-scanner' ),
+					'url'   => SettingList::page( 'ironlatch-schedule' ),
 				),
 				array(
-					'label' => __( 'Incident response', 'amsec-security-scanner' ),
-					'note'  => __( 'Review administrators, end other sessions, then require a new password.', 'amsec-security-scanner' ),
-					'url'   => SettingList::page( 'amsec-incident' ),
+					'label' => __( 'Incident response', 'ironlatch-security-scanner' ),
+					'note'  => __( 'Review administrators, end other sessions, then require a new password.', 'ironlatch-security-scanner' ),
+					'url'   => SettingList::page( 'ironlatch-incident' ),
 				),
 				array(
-					'label' => __( 'Site review', 'amsec-security-scanner' ),
-					'note'  => __( 'Shows which protections are on. Each one stays off until you turn it on.', 'amsec-security-scanner' ),
-					'url'   => SettingList::page( 'amsec-guide' ),
+					'label' => __( 'Site review', 'ironlatch-security-scanner' ),
+					'note'  => __( 'Shows which protections are on. Each one stays off until you turn it on.', 'ironlatch-security-scanner' ),
+					'url'   => SettingList::page( 'ironlatch-guide' ),
 				),
 				array(
-					'label' => __( 'Saved change', 'amsec-security-scanner' ),
-					'note'  => __( 'Opens one saved proposal. This screen stays empty until a proposal exists.', 'amsec-security-scanner' ),
-					'url'   => SettingList::page( 'amsec-fix-review' ),
+					'label' => __( 'Saved change', 'ironlatch-security-scanner' ),
+					'note'  => __( 'Opens one saved proposal. This screen stays empty until a proposal exists.', 'ironlatch-security-scanner' ),
+					'url'   => SettingList::page( 'ironlatch-fix-review' ),
 				),
 			)
 		);

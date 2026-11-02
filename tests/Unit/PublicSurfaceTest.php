@@ -56,7 +56,7 @@ final class PublicSurfaceTest extends TestCase {
 		self::assertSame( 'warn', $present->state );
 		self::assertStringContainsString( 'does not delete', $present->summary );
 		self::assertStringNotContainsString( 'safe', $present->summary );
-		self::assertSame( 'amsec-exposure', StartHere::control( $present )['page'] );
+		self::assertSame( 'ironlatch-exposure', StartHere::control( $present )['page'] );
 		self::assertArrayNotHasKey( 'action', StartHere::control( $present ) );
 		self::assertSame( 'pass', $absent->state );
 		self::assertNull( StartHere::control( $absent ) );
@@ -68,7 +68,7 @@ final class PublicSurfaceTest extends TestCase {
 		self::assertStringContainsString( 'license.txt', $present->summary );
 		self::assertStringContainsString( 'does not delete', $present->summary );
 		self::assertStringNotContainsString( 'safe', $present->summary );
-		self::assertSame( 'amsec-exposure', StartHere::control( $present )['page'] );
+		self::assertSame( 'ironlatch-exposure', StartHere::control( $present )['page'] );
 		self::assertArrayNotHasKey( 'action', StartHere::control( $present ) );
 	}
 
@@ -80,7 +80,7 @@ final class PublicSurfaceTest extends TestCase {
 		self::assertStringContainsString( 'does not read or delete', $present->summary );
 		self::assertStringContainsString( 'custom log path is not checked', $present->summary );
 		self::assertStringNotContainsString( 'safe', $present->summary );
-		self::assertSame( 'amsec-exposure', StartHere::control( $present )['page'] );
+		self::assertSame( 'ironlatch-exposure', StartHere::control( $present )['page'] );
 		self::assertArrayNotHasKey( 'action', StartHere::control( $present ) );
 		self::assertSame( 'pass', $absent->state );
 		self::assertNull( StartHere::control( $absent ) );
@@ -100,7 +100,7 @@ final class PublicSurfaceTest extends TestCase {
 		self::assertStringContainsString( 'does not turn them on', $updates->summary );
 		foreach ( array( $sample, $error, $backup ) as $row ) {
 			self::assertStringNotContainsString( 'safe', $row->summary );
-			self::assertSame( 'amsec-exposure', StartHere::control( $row )['page'] );
+			self::assertSame( 'ironlatch-exposure', StartHere::control( $row )['page'] );
 			self::assertArrayNotHasKey( 'action', StartHere::control( $row ) );
 		}
 		self::assertStringNotContainsString( 'safe', $php->summary );
@@ -141,7 +141,7 @@ final class PublicSurfaceTest extends TestCase {
 		self::assertNull( StartHere::control( $active ) );
 		self::assertSame( 'warn', $env->state );
 		self::assertStringContainsString( 'does not read or delete', $env->summary );
-		self::assertSame( 'amsec-exposure', StartHere::control( $env )['page'] );
+		self::assertSame( 'ironlatch-exposure', StartHere::control( $env )['page'] );
 		self::assertArrayNotHasKey( 'action', StartHere::control( $env ) );
 		self::assertSame( 'pass', $clear->state );
 		self::assertSame( 'pass', RootExposureCheck::decide( 'absent' ) );

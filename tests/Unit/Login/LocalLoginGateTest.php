@@ -76,7 +76,7 @@ final class LocalLoginGateTest extends TestCase {
 		self::assertSame(
 			array(
 				'empty_username'      => 'The username field is empty.',
-				'amsec_generic_login' => 'The username or password is incorrect.',
+				'ironlatch_generic_login' => 'The username or password is incorrect.',
 			),
 			LoginHints::generic(
 				true,

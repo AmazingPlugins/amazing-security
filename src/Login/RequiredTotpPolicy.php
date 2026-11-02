@@ -7,8 +7,8 @@ namespace AmazingPlugins\Security\Login;
 defined( 'ABSPATH' ) || exit;
 
 final class RequiredTotpPolicy {
-	public const OPTION = 'amsec_required_totp_policy';
-	public const META   = 'amsec_required_totp_grace';
+	public const OPTION = 'ironlatch_required_totp_policy';
+	public const META   = 'ironlatch_required_totp_grace';
 	public const GRACE  = 604800;
 
 	public static function coveredAccount( bool $administrator, array $roles ): bool {
@@ -74,9 +74,9 @@ final class RequiredTotpPolicy {
 				return $user;
 			}
 		} catch ( \Throwable ) {
-			return new \WP_Error( 'amsec_policy_unavailable', __( 'Administrator verification policy is unavailable. Contact the site owner for recovery.', 'amsec-security-scanner' ) );
+			return new \WP_Error( 'ironlatch_policy_unavailable', __( 'Administrator verification policy is unavailable. Contact the site owner for recovery.', 'ironlatch-security-scanner' ) );
 		}
-		return new \WP_Error( 'amsec_enrollment_required', __( 'Your verification enrollment period has ended. Ask an enrolled administrator to grant a new grace period, or use host-level recovery.', 'amsec-security-scanner' ) );
+		return new \WP_Error( 'ironlatch_enrollment_required', __( 'Your verification enrollment period has ended. Ask an enrolled administrator to grant a new grace period, or use host-level recovery.', 'ironlatch-security-scanner' ) );
 	}
 
 	private static function accountCovered( int $id ): bool {

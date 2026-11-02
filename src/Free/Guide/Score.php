@@ -10,14 +10,14 @@ defined( 'ABSPATH' ) || exit;
 final class Score {
 	/** @var array<string, string> */
 	public const FLAGS = array(
-		'amsec_login_confirm'         => '1',
-		'amsec_generic_login_errors'  => '1',
-		'amsec_hide_author_archives'  => '1',
-		'amsec_hide_rest_users'       => '1',
-		'amsec_hotlink'               => '1',
-		'amsec_approve_registrations' => '1',
-		'amsec_email_factor'          => '1',
-		'amsec_login_challenge'       => '1',
+		'ironlatch_login_confirm'         => '1',
+		'ironlatch_generic_login_errors'  => '1',
+		'ironlatch_hide_author_archives'  => '1',
+		'ironlatch_hide_rest_users'       => '1',
+		'ironlatch_hotlink'               => '1',
+		'ironlatch_approve_registrations' => '1',
+		'ironlatch_email_factor'          => '1',
+		'ironlatch_login_challenge'       => '1',
 	);
 
 	/**
@@ -31,7 +31,7 @@ final class Score {
 				++$on;
 			}
 		}
-		$idle = (string) ( $options['amsec_idle_minutes'] ?? '0' );
+		$idle = (string) ( $options['ironlatch_idle_minutes'] ?? '0' );
 		if ( in_array( $idle, array( '15', '30', '60' ), true ) ) {
 			++$on;
 		}
@@ -51,13 +51,13 @@ final class Score {
 			return array();
 		}
 		return array(
-			'amsec_login_confirm'         => '1',
-			'amsec_generic_login_errors'  => '1',
-			'amsec_hide_author_archives'  => '1',
-			'amsec_hide_rest_users'       => '1',
-			'amsec_hotlink'               => '1',
-			'amsec_approve_registrations' => '1',
-			'amsec_idle_minutes'          => '30',
+			'ironlatch_login_confirm'         => '1',
+			'ironlatch_generic_login_errors'  => '1',
+			'ironlatch_hide_author_archives'  => '1',
+			'ironlatch_hide_rest_users'       => '1',
+			'ironlatch_hotlink'               => '1',
+			'ironlatch_approve_registrations' => '1',
+			'ironlatch_idle_minutes'          => '30',
 		);
 	}
 }

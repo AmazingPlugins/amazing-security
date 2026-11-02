@@ -11,7 +11,7 @@ use Throwable;
 
 final class RestFirewallHook {
 	public function filter( mixed $result, mixed $server, mixed $request ): mixed {
-		if ( defined( 'AMSEC_DISABLE_FIREWALL' ) && AMSEC_DISABLE_FIREWALL ) {
+		if ( defined( 'IRONLATCH_DISABLE_FIREWALL' ) && IRONLATCH_DISABLE_FIREWALL ) {
 			return $result;
 		}
 		if ( ! $request instanceof \WP_REST_Request ) {

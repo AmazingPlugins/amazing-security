@@ -9,7 +9,7 @@ defined( 'ABSPATH' ) || exit;
 use AmazingPlugins\Security\Integrity\OptionGateway;
 
 final class ObservationStore {
-	private const OPTION = 'amsec_rest_observations';
+	private const OPTION = 'ironlatch_rest_observations';
 
 	public function __construct( private readonly OptionGateway $options ) {}
 

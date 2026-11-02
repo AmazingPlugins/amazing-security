@@ -15,7 +15,7 @@ require_once dirname( __DIR__, 4 ) . '/src/Free/LoginNotice/Decision.php';
 final class DecisionTest extends TestCase {
 	public function test_gap_is_one_hour(): void {
 		self::assertSame( 3600, Decision::GAP );
-		self::assertSame( 'amsec_login_email', Decision::OPTION );
+		self::assertSame( 'ironlatch_login_email', Decision::OPTION );
 	}
 
 	public function test_off_option_skips(): void {

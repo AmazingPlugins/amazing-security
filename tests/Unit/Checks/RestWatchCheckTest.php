@@ -24,7 +24,7 @@ final class RestWatchCheckTest extends TestCase {
 		$result = ( new RestWatchCheck( static fn (): bool => true ) )->run( new ScanContext() )[0];
 		self::assertSame( State::WARN, $result->state );
 		self::assertSame( 'disabled', $result->evidence['status'] );
-		self::assertStringContainsString( 'AMSEC_DISABLE_FIREWALL', $result->summary );
+		self::assertStringContainsString( 'IRONLATCH_DISABLE_FIREWALL', $result->summary );
 		self::assertStringContainsString( '7 observe rules', $result->summary );
 	}
 }

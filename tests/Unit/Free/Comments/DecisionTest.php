@@ -14,7 +14,7 @@ use PHPUnit\Framework\TestCase;
  */
 final class DecisionTest extends TestCase {
 	public function test_option_defaults_off(): void {
-		self::assertSame( 'amsec_comment_honeypot', Decision::OPTION );
+		self::assertSame( 'ironlatch_comment_honeypot', Decision::OPTION );
 		self::assertSame( '0', Decision::flag( null ) );
 		self::assertSame( '0', Decision::flag( false ) );
 		self::assertSame( '0', Decision::flag( '0' ) );

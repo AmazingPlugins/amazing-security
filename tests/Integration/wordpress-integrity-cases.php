@@ -12,7 +12,7 @@ use AmazingPlugins\Security\Integrity\TargetDiscovery;
 use AmazingPlugins\Security\Integrity\WordPressOrgManifestProvider;
 use AmazingPlugins\Security\Scan\ScanContext;
 
-$root = sys_get_temp_dir() . '/amsec-cases-' . bin2hex( random_bytes( 4 ) );
+$root = sys_get_temp_dir() . '/ironlatch-cases-' . bin2hex( random_bytes( 4 ) );
 mkdir( $root );
 file_put_contents( $root . '/clean.php', 'clean' );
 file_put_contents( $root . '/changed.php', 'changed' );

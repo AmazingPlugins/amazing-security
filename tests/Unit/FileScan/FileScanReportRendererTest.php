@@ -36,7 +36,7 @@ final class FileScanReportRendererTest extends TestCase {
 		$cursor->findings[] = array( 'id' => $id, 'kind' => 'suspected', 'path' => 'demo.php', 'summary' => 'Suspected code' );
 		$report = new FileScanReport( 'scan-1', 'warn', new DateTimeImmutable(), false, 1, 1, 0, 0, 0, 0, 1, 0, $cursor->findings );
 		$html = ( new FileScanReportRenderer( 'https://example.test/wp-admin/admin-post.php', 'nonce' ) )->render( $report, new FileScanStep( $cursor, false ), array() );
-		preg_match_all( '/id="(amsec-note-[^"]+)"/', $html, $matches );
+		preg_match_all( '/id="(ironlatch-note-[^"]+)"/', $html, $matches );
 		self::assertCount( 1, $matches[1] );
 		self::assertStringContainsString( 'Last finished scan', $html );
 	}
@@ -49,7 +49,7 @@ final class FileScanReportRendererTest extends TestCase {
 		self::assertStringContainsString( 'Theme example 1.2', $html );
 		self::assertStringContainsString( 'at most three themes', $html );
 		self::assertStringNotContainsString( 'package_limit', $html );
-		self::assertStringNotContainsString( 'amsec-file-note-form', $html );
+		self::assertStringNotContainsString( 'ironlatch-file-note-form', $html );
 		self::assertStringNotContainsString( '<code></code>', $html );
 	}
 

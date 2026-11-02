@@ -26,24 +26,24 @@ final class TotpAuthentication {
 			}
 			// Login forms use WordPress authentication instead of a plugin admin nonce.
 			// phpcs:ignore WordPress.Security.NonceVerification.Missing
-			$factor = isset( $_POST['amsec_otp'] ) && is_string( $_POST['amsec_otp'] ) ? sanitize_text_field( wp_unslash( $_POST['amsec_otp'] ) ) : '';
+			$factor = isset( $_POST['ironlatch_otp'] ) && is_string( $_POST['ironlatch_otp'] ) ? sanitize_text_field( wp_unslash( $_POST['ironlatch_otp'] ) ) : '';
 			if ( '' === $factor ) {
 				$redirect = '';
 				if ( function_exists( 'wp_validate_redirect' ) && isset( $_POST['redirect_to'] ) && is_string( $_POST['redirect_to'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
 					$redirect = wp_validate_redirect( sanitize_text_field( wp_unslash( $_POST['redirect_to'] ) ), '' ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 				}
 				if ( ( new LoginSecondStep() )->park( $user->ID, $redirect ) ) {
-					return new \WP_Error( LoginSecondStep::ERROR, __( 'Enter the code from your authenticator.', 'amsec-security-scanner' ) );
+					return new \WP_Error( LoginSecondStep::ERROR, __( 'Enter the code from your authenticator.', 'ironlatch-security-scanner' ) );
 				}
-				return new \WP_Error( 'amsec_verification_failed', __( 'Verification could not be completed.', 'amsec-security-scanner' ) );
+				return new \WP_Error( 'ironlatch_verification_failed', __( 'Verification could not be completed.', 'ironlatch-security-scanner' ) );
 			}
 			if ( $this->verifyFactor( $user->ID, $factor, time() ) ) {
 				return $user;
 			}
 		} catch ( RuntimeException ) {
-			return new \WP_Error( 'amsec_verification_failed', __( 'Verification could not be completed.', 'amsec-security-scanner' ) );
+			return new \WP_Error( 'ironlatch_verification_failed', __( 'Verification could not be completed.', 'ironlatch-security-scanner' ) );
 		}
-		return new \WP_Error( 'amsec_verification_failed', __( 'Verification could not be completed.', 'amsec-security-scanner' ) );
+		return new \WP_Error( 'ironlatch_verification_failed', __( 'Verification could not be completed.', 'ironlatch-security-scanner' ) );
 	}
 	/** Shared one-use verification for password login, passkey removal, and saved enrollment. */
 	public function verifyFactor( int $userId, string $factor, int $now ): bool {

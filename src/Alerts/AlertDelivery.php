@@ -12,7 +12,7 @@ use Closure;
 use Throwable;
 
 final class AlertDelivery {
-	private const STATE = 'amsec_alert_state';
+	private const STATE = 'ironlatch_alert_state';
 	private readonly Closure $send;
 
 	public function __construct( private readonly OptionGateway $options, callable $send, private readonly string $email, private readonly string $dashboardUrl ) {
@@ -30,7 +30,7 @@ final class AlertDelivery {
 			return 'off';
 		}
 		$ids  = array_values( array_unique( array_filter( $ids, static fn( mixed $id ): bool => is_string( $id ) && (bool) preg_match( '/^[a-zA-Z0-9-]{1,80}$/D', $id ) ) ) );
-		$lock = new WorkerLock( $this->options, 'amsec_alert_lock' );
+		$lock = new WorkerLock( $this->options, 'ironlatch_alert_lock' );
 		if ( ! $lock->acquire( 'mail-' . $now ) ) {
 			return 'busy';
 		}
@@ -57,7 +57,7 @@ final class AlertDelivery {
 		if ( ! $this->enabled() ) {
 			return 'off';
 		}
-		$lock = new WorkerLock( $this->options, 'amsec_alert_lock' );
+		$lock = new WorkerLock( $this->options, 'ironlatch_alert_lock' );
 		if ( ! $lock->acquire( 'mail-retry-' . $now ) ) {
 			return 'busy';
 		}
@@ -69,7 +69,7 @@ final class AlertDelivery {
 	}
 
 	private function enabled(): bool {
-		return '1' === $this->options->get( 'amsec_alerts_enabled' );
+		return '1' === $this->options->get( 'ironlatch_alerts_enabled' );
 	}
 
 	private function deliver( array $state, int $now ): string {
@@ -81,9 +81,9 @@ final class AlertDelivery {
 		$batch    = array_slice( $pending, 0, 50 );
 		$accepted = false;
 		if ( false !== filter_var( $this->email, FILTER_VALIDATE_EMAIL ) ) {
-			$body = "New security findings need review.\n\nFinding IDs:\n" . implode( "\n", $batch ) . "\n\nOpen the AmSec Security Scanner dashboard:\n" . $this->dashboardUrl;
+			$body = "New security findings need review.\n\nFinding IDs:\n" . implode( "\n", $batch ) . "\n\nOpen the Ironlatch Security Scanner dashboard:\n" . $this->dashboardUrl;
 			try {
-				$accepted = (bool) ( $this->send )( $this->email, 'AmSec Security Scanner: findings need review', $body );
+				$accepted = (bool) ( $this->send )( $this->email, 'Ironlatch Security Scanner: findings need review', $body );
 			} catch ( Throwable ) {
 				$accepted = false;
 			}
@@ -98,8 +98,8 @@ final class AlertDelivery {
 		if ( ! $this->save( $state ) ) {
 			return 'failed';
 		}
-		if ( array() !== $state['pending'] && ( $accepted || $state['failures'] < 3 ) && function_exists( 'wp_next_scheduled' ) && ! wp_next_scheduled( 'amsec_alert_retry' ) ) {
-			wp_schedule_single_event( time() + ( $accepted ? 60 : 3600 ), 'amsec_alert_retry' );
+		if ( array() !== $state['pending'] && ( $accepted || $state['failures'] < 3 ) && function_exists( 'wp_next_scheduled' ) && ! wp_next_scheduled( 'ironlatch_alert_retry' ) ) {
+			wp_schedule_single_event( time() + ( $accepted ? 60 : 3600 ), 'ironlatch_alert_retry' );
 		}
 		return $accepted ? 'accepted' : 'failed';
 	}

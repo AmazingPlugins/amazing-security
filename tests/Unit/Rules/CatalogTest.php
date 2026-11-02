@@ -5,7 +5,7 @@ use PHPUnit\Framework\TestCase;
 final class CatalogTest extends TestCase {
  private string $root;
  protected function setUp():void{
-  $this->root=sys_get_temp_dir().'/amsec-rules-'.bin2hex(random_bytes(6));mkdir($this->root,0700);mkdir($this->root.'/assets');
+  $this->root=sys_get_temp_dir().'/ironlatch-rules-'.bin2hex(random_bytes(6));mkdir($this->root,0700);mkdir($this->root.'/assets');
   foreach(RuleCatalog::descriptors() as $pack){foreach($pack['files'] as $path){$dir=dirname($this->root.'/'.$path);if(!is_dir($dir)){mkdir($dir,0700,true);}copy(dirname(__DIR__,3).'/'.$path,$this->root.'/'.$path);}}
   file_put_contents($this->root.'/assets/rule-manifest.json',json_encode((new RuleCatalog($this->root))->buildManifest('2026-09-30')));
  }

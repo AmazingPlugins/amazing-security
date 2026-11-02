@@ -22,7 +22,7 @@ final class RestWatchCheck implements SecurityCheck {
 
 	public function __construct( ?callable $disabled = null ) {
 		$this->disabled = Closure::fromCallable(
-			$disabled ?? static fn (): bool => defined( 'AMSEC_DISABLE_FIREWALL' ) && AMSEC_DISABLE_FIREWALL
+			$disabled ?? static fn (): bool => defined( 'IRONLATCH_DISABLE_FIREWALL' ) && IRONLATCH_DISABLE_FIREWALL
 		);
 	}
 
@@ -43,13 +43,13 @@ final class RestWatchCheck implements SecurityCheck {
 				$off
 					? sprintf(
 						/* translators: 1: version of the bundled REST rule pack, 2: number of observe rules. */
-						__( 'The REST request watch is disabled by AMSEC_DISABLE_FIREWALL. Public REST queries are not observed. Pack %1$s has %2$s observe rules unused while disabled.', 'amsec-security-scanner' ),
+						__( 'The REST request watch is disabled by IRONLATCH_DISABLE_FIREWALL. Public REST queries are not observed. Pack %1$s has %2$s observe rules unused while disabled.', 'ironlatch-security-scanner' ),
 						$ver,
 						$count
 					)
 					: sprintf(
 						/* translators: 1: version of the bundled REST rule pack, 2: number of public REST rules. */
-						__( 'The REST request watch is on (observe only). Pack %1$s records matches for %2$s public REST rules and does not block requests.', 'amsec-security-scanner' ),
+						__( 'The REST request watch is on (observe only). Pack %1$s records matches for %2$s public REST rules and does not block requests.', 'ironlatch-security-scanner' ),
 						$ver,
 						$count
 					),

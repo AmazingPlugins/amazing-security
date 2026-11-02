@@ -8,8 +8,8 @@ defined( 'ABSPATH' ) || exit;
 
 /** Idle logout decisions. Stored 0 stays off. */
 final class IdleLogout {
-	public const OPTION = 'amsec_idle_minutes';
-	public const META   = 'amsec_last_seen';
+	public const OPTION = 'ironlatch_idle_minutes';
+	public const META   = 'ironlatch_last_seen';
 
 	public static function minutes( mixed $stored ): int {
 		if ( is_int( $stored ) ) {

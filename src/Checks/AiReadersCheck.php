@@ -108,19 +108,19 @@ final class AiReadersCheck implements SecurityCheck {
 
 	private static function summary( string $guest, string $registration, string $crawlers ): string {
 		$bots = match ( true ) {
-			'open' === $guest && 'open' === $registration => __( 'Guests can comment on new posts, and anyone can register.', 'amsec-security-scanner' ),
-			'open' === $guest && 'closed' === $registration => __( 'Guests can comment on new posts. Registration is closed.', 'amsec-security-scanner' ),
-			'closed' === $guest && 'open' === $registration => __( 'Guests cannot comment on new posts, and anyone can register.', 'amsec-security-scanner' ),
-			'closed' === $guest && 'closed' === $registration => __( 'Guests cannot comment on new posts, and registration is closed.', 'amsec-security-scanner' ),
-			'open' === $guest => __( 'Guests can comment on new posts. The registration setting could not be read.', 'amsec-security-scanner' ),
-			'open' === $registration => __( 'Anyone can register. The comment setting could not be read.', 'amsec-security-scanner' ),
-			default => __( 'Comment or registration settings could not be read.', 'amsec-security-scanner' ),
+			'open' === $guest && 'open' === $registration => __( 'Guests can comment on new posts, and anyone can register.', 'ironlatch-security-scanner' ),
+			'open' === $guest && 'closed' === $registration => __( 'Guests can comment on new posts. Registration is closed.', 'ironlatch-security-scanner' ),
+			'closed' === $guest && 'open' === $registration => __( 'Guests cannot comment on new posts, and anyone can register.', 'ironlatch-security-scanner' ),
+			'closed' === $guest && 'closed' === $registration => __( 'Guests cannot comment on new posts, and registration is closed.', 'ironlatch-security-scanner' ),
+			'open' === $guest => __( 'Guests can comment on new posts. The registration setting could not be read.', 'ironlatch-security-scanner' ),
+			'open' === $registration => __( 'Anyone can register. The comment setting could not be read.', 'ironlatch-security-scanner' ),
+			default => __( 'Comment or registration settings could not be read.', 'ironlatch-security-scanner' ),
 		};
 		$rules = match ( $crawlers ) {
-			'allowed' => __( 'AI crawlers are not asked to stay out.', 'amsec-security-scanner' ),
-			'limited' => __( 'Some AI crawlers are asked to stay out.', 'amsec-security-scanner' ),
-			'blocked' => __( 'The crawler rules ask the main AI crawlers to stay out.', 'amsec-security-scanner' ),
-			default => __( 'The crawler rules could not be read.', 'amsec-security-scanner' ),
+			'allowed' => __( 'AI crawlers are not asked to stay out.', 'ironlatch-security-scanner' ),
+			'limited' => __( 'Some AI crawlers are asked to stay out.', 'ironlatch-security-scanner' ),
+			'blocked' => __( 'The crawler rules ask the main AI crawlers to stay out.', 'ironlatch-security-scanner' ),
+			default => __( 'The crawler rules could not be read.', 'ironlatch-security-scanner' ),
 		};
 		return $bots . ' ' . $rules . ' This check does not change those settings. Author names stay available over the content API.';
 	}

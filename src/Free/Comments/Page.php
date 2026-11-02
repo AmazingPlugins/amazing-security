@@ -10,57 +10,57 @@ defined( 'ABSPATH' ) || exit;
 final class Page {
 	public static function menu(): void {
 		add_submenu_page(
-			'amsec-security-scanner',
-			__( 'Comment checks', 'amsec-security-scanner' ),
-			__( 'Comment checks', 'amsec-security-scanner' ),
+			'ironlatch-security-scanner',
+			__( 'Comment checks', 'ironlatch-security-scanner' ),
+			__( 'Comment checks', 'ironlatch-security-scanner' ),
 			'manage_options',
-			'amsec-comments',
+			'ironlatch-comments',
 			array( self::class, 'render' )
 		);
 	}
 
 	public static function render(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'Administrator access required.', 'amsec-security-scanner' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'Administrator access required.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );
 		}
 		$enabled = self::stored();
 		$on      = '1' === $enabled;
-		echo '<div class="wrap amsec-security-scanner-admin amsec-brief">';
-		echo '<h1>' . esc_html__( 'Comment checks', 'amsec-security-scanner' ) . '</h1>';
-		echo '<p class="amsec-brief-status"><span class="amsec-pill' . ( $on ? ' is-on' : ' is-off' ) . '">' . esc_html( $on ? __( 'On', 'amsec-security-scanner' ) : __( 'Off', 'amsec-security-scanner' ) ) . '</span>';
+		echo '<div class="wrap ironlatch-security-scanner-admin ironlatch-brief">';
+		echo '<h1>' . esc_html__( 'Comment checks', 'ironlatch-security-scanner' ) . '</h1>';
+		echo '<p class="ironlatch-brief-status"><span class="ironlatch-pill' . ( $on ? ' is-on' : ' is-off' ) . '">' . esc_html( $on ? __( 'On', 'ironlatch-security-scanner' ) : __( 'Off', 'ironlatch-security-scanner' ) ) . '</span>';
 		echo esc_html( self::status( $enabled ) ) . '</p>';
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
-		echo '<input type="hidden" name="action" value="amsec_comments_save">';
-		wp_nonce_field( 'amsec_comments_save' );
-		echo '<p class="amsec-check"><label><input type="checkbox" name="' . esc_attr( Decision::OPTION ) . '" value="1"' . checked( '1', $enabled, false ) . '> ';
-		echo esc_html__( 'Add an extra field to the comment form', 'amsec-security-scanner' );
+		echo '<input type="hidden" name="action" value="ironlatch_comments_save">';
+		wp_nonce_field( 'ironlatch_comments_save' );
+		echo '<p class="ironlatch-check"><label><input type="checkbox" name="' . esc_attr( Decision::OPTION ) . '" value="1"' . checked( '1', $enabled, false ) . '> ';
+		echo esc_html__( 'Add an extra field to the comment form', 'ironlatch-security-scanner' );
 		echo '</label> ';
-		self::tip( __( 'The field is named Company and sits off screen. Leave it empty. A filled field refuses the comment. Nothing is sent to another host.', 'amsec-security-scanner' ) );
+		self::tip( __( 'The field is named Company and sits off screen. Leave it empty. A filled field refuses the comment. Nothing is sent to another host.', 'ironlatch-security-scanner' ) );
 		echo '</p>';
-		echo '<p class="amsec-check"><label><input type="checkbox" name="' . esc_attr( Rate::OPTION ) . '" value="1"' . checked( '1', self::rateStored(), false ) . '> ';
-		echo esc_html__( 'Wait one minute between comments from the same account or email', 'amsec-security-scanner' );
+		echo '<p class="ironlatch-check"><label><input type="checkbox" name="' . esc_attr( Rate::OPTION ) . '" value="1"' . checked( '1', self::rateStored(), false ) . '> ';
+		echo esc_html__( 'Wait one minute between comments from the same account or email', 'ironlatch-security-scanner' );
 		echo '</label> ';
-		self::tip( __( 'Administrators are not limited.', 'amsec-security-scanner' ) );
+		self::tip( __( 'Administrators are not limited.', 'ironlatch-security-scanner' ) );
 		echo '</p>';
-		echo '<p class="amsec-check"><label><input type="checkbox" name="' . esc_attr( SpamHold::OPTION ) . '" value="1"' . checked( '1', self::holdStored(), false ) . '> ';
-		echo esc_html__( 'Hold later comments from an email you marked as spam', 'amsec-security-scanner' );
+		echo '<p class="ironlatch-check"><label><input type="checkbox" name="' . esc_attr( SpamHold::OPTION ) . '" value="1"' . checked( '1', self::holdStored(), false ) . '> ';
+		echo esc_html__( 'Hold later comments from an email you marked as spam', 'ironlatch-security-scanner' );
 		echo '</label> ';
-		self::tip( __( 'The site stores a hash of that email, not the address.', 'amsec-security-scanner' ) );
+		self::tip( __( 'The site stores a hash of that email, not the address.', 'ironlatch-security-scanner' ) );
 		echo '</p>';
-		submit_button( __( 'Save comment checks', 'amsec-security-scanner' ) );
+		submit_button( __( 'Save comment checks', 'ironlatch-security-scanner' ) );
 		echo '</form>';
-		echo '<details class="amsec-more"><summary>' . esc_html__( 'See more', 'amsec-security-scanner' ) . '</summary>';
-		echo '<p>' . esc_html__( 'These start off. The extra field is for the WordPress comment form. A person leaves it empty. A filled field refuses the comment, and nothing is sent to another host.', 'amsec-security-scanner' ) . '</p>';
-		echo '<p>' . esc_html__( 'The minute switch allows one comment per minute from the same account or email. Administrators are not limited. The hold switch keeps later comments from an email after you mark one as spam, and it stores a hash of that email.', 'amsec-security-scanner' ) . '</p>';
+		echo '<details class="ironlatch-more"><summary>' . esc_html__( 'See more', 'ironlatch-security-scanner' ) . '</summary>';
+		echo '<p>' . esc_html__( 'These start off. The extra field is for the WordPress comment form. A person leaves it empty. A filled field refuses the comment, and nothing is sent to another host.', 'ironlatch-security-scanner' ) . '</p>';
+		echo '<p>' . esc_html__( 'The minute switch allows one comment per minute from the same account or email. Administrators are not limited. The hold switch keeps later comments from an email after you mark one as spam, and it stores a hash of that email.', 'ironlatch-security-scanner' ) . '</p>';
 		echo '</details></div>';
 	}
 
 	private static function tip( string $text ): void {
 		static $n = 0;
 		++$n;
-		$id = 'amsec-comment-tip-' . $n;
-		echo '<span class="amsec-tip"><button type="button" class="amsec-tip-button" aria-describedby="' . esc_attr( $id ) . '">' . esc_html__( 'Details', 'amsec-security-scanner' ) . '</button>';
-		echo '<span class="amsec-tip-bubble" id="' . esc_attr( $id ) . '" role="tooltip">' . esc_html( $text ) . '</span></span>';
+		$id = 'ironlatch-comment-tip-' . $n;
+		echo '<span class="ironlatch-tip"><button type="button" class="ironlatch-tip-button" aria-describedby="' . esc_attr( $id ) . '">' . esc_html__( 'Details', 'ironlatch-security-scanner' ) . '</button>';
+		echo '<span class="ironlatch-tip-bubble" id="' . esc_attr( $id ) . '" role="tooltip">' . esc_html( $text ) . '</span></span>';
 	}
 
 	public static function save(): void {
@@ -68,25 +68,25 @@ final class Page {
 		update_option( Decision::OPTION, Decision::flag( self::posted( Decision::OPTION ) ) );
 		update_option( Rate::OPTION, Rate::flag( self::posted( Rate::OPTION ) ) );
 		update_option( SpamHold::OPTION, SpamHold::flag( self::posted( SpamHold::OPTION ) ) );
-		wp_safe_redirect( \AmazingPlugins\Security\Admin\Brand::saved( admin_url( 'admin.php?page=amsec-traffic-guard#bots' ) ) );
+		wp_safe_redirect( \AmazingPlugins\Security\Admin\Brand::saved( admin_url( 'admin.php?page=ironlatch-traffic-guard#bots' ) ) );
 		exit;
 	}
 
 	public static function status( string $flag ): string {
 		if ( '1' === $flag ) {
-			return __( 'Comment checks are on.', 'amsec-security-scanner' );
+			return __( 'Comment checks are on.', 'ironlatch-security-scanner' );
 		}
-		return __( 'Comment checks are off.', 'amsec-security-scanner' );
+		return __( 'Comment checks are off.', 'ironlatch-security-scanner' );
 	}
 
 	private static function guard(): void {
 		if ( ! self::postRequest() ) {
-			wp_die( esc_html__( 'Open the comment checks page and use the form.', 'amsec-security-scanner' ), '', array( 'response' => 405 ) );
+			wp_die( esc_html__( 'Open the comment checks page and use the form.', 'ironlatch-security-scanner' ), '', array( 'response' => 405 ) );
 		}
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'Administrator access required.', 'amsec-security-scanner' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'Administrator access required.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );
 		}
-		check_admin_referer( 'amsec_comments_save' );
+		check_admin_referer( 'ironlatch_comments_save' );
 	}
 
 	private static function postRequest(): bool {

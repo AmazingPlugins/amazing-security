@@ -9,12 +9,12 @@ use AmazingPlugins\Security\Integrity\OptionGateway;
 use AmazingPlugins\Security\Login\AddressKey;
 final class WordPressClientAddress {
 	public static function peerConfirmed(): bool {
-		return defined( 'AMSEC_DIRECT_PEER_CONFIRMED' ) && true === AMSEC_DIRECT_PEER_CONFIRMED; }
+		return defined( 'IRONLATCH_DIRECT_PEER_CONFIRMED' ) && true === IRONLATCH_DIRECT_PEER_CONFIRMED; }
 	private function policy( ?OptionGateway $options = null ): ?array {
-		if ( defined( 'AMSEC_DISABLE_PROXY_HEADERS' ) && AMSEC_DISABLE_PROXY_HEADERS ) {
+		if ( defined( 'IRONLATCH_DISABLE_PROXY_HEADERS' ) && IRONLATCH_DISABLE_PROXY_HEADERS ) {
 			return ( new ProxyPolicy() )->read( null ); }
 		try {
-			return ( new ProxyPolicy() )->read( null === $options ? get_option( 'amsec_proxy_policy', null ) : $options->get( 'amsec_proxy_policy' ) );
+			return ( new ProxyPolicy() )->read( null === $options ? get_option( 'ironlatch_proxy_policy', null ) : $options->get( 'ironlatch_proxy_policy' ) );
 		} catch ( \Throwable ) {
 			return null; }
 	}

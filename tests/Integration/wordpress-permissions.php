@@ -1,9 +1,9 @@
 <?php
-if(!defined('WP_CLI')||!WP_CLI||DB_HOST!=='amsec-next-db'||!in_array(DB_NAME,['wordpress','wordpress69'],true)){exit(1);}
+if(!defined('WP_CLI')||!WP_CLI||DB_HOST!=='ironlatch-next-db'||!in_array(DB_NAME,['wordpress','wordpress69'],true)){exit(1);}
 use AmazingPlugins\Security\Checks\FilesystemPermissionsCheck;
 use AmazingPlugins\Security\Checks\UploadsExecutionCheck;
 use AmazingPlugins\Security\Scan\ScanContext;
-$dir=WP_CONTENT_DIR.'/amsec-mode-fixture-'.bin2hex(random_bytes(4));mkdir($dir,0700);$file=$dir.'/fixture.txt';file_put_contents($file,'Harmless mode fixture');$original=hash_file('sha256',$file);
+$dir=WP_CONTENT_DIR.'/ironlatch-mode-fixture-'.bin2hex(random_bytes(4));mkdir($dir,0700);$file=$dir.'/fixture.txt';file_put_contents($file,'Harmless mode fixture');$original=hash_file('sha256',$file);
 try{
  foreach([[0600,'pass'],[0644,'warn'],[0666,'warn']] as [$mode,$expected]){chmod($file,$mode);$row=(new FilesystemPermissionsCheck(['configuration'=>$file]))->run(new ScanContext())[0];if($row->state!==$expected||str_contains(json_encode($row->toArray()),$dir)||$row->coverage!=='partial'){throw new RuntimeException('Mode interpretation/redaction failed.');}}
  chmod($dir,0777);$row=(new FilesystemPermissionsCheck(['uploads'=>$dir]))->run(new ScanContext())[0];if($row->state!=='warn'){throw new RuntimeException('World-writable directory missed.');}chmod($dir,0700);

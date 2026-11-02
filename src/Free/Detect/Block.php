@@ -22,7 +22,7 @@ final class Block {
 			if ( $total > 2048 ) {
 				return false;
 			}
-			if ( 'amsec_block_probe' === $key || str_contains( $value, 'amsec_webshell_marker_<?php' ) ) {
+			if ( 'ironlatch_block_probe' === $key || str_contains( $value, 'ironlatch_webshell_marker_<?php' ) ) {
 				return true;
 			}
 		}

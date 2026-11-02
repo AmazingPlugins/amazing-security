@@ -11,7 +11,7 @@ use AmazingPlugins\Security\Integrity\Manifest;
 use AmazingPlugins\Security\Integrity\WordPressOptions;
 use AmazingPlugins\Security\Scan\ScanContext;
 
-$root = sys_get_temp_dir() . '/amsec-file-fixture-' . bin2hex( random_bytes( 4 ) );
+$root = sys_get_temp_dir() . '/ironlatch-file-fixture-' . bin2hex( random_bytes( 4 ) );
 mkdir( $root );
 file_put_contents( $root . '/known.php', '<?php echo 1;' );
 file_put_contents( $root . '/extra.php', '<?php eval(base64_decode("ZWNobyAxOw=="));' );
@@ -36,8 +36,8 @@ $store->complete( 'fixture-1', FileScanReport::fromCursor( $cursor ) );
 if ( 'warn' !== $store->latestCompleted()->state || 'warn' !== $store->historicalWarnings()[0]->state ) {
 	throw new RuntimeException( 'Completed warning or history was not saved.' );
 }
-$raw = get_option( 'amsec_security_scanner_file_scan_completed' );
-if ( str_contains( $raw, 'ZWNobyAxOw==' ) || str_contains( $raw, $root ) || isset( wp_load_alloptions()['amsec_security_scanner_file_scan_completed'] ) ) {
+$raw = get_option( 'ironlatch_security_scanner_file_scan_completed' );
+if ( str_contains( $raw, 'ZWNobyAxOw==' ) || str_contains( $raw, $root ) || isset( wp_load_alloptions()['ironlatch_security_scanner_file_scan_completed'] ) ) {
 	throw new RuntimeException( 'Stored report contains content, absolute paths, or autoloaded data.' );
 }
 $partial = new FileScanCursor( 'fixture-2' );
@@ -50,9 +50,9 @@ $store->saveProgress( 'fixture-2', new FileScanStep( $partial, true ) );
 if ( 'warn' !== $store->latestCompleted()->state ) {
 	throw new RuntimeException( 'Partial scan erased prior warning.' );
 }
-delete_option( 'amsec_security_scanner_file_scan_active' );
-delete_option( 'amsec_security_scanner_file_scan_completed' );
-delete_option( 'amsec_security_scanner_file_scan_history' );
+delete_option( 'ironlatch_security_scanner_file_scan_active' );
+delete_option( 'ironlatch_security_scanner_file_scan_completed' );
+delete_option( 'ironlatch_security_scanner_file_scan_history' );
 unlink( $root . '/known.php' );
 unlink( $root . '/extra.php' );
 rmdir( $root );

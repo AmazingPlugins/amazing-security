@@ -8,9 +8,9 @@ defined( 'ABSPATH' ) || exit;
 
 /** Apache rule for image requests. Nginx does not read this file. */
 final class HotlinkRule {
-	public const BEGIN = '# Begin AmSec Security Scanner hotlink';
+	public const BEGIN = '# Begin Ironlatch Security Scanner hotlink';
 
-	public const END = '# End AmSec Security Scanner hotlink';
+	public const END = '# End Ironlatch Security Scanner hotlink';
 
 	public static function snippet( string $host ): string {
 		$host = strtolower( trim( $host ) );

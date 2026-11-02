@@ -13,25 +13,25 @@ use PHPUnit\Framework\TestCase;
 final class SubmenuTest extends TestCase {
 	public function test_the_side_menu_is_scan_recommendations_authentication_traffic_files_records_and_settings(): void {
 		self::assertSame(
-			array( 'amsec-security-scanner', 'amsec-recommendations', 'amsec-accounts', 'amsec-traffic-guard', 'amsec-files', 'amsec-records', 'amsec-settings', 'amsec-assistant' ),
+			array( 'ironlatch-security-scanner', 'ironlatch-recommendations', 'ironlatch-accounts', 'ironlatch-traffic-guard', 'ironlatch-files', 'ironlatch-records', 'ironlatch-settings', 'ironlatch-assistant' ),
 			array_merge( array( Submenu::PARENT ), Submenu::visible() )
 		);
 	}
 
 	public function test_extra_screens_are_hidden_and_the_scan_page_stays(): void {
 		$registered = array(
-			'amsec-security-scanner',
-			'amsec-accounts',
-			'amsec-traffic-guard',
-			'amsec-tools',
-			'amsec-fix-review',
-			'amsec-activity',
-			'amsec-repair',
-			'amsec-guide',
-			'amsec-review',
+			'ironlatch-security-scanner',
+			'ironlatch-accounts',
+			'ironlatch-traffic-guard',
+			'ironlatch-tools',
+			'ironlatch-fix-review',
+			'ironlatch-activity',
+			'ironlatch-repair',
+			'ironlatch-guide',
+			'ironlatch-review',
 		);
 		self::assertSame(
-			array( 'amsec-tools', 'amsec-fix-review', 'amsec-activity', 'amsec-repair', 'amsec-guide', 'amsec-review' ),
+			array( 'ironlatch-tools', 'ironlatch-fix-review', 'ironlatch-activity', 'ironlatch-repair', 'ironlatch-guide', 'ironlatch-review' ),
 			Submenu::hidden( $registered )
 		);
 	}

@@ -1,16 +1,16 @@
 <?php
 // Only on named disposable databases, after installing the exact private ZIP.
-if ( ! defined('WP_CLI') || ! WP_CLI || 'amsec-next-db' !== DB_HOST || ! in_array(DB_NAME,['wordpress','wordpress69'],true) ) { exit(1); }
+if ( ! defined('WP_CLI') || ! WP_CLI || 'ironlatch-next-db' !== DB_HOST || ! in_array(DB_NAME,['wordpress','wordpress69'],true) ) { exit(1); }
 use AmazingPlugins\Security\Activity\ActivityEvent;
 use AmazingPlugins\Security\Activity\ActivityRepository;
 use AmazingPlugins\Security\Activity\ActivityPage;
 global $wpdb;
 $r=new ActivityRepository($wpdb);
-$table=$wpdb->prefix.'amsec_activity';
+$table=$wpdb->prefix.'ironlatch_activity';
 $wpdb->query("DELETE FROM {$table}");
-update_option('amsec_activity_enabled','1',false);
+update_option('ironlatch_activity_enabled','1',false);
 wp_set_current_user(1);
-$id=wp_insert_user(['user_login'=>'amsec-activity-fixture-'.bin2hex(random_bytes(4)),'user_pass'=>bin2hex(random_bytes(16)),'role'=>'subscriber']);
+$id=wp_insert_user(['user_login'=>'ironlatch-activity-fixture-'.bin2hex(random_bytes(4)),'user_pass'=>bin2hex(random_bytes(16)),'role'=>'subscriber']);
 if(is_wp_error($id)){throw new RuntimeException('Fixture user creation failed.');}
 $user=get_user_by('id',$id);$user->set_role('editor');
 $secret=bin2hex(random_bytes(16));wp_set_password($secret,$id);
@@ -20,7 +20,7 @@ if(is_wp_error($ok)){throw new RuntimeException('Normal login failed.');}
 $bad=wp_signon(['user_login'=>$user->user_login,'user_password'=>$secret.'bad'],false);
 if(!is_wp_error($bad)){throw new RuntimeException('Bad password accepted.');}
 wp_set_current_user(1);
-update_option('amsec_login_xmlrpc_disabled','activity-fixture');
+update_option('ironlatch_login_xmlrpc_disabled','activity-fixture');
 $rows=$r->page();$events=array_column($rows,'event');
 foreach(['login_succeeded','login_failed','user_created','user_role_changed','security_setting_changed'] as $event){if(!in_array($event,$events,true)){throw new RuntimeException('Missing actual event: '.$event);}}
 if(str_contains(json_encode($rows),$secret)||str_contains(json_encode($rows),$user->user_login)){throw new RuntimeException('Sensitive login material retained.');}

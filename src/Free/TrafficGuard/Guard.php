@@ -17,11 +17,11 @@ final class Guard {
 		$this->record( $server );
 		$lists = new BlockList();
 		if ( $lists->blocked( $this->list( Options::HOSTNAMES ), $this->list( Options::AGENTS ), $this->list( Options::REFERRERS ), $server, $this->canManage() ) ) {
-			$this->deny( __( 'Request blocked.', 'amsec-security-scanner' ) );
+			$this->deny( __( 'Request blocked.', 'ironlatch-security-scanner' ) );
 		}
 		$hotlink = new Hotlink();
 		if ( $hotlink->blocked( $this->enabled( Options::HOTLINK ), $server, $this->siteHost() ) ) {
-			$this->deny( __( 'Image request blocked.', 'amsec-security-scanner' ) );
+			$this->deny( __( 'Image request blocked.', 'ironlatch-security-scanner' ) );
 		}
 	}
 
@@ -35,15 +35,15 @@ final class Guard {
 			'HTTP_REFERER'    => $this->serverValue( 'HTTP_REFERER' ),
 		);
 		if ( ( function_exists( 'wp_doing_cron' ) && wp_doing_cron() ) || ( defined( 'DOING_CRON' ) && DOING_CRON ) ) {
-			$server['AMSEC_CRON'] = '1';
+			$server['IRONLATCH_CRON'] = '1';
 		}
 		$rest = ( defined( 'REST_REQUEST' ) && REST_REQUEST ) || ( function_exists( 'wp_is_serving_rest_request' ) && wp_is_serving_rest_request() );
 		if ( $rest ) {
-			$server['AMSEC_REST'] = '1';
+			$server['IRONLATCH_REST'] = '1';
 		}
 		$cli = in_array( PHP_SAPI, array( 'cli', 'phpdbg' ), true ) || ( defined( 'WP_CLI' ) && WP_CLI );
 		if ( $cli ) {
-			$server['AMSEC_CLI'] = '1';
+			$server['IRONLATCH_CLI'] = '1';
 		}
 		return $server;
 	}

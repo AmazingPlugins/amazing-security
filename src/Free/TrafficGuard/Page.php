@@ -20,11 +20,11 @@ use AmazingPlugins\Security\Traffic\TrafficSettings;
 final class Page {
 	public function register(): void {
 		add_submenu_page(
-			'amsec-security-scanner',
-			__( 'Traffic', 'amsec-security-scanner' ),
-			__( 'Traffic', 'amsec-security-scanner' ),
+			'ironlatch-security-scanner',
+			__( 'Traffic', 'ironlatch-security-scanner' ),
+			__( 'Traffic', 'ironlatch-security-scanner' ),
 			'manage_options',
-			'amsec-traffic-guard',
+			'ironlatch-traffic-guard',
 			array( $this, 'render' )
 		);
 		add_action( 'admin_enqueue_scripts', array( $this, 'assets' ) );
@@ -33,13 +33,13 @@ final class Page {
 	public function assets(): void {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin screen slug.
 		$page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( (string) $_GET['page'] ) ) : '';
-		if ( 'amsec-traffic-guard' !== $page ) {
+		if ( 'ironlatch-traffic-guard' !== $page ) {
 			return;
 		}
-		wp_enqueue_script( 'amsec-security-scanner-traffic', plugins_url( 'assets/admin-traffic.js', AMSEC_SECURITY_SCANNER_FILE ), array(), '0.1.0', true );
+		wp_enqueue_script( 'ironlatch-security-scanner-traffic', plugins_url( 'assets/admin-traffic.js', IRONLATCH_SECURITY_SCANNER_FILE ), array(), '0.1.0', true );
 		wp_localize_script(
-			'amsec-security-scanner-traffic',
-			'amsecTrafficExamples',
+			'ironlatch-security-scanner-traffic',
+			'ironlatchTrafficExamples',
 			array(
 				'fields'   => array(
 					'host'     => Options::HOSTNAMES,
@@ -49,16 +49,16 @@ final class Page {
 				'host'     => Examples::hostnames(),
 				'agent'    => Examples::agents(),
 				'referrer' => Examples::referrers(),
-				'added'    => __( 'Those lines are in the boxes. Save writes them.', 'amsec-security-scanner' ),
-				'already'  => __( 'Those lines are already in the boxes.', 'amsec-security-scanner' ),
-				'full'     => __( 'A box already has 20 lines.', 'amsec-security-scanner' ),
+				'added'    => __( 'Those lines are in the boxes. Save writes them.', 'ironlatch-security-scanner' ),
+				'already'  => __( 'Those lines are already in the boxes.', 'ironlatch-security-scanner' ),
+				'full'     => __( 'A box already has 20 lines.', 'ironlatch-security-scanner' ),
 			)
 		);
 	}
 
 	public function render(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'Administrator access required.', 'amsec-security-scanner' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'Administrator access required.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );
 		}
 		$hostnames = $this->stored( Options::HOSTNAMES );
 		$agents    = $this->stored( Options::AGENTS );
@@ -66,20 +66,20 @@ final class Page {
 		$live      = $this->stored( Options::LIVE );
 		$hotlink   = $this->stored( Options::HOTLINK );
 		$notice    = $this->notice();
-		echo '<div class="wrap amsec-security-scanner-admin">';
+		echo '<div class="wrap ironlatch-security-scanner-admin">';
 		if ( '' !== $notice ) {
 			echo '<div class="notice notice-info"><p>' . esc_html( $notice ) . '</p></div>';
 		}
 		ScreenTabs::bar(
 			array(
-				'bots'    => __( 'Comments and registration', 'amsec-security-scanner' ),
-				'lists'   => __( 'Lists', 'amsec-security-scanner' ),
-				'rest'    => __( 'REST rate controls', 'amsec-security-scanner' ),
-				'precise' => __( 'Precise blocks', 'amsec-security-scanner' ),
-				'network' => __( 'Network controls', 'amsec-security-scanner' ),
-				'headers' => __( 'Security headers', 'amsec-security-scanner' ),
-				'proxies' => __( 'Trusted proxies', 'amsec-security-scanner' ),
-				'history' => __( 'History', 'amsec-security-scanner' ),
+				'bots'    => __( 'Comments and registration', 'ironlatch-security-scanner' ),
+				'lists'   => __( 'Lists', 'ironlatch-security-scanner' ),
+				'rest'    => __( 'REST rate controls', 'ironlatch-security-scanner' ),
+				'precise' => __( 'Precise blocks', 'ironlatch-security-scanner' ),
+				'network' => __( 'Network controls', 'ironlatch-security-scanner' ),
+				'headers' => __( 'Security headers', 'ironlatch-security-scanner' ),
+				'proxies' => __( 'Trusted proxies', 'ironlatch-security-scanner' ),
+				'history' => __( 'History', 'ironlatch-security-scanner' ),
 			)
 		);
 		ScreenTabs::panel( 'bots', true );
@@ -89,24 +89,24 @@ final class Page {
 		( new \AmazingPlugins\Security\Bots\RateLimiter() )->render();
 		ScreenTabs::close();
 		ScreenTabs::panel( 'lists', false );
-		echo '<p>' . esc_html__( 'Block lists, the live log, and the hotlink check stay off until you turn them on.', 'amsec-security-scanner' ) . '</p>';
-		echo '<section class="amsec-overview"><form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
-		echo '<input type="hidden" name="action" value="amsec_traffic_guard">';
-		wp_nonce_field( 'amsec_traffic_guard_save' );
-		echo '<h2>' . esc_html__( 'Block lists', 'amsec-security-scanner' ) . '</h2>';
-		echo '<p>' . esc_html__( 'One entry per line, 20 lines at most, 120 characters each. An empty box stays off. Host lines must match the whole hostname. A browser line blocks any browser string that contains it. Referrer lines must start with http:// or https://. Administrators are not blocked. A list that matches this request is not saved.', 'amsec-security-scanner' ) . '</p>';
-		echo '<p class="amsec-example-actions"><button type="button" class="button" id="amsec-put-examples">' . esc_html__( 'Put recommended examples', 'amsec-security-scanner' ) . '</button></p>';
-		echo '<p id="amsec-example-note" class="amsec-example-note" hidden></p>';
-		$this->textarea( Options::HOSTNAMES, __( 'Hostname block list', 'amsec-security-scanner' ), $hostnames );
-		$this->textarea( Options::AGENTS, __( 'Browser block list', 'amsec-security-scanner' ), $agents );
-		$this->textarea( Options::REFERRERS, __( 'Referrer block list', 'amsec-security-scanner' ), $referrers );
-		echo '<h2>' . esc_html__( 'Live log', 'amsec-security-scanner' ) . '</h2>';
-		echo '<p>' . esc_html__( 'When this is on, up to 500 rows stay in the WordPress database. Each row stores the REMOTE_ADDR value (45 characters at most), the request path without the query string (200 characters at most), and a UTC unix time. wp-admin, cron, CLI, and REST requests are skipped. Turning this off stops recording and deletes the rows.', 'amsec-security-scanner' ) . '</p>';
-		$this->toggle( Options::LIVE, __( 'Live log', 'amsec-security-scanner' ), $live );
-		echo '<h2>' . esc_html__( 'Hotlink check', 'amsec-security-scanner' ) . '</h2>';
-		echo '<p>' . esc_html__( 'When this is on, an Apache rule is written in the uploads folder. jpg, jpeg, png, gif, and webp files are refused when the referrer is another site. An empty referrer is allowed. A referrer on this host is allowed. Nginx ignores that file.', 'amsec-security-scanner' ) . '</p>';
-		$this->toggle( Options::HOTLINK, __( 'Hotlink check', 'amsec-security-scanner' ), $hotlink );
-		submit_button( __( 'Save traffic controls', 'amsec-security-scanner' ) );
+		echo '<p>' . esc_html__( 'Block lists, the live log, and the hotlink check stay off until you turn them on.', 'ironlatch-security-scanner' ) . '</p>';
+		echo '<section class="ironlatch-overview"><form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
+		echo '<input type="hidden" name="action" value="ironlatch_traffic_guard">';
+		wp_nonce_field( 'ironlatch_traffic_guard_save' );
+		echo '<h2>' . esc_html__( 'Block lists', 'ironlatch-security-scanner' ) . '</h2>';
+		echo '<p>' . esc_html__( 'One entry per line, 20 lines at most, 120 characters each. An empty box stays off. Host lines must match the whole hostname. A browser line blocks any browser string that contains it. Referrer lines must start with http:// or https://. Administrators are not blocked. A list that matches this request is not saved.', 'ironlatch-security-scanner' ) . '</p>';
+		echo '<p class="ironlatch-example-actions"><button type="button" class="button" id="ironlatch-put-examples">' . esc_html__( 'Put recommended examples', 'ironlatch-security-scanner' ) . '</button></p>';
+		echo '<p id="ironlatch-example-note" class="ironlatch-example-note" hidden></p>';
+		$this->textarea( Options::HOSTNAMES, __( 'Hostname block list', 'ironlatch-security-scanner' ), $hostnames );
+		$this->textarea( Options::AGENTS, __( 'Browser block list', 'ironlatch-security-scanner' ), $agents );
+		$this->textarea( Options::REFERRERS, __( 'Referrer block list', 'ironlatch-security-scanner' ), $referrers );
+		echo '<h2>' . esc_html__( 'Live log', 'ironlatch-security-scanner' ) . '</h2>';
+		echo '<p>' . esc_html__( 'When this is on, up to 500 rows stay in the WordPress database. Each row stores the REMOTE_ADDR value (45 characters at most), the request path without the query string (200 characters at most), and a UTC unix time. wp-admin, cron, CLI, and REST requests are skipped. Turning this off stops recording and deletes the rows.', 'ironlatch-security-scanner' ) . '</p>';
+		$this->toggle( Options::LIVE, __( 'Live log', 'ironlatch-security-scanner' ), $live );
+		echo '<h2>' . esc_html__( 'Hotlink check', 'ironlatch-security-scanner' ) . '</h2>';
+		echo '<p>' . esc_html__( 'When this is on, an Apache rule is written in the uploads folder. jpg, jpeg, png, gif, and webp files are refused when the referrer is another site. An empty referrer is allowed. A referrer on this host is allowed. Nginx ignores that file.', 'ironlatch-security-scanner' ) . '</p>';
+		$this->toggle( Options::HOTLINK, __( 'Hotlink check', 'ironlatch-security-scanner' ), $hotlink );
+		submit_button( __( 'Save traffic controls', 'ironlatch-security-scanner' ) );
 		echo '</form></section>';
 		$this->logTable( '1' === $live );
 		ScreenTabs::close();
@@ -133,9 +133,9 @@ final class Page {
 
 	public function save(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'Administrator access required.', 'amsec-security-scanner' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'Administrator access required.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );
 		}
-		check_admin_referer( 'amsec_traffic_guard_save' );
+		check_admin_referer( 'ironlatch_traffic_guard_save' );
 		$post = wp_unslash( $_POST ); // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Nonce checked above. Each field is sanitized before it is saved.
 		if ( ! is_array( $post ) ) {
 			$post = array();
@@ -178,51 +178,51 @@ final class Page {
 	private function toggle( string $name, string $label, string $value ): void {
 		echo '<p><label for="' . esc_attr( $name ) . '">' . esc_html( $label ) . ' ';
 		echo '<select name="' . esc_attr( $name ) . '" id="' . esc_attr( $name ) . '">';
-		echo '<option value="0"' . selected( '1' === $value ? '1' : '0', '0', false ) . '>' . esc_html__( 'Off', 'amsec-security-scanner' ) . '</option>';
-		echo '<option value="1"' . selected( '1' === $value ? '1' : '0', '1', false ) . '>' . esc_html__( 'On', 'amsec-security-scanner' ) . '</option>';
+		echo '<option value="0"' . selected( '1' === $value ? '1' : '0', '0', false ) . '>' . esc_html__( 'Off', 'ironlatch-security-scanner' ) . '</option>';
+		echo '<option value="1"' . selected( '1' === $value ? '1' : '0', '1', false ) . '>' . esc_html__( 'On', 'ironlatch-security-scanner' ) . '</option>';
 		echo '</select></label></p>';
 	}
 
 	private function logTable( bool $enabled ): void {
-		echo '<h2>' . esc_html__( 'Latest 50 rows', 'amsec-security-scanner' ) . '</h2>';
+		echo '<h2>' . esc_html__( 'Latest 50 rows', 'ironlatch-security-scanner' ) . '</h2>';
 		if ( ! $enabled ) {
-			echo '<p>' . esc_html__( 'Logging is off.', 'amsec-security-scanner' ) . '</p>';
+			echo '<p>' . esc_html__( 'Logging is off.', 'ironlatch-security-scanner' ) . '</p>';
 			return;
 		}
 		try {
 			$stored = get_option( Options::LIVE_ROWS, array() );
 		} catch ( \Throwable $exception ) {
 			if ( $exception instanceof \Throwable ) {
-				echo '<p>' . esc_html__( 'The log could not be read.', 'amsec-security-scanner' ) . '</p>';
+				echo '<p>' . esc_html__( 'The log could not be read.', 'ironlatch-security-scanner' ) . '</p>';
 				return;
 			}
 		}
 		$rows = ( new LiveTraffic() )->latest( is_array( $stored ) ? $stored : array(), LiveTraffic::VIEW );
 		if ( array() === $rows ) {
-			echo '<p>' . esc_html__( 'No rows stored.', 'amsec-security-scanner' ) . '</p>';
+			echo '<p>' . esc_html__( 'No rows stored.', 'ironlatch-security-scanner' ) . '</p>';
 			return;
 		}
 		echo '<table class="widefat striped"><thead><tr>';
-		echo '<th scope="col">' . esc_html__( 'Time (UTC)', 'amsec-security-scanner' ) . '</th>';
-		echo '<th scope="col">' . esc_html__( 'Address', 'amsec-security-scanner' ) . '</th>';
-		echo '<th scope="col">' . esc_html__( 'Path', 'amsec-security-scanner' ) . '</th>';
+		echo '<th scope="col">' . esc_html__( 'Time (UTC)', 'ironlatch-security-scanner' ) . '</th>';
+		echo '<th scope="col">' . esc_html__( 'Address', 'ironlatch-security-scanner' ) . '</th>';
+		echo '<th scope="col">' . esc_html__( 'Path', 'ironlatch-security-scanner' ) . '</th>';
 		echo '</tr></thead><tbody>';
 		foreach ( $rows as $row ) {
-			$stamp = $row['time'] > 0 ? gmdate( 'Y-m-d H:i:s', $row['time'] ) : __( 'Unknown', 'amsec-security-scanner' );
+			$stamp = $row['time'] > 0 ? gmdate( 'Y-m-d H:i:s', $row['time'] ) : __( 'Unknown', 'ironlatch-security-scanner' );
 			echo '<tr><td>' . esc_html( $stamp ) . '</td><td>' . esc_html( $row['ip'] ) . '</td><td>' . esc_html( $row['path'] ) . '</td></tr>';
 		}
 		echo '</tbody></table>';
 	}
 
 	private function notice(): string {
-		$status = isset( $_GET['amsec_traffic_guard'] ) ? sanitize_key( wp_unslash( (string) $_GET['amsec_traffic_guard'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only status flag after a verified save redirect.
+		$status = isset( $_GET['ironlatch_traffic_guard'] ) ? sanitize_key( wp_unslash( (string) $_GET['ironlatch_traffic_guard'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only status flag after a verified save redirect.
 		$notes  = array(
-			'saved'  => __( 'Traffic controls saved.', 'amsec-security-scanner' ),
-			'count'  => __( 'Use 20 entries or fewer in each list.', 'amsec-security-scanner' ),
-			'length' => __( 'Use 120 characters or fewer for each entry.', 'amsec-security-scanner' ),
-			'prefix' => __( 'Referrer entries have to start with http:// or https://.', 'amsec-security-scanner' ),
-			'self'   => __( 'That list matches this request, so nothing was saved.', 'amsec-security-scanner' ),
-			'save'   => __( 'The traffic controls could not be saved.', 'amsec-security-scanner' ),
+			'saved'  => __( 'Traffic controls saved.', 'ironlatch-security-scanner' ),
+			'count'  => __( 'Use 20 entries or fewer in each list.', 'ironlatch-security-scanner' ),
+			'length' => __( 'Use 120 characters or fewer for each entry.', 'ironlatch-security-scanner' ),
+			'prefix' => __( 'Referrer entries have to start with http:// or https://.', 'ironlatch-security-scanner' ),
+			'self'   => __( 'That list matches this request, so nothing was saved.', 'ironlatch-security-scanner' ),
+			'save'   => __( 'The traffic controls could not be saved.', 'ironlatch-security-scanner' ),
 		);
 		return $notes[ $status ] ?? '';
 	}
@@ -306,7 +306,7 @@ final class Page {
 	}
 
 	private function redirect( string $code ): void {
-		wp_safe_redirect( admin_url( 'admin.php?page=amsec-traffic-guard&amsec_traffic_guard=' . rawurlencode( $code ) . '#lists' ) );
+		wp_safe_redirect( admin_url( 'admin.php?page=ironlatch-traffic-guard&ironlatch_traffic_guard=' . rawurlencode( $code ) . '#lists' ) );
 		exit;
 	}
 }

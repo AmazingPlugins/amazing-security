@@ -67,8 +67,8 @@ final class LiveTrafficTest extends TestCase {
 			)
 		);
 		self::assertFalse( $log->shouldStore( true, array( 'REQUEST_URI' => '/wp-admin/index.php' ) ) );
-		self::assertFalse( $log->shouldStore( true, array( 'AMSEC_CRON' => '1', 'REQUEST_URI' => '/' ) ) );
-		self::assertFalse( $log->shouldStore( true, array( 'AMSEC_CLI' => '1', 'REQUEST_URI' => '/' ) ) );
-		self::assertFalse( $log->shouldStore( true, array( 'AMSEC_REST' => '1', 'REQUEST_URI' => '/' ) ) );
+		self::assertFalse( $log->shouldStore( true, array( 'IRONLATCH_CRON' => '1', 'REQUEST_URI' => '/' ) ) );
+		self::assertFalse( $log->shouldStore( true, array( 'IRONLATCH_CLI' => '1', 'REQUEST_URI' => '/' ) ) );
+		self::assertFalse( $log->shouldStore( true, array( 'IRONLATCH_REST' => '1', 'REQUEST_URI' => '/' ) ) );
 	}
 }

@@ -10,7 +10,7 @@ final class TrafficSettingsService {
 	private mixed $raw = null;
 	public function __construct( private readonly OptionGateway $options ) {}
 	public function status(): array {
-		$this->raw = $this->options->get( 'amsec_traffic_policy' );
+		$this->raw = $this->options->get( 'ironlatch_traffic_policy' );
 		return ( new TrafficPolicy() )->read( $this->raw ) ?? array( 'invalid' => true ); }
 	public function fingerprint(): string {
 		$this->status();
@@ -21,13 +21,13 @@ final class TrafficSettingsService {
 		if ( ( new TrafficPolicy() )->fingerprint( $this->raw ) !== $expected ) {
 			return 'changed'; }
 		$encoded = $this->encode( $enabled );
-		$ok      = null === $this->raw ? $this->options->add( 'amsec_traffic_policy', $encoded ) : $this->options->replaceIfSame( 'amsec_traffic_policy', $this->raw, $encoded );
-		return $ok && $this->options->get( 'amsec_traffic_policy' ) === $encoded ? 'saved' : 'failed';
+		$ok      = null === $this->raw ? $this->options->add( 'ironlatch_traffic_policy', $encoded ) : $this->options->replaceIfSame( 'ironlatch_traffic_policy', $this->raw, $encoded );
+		return $ok && $this->options->get( 'ironlatch_traffic_policy' ) === $encoded ? 'saved' : 'failed';
 	}
 	public function disable(): bool {
 		$s = $this->encode( false );
-		$this->options->set( 'amsec_traffic_policy', $s );
-		return $this->options->get( 'amsec_traffic_policy' ) === $s; }
+		$this->options->set( 'ironlatch_traffic_policy', $s );
+		return $this->options->get( 'ironlatch_traffic_policy' ) === $s; }
 	private function encode( bool $enabled ): string {
 	 // phpcs:ignore WordPress.WP.AlternativeFunctions.json_encode_json_encode -- Pure fixed policy serialization.
 		return json_encode(

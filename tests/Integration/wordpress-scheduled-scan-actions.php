@@ -12,7 +12,7 @@ $options = new WordPressOptions();
 $integrity = new WordPressIntegrityStore( $options );
 $files = new WordPressFileScanStore( $options );
 $cycle = new SuiteCycle( $options );
-$options->delete( 'amsec_suite_cycle' );
+$options->delete( 'ironlatch_suite_cycle' );
 if ( ! $cycle->start( time() ) ) {
 	throw new RuntimeException( 'Could not start scheduled suite.' );
 }
@@ -22,7 +22,7 @@ if ( null === $integrity->latestProgress() && null === $integrity->latestComplet
 	throw new RuntimeException( 'Scheduled integrity step saved no state.' );
 }
 
-$options->delete( 'amsec_suite_cycle' );
+$options->delete( 'ironlatch_suite_cycle' );
 if ( ! $cycle->start( time() ) || ! $cycle->advance( 'integrity', 'files', time() ) ) {
 	throw new RuntimeException( 'Could not move test to file stage.' );
 }

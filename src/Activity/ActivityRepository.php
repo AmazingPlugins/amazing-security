@@ -14,7 +14,7 @@ final class ActivityRepository {
 	private readonly string $table;
 
 	public function __construct( private readonly object $db ) {
-		$this->table = $db->prefix . 'amsec_activity';
+		$this->table = $db->prefix . 'ironlatch_activity';
 	}
 
 	public function append( ActivityEvent $event ): bool {
@@ -22,7 +22,7 @@ final class ActivityRepository {
 	}
 
 	private function appendQuiet( ActivityEvent $event ): bool {
-		$lock = 'amsec_activity_' . substr( hash( 'sha256', $this->table . ( defined( 'DB_NAME' ) ? DB_NAME : '' ) ), 0, 32 );
+		$lock = 'ironlatch_activity_' . substr( hash( 'sha256', $this->table . ( defined( 'DB_NAME' ) ? DB_NAME : '' ) ), 0, 32 );
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Zero-wait lock bounds concurrent quota admission.
 		if ( '1' !== (string) $this->db->get_var( $this->db->prepare( 'SELECT GET_LOCK(%s, 0)', $lock ) ) ) {
 			return false;

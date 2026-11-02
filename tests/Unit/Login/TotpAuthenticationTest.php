@@ -45,7 +45,7 @@ namespace AmazingPlugins\Security\Tests\Unit\Login {
 			self::assertSame( $wrongPassword, $auth->authenticate( $wrongPassword, 'owner', 'wrong' ) );
 			$_POST = array();
 			self::assertInstanceOf( \WP_Error::class, $auth->authenticate( $admin, 'owner', 'correct' ) );
-			$_POST['amsec_otp'] = ( new Totp() )->atStep( $seed, intdiv( time(), 30 ) );
+			$_POST['ironlatch_otp'] = ( new Totp() )->atStep( $seed, intdiv( time(), 30 ) );
 			self::assertSame( $admin, $auth->authenticate( $admin, 'owner', 'correct' ) );
 			self::assertInstanceOf( \WP_Error::class, $auth->authenticate( $admin, 'owner', 'correct' ) );
 			$customer = new \WP_User( 8, false );

@@ -1,9 +1,9 @@
 <?php
 // Disposable Docker WordPress only. Reproduces a second writer changing a cached option.
-if ( ! defined( 'WP_CLI' ) || ! WP_CLI || 'amsec-next-db' !== DB_HOST || ! in_array( DB_NAME, array( 'wordpress', 'wordpress69' ), true ) ) { exit( 1 ); }
+if ( ! defined( 'WP_CLI' ) || ! WP_CLI || 'ironlatch-next-db' !== DB_HOST || ! in_array( DB_NAME, array( 'wordpress', 'wordpress69' ), true ) ) { exit( 1 ); }
 use AmazingPlugins\Security\Integrity\WordPressOptions;
 global $wpdb;
-$key = 'amsec_test_cas_' . bin2hex( random_bytes( 8 ) );
+$key = 'ironlatch_test_cas_' . bin2hex( random_bytes( 8 ) );
 $options = new WordPressOptions();
 try {
     if ( ! $options->add( $key, 'first' ) || 'first' !== $options->get( $key ) ) { throw new RuntimeException( 'Fixture setup failed.' ); }

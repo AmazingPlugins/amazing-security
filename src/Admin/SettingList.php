@@ -13,12 +13,12 @@ final class SettingList {
 	 */
 	public static function render( string $title, string $intro, array $rows ): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'Administrator access required.', 'amsec-security-scanner' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'Administrator access required.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );
 		}
-		echo '<div class="wrap amsec-security-scanner-admin"><h1>' . esc_html( $title ) . '</h1>';
-		echo '<p>' . esc_html( $intro ) . '</p><ul class="amsec-settings">';
+		echo '<div class="wrap ironlatch-security-scanner-admin"><h1>' . esc_html( $title ) . '</h1>';
+		echo '<p>' . esc_html( $intro ) . '</p><ul class="ironlatch-settings">';
 		foreach ( $rows as $row ) {
-			echo '<li><a href="' . esc_url( $row['url'] ) . '"><span class="amsec-settings-copy"><strong>' . esc_html( $row['label'] ) . '</strong><span>' . esc_html( $row['note'] ) . '</span></span><span class="amsec-settings-go">' . esc_html__( 'Open', 'amsec-security-scanner' ) . '</span></a></li>';
+			echo '<li><a href="' . esc_url( $row['url'] ) . '"><span class="ironlatch-settings-copy"><strong>' . esc_html( $row['label'] ) . '</strong><span>' . esc_html( $row['note'] ) . '</span></span><span class="ironlatch-settings-go">' . esc_html__( 'Open', 'ironlatch-security-scanner' ) . '</span></a></li>';
 		}
 		echo '</ul></div>';
 	}

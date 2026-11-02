@@ -1,5 +1,5 @@
 ( function ( $ ) {
-	var d = window.amsecTour;
+	var d = window.ironlatchTour;
 	var steps = d.steps.filter( function ( s ) {
 		return $( s.target ).filter( ':visible' ).length;
 	} );
@@ -11,10 +11,10 @@
 		steps.unshift( d.phone );
 	}
 	var i = 0;
-	var $dim = $( '<div class="amsec-tour-dim"></div>' );
+	var $dim = $( '<div class="ironlatch-tour-dim"></div>' );
 
 	function clear() {
-		$( '.amsec-tour-target' ).removeClass( 'amsec-tour-target' );
+		$( '.ironlatch-tour-target' ).removeClass( 'ironlatch-tour-target' );
 	}
 
 	function finish() {
@@ -28,7 +28,7 @@
 		var last = i === steps.length - 1;
 		var $el = $( s.target ).filter( ':visible' ).first();
 		clear();
-		$el.addClass( 'amsec-tour-target' );
+		$el.addClass( 'ironlatch-tour-target' );
 		if ( ! $el.closest( '#adminmenu, #wpadminbar' ).length ) {
 			$el[ 0 ].scrollIntoView( { block: 'center' } );
 		}

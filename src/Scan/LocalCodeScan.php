@@ -18,7 +18,7 @@ use Throwable;
 
 /** Scans plugin, theme, and uploads PHP with the local patterns. It does not contact WordPress.org. */
 final class LocalCodeScan {
-	public const OPTION = 'amsec_local_code_state';
+	public const OPTION = 'ironlatch_local_code_state';
 
 	/** @return array{stored: string, found: int, scanned: int, matches: string} */
 	public static function snapshot(): array {
@@ -53,7 +53,7 @@ final class LocalCodeScan {
 		);
 	}
 
-	public const TICK = 'amsec_local_code_tick';
+	public const TICK = 'ironlatch_local_code_tick';
 
 	/** Entries read from one folder, and targets in one pass. Past either, the pass is marked partial. */
 	private const DIR_ENTRIES = 2000;

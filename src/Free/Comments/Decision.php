@@ -8,8 +8,8 @@ defined( 'ABSPATH' ) || exit;
 
 /** Accept or reject from the extra comment field. No WordPress calls. */
 final class Decision {
-	public const OPTION = 'amsec_comment_honeypot';
-	public const FIELD  = 'amsec_comment_company';
+	public const OPTION = 'ironlatch_comment_honeypot';
+	public const FIELD  = 'ironlatch_comment_company';
 
 	public static function flag( mixed $value ): string {
 		return '1' === $value ? '1' : '0';

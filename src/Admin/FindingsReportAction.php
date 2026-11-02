@@ -13,13 +13,13 @@ use AmazingPlugins\Security\Findings\FindingsRepository;
 final class FindingsReportAction {
 	public function handle(): void {
 		if ( ! current_user_can( 'manage_options' ) || ! FixApprovalAction::cookieAuthenticated() ) {
-			wp_die( esc_html__( 'A current administrator session is required.', 'amsec-security-scanner' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'A current administrator session is required.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );
 		}
-		check_admin_referer( 'amsec_findings_report' );
+		check_admin_referer( 'ironlatch_findings_report' );
 		$report = FindingsReport::text( ( new FindingsRepository() )->latest() );
 		nocache_headers();
 		header( 'Content-Type: text/plain; charset=utf-8' );
-		header( 'Content-Disposition: attachment; filename="amsec-security-scanner-findings.txt"' );
+		header( 'Content-Disposition: attachment; filename="ironlatch-security-scanner-findings.txt"' );
 		header( 'X-Content-Type-Options: nosniff' );
 		echo $report; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Plain-text download, not HTML.
 		exit;

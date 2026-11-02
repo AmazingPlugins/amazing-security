@@ -89,10 +89,10 @@ final class SiteRiskTest extends TestCase {
 				array( 'area' => 'nope', 'status' => 'good', 'reason' => 'on' ),
 			)
 		);
-		self::assertStringContainsString( '<h2 id="amsec-risk-title">', $html );
-		self::assertStringContainsString( '<span class="amsec-pill is-risk">Risk</span>', $html );
-		self::assertStringContainsString( '<span class="amsec-pill is-on">Good</span>', $html );
-		self::assertStringContainsString( 'page=amsec-traffic-guard', $html );
+		self::assertStringContainsString( '<h2 id="ironlatch-risk-title">', $html );
+		self::assertStringContainsString( '<span class="ironlatch-pill is-risk">Risk</span>', $html );
+		self::assertStringContainsString( '<span class="ironlatch-pill is-on">Good</span>', $html );
+		self::assertStringContainsString( 'page=ironlatch-traffic-guard', $html );
 		self::assertSame( 2, substr_count( $html, '<li ' ) );
 	}
 }

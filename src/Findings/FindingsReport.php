@@ -12,17 +12,17 @@ use AmazingPlugins\Security\Scan\ScanRun;
 final class FindingsReport {
 	public static function text( ?ScanRun $run ): string {
 		$lines = array(
-			__( 'AmSec Security Scanner findings', 'amsec-security-scanner' ),
-			__( 'This is a starting list for the site owner or a host. It is not a compliance report. It does not show that the site is clean.', 'amsec-security-scanner' ),
-			__( 'Login CAPTCHA and compromised-password checks stay on this site. No password or login attempt was sent.', 'amsec-security-scanner' ),
+			__( 'Ironlatch Security Scanner findings', 'ironlatch-security-scanner' ),
+			__( 'This is a starting list for the site owner or a host. It is not a compliance report. It does not show that the site is clean.', 'ironlatch-security-scanner' ),
+			__( 'Login CAPTCHA and compromised-password checks stay on this site. No password or login attempt was sent.', 'ironlatch-security-scanner' ),
 			'',
 		);
 		if ( null === $run ) {
-			$lines[] = __( 'No completed local check is stored.', 'amsec-security-scanner' );
+			$lines[] = __( 'No completed local check is stored.', 'ironlatch-security-scanner' );
 			return implode( "\n", $lines ) . "\n";
 		}
-		$lines[] = sprintf( /* translators: %s: time the completed local check finished, in ISO 8601 format. */ __( 'Checked: %s', 'amsec-security-scanner' ), $run->finishedAt->format( 'c' ) );
-		$lines[] = $run->partial ? __( 'This check did not finish.', 'amsec-security-scanner' ) : __( 'This check finished.', 'amsec-security-scanner' );
+		$lines[] = sprintf( /* translators: %s: time the completed local check finished, in ISO 8601 format. */ __( 'Checked: %s', 'ironlatch-security-scanner' ), $run->finishedAt->format( 'c' ) );
+		$lines[] = $run->partial ? __( 'This check did not finish.', 'ironlatch-security-scanner' ) : __( 'This check finished.', 'ironlatch-security-scanner' );
 		$lines[] = '';
 		foreach ( $run->results as $result ) {
 			if ( ! $result instanceof CheckResult ) {
@@ -37,12 +37,12 @@ final class FindingsReport {
 
 	private static function state( string $state ): string {
 		return match ( $state ) {
-			'critical' => __( 'Critical', 'amsec-security-scanner' ),
-			'fail' => __( 'Needs a change', 'amsec-security-scanner' ),
-			'warn' => __( 'Needs attention', 'amsec-security-scanner' ),
-			'pass' => __( 'Configured', 'amsec-security-scanner' ),
-			'unknown' => __( 'Could not check', 'amsec-security-scanner' ),
-			default => __( 'Could not check', 'amsec-security-scanner' ),
+			'critical' => __( 'Critical', 'ironlatch-security-scanner' ),
+			'fail' => __( 'Needs a change', 'ironlatch-security-scanner' ),
+			'warn' => __( 'Needs attention', 'ironlatch-security-scanner' ),
+			'pass' => __( 'Configured', 'ironlatch-security-scanner' ),
+			'unknown' => __( 'Could not check', 'ironlatch-security-scanner' ),
+			default => __( 'Could not check', 'ironlatch-security-scanner' ),
 		};
 	}
 

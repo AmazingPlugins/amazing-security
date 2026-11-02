@@ -1,19 +1,19 @@
 <?php
 // Disposable Docker site only, via wp eval-file. Makes bounded HTTP requests to this same site.
-// Usage: AMSEC_BENCHMARK_URL=http://container wp eval-file ... --user=admin
+// Usage: IRONLATCH_BENCHMARK_URL=http://container wp eval-file ... --user=admin
 if ( ! defined( 'WP_CLI' ) || ! WP_CLI ) { exit( 1 ); }
 use AmazingPlugins\Security\Firewall\RequestInspector;
 
 global $wpdb;
-$base = getenv( 'AMSEC_BENCHMARK_URL' );
-if ( ! is_string( $base ) || ! preg_match( '~^http://amsec-next-wp(?:69)?$~D', $base ) ) { throw new RuntimeException( 'Only the named disposable Docker sites are allowed.' ); }
-if ( 'amsec-next-db' !== DB_HOST || DB_NAME !== ( str_ends_with( $base, '69' ) ? 'wordpress69' : 'wordpress' ) ) { throw new RuntimeException( 'Bootstrap database does not match the disposable HTTP target.' ); }
+$base = getenv( 'IRONLATCH_BENCHMARK_URL' );
+if ( ! is_string( $base ) || ! preg_match( '~^http://ironlatch-next-wp(?:69)?$~D', $base ) ) { throw new RuntimeException( 'Only the named disposable Docker sites are allowed.' ); }
+if ( 'ironlatch-next-db' !== DB_HOST || DB_NAME !== ( str_ends_with( $base, '69' ) ? 'wordpress69' : 'wordpress' ) ) { throw new RuntimeException( 'Bootstrap database does not match the disposable HTTP target.' ); }
 if ( str_ends_with( $base, '69' ) && ! class_exists( 'WC_Product_Simple' ) ) { throw new RuntimeException( 'WooCommerce is required for the 6.9 cart matrix.' ); }
-$toggle = WPMU_PLUGIN_DIR . '/amsec-request-benchmark.php';
+$toggle = WPMU_PLUGIN_DIR . '/ironlatch-request-benchmark.php';
 if ( file_exists( $toggle ) ) { throw new RuntimeException( 'Benchmark toggle already exists; inspect it before proceeding.' ); }
-$read = static function () use ( $wpdb ) { return $wpdb->get_var( $wpdb->prepare( "SELECT option_value FROM {$wpdb->options} WHERE option_name = %s", 'amsec_rest_observations' ) ); };
+$read = static function () use ( $wpdb ) { return $wpdb->get_var( $wpdb->prepare( "SELECT option_value FROM {$wpdb->options} WHERE option_name = %s", 'ironlatch_rest_observations' ) ); };
 $saved = $read();
-$clear = static function () use ( $wpdb ): void { $wpdb->delete( $wpdb->options, array( 'option_name' => 'amsec_rest_observations' ) ); wp_cache_delete( 'amsec_rest_observations', 'options' ); wp_cache_delete( 'notoptions', 'options' ); wp_cache_delete( 'alloptions', 'options' ); };
+$clear = static function () use ( $wpdb ): void { $wpdb->delete( $wpdb->options, array( 'option_name' => 'ironlatch_rest_observations' ) ); wp_cache_delete( 'ironlatch_rest_observations', 'options' ); wp_cache_delete( 'notoptions', 'options' ); wp_cache_delete( 'alloptions', 'options' ); };
 $summary = static function () use ( $read ): array { return json_decode( $read() ?? '{}', true ) ?? array(); };
 $count = static function () use ( $summary ): int { return array_sum( array_column( $summary(), 'count' ) ); };
 $assert = static function ( bool $pass, string $message ): void { if ( ! $pass ) { throw new RuntimeException( $message ); } };
@@ -64,7 +64,7 @@ try {
 
     if ( class_exists( 'WC_Product_Simple' ) ) {
         $product = new WC_Product_Simple();
-        $product->set_name( 'Disposable AmSec Security Scanner cart fixture' );
+        $product->set_name( 'Disposable Ironlatch Security Scanner cart fixture' );
         $product->set_regular_price( '1' );
         $product->set_virtual( true );
         $product->set_status( 'publish' );
@@ -87,7 +87,7 @@ try {
     foreach ( array( 'ordinary' => 'hello', 'matching' => '../docs UNION SELECT' ) as $kind => $query ) {
         foreach ( array( 'disabled', 'observe', 'observe', 'disabled' ) as $mode ) {
             if ( 'disabled' === $mode ) {
-                $assert( false !== file_put_contents( $toggle, '<?php define("AMSEC_DISABLE_FIREWALL", true);' ), 'Could not install emergency-disable toggle.' );
+                $assert( false !== file_put_contents( $toggle, '<?php define("IRONLATCH_DISABLE_FIREWALL", true);' ), 'Could not install emergency-disable toggle.' );
             } elseif ( file_exists( $toggle ) ) { unlink( $toggle ); }
             $clear();
             // Warm the runtime before timing; observation counts are reset afterward.
@@ -130,7 +130,7 @@ try {
     if ( file_exists( $toggle ) && ! unlink( $toggle ) ) { $cleanupErrors[] = 'disable toggle'; }
     if ( null !== $product ) { $fixtureId = $product->get_id(); $product->delete( true ); if ( $fixtureId && null !== get_post( $fixtureId ) ) { $cleanupErrors[] = 'product'; } }
     $clear();
-    if ( null !== $saved && ! add_option( 'amsec_rest_observations', $saved, '', false ) ) { $cleanupErrors[] = 'observation restoration'; }
+    if ( null !== $saved && ! add_option( 'ironlatch_rest_observations', $saved, '', false ) ) { $cleanupErrors[] = 'observation restoration'; }
     if ( $read() !== $saved ) { $cleanupErrors[] = 'stored observation value'; }
     if ( array() !== $cleanupErrors ) { throw new RuntimeException( 'Cleanup failed: ' . implode( ', ', $cleanupErrors ) ); }
 }

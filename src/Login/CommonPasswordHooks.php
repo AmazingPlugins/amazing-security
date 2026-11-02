@@ -40,7 +40,7 @@ final class CommonPasswordHooks {
 			return;
 		}
 		if ( CommonPasswords::matches( $password ) ) {
-			$errors->add( 'amsec_common_password', __( 'Choose a password that is not on the local common-password list.', 'amsec-security-scanner' ) );
+			$errors->add( 'ironlatch_common_password', __( 'Choose a password that is not on the local common-password list.', 'ironlatch-security-scanner' ) );
 			return;
 		}
 		try {
@@ -49,7 +49,7 @@ final class CommonPasswordHooks {
 			return;
 		}
 		if ( true === $listed ) {
-			$errors->add( 'amsec_breached_password', __( 'Choose a different password. A breach list matched a hash prefix, and the password itself was not sent.', 'amsec-security-scanner' ) );
+			$errors->add( 'ironlatch_breached_password', __( 'Choose a different password. A breach list matched a hash prefix, and the password itself was not sent.', 'ironlatch-security-scanner' ) );
 		}
 	}
 

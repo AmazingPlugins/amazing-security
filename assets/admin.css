@@ -15,31 +15,31 @@
   src: url(fonts/inter-latin.woff2) format("woff2");
 }
 
-.amsec-security-scanner-admin {
-  --amsec-ink: #1a1410;
-  --amsec-line: rgba(26, 20, 16, 0.12);
-  --amsec-muted: #6b5c4f;
-  --amsec-coral: #f26b3a;
-  --amsec-coral-deep: #a63617;
-  --amsec-cream: #faf5ec;
-  --amsec-amber: #f4a93c;
+.ironlatch-security-scanner-admin {
+  --ironlatch-ink: #1a1410;
+  --ironlatch-line: rgba(26, 20, 16, 0.12);
+  --ironlatch-muted: #6b5c4f;
+  --ironlatch-coral: #f26b3a;
+  --ironlatch-coral-deep: #a63617;
+  --ironlatch-cream: #faf5ec;
+  --ironlatch-amber: #f4a93c;
   box-sizing: border-box;
   max-width: none;
-  color: var(--amsec-ink);
+  color: var(--ironlatch-ink);
   font-family: Inter, system-ui, sans-serif;
 }
 
-.amsec-start {
+.ironlatch-start {
   margin: 8px 0 0;
   padding: 0;
   list-style: none;
 }
 
-.amsec-start-heading {
+.ironlatch-start-heading {
   margin: 22px 0 8px;
 }
 
-.amsec-start-item {
+.ironlatch-start-item {
   display: grid;
   grid-template-columns: 7.5rem minmax(0, 1fr) 13.5rem;
   gap: 8px 14px;
@@ -47,35 +47,35 @@
   margin: 0 0 8px;
   padding: 12px 14px;
   background: #fff;
-  border: 1px solid var(--amsec-line);
-  border-left: 3px solid var(--amsec-coral);
+  border: 1px solid var(--ironlatch-line);
+  border-left: 3px solid var(--ironlatch-coral);
   border-radius: 14px;
 }
 
-.amsec-start-item[data-state="critical"] {
+.ironlatch-start-item[data-state="critical"] {
   border-left-color: #9b1c1c;
 }
 
-.amsec-start-item[data-state="warn"],
-.amsec-start-item[data-state="fail"] {
+.ironlatch-start-item[data-state="warn"],
+.ironlatch-start-item[data-state="fail"] {
   border-left-color: #b65a00;
 }
 
-.amsec-start-item[data-state="pass"] {
+.ironlatch-start-item[data-state="pass"] {
   border-left-color: #1e7a46;
 }
 
-.amsec-start-item.is-quiet {
+.ironlatch-start-item.is-quiet {
   grid-template-columns: 7.5rem minmax(0, 1fr);
 }
 
-.amsec-start-item[data-state="none"],
-.amsec-start-item[data-state="partial"] {
-  border-left-color: var(--amsec-amber);
+.ironlatch-start-item[data-state="none"],
+.ironlatch-start-item[data-state="partial"] {
+  border-left-color: var(--ironlatch-amber);
 }
 
-.amsec-start-badge {
-  color: var(--amsec-muted);
+.ironlatch-start-badge {
+  color: var(--ironlatch-muted);
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.02em;
@@ -83,106 +83,106 @@
   white-space: nowrap;
 }
 
-.amsec-start-item[data-state="critical"] .amsec-start-badge {
+.ironlatch-start-item[data-state="critical"] .ironlatch-start-badge {
   color: #9b1c1c;
 }
 
-.amsec-start-item[data-state="warn"] .amsec-start-badge,
-.amsec-start-item[data-state="fail"] .amsec-start-badge {
+.ironlatch-start-item[data-state="warn"] .ironlatch-start-badge,
+.ironlatch-start-item[data-state="fail"] .ironlatch-start-badge {
   color: #8a4600;
 }
 
-.amsec-start-item[data-state="pass"] .amsec-start-badge {
+.ironlatch-start-item[data-state="pass"] .ironlatch-start-badge {
   color: #1e7a46;
 }
 
-.amsec-start-item[data-state="none"] .amsec-start-badge,
-.amsec-start-item[data-state="partial"] .amsec-start-badge {
+.ironlatch-start-item[data-state="none"] .ironlatch-start-badge,
+.ironlatch-start-item[data-state="partial"] .ironlatch-start-badge {
   color: #a63617;
 }
 
-.amsec-start-copy strong {
+.ironlatch-start-copy strong {
   display: block;
   margin-bottom: 2px;
 }
 
-.amsec-start-item > .button,
-.amsec-start-item > .amsec-start-action,
-.amsec-start-item > .amsec-start-action .button {
+.ironlatch-start-item > .button,
+.ironlatch-start-item > .ironlatch-start-action,
+.ironlatch-start-item > .ironlatch-start-action .button {
   width: 100%;
   margin: 0;
   text-align: center;
 }
 
-.amsec-start-action {
+.ironlatch-start-action {
   margin: 0;
   justify-self: stretch;
 }
 
-.amsec-overview > .amsec-start-action,
-.amsec-overview > .amsec-start-action + p {
+.ironlatch-overview > .ironlatch-start-action,
+.ironlatch-overview > .ironlatch-start-action + p {
   display: block;
   margin-right: auto;
   margin-left: auto;
   text-align: center;
 }
 
-.amsec-overview > .amsec-start-action {
+.ironlatch-overview > .ironlatch-start-action {
   width: max-content;
   margin-top: 16px;
 }
 
-.amsec-start-done {
+.ironlatch-start-done {
   margin-top: 16px;
 }
 
-.amsec-start-done summary {
+.ironlatch-start-done summary {
   cursor: pointer;
   font-weight: 600;
 }
 
 @media (max-width: 782px) {
-  .amsec-start-item {
+  .ironlatch-start-item {
     grid-template-columns: 1fr;
   }
 
-  .amsec-start-action,
-  .amsec-start-action .button {
+  .ironlatch-start-action,
+  .ironlatch-start-action .button {
     justify-self: start;
     width: auto;
   }
 }
 
-.amsec-security-scanner-admin code,
-.amsec-security-scanner-admin .widefat td {
+.ironlatch-security-scanner-admin code,
+.ironlatch-security-scanner-admin .widefat td {
   overflow-wrap: anywhere;
   white-space: normal;
 }
 
 @media (max-width: 782px) {
-  .amsec-security-scanner-admin .amsec-security-scanner-table-scroll .amsec-stacked-table {
+  .ironlatch-security-scanner-admin .ironlatch-security-scanner-table-scroll .ironlatch-stacked-table {
     min-width: 0;
     background: transparent;
     border: 0;
   }
-  .amsec-stacked-table thead {
+  .ironlatch-stacked-table thead {
     position: absolute;
     width: 1px;
     height: 1px;
     overflow: hidden;
     clip-path: inset(50%);
   }
-  .amsec-stacked-table tbody,
-  .amsec-stacked-table tr {
+  .ironlatch-stacked-table tbody,
+  .ironlatch-stacked-table tr {
     display: block;
   }
-  .amsec-stacked-table tr {
+  .ironlatch-stacked-table tr {
     margin: 0 0 12px;
     padding: 12px;
     background: #fff;
     border: 1px solid #dcdcde;
   }
-  .amsec-stacked-table :is(td, th[scope="row"]) {
+  .ironlatch-stacked-table :is(td, th[scope="row"]) {
     display: grid;
     grid-template-columns: 66px minmax(0, 1fr);
     gap: 8px;
@@ -190,43 +190,43 @@
     overflow-wrap: anywhere;
     border: 0;
   }
-  .amsec-stacked-table [data-label]::before {
+  .ironlatch-stacked-table [data-label]::before {
     content: attr(data-label);
     color: #50575e;
     font-size: 12px;
     font-weight: 600;
   }
-  .amsec-stacked-table td[data-label="Finding"] {
+  .ironlatch-stacked-table td[data-label="Finding"] {
     display: block;
     line-height: 1.5;
   }
-  .amsec-stacked-table td[data-label="Finding"]::before {
+  .ironlatch-stacked-table td[data-label="Finding"]::before {
     display: block;
     margin-bottom: 4px;
   }
 }
 
-.amsec-security-scanner-admin .amsec-header {
+.ironlatch-security-scanner-admin .ironlatch-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 18px;
   padding: 18px 0 8px;
-  border-bottom: 1px solid var(--amsec-line);
+  border-bottom: 1px solid var(--ironlatch-line);
 }
 
-.amsec-stage {
+.ironlatch-stage {
   display: flex;
   justify-content: center;
   padding: 36px 16px 12px;
 }
 
-.amsec-scan-first .amsec-stage {
+.ironlatch-scan-first .ironlatch-stage {
   flex-direction: column;
   align-items: center;
 }
 
-.amsec-scan-form {
+.ironlatch-scan-form {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -235,7 +235,7 @@
   text-align: center;
 }
 
-.amsec-scan-button {
+.ironlatch-scan-button {
   appearance: none;
   display: inline-flex;
   align-items: center;
@@ -255,73 +255,73 @@
   box-shadow: 0 0 0 12px rgba(242, 107, 58, 0.16), 0 18px 40px rgba(242, 107, 58, 0.28);
 }
 
-.amsec-scan-button:hover,
-.amsec-scan-button:focus {
+.ironlatch-scan-button:hover,
+.ironlatch-scan-button:focus {
   background: #a63617;
   color: #fff;
 }
 
-.amsec-scan-button:focus-visible {
+.ironlatch-scan-button:focus-visible {
   outline: 3px solid #1d2327;
   outline-offset: 4px;
 }
 
-.amsec-scan-first {
+.ironlatch-scan-first {
   min-height: 62vh;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.amsec-scan-first .amsec-scan-button {
+.ironlatch-scan-first .ironlatch-scan-button {
   width: 240px;
   height: 240px;
   border: 6px solid #f4a93c;
   font-size: 36px;
   box-shadow: 0 18px 40px rgba(242, 107, 58, 0.28);
-  animation: amsec-scan-blink 1.05s steps(2, jump-none) infinite;
+  animation: ironlatch-scan-blink 1.05s steps(2, jump-none) infinite;
 }
 
-@keyframes amsec-scan-blink {
+@keyframes ironlatch-scan-blink {
   50% {
     border-color: rgba(244, 169, 60, 0.15);
   }
 }
 
-.amsec-scan-progress {
+.ironlatch-scan-progress {
   width: min(760px, 92vw);
   text-align: center;
 }
 
-.amsec-scan-status {
+.ironlatch-scan-status {
   margin: 0 0 16px;
   font-size: 28px;
   font-weight: 700;
 }
 
-.amsec-scan-track {
+.ironlatch-scan-track {
   height: 14px;
   overflow: hidden;
   border-radius: 999px;
   background: #dcdcde;
 }
 
-.amsec-scan-fill {
+.ironlatch-scan-fill {
   display: block;
   width: 42%;
   height: 100%;
   border-radius: 999px;
   background: #c13a1b;
-  animation: amsec-scan-slide 1.1s ease-in-out infinite;
+  animation: ironlatch-scan-slide 1.1s ease-in-out infinite;
 }
 
-.amsec-scan-fill.is-done {
+.ironlatch-scan-fill.is-done {
   width: 100%;
   animation: none;
   transform: none;
 }
 
-@keyframes amsec-scan-slide {
+@keyframes ironlatch-scan-slide {
   0% {
     transform: translateX(-120%);
   }
@@ -331,19 +331,19 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .amsec-scan-fill {
+  .ironlatch-scan-fill {
     width: 100%;
     animation: none;
     opacity: 0.7;
   }
 
-  .amsec-scan-first .amsec-scan-button {
+  .ironlatch-scan-first .ironlatch-scan-button {
     animation: none;
     border-color: #f4a93c;
   }
 }
 
-.amsec-rescan-bar {
+.ironlatch-rescan-bar {
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -357,13 +357,13 @@
   text-align: left;
 }
 
-.amsec-page-bar {
+.ironlatch-page-bar {
   box-sizing: border-box;
   width: auto;
   margin: 10px 20px 16px;
 }
 
-.amsec-page-bar h1 {
+.ironlatch-page-bar h1 {
   margin: 0;
   font-family: Fraunces, "Times New Roman", serif;
   font-size: 28px;
@@ -372,13 +372,13 @@
   color: #1a1410;
 }
 
-body.amsec-app #wpbody-content > .wrap.amsec-security-scanner-admin:not(.amsec-scan) > h1,
-body.amsec-app #wpbody-content > .wrap.amsec-security-scanner-admin:not(.amsec-scan) > .amsec-header h1 {
+body.ironlatch-app #wpbody-content > .wrap.ironlatch-security-scanner-admin:not(.ironlatch-scan) > h1,
+body.ironlatch-app #wpbody-content > .wrap.ironlatch-security-scanner-admin:not(.ironlatch-scan) > .ironlatch-header h1 {
   /* The page bar above already shows this title as the h1; hide the copy from screen readers too. */
   display: none;
 }
 
-.amsec-rescan-row {
+.ironlatch-rescan-row {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
@@ -386,7 +386,7 @@ body.amsec-app #wpbody-content > .wrap.amsec-security-scanner-admin:not(.amsec-s
   min-width: 0;
 }
 
-.amsec-scan-button.amsec-rescan-button {
+.ironlatch-scan-button.ironlatch-rescan-button {
   width: auto;
   height: auto;
   min-height: 44px;
@@ -398,7 +398,7 @@ body.amsec-app #wpbody-content > .wrap.amsec-security-scanner-admin:not(.amsec-s
   box-shadow: none;
 }
 
-.amsec-security-scanner-admin .amsec-overview {
+.ironlatch-security-scanner-admin .ironlatch-overview {
   margin: 12px auto 28px;
   padding: 22px 22px 8px;
   background: #fff;
@@ -407,25 +407,25 @@ body.amsec-app #wpbody-content > .wrap.amsec-security-scanner-admin:not(.amsec-s
 }
 
 @media (max-width: 782px) {
-  .amsec-stage {
+  .ironlatch-stage {
     padding-top: 24px;
   }
 
-  .amsec-scan-button:not(.amsec-rescan-button),
-  .amsec-scan-first .amsec-scan-button {
+  .ironlatch-scan-button:not(.ironlatch-rescan-button),
+  .ironlatch-scan-first .ironlatch-scan-button {
     width: 180px;
     height: 180px;
     font-size: 28px;
     box-shadow: 0 12px 28px rgba(242, 107, 58, 0.24);
   }
 
-  .amsec-security-scanner-admin .amsec-overview {
+  .ironlatch-security-scanner-admin .ironlatch-overview {
     padding: 16px 14px 4px;
     border-radius: 16px;
   }
 }
 
-.amsec-security-scanner-admin .amsec-header h1 {
+.ironlatch-security-scanner-admin .ironlatch-header h1 {
   margin: 0 0 8px;
   font-family: Fraunces, "Times New Roman", serif;
   font-size: 30px;
@@ -434,97 +434,97 @@ body.amsec-app #wpbody-content > .wrap.amsec-security-scanner-admin:not(.amsec-s
   color: #1a1410;
 }
 
-.amsec-security-scanner-admin .amsec-header p {
+.ironlatch-security-scanner-admin .ironlatch-header p {
   max-width: 72ch;
   margin: 0 0 14px;
-  color: var(--amsec-muted);
+  color: var(--ironlatch-muted);
   font-size: 14px;
   line-height: 1.55;
 }
 
-.amsec-security-scanner-admin .amsec-schedule-status {
+.ironlatch-security-scanner-admin .ironlatch-schedule-status {
   display: flex;
   align-items: baseline;
   gap: 12px;
   padding: 11px 0;
-  border-bottom: 1px solid var(--amsec-line);
-  color: var(--amsec-muted);
+  border-bottom: 1px solid var(--ironlatch-line);
+  color: var(--ironlatch-muted);
 }
 
-.amsec-security-scanner-admin .amsec-schedule-status strong {
-  color: var(--amsec-ink);
+.ironlatch-security-scanner-admin .ironlatch-schedule-status strong {
+  color: var(--ironlatch-ink);
 }
 
-.amsec-security-scanner-admin .amsec-schedule-status small {
+.ironlatch-security-scanner-admin .ironlatch-schedule-status small {
   margin-left: auto;
-  color: var(--amsec-muted);
+  color: var(--ironlatch-muted);
 }
 
 @media (max-width: 600px) {
-  .amsec-security-scanner-admin .amsec-schedule-status {
+  .ironlatch-security-scanner-admin .ironlatch-schedule-status {
     flex-wrap: wrap;
   }
 
-  .amsec-security-scanner-admin .amsec-schedule-status small {
+  .ironlatch-security-scanner-admin .ironlatch-schedule-status small {
     width: 100%;
     margin-left: 0;
   }
 }
 
-.amsec-security-scanner-admin > section {
+.ironlatch-security-scanner-admin > section {
   margin: 26px 0;
 }
 
-.amsec-security-scanner-admin .amsec-firewall-status {
+.ironlatch-security-scanner-admin .ironlatch-firewall-status {
   padding: 18px 0;
-  border-top: 1px solid var(--amsec-line);
-  border-bottom: 1px solid var(--amsec-line);
+  border-top: 1px solid var(--ironlatch-line);
+  border-bottom: 1px solid var(--ironlatch-line);
 }
 
-.amsec-security-scanner-admin .amsec-firewall-status h2 {
+.ironlatch-security-scanner-admin .ironlatch-firewall-status h2 {
   margin: 0 0 8px;
 }
 
-.amsec-security-scanner-admin .amsec-firewall-status p {
+.ironlatch-security-scanner-admin .ironlatch-firewall-status p {
   max-width: 70ch;
   margin: 0 0 8px;
   line-height: 1.5;
 }
 
-.amsec-security-scanner-admin .amsec-alert-settings {
+.ironlatch-security-scanner-admin .ironlatch-alert-settings {
   padding: 0 0 18px;
-  border-bottom: 1px solid var(--amsec-line);
+  border-bottom: 1px solid var(--ironlatch-line);
 }
 
-.amsec-security-scanner-admin .amsec-alert-settings p {
+.ironlatch-security-scanner-admin .ironlatch-alert-settings p {
   max-width: 70ch;
   line-height: 1.5;
 }
 
-.amsec-security-scanner-admin .amsec-alert-settings fieldset {
+.ironlatch-security-scanner-admin .ironlatch-alert-settings fieldset {
   display: flex;
   gap: 18px;
   margin: 12px 0;
 }
 
-.amsec-security-scanner-admin .amsec-alert-settings label {
+.ironlatch-security-scanner-admin .ironlatch-alert-settings label {
   display: inline-flex;
   align-items: center;
   gap: 5px;
 }
 
-.amsec-setting-group {
+.ironlatch-setting-group {
   margin: 0 0 22px;
 }
 
-.amsec-setting-group h2 {
+.ironlatch-setting-group h2 {
   margin: 0 0 8px;
   font-family: Fraunces, "Times New Roman", serif;
   font-size: 22px;
   font-weight: 650;
 }
 
-.amsec-settings {
+.ironlatch-settings {
   margin: 0;
   padding: 0;
   list-style: none;
@@ -534,7 +534,7 @@ body.amsec-app #wpbody-content > .wrap.amsec-security-scanner-admin:not(.amsec-s
   overflow: hidden;
 }
 
-.amsec-settings a {
+.ironlatch-settings a {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -547,40 +547,40 @@ body.amsec-app #wpbody-content > .wrap.amsec-security-scanner-admin:not(.amsec-s
   text-decoration: none;
 }
 
-.amsec-settings li:last-child a {
+.ironlatch-settings li:last-child a {
   border-bottom: 0;
 }
 
-.amsec-settings-copy {
+.ironlatch-settings-copy {
   display: grid;
   gap: 2px;
 }
 
-.amsec-settings-copy span {
+.ironlatch-settings-copy span {
   color: #6b5c4f;
   font-weight: 400;
   line-height: 1.4;
 }
 
-.amsec-settings-go {
+.ironlatch-settings-go {
   flex: none;
   color: #1a1410;
   font-weight: 650;
 }
 
-.amsec-settings a:hover .amsec-settings-go,
-.amsec-settings a:focus .amsec-settings-go {
+.ironlatch-settings a:hover .ironlatch-settings-go,
+.ironlatch-settings a:focus .ironlatch-settings-go {
   color: #a63617;
 }
 
-.amsec-security-scanner-admin .amsec-overview h2,
-.amsec-security-scanner-admin .amsec-group h2 {
+.ironlatch-security-scanner-admin .ironlatch-overview h2,
+.ironlatch-security-scanner-admin .ironlatch-group h2 {
   margin-bottom: 12px;
   font-family: Fraunces, "Times New Roman", serif;
   font-weight: 650;
 }
 
-body.amsec-app .amsec-security-scanner-admin:not(.amsec-scan) {
+body.ironlatch-app .ironlatch-security-scanner-admin:not(.ironlatch-scan) {
   box-sizing: border-box;
   padding: 22px 22px 16px;
   background: #fff;
@@ -588,15 +588,15 @@ body.amsec-app .amsec-security-scanner-admin:not(.amsec-scan) {
   border-radius: 20px;
 }
 
-body.amsec-app .amsec-security-scanner-admin:not(.amsec-scan):has(.amsec-screen-tabs) {
+body.ironlatch-app .ironlatch-security-scanner-admin:not(.ironlatch-scan):has(.ironlatch-screen-tabs) {
   padding: 0;
   background: transparent;
   border: 0;
   border-radius: 0;
 }
 
-body.amsec-app .amsec-security-scanner-admin:not(.amsec-scan) > h1,
-body.amsec-app .amsec-security-scanner-admin:not(.amsec-scan) .amsec-header h1 {
+body.ironlatch-app .ironlatch-security-scanner-admin:not(.ironlatch-scan) > h1,
+body.ironlatch-app .ironlatch-security-scanner-admin:not(.ironlatch-scan) .ironlatch-header h1 {
   margin-top: 0;
   font-family: Fraunces, "Times New Roman", serif;
   font-size: 30px;
@@ -604,7 +604,7 @@ body.amsec-app .amsec-security-scanner-admin:not(.amsec-scan) .amsec-header h1 {
   color: #1a1410;
 }
 
-body.amsec-app .amsec-security-scanner-admin:not(.amsec-scan) :is(.amsec-overview, .amsec-login, .amsec-mcp, .amsec-file-scan, .amsec-fix-review, .amsec-consent) {
+body.ironlatch-app .ironlatch-security-scanner-admin:not(.ironlatch-scan) :is(.ironlatch-overview, .ironlatch-login, .ironlatch-mcp, .ironlatch-file-scan, .ironlatch-fix-review, .ironlatch-consent) {
   margin: 12px 0 0;
   padding: 0;
   background: transparent;
@@ -613,15 +613,15 @@ body.amsec-app .amsec-security-scanner-admin:not(.amsec-scan) :is(.amsec-overvie
   box-shadow: none;
 }
 
-.amsec-auth fieldset,
-.amsec-auth-group {
+.ironlatch-auth fieldset,
+.ironlatch-auth-group {
   margin: 22px 0 0;
   padding: 0;
   border: 0;
 }
 
-.amsec-auth legend,
-.amsec-auth-group h2 {
+.ironlatch-auth legend,
+.ironlatch-auth-group h2 {
   margin: 0 0 12px;
   padding: 0;
   font-family: Fraunces, "Times New Roman", serif;
@@ -630,7 +630,7 @@ body.amsec-app .amsec-security-scanner-admin:not(.amsec-scan) :is(.amsec-overvie
   color: #1a1410;
 }
 
-.amsec-field {
+.ironlatch-field {
   display: grid;
   grid-template-columns: minmax(160px, 240px) minmax(180px, 260px);
   gap: 6px 16px;
@@ -638,35 +638,35 @@ body.amsec-app .amsec-security-scanner-admin:not(.amsec-scan) :is(.amsec-overvie
   margin: 0 0 16px;
 }
 
-.amsec-field label {
+.ironlatch-field label {
   font-weight: 650;
 }
 
-.amsec-field select {
+.ironlatch-field select {
   width: 100%;
   margin: 0;
 }
 
-.amsec-field p,
-.amsec-auth-group > p {
+.ironlatch-field p,
+.ironlatch-auth-group > p {
   max-width: 68ch;
   margin: 0 0 8px;
   color: #3a2e26;
 }
 
-.amsec-field p {
+.ironlatch-field p {
   grid-column: 1 / -1;
   margin: 0;
 }
 
-.amsec-auth .amsec-check {
+.ironlatch-auth .ironlatch-check {
   display: flex;
   align-items: flex-start;
   gap: 10px;
   margin: 0 0 12px;
 }
 
-.amsec-links {
+.ironlatch-links {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
@@ -675,7 +675,7 @@ body.amsec-app .amsec-security-scanner-admin:not(.amsec-scan) :is(.amsec-overvie
   list-style: none;
 }
 
-.amsec-links a {
+.ironlatch-links a {
   display: inline-block;
   padding: 8px 14px;
   background: #faf5ec;
@@ -686,22 +686,22 @@ body.amsec-app .amsec-security-scanner-admin:not(.amsec-scan) :is(.amsec-overvie
   text-decoration: none;
 }
 
-.amsec-links a:hover,
-.amsec-links a:focus {
+.ironlatch-links a:hover,
+.ironlatch-links a:focus {
   background: #fff;
   color: #1a1410;
 }
 
-.amsec-example-actions {
+.ironlatch-example-actions {
   margin: 4px 0 8px;
 }
 
-.amsec-example-note {
+.ironlatch-example-note {
   margin: 0 0 12px;
   color: #3a2e26;
 }
 
-.amsec-security-scanner-admin textarea {
+.ironlatch-security-scanner-admin textarea {
   width: 100%;
   max-width: 640px;
   border-radius: 12px;
@@ -709,12 +709,12 @@ body.amsec-app .amsec-security-scanner-admin:not(.amsec-scan) :is(.amsec-overvie
 }
 
 @media (max-width: 782px) {
-  .amsec-field {
+  .ironlatch-field {
     grid-template-columns: 1fr;
   }
 }
 
-.amsec-start-home {
+.ironlatch-start-home {
   margin: 0 0 16px;
   padding: 16px 16px 4px;
   background: #fff;
@@ -722,15 +722,15 @@ body.amsec-app .amsec-security-scanner-admin:not(.amsec-scan) :is(.amsec-overvie
   border-radius: 16px;
 }
 
-.amsec-start-home ol {
+.ironlatch-start-home ol {
   margin: 0 0 12px 1.2em;
 }
 
-.amsec-start-home li {
+.ironlatch-start-home li {
   margin: 0 0 6px;
 }
 
-.amsec-jumps {
+.ironlatch-jumps {
   display: grid;
   gap: 8px;
   margin: 0 0 18px;
@@ -739,7 +739,7 @@ body.amsec-app .amsec-security-scanner-admin:not(.amsec-scan) :is(.amsec-overvie
   border: 0;
 }
 
-.amsec-jumps a {
+.ironlatch-jumps a {
   display: grid;
   gap: 2px;
   align-items: start;
@@ -755,155 +755,155 @@ body.amsec-app .amsec-security-scanner-admin:not(.amsec-scan) :is(.amsec-overvie
   text-decoration: none;
 }
 
-.amsec-jumps a span {
+.ironlatch-jumps a span {
   color: #6b5c4f;
   font-weight: 400;
   line-height: 1.45;
 }
 
-.amsec-jumps a:hover,
-.amsec-jumps a:focus {
+.ironlatch-jumps a:hover,
+.ironlatch-jumps a:focus {
   background: #fff;
   border-color: rgba(26, 20, 16, 0.2);
   color: #a63617;
 }
 
-.amsec-security-scanner-admin :is(select, textarea, input[type="text"], input[type="number"]) {
+.ironlatch-security-scanner-admin :is(select, textarea, input[type="text"], input[type="number"]) {
   border-radius: 12px;
   border-color: rgba(26, 20, 16, 0.2);
 }
 
 @media (max-width: 782px) {
-  .amsec-jumps {
+  .ironlatch-jumps {
     gap: 2px;
   }
 }
 
-.amsec-ledger {
+.ironlatch-ledger {
   background: #fff;
-  border: 1px solid var(--amsec-line);
+  border: 1px solid var(--ironlatch-line);
 }
 
-.amsec-ledger-row {
+.ironlatch-ledger-row {
   display: grid;
   grid-template-columns: minmax(140px, 1.3fr) minmax(125px, 1fr) minmax(130px, 1fr) minmax(120px, 1fr) auto;
   gap: 16px;
   align-items: center;
   padding: 15px 18px;
-  border-left: 3px solid var(--amsec-coral);
+  border-left: 3px solid var(--ironlatch-coral);
 }
 
-.amsec-ledger-row + .amsec-ledger-row {
-  border-top: 1px solid var(--amsec-line);
+.ironlatch-ledger-row + .ironlatch-ledger-row {
+  border-top: 1px solid var(--ironlatch-line);
 }
 
-.amsec-ledger-name {
+.ironlatch-ledger-name {
   font-weight: 600;
 }
 
-.amsec-ledger-date {
-  color: var(--amsec-muted);
+.ironlatch-ledger-date {
+  color: var(--ironlatch-muted);
 }
 
-.amsec-ledger-coverage {
-  color: var(--amsec-muted);
+.ironlatch-ledger-coverage {
+  color: var(--ironlatch-muted);
 }
 
-.amsec-attention {
+.ironlatch-attention {
   margin-top: 18px;
   padding: 16px 18px;
   background: #fff;
-  border: 1px solid var(--amsec-line);
+  border: 1px solid var(--ironlatch-line);
 }
 
-.amsec-attention h3 {
+.ironlatch-attention h3 {
   margin: 0 0 8px;
 }
 
-.amsec-attention p {
+.ironlatch-attention p {
   margin: 0 0 8px;
 }
 
-.amsec-attention ul {
+.ironlatch-attention ul {
   margin: 0 0 0 18px;
   list-style: disc;
 }
 
-.amsec-attention li {
+.ironlatch-attention li {
   margin-bottom: 6px;
 }
 
-.amsec-consent {
+.ironlatch-consent {
   margin: 18px 0;
   padding: 18px 20px;
   background: #fff;
-  border: 1px solid var(--amsec-line);
+  border: 1px solid var(--ironlatch-line);
   border-left: 3px solid #f4a93c;
 }
 
-.amsec-consent h3 {
+.ironlatch-consent h3 {
   margin-top: 0;
 }
 
-.amsec-consent p {
+.ironlatch-consent p {
   max-width: 75ch;
   line-height: 1.55;
 }
 
-.amsec-security-scanner-table-scroll {
+.ironlatch-security-scanner-table-scroll {
   max-width: 100%;
   overflow-x: auto;
 }
 
-.amsec-security-scanner-table-scroll:focus-visible {
+.ironlatch-security-scanner-table-scroll:focus-visible {
   outline: 2px solid #a63617;
   outline-offset: 2px;
 }
 
-.amsec-security-scanner-table-scroll .widefat {
+.ironlatch-security-scanner-table-scroll .widefat {
   min-width: 640px;
 }
 
 @media (max-width: 782px) {
-  .amsec-security-scanner-admin .amsec-header {
+  .ironlatch-security-scanner-admin .ironlatch-header {
     display: block;
   }
 
-  .amsec-security-scanner-admin .amsec-header h1 {
+  .ironlatch-security-scanner-admin .ironlatch-header h1 {
     font-size: 26px;
   }
 
-  .amsec-ledger-row {
+  .ironlatch-ledger-row {
     grid-template-columns: 1fr auto;
     gap: 7px 12px;
     padding: 14px;
   }
 
-  .amsec-ledger-date {
+  .ironlatch-ledger-date {
     grid-column: 1;
   }
 
-  .amsec-ledger-coverage {
+  .ironlatch-ledger-coverage {
     grid-column: 1;
   }
 
-  .amsec-ledger-row > a {
+  .ironlatch-ledger-row > a {
     grid-column: 2;
     grid-row: 2 / 4;
     align-self: center;
   }
 
-  .amsec-vuln-scroll {
+  .ironlatch-vuln-scroll {
     overflow-x: visible;
   }
 
-  .amsec-security-scanner-table-scroll .amsec-security-scanner-responsive-table {
+  .ironlatch-security-scanner-table-scroll .ironlatch-security-scanner-responsive-table {
     min-width: 0;
     border: 0;
     background: transparent;
   }
 
-  .amsec-security-scanner-responsive-table thead {
+  .ironlatch-security-scanner-responsive-table thead {
     position: absolute;
     width: 1px;
     height: 1px;
@@ -911,34 +911,34 @@ body.amsec-app .amsec-security-scanner-admin:not(.amsec-scan) :is(.amsec-overvie
     clip-path: inset(50%);
   }
 
-  .amsec-security-scanner-responsive-table tbody,
-  .amsec-security-scanner-responsive-table td {
+  .ironlatch-security-scanner-responsive-table tbody,
+  .ironlatch-security-scanner-responsive-table td {
     display: block;
   }
 
-  .amsec-security-scanner-responsive-table tr {
+  .ironlatch-security-scanner-responsive-table tr {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
     gap: 5px 12px;
     margin-bottom: 10px;
     padding: 12px 14px;
     background: #fff;
-    border: 1px solid var(--amsec-line);
+    border: 1px solid var(--ironlatch-line);
   }
 
-  .amsec-security-scanner-responsive-table td {
+  .ironlatch-security-scanner-responsive-table td {
     border: 0;
     padding: 0;
     overflow-wrap: anywhere;
   }
 
-  .amsec-security-scanner-responsive-table td[data-label="Package"] {
+  .ironlatch-security-scanner-responsive-table td[data-label="Package"] {
     grid-column: 1;
     grid-row: 1;
     font-weight: 600;
   }
 
-  .amsec-security-scanner-responsive-table td[data-label="State"] {
+  .ironlatch-security-scanner-responsive-table td[data-label="State"] {
     grid-column: 2;
     grid-row: 1;
     color: #8a4600;
@@ -947,110 +947,110 @@ body.amsec-app .amsec-security-scanner-admin:not(.amsec-scan) :is(.amsec-overvie
     text-transform: uppercase;
   }
 
-  .amsec-security-scanner-responsive-table td[data-label="Finding"] {
+  .ironlatch-security-scanner-responsive-table td[data-label="Finding"] {
     grid-column: 1 / -1;
     grid-row: 2;
     line-height: 1.45;
   }
 
-  .amsec-security-scanner-responsive-table td[data-label="Installed"] {
+  .ironlatch-security-scanner-responsive-table td[data-label="Installed"] {
     grid-column: 1;
     grid-row: 3;
-    color: var(--amsec-muted);
+    color: var(--ironlatch-muted);
     font-size: 12px;
   }
 
-  .amsec-security-scanner-responsive-table td[data-label="Source"] {
+  .ironlatch-security-scanner-responsive-table td[data-label="Source"] {
     grid-column: 2;
     grid-row: 3;
     font-size: 12px;
   }
 
-  .amsec-security-scanner-responsive-table td::before {
+  .ironlatch-security-scanner-responsive-table td::before {
     content: none;
   }
 
-  .amsec-security-scanner-responsive-table td[data-label="Installed"]::before {
+  .ironlatch-security-scanner-responsive-table td[data-label="Installed"]::before {
     content: 'Installed: ';
   }
 }
-.amsec-login { margin: 24px 0; padding: 24px; background: #fff; border: 1px solid #c9d3dc; border-radius: 6px; }
-.amsec-login-heading { display: flex; align-items: start; justify-content: space-between; gap: 20px; border-bottom: 1px solid #e2e8ed; margin-bottom: 20px; }
-.amsec-login-heading h2 { margin-top: 0; }
-.amsec-login-state { padding: 5px 10px; background: #faf5ec; color: #1a1410; border-radius: 3px; white-space: nowrap; }
-.amsec-login-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
-.amsec-login-panel { min-width: 0; }
-.amsec-file-actionbar { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-start; margin: 16px 0 0; }
-.amsec-file-actionbar form { margin: 0; }
-.amsec-file-scan { background: #fff; border: 1px solid #c9d3dc; border-radius: 6px; padding: 24px; }
-.amsec-file-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; border-bottom: 1px solid #e2e8ed; margin-bottom: 18px; }
-.amsec-file-heading h2 { margin: 0 0 8px; }
-.amsec-file-heading p { max-width: 66ch; color: #50575e; line-height: 1.55; margin: 0 0 18px; }
-.amsec-file-rule-age { color: #50575e; white-space: nowrap; font-size: 12px; }
-.amsec-file-status { display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: baseline; padding: 12px 16px; border-left: 4px solid #a63617; background: #faf5ec; }
-.amsec-file-status-partial { border-left-color: #b65a00; background: #fff6e8; }
-.amsec-file-status strong { font-size: 15px; }
-.amsec-file-coverage { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 18px; margin: 22px 0; border-top: 1px solid #e2e8ed; }
-.amsec-file-coverage div { padding: 12px 0; border-bottom: 1px solid #e2e8ed; }
-.amsec-file-coverage dt { color: #50575e; font-size: 12px; }
-.amsec-file-coverage dd { margin: 3px 0 0; font-size: 19px; font-weight: 650; font-variant-numeric: tabular-nums; }
-.amsec-file-findings ol { list-style: none; margin: 0; padding: 0; }
-.amsec-file-finding { padding: 16px 0; border-top: 1px solid #e2e8ed; }
-.amsec-file-finding-top { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
-.amsec-file-finding-top span, .amsec-file-line { color: #50575e; font-size: 12px; }
-.amsec-file-finding code { display: inline-block; max-width: 100%; overflow-wrap: anywhere; white-space: normal; }
-.amsec-file-line { display: inline-block; margin-left: 8px; }
-.amsec-file-package { display: block; font-weight: 600; overflow-wrap: anywhere; }
-.amsec-file-reason { display: block; color: #50575e; font-size: 12px; overflow-wrap: anywhere; }
-.amsec-file-finding p { margin: 8px 0; }
-.amsec-file-note { padding: 8px 12px; background: #f6f7f7; }
-.amsec-file-note-form { margin-top: 12px; max-width: 520px; }
-.amsec-file-note-form label { display: block; margin-bottom: 6px; font-weight: 600; }
-.amsec-file-note-form textarea { display: block; width: 100%; margin-bottom: 8px; }
-.amsec-file-empty { padding: 12px 16px; background: #f6f7f7; }
-.amsec-file-history { margin-top: 18px; border-top: 1px solid #e2e8ed; padding-top: 12px; }
-.amsec-file-history summary { cursor: pointer; font-weight: 600; }
-.amsec-file-history ul { margin: 8px 0 12px 20px; }
-.amsec-file-history li { margin: 7px 0; overflow-wrap: anywhere; }
-.amsec-file-history code { white-space: normal; overflow-wrap: anywhere; }
-.amsec-file-scan :is(a, button, textarea, summary):focus-visible, .amsec-file-actionbar button:focus-visible { outline: 2px solid #a63617; outline-offset: 3px; }
-@media (max-width: 782px) { .amsec-file-actionbar { justify-content: flex-start; } .amsec-file-heading { display: block; } .amsec-file-rule-age { display: block; margin-bottom: 16px; } .amsec-file-coverage { grid-template-columns: repeat(2, minmax(0, 1fr)); } .amsec-file-scan { padding: 18px; } }
-@media (max-width: 420px) { .amsec-file-coverage { grid-template-columns: 1fr 1fr; gap: 0 10px; } .amsec-file-finding-top { display: block; } .amsec-file-finding-top span { display: block; margin-top: 3px; } }
-.amsec-login-panel h3 { margin-top: 0; }
-.amsec-login-panel select { display: block; width: 100%; max-width: 420px; margin: 8px 0; }
-.amsec-login-panel .amsec-check { display: block; margin: 14px 0 4px; }
-.amsec-factor-form { border-top: 1px solid #e2e8ed; padding: 16px 0; }
-.amsec-factor-form label { display: block; margin-bottom: 10px; }
-.amsec-factor-form input { display: block; max-width: 320px; width: 100%; margin-top: 4px; }
-@media (max-width: 782px) { .amsec-login { padding: 18px; } .amsec-login-grid { grid-template-columns: 1fr; } .amsec-login-heading { display: block; } .amsec-login-state { display: inline-block; margin-bottom: 12px; } }
-.amsec-mcp { margin: 24px 0; padding: 20px 24px; background: #fff; border: 1px solid #d6dbe0; }
-.amsec-mcp h2 { margin-top: 0; }
-.amsec-mcp form { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.ironlatch-login { margin: 24px 0; padding: 24px; background: #fff; border: 1px solid #c9d3dc; border-radius: 6px; }
+.ironlatch-login-heading { display: flex; align-items: start; justify-content: space-between; gap: 20px; border-bottom: 1px solid #e2e8ed; margin-bottom: 20px; }
+.ironlatch-login-heading h2 { margin-top: 0; }
+.ironlatch-login-state { padding: 5px 10px; background: #faf5ec; color: #1a1410; border-radius: 3px; white-space: nowrap; }
+.ironlatch-login-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.ironlatch-login-panel { min-width: 0; }
+.ironlatch-file-actionbar { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-start; margin: 16px 0 0; }
+.ironlatch-file-actionbar form { margin: 0; }
+.ironlatch-file-scan { background: #fff; border: 1px solid #c9d3dc; border-radius: 6px; padding: 24px; }
+.ironlatch-file-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; border-bottom: 1px solid #e2e8ed; margin-bottom: 18px; }
+.ironlatch-file-heading h2 { margin: 0 0 8px; }
+.ironlatch-file-heading p { max-width: 66ch; color: #50575e; line-height: 1.55; margin: 0 0 18px; }
+.ironlatch-file-rule-age { color: #50575e; white-space: nowrap; font-size: 12px; }
+.ironlatch-file-status { display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: baseline; padding: 12px 16px; border-left: 4px solid #a63617; background: #faf5ec; }
+.ironlatch-file-status-partial { border-left-color: #b65a00; background: #fff6e8; }
+.ironlatch-file-status strong { font-size: 15px; }
+.ironlatch-file-coverage { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 18px; margin: 22px 0; border-top: 1px solid #e2e8ed; }
+.ironlatch-file-coverage div { padding: 12px 0; border-bottom: 1px solid #e2e8ed; }
+.ironlatch-file-coverage dt { color: #50575e; font-size: 12px; }
+.ironlatch-file-coverage dd { margin: 3px 0 0; font-size: 19px; font-weight: 650; font-variant-numeric: tabular-nums; }
+.ironlatch-file-findings ol { list-style: none; margin: 0; padding: 0; }
+.ironlatch-file-finding { padding: 16px 0; border-top: 1px solid #e2e8ed; }
+.ironlatch-file-finding-top { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+.ironlatch-file-finding-top span, .ironlatch-file-line { color: #50575e; font-size: 12px; }
+.ironlatch-file-finding code { display: inline-block; max-width: 100%; overflow-wrap: anywhere; white-space: normal; }
+.ironlatch-file-line { display: inline-block; margin-left: 8px; }
+.ironlatch-file-package { display: block; font-weight: 600; overflow-wrap: anywhere; }
+.ironlatch-file-reason { display: block; color: #50575e; font-size: 12px; overflow-wrap: anywhere; }
+.ironlatch-file-finding p { margin: 8px 0; }
+.ironlatch-file-note { padding: 8px 12px; background: #f6f7f7; }
+.ironlatch-file-note-form { margin-top: 12px; max-width: 520px; }
+.ironlatch-file-note-form label { display: block; margin-bottom: 6px; font-weight: 600; }
+.ironlatch-file-note-form textarea { display: block; width: 100%; margin-bottom: 8px; }
+.ironlatch-file-empty { padding: 12px 16px; background: #f6f7f7; }
+.ironlatch-file-history { margin-top: 18px; border-top: 1px solid #e2e8ed; padding-top: 12px; }
+.ironlatch-file-history summary { cursor: pointer; font-weight: 600; }
+.ironlatch-file-history ul { margin: 8px 0 12px 20px; }
+.ironlatch-file-history li { margin: 7px 0; overflow-wrap: anywhere; }
+.ironlatch-file-history code { white-space: normal; overflow-wrap: anywhere; }
+.ironlatch-file-scan :is(a, button, textarea, summary):focus-visible, .ironlatch-file-actionbar button:focus-visible { outline: 2px solid #a63617; outline-offset: 3px; }
+@media (max-width: 782px) { .ironlatch-file-actionbar { justify-content: flex-start; } .ironlatch-file-heading { display: block; } .ironlatch-file-rule-age { display: block; margin-bottom: 16px; } .ironlatch-file-coverage { grid-template-columns: repeat(2, minmax(0, 1fr)); } .ironlatch-file-scan { padding: 18px; } }
+@media (max-width: 420px) { .ironlatch-file-coverage { grid-template-columns: 1fr 1fr; gap: 0 10px; } .ironlatch-file-finding-top { display: block; } .ironlatch-file-finding-top span { display: block; margin-top: 3px; } }
+.ironlatch-login-panel h3 { margin-top: 0; }
+.ironlatch-login-panel select { display: block; width: 100%; max-width: 420px; margin: 8px 0; }
+.ironlatch-login-panel .ironlatch-check { display: block; margin: 14px 0 4px; }
+.ironlatch-factor-form { border-top: 1px solid #e2e8ed; padding: 16px 0; }
+.ironlatch-factor-form label { display: block; margin-bottom: 10px; }
+.ironlatch-factor-form input { display: block; max-width: 320px; width: 100%; margin-top: 4px; }
+@media (max-width: 782px) { .ironlatch-login { padding: 18px; } .ironlatch-login-grid { grid-template-columns: 1fr; } .ironlatch-login-heading { display: block; } .ironlatch-login-state { display: inline-block; margin-bottom: 12px; } }
+.ironlatch-mcp { margin: 24px 0; padding: 20px 24px; background: #fff; border: 1px solid #d6dbe0; }
+.ironlatch-mcp h2 { margin-top: 0; }
+.ironlatch-mcp form { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
 
-.amsec-fix-review { max-width: 680px; padding: 28px 32px; margin: 24px 0; background: #fff; border: 1px solid #d6dbe0; }
-.amsec-fix-review h1 { margin: 0 0 12px; font-size: 25px; line-height: 1.25; }
-.amsec-fix-review p { line-height: 1.55; }
-.amsec-fix-diff { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 24px 0; border-top: 1px solid #d6dbe0; border-bottom: 1px solid #d6dbe0; }
-.amsec-fix-diff > div { padding: 14px 12px 14px 0; }
-.amsec-fix-diff dt { color: #50575e; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .03em; }
-.amsec-fix-diff dd { margin: 6px 0 0; font-size: 16px; font-weight: 600; }
-.amsec-fix-review form { display: grid; justify-items: start; gap: 10px; margin-top: 24px; }
-.amsec-fix-review input[type="password"] { width: 100%; max-width: 340px; }
-.amsec-fix-review :is(button, input):focus-visible { outline: 2px solid #f26b3a; outline-offset: 2px; }
+.ironlatch-fix-review { max-width: 680px; padding: 28px 32px; margin: 24px 0; background: #fff; border: 1px solid #d6dbe0; }
+.ironlatch-fix-review h1 { margin: 0 0 12px; font-size: 25px; line-height: 1.25; }
+.ironlatch-fix-review p { line-height: 1.55; }
+.ironlatch-fix-diff { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 24px 0; border-top: 1px solid #d6dbe0; border-bottom: 1px solid #d6dbe0; }
+.ironlatch-fix-diff > div { padding: 14px 12px 14px 0; }
+.ironlatch-fix-diff dt { color: #50575e; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .03em; }
+.ironlatch-fix-diff dd { margin: 6px 0 0; font-size: 16px; font-weight: 600; }
+.ironlatch-fix-review form { display: grid; justify-items: start; gap: 10px; margin-top: 24px; }
+.ironlatch-fix-review input[type="password"] { width: 100%; max-width: 340px; }
+.ironlatch-fix-review :is(button, input):focus-visible { outline: 2px solid #f26b3a; outline-offset: 2px; }
 
-body.amsec-app #wpcontent {
+body.ironlatch-app #wpcontent {
   background: #faf5ec;
 }
 
 /* Short pages show the page background under the footer, so it matches too. */
-html:has(> body.amsec-app),
-body.amsec-app,
-body.amsec-app #wpfooter {
+html:has(> body.ironlatch-app),
+body.ironlatch-app,
+body.ironlatch-app #wpfooter {
   background: #faf5ec;
 }
 
-body.amsec-app #wpbody-content .wrap,
-body.amsec-app .amsec-security-scanner-admin {
+body.ironlatch-app #wpbody-content .wrap,
+body.ironlatch-app .ironlatch-security-scanner-admin {
   box-sizing: border-box;
   max-width: none;
   margin-right: 20px;
@@ -1059,50 +1059,50 @@ body.amsec-app .amsec-security-scanner-admin {
   font-family: Inter, system-ui, sans-serif;
 }
 
-body.amsec-app #wpbody-content .wrap > h1,
-body.amsec-app .amsec-security-scanner-admin h1,
-body.amsec-app .amsec-brand-name {
+body.ironlatch-app #wpbody-content .wrap > h1,
+body.ironlatch-app .ironlatch-security-scanner-admin h1,
+body.ironlatch-app .ironlatch-brand-name {
   font-family: Fraunces, "Times New Roman", serif;
   color: #1a1410;
 }
 
-body.amsec-app .button-primary {
+body.ironlatch-app .button-primary {
   background: #c13a1b;
   border-color: #a63617;
   border-radius: 999px;
   color: #fff;
 }
 
-body.amsec-app .button-primary:hover,
-body.amsec-app .button-primary:focus {
+body.ironlatch-app .button-primary:hover,
+body.ironlatch-app .button-primary:focus {
   background: #a63617;
   border-color: #a63617;
   color: #fff;
 }
 
-body.amsec-app .button:not(.button-primary),
-body.amsec-app .button-secondary {
+body.ironlatch-app .button:not(.button-primary),
+body.ironlatch-app .button-secondary {
   border-radius: 999px;
   border-color: #a63617;
   background: #fff;
   color: #a63617;
 }
 
-body.amsec-app .button:not(.button-primary):hover,
-body.amsec-app .button:not(.button-primary):focus,
-body.amsec-app .button-secondary:hover,
-body.amsec-app .button-secondary:focus {
+body.ironlatch-app .button:not(.button-primary):hover,
+body.ironlatch-app .button:not(.button-primary):focus,
+body.ironlatch-app .button-secondary:hover,
+body.ironlatch-app .button-secondary:focus {
   border-color: #a63617;
   background: #faf5ec;
   color: #a63617;
 }
 
-body.amsec-app #wpbody-content > :is(.notice, .update-nag, .updated, .error) {
+body.ironlatch-app #wpbody-content > :is(.notice, .update-nag, .updated, .error) {
   margin: 16px 20px 0;
   border-radius: 14px;
 }
 
-.amsec-brand {
+.ironlatch-brand {
   box-sizing: border-box;
   display: flex;
   align-items: center;
@@ -1115,35 +1115,35 @@ body.amsec-app #wpbody-content > :is(.notice, .update-nag, .updated, .error) {
   border-radius: 18px;
 }
 
-.amsec-brand-mark {
+.ironlatch-brand-mark {
   display: flex;
   align-items: center;
   gap: 12px;
   min-width: 0;
 }
 
-.amsec-brand-mark img {
+.ironlatch-brand-mark img {
   width: 44px;
   height: 44px;
   border-radius: 12px;
   object-fit: cover;
 }
 
-.amsec-brand-title {
+.ironlatch-brand-title {
   display: flex;
   align-items: baseline;
   gap: 10px;
   min-width: 0;
 }
 
-.amsec-brand-name {
+.ironlatch-brand-name {
   margin: 0;
   font-size: 28px;
   line-height: 1.1;
   font-weight: 650;
 }
 
-.amsec-brand-version {
+.ironlatch-brand-version {
   margin: 0;
   padding: 2px 8px;
   border-radius: 999px;
@@ -1155,7 +1155,7 @@ body.amsec-app #wpbody-content > :is(.notice, .update-nag, .updated, .error) {
   line-height: 1.4;
 }
 
-.amsec-brand-links {
+.ironlatch-brand-links {
   display: flex;
   gap: 16px;
   margin: 0;
@@ -1163,7 +1163,7 @@ body.amsec-app #wpbody-content > :is(.notice, .update-nag, .updated, .error) {
   font-weight: 600;
 }
 
-.amsec-brand-links a {
+.ironlatch-brand-links a {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -1171,18 +1171,18 @@ body.amsec-app #wpbody-content > :is(.notice, .update-nag, .updated, .error) {
   text-decoration: none;
 }
 
-.amsec-brand-links img {
+.ironlatch-brand-links img {
   width: 22px;
   height: 22px;
   border-radius: 6px;
 }
 
-.amsec-brand-links a:hover,
-.amsec-brand-links a:focus {
+.ironlatch-brand-links a:hover,
+.ironlatch-brand-links a:focus {
   color: #a63617;
 }
 
-.amsec-screen-tabs {
+.ironlatch-screen-tabs {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
@@ -1191,7 +1191,7 @@ body.amsec-app #wpbody-content > :is(.notice, .update-nag, .updated, .error) {
   border-bottom: 1px solid rgba(26, 20, 16, 0.12);
 }
 
-.amsec-screen-tabs button {
+.ironlatch-screen-tabs button {
   appearance: none;
   margin: 0 0 -1px;
   padding: 11px 12px 12px;
@@ -1205,13 +1205,13 @@ body.amsec-app #wpbody-content > :is(.notice, .update-nag, .updated, .error) {
   cursor: pointer;
 }
 
-.amsec-screen-tabs button.is-current {
+.ironlatch-screen-tabs button.is-current {
   border-color: rgba(26, 20, 16, 0.12);
   background: #fff;
   color: #1a1410;
 }
 
-body.amsec-app .amsec-screen-tabs ~ .amsec-tab-panel {
+body.ironlatch-app .ironlatch-screen-tabs ~ .ironlatch-tab-panel {
   margin: 0 0 28px;
   padding: 22px 22px 8px;
   background: #fff;
@@ -1220,8 +1220,8 @@ body.amsec-app .amsec-screen-tabs ~ .amsec-tab-panel {
   border-radius: 0 0 20px 20px;
 }
 
-body.amsec-app #wpbody-content .amsec-tab-panel .amsec-security-scanner-admin,
-body.amsec-app #wpbody-content .amsec-tab-panel .wrap {
+body.ironlatch-app #wpbody-content .ironlatch-tab-panel .ironlatch-security-scanner-admin,
+body.ironlatch-app #wpbody-content .ironlatch-tab-panel .wrap {
   margin: 0;
   padding: 0;
   background: transparent;
@@ -1230,45 +1230,45 @@ body.amsec-app #wpbody-content .amsec-tab-panel .wrap {
   box-shadow: none;
 }
 
-.amsec-tab-panel .amsec-header h2:first-child,
-.amsec-tab-panel .wrap > h2:first-child {
+.ironlatch-tab-panel .ironlatch-header h2:first-child,
+.ironlatch-tab-panel .wrap > h2:first-child {
   font-size: 22px;
 }
 
-.amsec-tab-panel .amsec-header a {
+.ironlatch-tab-panel .ironlatch-header a {
   display: none;
 }
 
-.amsec-security-scanner-admin h2,
-.amsec-tab-panel h2 {
+.ironlatch-security-scanner-admin h2,
+.ironlatch-tab-panel h2 {
   font-family: Fraunces, "Times New Roman", serif;
   font-weight: 650;
   color: #1a1410;
 }
 
-body.amsec-app .amsec-security-scanner-admin .widefat,
-.amsec-tab-panel .widefat {
+body.ironlatch-app .ironlatch-security-scanner-admin .widefat,
+.ironlatch-tab-panel .widefat {
   border: 1px solid rgba(26, 20, 16, 0.12);
   border-radius: 14px;
   background: #fff;
   box-shadow: none;
 }
 
-body.amsec-app .amsec-security-scanner-admin .widefat thead th,
-.amsec-tab-panel .widefat thead th {
+body.ironlatch-app .ironlatch-security-scanner-admin .widefat thead th,
+.ironlatch-tab-panel .widefat thead th {
   background: #faf5ec;
   color: #1a1410;
   font-weight: 650;
 }
 
-body.amsec-app .amsec-security-scanner-admin code,
-.amsec-tab-panel code {
+body.ironlatch-app .ironlatch-security-scanner-admin code,
+.ironlatch-tab-panel code {
   padding: 1px 5px;
   background: #faf5ec;
   border-radius: 6px;
 }
 
-.amsec-cats {
+.ironlatch-cats {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
@@ -1278,7 +1278,7 @@ body.amsec-app .amsec-security-scanner-admin code,
   border-bottom: 1px solid rgba(26, 20, 16, 0.12);
 }
 
-.amsec-cats a {
+.ironlatch-cats a {
   position: relative;
   margin: 0 0 -1px;
   padding: 11px 16px 12px;
@@ -1291,14 +1291,14 @@ body.amsec-app .amsec-security-scanner-admin code,
   text-decoration: none;
 }
 
-.amsec-cats a.is-current {
+.ironlatch-cats a.is-current {
   border-color: rgba(26, 20, 16, 0.12);
   background: #fff;
   color: #1a1410;
 }
 
-.amsec-cats + .amsec-overview,
-.amsec-tab-panel {
+.ironlatch-cats + .ironlatch-overview,
+.ironlatch-tab-panel {
   margin-top: 0;
   margin-bottom: 28px;
   padding: 22px 22px 8px;
@@ -1308,7 +1308,7 @@ body.amsec-app .amsec-security-scanner-admin code,
   border-radius: 0 0 20px 20px;
 }
 
-.amsec-tab-panel :is(.amsec-overview, .amsec-file-scan, .amsec-login, .amsec-mcp, .amsec-consent) {
+.ironlatch-tab-panel :is(.ironlatch-overview, .ironlatch-file-scan, .ironlatch-login, .ironlatch-mcp, .ironlatch-consent) {
   margin: 16px 0;
   padding: 0;
   background: transparent;
@@ -1317,12 +1317,12 @@ body.amsec-app .amsec-security-scanner-admin code,
   box-shadow: none;
 }
 
-.amsec-tab-panel h2,
-.amsec-cats + .amsec-overview h2 {
+.ironlatch-tab-panel h2,
+.ironlatch-cats + .ironlatch-overview h2 {
   color: #1a1410;
 }
 
-.amsec-pager {
+.ironlatch-pager {
   display: grid;
   grid-template-columns: auto auto auto;
   align-items: center;
@@ -1331,7 +1331,7 @@ body.amsec-app .amsec-security-scanner-admin code,
   margin: 16px auto 8px;
 }
 
-.amsec-pager-nav {
+.ironlatch-pager-nav {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1346,56 +1346,56 @@ body.amsec-app .amsec-security-scanner-admin code,
   text-decoration: none;
 }
 
-.amsec-pager-nav.is-spacer {
+.ironlatch-pager-nav.is-spacer {
   visibility: hidden;
 }
 
-.amsec-pager-label {
+.ironlatch-pager-label {
   color: #6b5c4f;
   font-weight: 650;
   text-align: center;
 }
 
 @media (max-width: 782px) {
-  body.amsec-app #wpbody-content > :is(.notice, .update-nag, .updated, .error) {
+  body.ironlatch-app #wpbody-content > :is(.notice, .update-nag, .updated, .error) {
     margin-right: 12px;
     margin-left: 12px;
   }
 
-  .amsec-brand,
-  .amsec-page-bar,
-  body.amsec-app #wpbody-content .wrap {
+  .ironlatch-brand,
+  .ironlatch-page-bar,
+  body.ironlatch-app #wpbody-content .wrap {
     margin-right: 12px;
     margin-left: 12px;
   }
 
-  .amsec-brand {
+  .ironlatch-brand {
     align-items: flex-start;
     flex-direction: column;
   }
 
-  .amsec-brand-name {
+  .ironlatch-brand-name {
     font-size: 22px;
   }
 
-  .amsec-brand-links {
+  .ironlatch-brand-links {
     flex-wrap: wrap;
   }
 }
 
 @media (max-width: 600px) {
-  body.amsec-app {
+  body.ironlatch-app {
     padding-top: 46px;
   }
 
-  body.amsec-app #wpadminbar {
+  body.ironlatch-app #wpadminbar {
     position: fixed;
     top: 0;
   }
 }
-@media (max-width: 600px) { .amsec-fix-review { padding: 20px; } .amsec-fix-diff { grid-template-columns: 1fr; } .amsec-fix-diff > div { padding: 12px 0; } .amsec-fix-diff > div + div { border-top: 1px solid #e6e8eb; } }
+@media (max-width: 600px) { .ironlatch-fix-review { padding: 20px; } .ironlatch-fix-diff { grid-template-columns: 1fr; } .ironlatch-fix-diff > div { padding: 12px 0; } .ironlatch-fix-diff > div + div { border-top: 1px solid #e6e8eb; } }
 
-.amsec-activity-switch {
+.ironlatch-activity-switch {
   margin: 0 0 18px;
   padding: 14px 16px;
   background: #f7f1ea;
@@ -1403,15 +1403,15 @@ body.amsec-app .amsec-security-scanner-admin code,
   border-radius: 12px;
 }
 
-.amsec-activity-switch p {
+.ironlatch-activity-switch p {
   margin: 0 0 10px;
 }
 
-.amsec-activity-switch .button {
+.ironlatch-activity-switch .button {
   margin: 0;
 }
 
-.amsec-activity-filter {
+.ironlatch-activity-filter {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -1419,22 +1419,22 @@ body.amsec-app .amsec-security-scanner-admin code,
   margin: 4px 0 18px;
 }
 
-.amsec-activity-filter select {
+.ironlatch-activity-filter select {
   min-width: 14rem;
 }
 
-.amsec-log-day {
+.ironlatch-log-day {
   margin: 0 0 18px;
 }
 
-.amsec-log-day h2 {
+.ironlatch-log-day h2 {
   margin: 0 0 8px;
   font-family: Fraunces, "Times New Roman", serif;
   font-size: 18px;
   font-weight: 650;
 }
 
-.amsec-log {
+.ironlatch-log {
   margin: 0;
   padding: 0;
   list-style: none;
@@ -1444,7 +1444,7 @@ body.amsec-app .amsec-security-scanner-admin code,
   overflow: hidden;
 }
 
-.amsec-log li {
+.ironlatch-log li {
   display: grid;
   grid-template-columns: 3.6rem minmax(11rem, 15rem) minmax(0, 1fr);
   gap: 8px 16px;
@@ -1454,56 +1454,56 @@ body.amsec-app .amsec-security-scanner-admin code,
   border-bottom: 1px solid rgba(26, 20, 16, 0.08);
 }
 
-.amsec-log li:last-child {
+.ironlatch-log li:last-child {
   border-bottom: 0;
 }
 
-.amsec-log time {
+.ironlatch-log time {
   color: #6b5c4f;
   font-size: 13px;
   font-variant-numeric: tabular-nums;
 }
 
-.amsec-log p {
+.ironlatch-log p {
   display: contents;
   margin: 0;
 }
 
-.amsec-log strong {
+.ironlatch-log strong {
   font-weight: 650;
 }
 
-.amsec-log span {
+.ironlatch-log span {
   color: #6b5c4f;
   line-height: 1.4;
 }
 
-.amsec-log-empty {
+.ironlatch-log-empty {
   margin: 0 0 8px;
   color: #6b5c4f;
 }
 
 @media (max-width: 782px) {
-  .amsec-log li {
+  .ironlatch-log li {
     grid-template-columns: 3.6rem minmax(0, 1fr);
   }
 
-  .amsec-log p {
+  .ironlatch-log p {
     display: block;
   }
 
-  .amsec-log span {
+  .ironlatch-log span {
     display: block;
   }
 }
 
-.amsec-session-lines {
+.ironlatch-session-lines {
   margin: 12px 0 18px;
   padding: 0;
   list-style: none;
 }
 
-.amsec-session-lines li {
+.ironlatch-session-lines li {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -1512,7 +1512,7 @@ body.amsec-app .amsec-security-scanner-admin code,
   border-bottom: 1px solid rgba(26, 20, 16, 0.08);
 }
 
-.amsec-session-lines .dashicons {
+.ironlatch-session-lines .dashicons {
   flex: 0 0 auto;
   width: 20px;
   height: 20px;
@@ -1521,11 +1521,11 @@ body.amsec-app .amsec-security-scanner-admin code,
   color: #1a1410;
 }
 
-.amsec-session-lines li.is-current .dashicons {
+.ironlatch-session-lines li.is-current .dashicons {
   color: #1e7a46;
 }
 
-.amsec-session-summary {
+.ironlatch-session-summary {
   flex: 1 1 auto;
   min-width: 0;
   white-space: nowrap;
@@ -1533,23 +1533,23 @@ body.amsec-app .amsec-security-scanner-admin code,
   text-overflow: ellipsis;
 }
 
-.amsec-session-lines a {
+.ironlatch-session-lines a {
   flex: 0 0 auto;
   color: #1a1410;
   font-weight: 650;
   text-decoration: none;
 }
 
-.amsec-session-lines a:hover,
-.amsec-session-lines a:focus {
+.ironlatch-session-lines a:hover,
+.ironlatch-session-lines a:focus {
   text-decoration: underline;
 }
 
-.amsec-session-back {
+.ironlatch-session-back {
   margin: 0 0 12px;
 }
 
-.amsec-session {
+.ironlatch-session {
   margin: 0;
   padding: 14px 16px;
   background: #f7f1ea;
@@ -1557,11 +1557,11 @@ body.amsec-app .amsec-security-scanner-admin code,
   border-radius: 12px;
 }
 
-.amsec-session.is-current {
+.ironlatch-session.is-current {
   border-color: #1e7a46;
 }
 
-.amsec-session-kicker {
+.ironlatch-session-kicker {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -1573,48 +1573,48 @@ body.amsec-app .amsec-security-scanner-admin code,
   text-transform: uppercase;
 }
 
-.amsec-session-kicker .dashicons {
+.ironlatch-session-kicker .dashicons {
   width: 18px;
   height: 18px;
   font-size: 18px;
   line-height: 18px;
 }
 
-.amsec-session h1 {
+.ironlatch-session h1 {
   margin: 0 0 10px;
   font-family: Fraunces, "Times New Roman", serif;
   font-size: 18px;
   font-weight: 650;
 }
 
-.amsec-session dl {
+.ironlatch-session dl {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
   gap: 10px 16px;
   margin: 0;
 }
 
-.amsec-session dt {
+.ironlatch-session dt {
   color: #6b5c4f;
   font-size: 12px;
   font-weight: 700;
 }
 
-.amsec-session dd {
+.ironlatch-session dd {
   margin: 2px 0 0;
 }
 
-.amsec-session details {
+.ironlatch-session details {
   margin-top: 12px;
 }
 
-.amsec-session-agent {
+.ironlatch-session-agent {
   margin: 8px 0 0;
   color: #6b5c4f;
   overflow-wrap: anywhere;
 }
 
-.amsec-brief-status {
+.ironlatch-brief-status {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -1622,7 +1622,7 @@ body.amsec-app .amsec-security-scanner-admin code,
   margin: 8px 0 12px;
 }
 
-.amsec-pill {
+.ironlatch-pill {
   display: inline-block;
   padding: 2px 10px;
   border-radius: 999px;
@@ -1631,17 +1631,17 @@ body.amsec-app .amsec-security-scanner-admin code,
   font-weight: 700;
 }
 
-.amsec-pill.is-on {
+.ironlatch-pill.is-on {
   background: #e5f6ec;
   color: #1e7a46;
 }
 
-.amsec-pill.is-risk {
+.ironlatch-pill.is-risk {
   background: #fde8e4;
   color: #a63617;
 }
 
-.amsec-facts {
+.ironlatch-facts {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
@@ -1650,7 +1650,7 @@ body.amsec-app .amsec-security-scanner-admin code,
   list-style: none;
 }
 
-.amsec-facts li {
+.ironlatch-facts li {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -1660,22 +1660,22 @@ body.amsec-app .amsec-security-scanner-admin code,
   font-weight: 650;
 }
 
-.amsec-facts strong {
+.ironlatch-facts strong {
   color: #a63617;
 }
 
-.amsec-check {
+.ironlatch-check {
   display: flex;
   align-items: center;
   gap: 6px;
 }
 
-.amsec-tip {
+.ironlatch-tip {
   position: relative;
   display: inline-flex;
 }
 
-.amsec-tip-button {
+.ironlatch-tip-button {
   margin: 0;
   padding: 0 6px;
   border: 0;
@@ -1687,7 +1687,7 @@ body.amsec-app .amsec-security-scanner-admin code,
   cursor: help;
 }
 
-.amsec-tip-bubble {
+.ironlatch-tip-bubble {
   position: absolute;
   z-index: 30;
   top: calc(100% + 6px);
@@ -1704,40 +1704,40 @@ body.amsec-app .amsec-security-scanner-admin code,
   pointer-events: none;
 }
 
-.amsec-tip:hover .amsec-tip-bubble,
-.amsec-tip:focus-within .amsec-tip-bubble {
+.ironlatch-tip:hover .ironlatch-tip-bubble,
+.ironlatch-tip:focus-within .ironlatch-tip-bubble {
   opacity: 1;
 }
 
-.amsec-more {
+.ironlatch-more {
   margin: 8px 0 0;
 }
 
-.amsec-more summary {
+.ironlatch-more summary {
   width: fit-content;
   color: #a63617;
   font-weight: 700;
   cursor: pointer;
 }
 
-.amsec-more p,
-.amsec-brief-note {
+.ironlatch-more p,
+.ironlatch-brief-note {
   max-width: 68ch;
   color: #6b5c4f;
 }
 
-body.amsec-app #wpbody-content .amsec-tab-panel .amsec-brief + .amsec-brief {
+body.ironlatch-app #wpbody-content .ironlatch-tab-panel .ironlatch-brief + .ironlatch-brief {
   margin-top: 18px;
   padding-top: 8px;
   border-top: 1px solid rgba(26, 20, 16, 0.12);
 }
 
-.amsec-scan-form.amsec-rescan-center {
+.ironlatch-scan-form.ironlatch-rescan-center {
   margin: 20px auto 24px;
   gap: 12px;
 }
 
-.amsec-cat-count {
+.ironlatch-cat-count {
   display: inline-block;
   min-width: 1.6em;
   margin-left: 6px;
@@ -1751,63 +1751,63 @@ body.amsec-app #wpbody-content .amsec-tab-panel .amsec-brief + .amsec-brief {
   text-align: center;
 }
 
-.amsec-cats a.is-success .amsec-cat-count {
+.ironlatch-cats a.is-success .ironlatch-cat-count {
   background: #dff3e6;
   color: #1e7a46;
 }
 
-.amsec-cats a.is-error .amsec-cat-count {
+.ironlatch-cats a.is-error .ironlatch-cat-count {
   background: #fbe3da;
   color: #a63617;
 }
 
-.amsec-cats a.is-critical .amsec-cat-count {
+.ironlatch-cats a.is-critical .ironlatch-cat-count {
   background: #f6d9d9;
   color: #9b1c1c;
 }
 
-.amsec-cats a.is-warning .amsec-cat-count {
+.ironlatch-cats a.is-warning .ironlatch-cat-count {
   background: #f8ebd0;
   color: #8a5a10;
 }
 
-.amsec-cats a.is-recommended .amsec-cat-count {
+.ironlatch-cats a.is-recommended .ironlatch-cat-count {
   background: #eadff0;
   color: #5b3a6b;
 }
 
-.amsec-tour-dim {
+.ironlatch-tour-dim {
   position: fixed;
   inset: 0;
   background: rgba(20, 14, 10, 0.55);
   z-index: 9980;
 }
 
-#adminmenu .amsec-tour-target {
+#adminmenu .ironlatch-tour-target {
   background: #a63617 !important;
   color: #fff !important;
   border-radius: 6px;
   box-shadow: 0 0 0 3px #f4a93c, 0 0 20px 4px rgba(217, 75, 38, 0.7);
 }
 
-html:has(body.amsec-app) {
+html:has(body.ironlatch-app) {
   background: #faf5ec;
 }
 
-#wpadminbar .amsec-tour-target {
+#wpadminbar .ironlatch-tour-target {
   background: #a63617 !important;
   border-radius: 6px;
   box-shadow: 0 0 0 3px #f4a93c, 0 0 20px 4px rgba(217, 75, 38, 0.7);
 }
 
-body.amsec-app .amsec-security-scanner-admin fieldset legend {
+body.ironlatch-app .ironlatch-security-scanner-admin fieldset legend {
   display: block;
   margin: 0 0 6px;
   padding: 0;
   font-weight: 650;
 }
 
-body.amsec-app .amsec-security-scanner-admin fieldset > label {
+body.ironlatch-app .ironlatch-security-scanner-admin fieldset > label {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -1815,15 +1815,15 @@ body.amsec-app .amsec-security-scanner-admin fieldset > label {
 }
 
 @media (max-width: 782px) {
-  .amsec-cats,
-  .amsec-screen-tabs {
+  .ironlatch-cats,
+  .ironlatch-screen-tabs {
     gap: 8px;
     margin-bottom: 12px;
     border-bottom: 0;
   }
 
-  .amsec-cats a,
-  .amsec-screen-tabs button {
+  .ironlatch-cats a,
+  .ironlatch-screen-tabs button {
     margin: 0;
     padding: 9px 14px;
     border: 1px solid rgba(26, 20, 16, 0.12);
@@ -1831,21 +1831,21 @@ body.amsec-app .amsec-security-scanner-admin fieldset > label {
     background: #fff;
   }
 
-  .amsec-cats a.is-current,
-  .amsec-screen-tabs button.is-current {
+  .ironlatch-cats a.is-current,
+  .ironlatch-screen-tabs button.is-current {
     border-color: #1a1410;
     background: #1a1410;
     color: #fff;
   }
 
-  .amsec-cats + *,
-  body.amsec-app .amsec-screen-tabs ~ .amsec-tab-panel {
+  .ironlatch-cats + *,
+  body.ironlatch-app .ironlatch-screen-tabs ~ .ironlatch-tab-panel {
     border-top: 1px solid rgba(26, 20, 16, 0.12);
     border-radius: 20px;
   }
 
   /* Fixed bubbles never widen the page, so a hidden tip cannot cause sideways scrolling. */
-  .amsec-tip-bubble {
+  .ironlatch-tip-bubble {
     position: fixed;
     top: auto;
     right: 12px;
@@ -1853,41 +1853,41 @@ body.amsec-app .amsec-security-scanner-admin fieldset > label {
     width: auto;
   }
 
-  .amsec-start-home {
+  .ironlatch-start-home {
     padding: 14px;
   }
 
-  .amsec-pager {
+  .ironlatch-pager {
     grid-template-columns: 1fr auto 1fr;
     gap: 8px;
   }
 }
 
-.amsec-scan-button.amsec-tour-target,
-.amsec-cats.amsec-tour-target {
+.ironlatch-scan-button.ironlatch-tour-target,
+.ironlatch-cats.ironlatch-tour-target {
   position: relative;
   z-index: 9985;
   box-shadow: 0 0 0 4px #f4a93c, 0 0 20px 4px rgba(217, 75, 38, 0.5);
 }
 
-.amsec-cats.amsec-tour-target {
+.ironlatch-cats.ironlatch-tour-target {
   border-radius: 14px;
   background: #faf5ec;
 }
 
 /* Each setting gets its own row; the generic fieldset rule lays labels side by side. */
-body.amsec-app .amsec-security-scanner-admin fieldset > label.amsec-check {
+body.ironlatch-app .ironlatch-security-scanner-admin fieldset > label.ironlatch-check {
   display: flex;
   margin-right: 0;
 }
 
 /* Standalone links and disclosure toggles need a 24px tap target on phones (WCAG 2.2 target size). */
 @media screen and (max-width: 782px) {
-  body.amsec-app .amsec-security-scanner-admin .amsec-tip-button,
-  body.amsec-app .amsec-security-scanner-admin li > a:not(.button, .amsec-settings a),
-  body.amsec-app .amsec-security-scanner-admin td > a:not(.button),
-  body.amsec-app .amsec-security-scanner-admin p > a:not(.button):only-child,
-  body.amsec-app .amsec-security-scanner-admin p > a:not(.button):last-child {
+  body.ironlatch-app .ironlatch-security-scanner-admin .ironlatch-tip-button,
+  body.ironlatch-app .ironlatch-security-scanner-admin li > a:not(.button, .ironlatch-settings a),
+  body.ironlatch-app .ironlatch-security-scanner-admin td > a:not(.button),
+  body.ironlatch-app .ironlatch-security-scanner-admin p > a:not(.button):only-child,
+  body.ironlatch-app .ironlatch-security-scanner-admin p > a:not(.button):last-child {
     display: inline-block;
     min-height: 24px;
     padding: 3px 0;
@@ -1895,7 +1895,7 @@ body.amsec-app .amsec-security-scanner-admin fieldset > label.amsec-check {
   }
 
   /* Keep the disclosure triangle; list-item is what draws it. */
-  body.amsec-app .amsec-security-scanner-admin summary {
+  body.ironlatch-app .ironlatch-security-scanner-admin summary {
     display: list-item;
     min-height: 24px;
     padding: 3px 0;
@@ -1904,18 +1904,18 @@ body.amsec-app .amsec-security-scanner-admin fieldset > label.amsec-check {
 }
 
 /* A running scan hides the previous results; only the progress shows until the new report loads. */
-body.amsec-app .amsec-scan.is-scanning > :not(.amsec-scan-form),
-body.amsec-app .amsec-scan.is-scanning .amsec-scan-button {
+body.ironlatch-app .ironlatch-scan.is-scanning > :not(.ironlatch-scan-form),
+body.ironlatch-app .ironlatch-scan.is-scanning .ironlatch-scan-button {
   display: none;
 }
 
 /* Polish layer: one look for buttons, links, controls and notices on every screen. */
 /* WordPress fills checked boxes and radios with this variable. */
-body.amsec-app .amsec-security-scanner-admin {
+body.ironlatch-app .ironlatch-security-scanner-admin {
   --wp-admin-theme-color: #a63617;
 }
 
-body.amsec-app .amsec-security-scanner-admin .button:not(.button-link) {
+body.ironlatch-app .ironlatch-security-scanner-admin .button:not(.button-link) {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1928,40 +1928,40 @@ body.amsec-app .amsec-security-scanner-admin .button:not(.button-link) {
 }
 
 /* :where() keeps this at element weight, so it only replaces WordPress's default link blue. */
-:where(body.amsec-app .amsec-security-scanner-admin) a {
+:where(body.ironlatch-app .ironlatch-security-scanner-admin) a {
   color: #a63617;
 }
 
-:where(body.amsec-app .amsec-security-scanner-admin) a:hover {
+:where(body.ironlatch-app .ironlatch-security-scanner-admin) a:hover {
   color: #1a1410;
 }
 
-body.amsec-app .amsec-security-scanner-admin :is(input[type="checkbox"], input[type="radio"], select, input[type="text"], input[type="number"], input[type="email"], input[type="url"], textarea):focus {
+body.ironlatch-app .ironlatch-security-scanner-admin :is(input[type="checkbox"], input[type="radio"], select, input[type="text"], input[type="number"], input[type="email"], input[type="url"], textarea):focus {
   border-color: #a63617;
   box-shadow: 0 0 0 1px #a63617;
 }
 
-body.amsec-app .amsec-security-scanner-admin select {
+body.ironlatch-app .ironlatch-security-scanner-admin select {
   padding-right: 28px;
   background-position: right 8px top 55%;
 }
 
-body.amsec-app .amsec-security-scanner-admin .notice-info {
+body.ironlatch-app .ironlatch-security-scanner-admin .notice-info {
   border-left-color: #f4a93c;
   background: #faf5ec;
 }
 
-body.amsec-app .amsec-security-scanner-admin h3 {
+body.ironlatch-app .ironlatch-security-scanner-admin h3 {
   font-family: Fraunces, "Times New Roman", serif;
   font-weight: 650;
   color: #1a1410;
 }
 
-body.amsec-app .amsec-security-scanner-admin dl:not([class]) dd {
+body.ironlatch-app .ironlatch-security-scanner-admin dl:not([class]) dd {
   margin: 0 0 12px;
 }
 
-body.amsec-app .amsec-security-scanner-admin pre {
+body.ironlatch-app .ironlatch-security-scanner-admin pre {
   padding: 12px 14px;
   overflow-x: auto;
   border: 1px solid rgba(26, 20, 16, 0.12);
@@ -1971,75 +1971,75 @@ body.amsec-app .amsec-security-scanner-admin pre {
 }
 
 /* A checkbox label that wraps keeps its text indented beside the box. */
-body.amsec-app .amsec-security-scanner-admin label:has(> input[type="checkbox"]:first-child) {
+body.ironlatch-app .ironlatch-security-scanner-admin label:has(> input[type="checkbox"]:first-child) {
   display: flex;
   gap: 8px;
   align-items: flex-start;
 }
 
-body.amsec-app .amsec-security-scanner-admin label:has(> input[type="checkbox"]:first-child) > input {
+body.ironlatch-app .ironlatch-security-scanner-admin label:has(> input[type="checkbox"]:first-child) > input {
   flex: none;
   margin: 2px 0 0;
 }
 
 /* Table cells wrap between words; only long paths break inside a word. */
-body.amsec-app .amsec-security-scanner-admin .widefat td {
+body.ironlatch-app .ironlatch-security-scanner-admin .widefat td {
   overflow-wrap: break-word;
 }
 
 @media screen and (max-width: 782px) {
-  body.amsec-app .amsec-security-scanner-admin .button:not(.button-link) {
+  body.ironlatch-app .ironlatch-security-scanner-admin .button:not(.button-link) {
     min-height: 40px;
   }
 }
 
 @media (max-width: 782px) {
   /* Guide rows: badge on top, name and a small Open button side by side. */
-  .amsec-guide .amsec-start-item {
+  .ironlatch-guide .ironlatch-start-item {
     grid-template-columns: minmax(0, 1fr) auto;
   }
 
-  .amsec-guide .amsec-start-badge {
+  .ironlatch-guide .ironlatch-start-badge {
     grid-column: 1 / -1;
   }
 
-  body.amsec-app .amsec-guide .amsec-start-item .button {
+  body.ironlatch-app .ironlatch-guide .ironlatch-start-item .button {
     width: auto;
   }
 
   /* Session lines wrap instead of cutting the browser name. */
-  .amsec-session-summary {
+  .ironlatch-session-summary {
     white-space: normal;
   }
 }
 
-.amsec-session-lines a,
-.amsec-settings-go {
+.ironlatch-session-lines a,
+.ironlatch-settings-go {
   color: #a63617;
 }
 
 /* Stacked sections (one per plugin, root or rule) need air above each heading. */
-.amsec-file-scan + .amsec-file-scan {
+.ironlatch-file-scan + .ironlatch-file-scan {
   margin-top: 28px;
 }
 
-.amsec-security-scanner-admin caption {
+.ironlatch-security-scanner-admin caption {
   text-align: left;
 }
 
 /* Determinate scan bar: the script sets the width and the percentage. */
-.amsec-scan-fill.is-determinate {
+.ironlatch-scan-fill.is-determinate {
   width: 0;
   animation: none;
   transform: none;
   transition: width 0.12s linear;
 }
 
-.amsec-scan-percent {
+.ironlatch-scan-percent {
   font-variant-numeric: tabular-nums;
 }
 
-.amsec-scan-step {
+.ironlatch-scan-step {
   min-height: 1.4em;
   margin: -6px 0 16px;
   color: #1a1410;
@@ -2049,11 +2049,11 @@ body.amsec-app .amsec-security-scanner-admin .widefat td {
 }
 
 /* Scan checklist: gray dot waiting, spinning ring while active, green tick when done. */
-.amsec-scan-progress .amsec-scan-stop {
+.ironlatch-scan-progress .ironlatch-scan-stop {
   margin-top: 16px;
 }
 
-.amsec-scan-list {
+.ironlatch-scan-list {
   max-height: 480px;
   margin: 8px 0 0;
   padding: 10px;
@@ -2065,7 +2065,7 @@ body.amsec-app .amsec-security-scanner-admin .widefat td {
   text-align: left;
 }
 
-.amsec-scan-list li {
+.ironlatch-scan-list li {
   display: flex;
   align-items: center;
   gap: 14px;
@@ -2077,24 +2077,24 @@ body.amsec-app .amsec-security-scanner-admin .widefat td {
   line-height: 1.4;
 }
 
-.amsec-scan-num {
+.ironlatch-scan-num {
   flex: none;
   min-width: 2ch;
   font-variant-numeric: tabular-nums;
   text-align: right;
 }
 
-.amsec-scan-list li[data-state="active"] {
+.ironlatch-scan-list li[data-state="active"] {
   background: #faf5ec;
   color: #1a1410;
   font-weight: 600;
 }
 
-.amsec-scan-list li[data-state="done"] {
+.ironlatch-scan-list li[data-state="done"] {
   color: #1a1410;
 }
 
-.amsec-scan-dot {
+.ironlatch-scan-dot {
   position: relative;
   flex: none;
   box-sizing: border-box;
@@ -2104,18 +2104,18 @@ body.amsec-app .amsec-security-scanner-admin .widefat td {
   background: #d9d2ca;
 }
 
-[data-state="active"] > .amsec-scan-dot {
+[data-state="active"] > .ironlatch-scan-dot {
   border: 3px solid rgba(166, 54, 23, 0.25);
   border-top-color: #a63617;
   background: transparent;
-  animation: amsec-scan-spin 0.8s linear infinite;
+  animation: ironlatch-scan-spin 0.8s linear infinite;
 }
 
-[data-state="done"] > .amsec-scan-dot {
+[data-state="done"] > .ironlatch-scan-dot {
   background: #1e7a46;
 }
 
-[data-state="done"] > .amsec-scan-dot::after {
+[data-state="done"] > .ironlatch-scan-dot::after {
   content: "";
   position: absolute;
   top: 4px;
@@ -2127,36 +2127,36 @@ body.amsec-app .amsec-security-scanner-admin .widefat td {
   transform: rotate(45deg);
 }
 
-@keyframes amsec-scan-spin {
+@keyframes ironlatch-scan-spin {
   to {
     transform: rotate(360deg);
   }
 }
 
 @media (max-width: 600px) {
-  .amsec-scan-step {
+  .ironlatch-scan-step {
     font-size: 17px;
   }
 
-  .amsec-scan-list li {
+  .ironlatch-scan-list li {
     font-size: 16px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  [data-state="active"] > .amsec-scan-dot {
+  [data-state="active"] > .ironlatch-scan-dot {
     border-color: #a63617;
     animation: none;
   }
 }
 
-.amsec-risk-list {
+.ironlatch-risk-list {
   margin: 0 0 12px;
   padding: 0;
   list-style: none;
 }
 
-.amsec-risk-row {
+.ironlatch-risk-row {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
@@ -2166,44 +2166,44 @@ body.amsec-app .amsec-security-scanner-admin .widefat td {
   border-top: 1px solid rgba(26, 20, 16, 0.08);
 }
 
-.amsec-risk-row:first-child {
+.ironlatch-risk-row:first-child {
   border-top: 0;
 }
 
-.amsec-risk-row .amsec-pill {
+.ironlatch-risk-row .ironlatch-pill {
   min-width: 44px;
   text-align: center;
 }
 
-.amsec-risk-text {
+.ironlatch-risk-text {
   flex: 1 1 260px;
   min-width: 0;
   overflow-wrap: anywhere;
 }
 
-.amsec-risk-text strong {
+.ironlatch-risk-text strong {
   display: block;
 }
 
-.amsec-risk-row a {
+.ironlatch-risk-row a {
   color: #a63617;
   font-weight: 600;
 }
 
-.amsec-scan-note {
+.ironlatch-scan-note {
   color: #6b5c4f;
   font-size: 15px;
   font-weight: 400;
 }
 
 /* Scan progress folds its steps into categories; only the running one opens, and a click opens or folds any of them. */
-.amsec-scan-list li.amsec-scan-group {
+.ironlatch-scan-list li.ironlatch-scan-group {
   flex-wrap: wrap;
   padding: 0;
   font-weight: 650;
 }
 
-.amsec-scan-toggle {
+.ironlatch-scan-toggle {
   display: flex;
   flex: 1 1 100%;
   align-items: center;
@@ -2219,16 +2219,16 @@ body.amsec-app .amsec-security-scanner-admin .widefat td {
   cursor: pointer;
 }
 
-.amsec-scan-toggle:hover {
+.ironlatch-scan-toggle:hover {
   background: #faf5ec;
 }
 
-.amsec-scan-toggle:focus-visible {
+.ironlatch-scan-toggle:focus-visible {
   outline: 2px solid #c8401b;
   outline-offset: 2px;
 }
 
-.amsec-scan-toggle::after {
+.ironlatch-scan-toggle::after {
   flex: none;
   width: 8px;
   height: 8px;
@@ -2239,15 +2239,15 @@ body.amsec-app .amsec-security-scanner-admin .widefat td {
   transform: rotate(45deg) translateY(-3px);
 }
 
-.amsec-scan-toggle[aria-expanded="true"]::after {
+.ironlatch-scan-toggle[aria-expanded="true"]::after {
   transform: rotate(-135deg) translateY(-3px);
 }
 
-.amsec-scan-list li.amsec-scan-group[data-state="active"] {
+.ironlatch-scan-list li.ironlatch-scan-group[data-state="active"] {
   background: transparent;
 }
 
-.amsec-scan-count {
+.ironlatch-scan-count {
   margin-left: auto;
   color: #6b5c4f;
   font-size: 15px;
@@ -2255,14 +2255,14 @@ body.amsec-app .amsec-security-scanner-admin .widefat td {
   font-weight: 400;
 }
 
-.amsec-scan-items {
+.ironlatch-scan-items {
   flex-basis: 100%;
   margin: 0 0 6px 36px;
   padding: 0;
   list-style: none;
 }
 
-.amsec-scan-items li {
+.ironlatch-scan-items li {
   font-size: 16px;
   font-weight: 400;
 }

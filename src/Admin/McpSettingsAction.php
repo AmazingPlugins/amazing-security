@@ -22,18 +22,18 @@ final class McpSettingsAction {
 
 	public function save(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'You cannot change MCP access.', 'amsec-security-scanner' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'You cannot change MCP access.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );
 		}
-		check_admin_referer( 'amsec_mcp_settings' );
+		check_admin_referer( 'ironlatch_mcp_settings' );
 		try {
 			// Nonce verified above.
 			// phpcs:ignore WordPress.Security.NonceVerification.Missing
 			$enabled = self::parse( wp_unslash( $_POST ) );
 			( new McpPreferences( new WordPressOptions() ) )->setEnabled( $enabled );
 		} catch ( Throwable ) {
-			wp_die( esc_html__( 'MCP setting could not be saved.', 'amsec-security-scanner' ), '', array( 'response' => 400 ) );
+			wp_die( esc_html__( 'MCP setting could not be saved.', 'ironlatch-security-scanner' ), '', array( 'response' => 400 ) );
 		}
-		wp_safe_redirect( admin_url( 'admin.php?page=amsec-assistant#amsec-mcp' ) );
+		wp_safe_redirect( admin_url( 'admin.php?page=ironlatch-assistant#ironlatch-mcp' ) );
 		exit;
 	}
 }

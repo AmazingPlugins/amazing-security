@@ -26,7 +26,7 @@ final class RestRatePolicy {
 		}return $s;
 	}
 	public function fingerprint( mixed $raw ): string {
-		return hash( 'sha256', is_string( $raw ) ? $raw : 'amsec-rest-rate-missing' );}
+		return hash( 'sha256', is_string( $raw ) ? $raw : 'ironlatch-rest-rate-missing' );}
 	public function target( string $route, string $method, bool $authenticated, mixed $prior ): ?string {
 		if ( $authenticated || null !== $prior ) {
 			return null;}

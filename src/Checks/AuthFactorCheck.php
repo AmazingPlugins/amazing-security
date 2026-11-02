@@ -58,15 +58,15 @@ final class AuthFactorCheck implements SecurityCheck {
 			default                     => State::CRITICAL,
 		};
 		$kind     = 'passkeys-status' === $this->checkId ? 'passkeys' : 'authenticator';
-		$provider = is_string( $factor['provider'] ?? null ) && '' !== $factor['provider'] ? $factor['provider'] : __( 'That plugin', 'amsec-security-scanner' );
+		$provider = is_string( $factor['provider'] ?? null ) && '' !== $factor['provider'] ? $factor['provider'] : __( 'That plugin', 'ironlatch-security-scanner' );
 		$summary  = match ( $kind . ':' . $stateKey ) {
-			'authenticator:active' => $provider . ' is handling authenticator codes for this account. AmSec Security Scanner does not store backup codes; manage enrollment there.',
-			'authenticator:available' => $provider . ' is installed but not in use for this account. Turn it on there. AmSec Security Scanner only reports status.',
-			'authenticator:missing' => __( 'No authenticator-app plugin was detected. Install a dedicated plugin such as Two Factor if you want app codes. AmSec Security Scanner does not enroll devices.', 'amsec-security-scanner' ),
-			'passkeys:active' => $provider . ' is handling passkeys for this account. Manage devices there. AmSec Security Scanner does not enroll passkeys.',
-			'passkeys:available' => $provider . ' is installed but not in use for this account. Turn it on there. AmSec Security Scanner only reports status.',
-			'passkeys:missing' => __( 'No passkey plugin was detected. Install a dedicated plugin such as Two Factor if you want passkeys. AmSec Security Scanner does not enroll devices.', 'amsec-security-scanner' ),
-			default => __( 'Authenticator status could not be read. AmSec Security Scanner does not enroll devices.', 'amsec-security-scanner' ),
+			'authenticator:active' => $provider . ' is handling authenticator codes for this account. Ironlatch Security Scanner does not store backup codes; manage enrollment there.',
+			'authenticator:available' => $provider . ' is installed but not in use for this account. Turn it on there. Ironlatch Security Scanner only reports status.',
+			'authenticator:missing' => __( 'No authenticator-app plugin was detected. Install a dedicated plugin such as Two Factor if you want app codes. Ironlatch Security Scanner does not enroll devices.', 'ironlatch-security-scanner' ),
+			'passkeys:active' => $provider . ' is handling passkeys for this account. Manage devices there. Ironlatch Security Scanner does not enroll passkeys.',
+			'passkeys:available' => $provider . ' is installed but not in use for this account. Turn it on there. Ironlatch Security Scanner only reports status.',
+			'passkeys:missing' => __( 'No passkey plugin was detected. Install a dedicated plugin such as Two Factor if you want passkeys. Ironlatch Security Scanner does not enroll devices.', 'ironlatch-security-scanner' ),
+			default => __( 'Authenticator status could not be read. Ironlatch Security Scanner does not enroll devices.', 'ironlatch-security-scanner' ),
 		};
 		$confidence = match ( $state ) {
 			State::CRITICAL => 'high',

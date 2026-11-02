@@ -12,7 +12,7 @@ final class SecretCipher {
 	private string $key;
 
 	public function __construct( string $siteSecret ) {
-		$this->key = hash_hkdf( 'sha256', $siteSecret, 32, 'amsec-totp-v1' );
+		$this->key = hash_hkdf( 'sha256', $siteSecret, 32, 'ironlatch-totp-v1' );
 	}
 
 	public function encrypt( string $plaintext ): string {
@@ -21,7 +21,7 @@ final class SecretCipher {
 		}
 		$nonce      = random_bytes( 12 );
 		$tag        = '';
-		$ciphertext = openssl_encrypt( $plaintext, 'aes-256-gcm', $this->key, OPENSSL_RAW_DATA, $nonce, $tag, 'amsec-totp-v1', 16 );
+		$ciphertext = openssl_encrypt( $plaintext, 'aes-256-gcm', $this->key, OPENSSL_RAW_DATA, $nonce, $tag, 'ironlatch-totp-v1', 16 );
 		if ( false === $ciphertext ) {
 			throw new RuntimeException( 'TOTP encryption failed.' );
 		}
@@ -40,7 +40,7 @@ final class SecretCipher {
 		if ( false === $bytes || strlen( $bytes ) < 28 ) {
 			return null;
 		}
-		$plaintext = openssl_decrypt( substr( $bytes, 28 ), 'aes-256-gcm', $this->key, OPENSSL_RAW_DATA, substr( $bytes, 0, 12 ), substr( $bytes, 12, 16 ), 'amsec-totp-v1' );
+		$plaintext = openssl_decrypt( substr( $bytes, 28 ), 'aes-256-gcm', $this->key, OPENSSL_RAW_DATA, substr( $bytes, 0, 12 ), substr( $bytes, 12, 16 ), 'ironlatch-totp-v1' );
 		return false === $plaintext ? null : $plaintext;
 	}
 }

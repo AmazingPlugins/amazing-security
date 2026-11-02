@@ -8,16 +8,16 @@ network="${3:?docker network}"
 database_host="${4:?database host}"
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 scratch="$(mktemp -d)"
-trap 'rm -rf "$scratch"; docker exec "$site" sh -c "rm -f /var/www/html/wp-content/amsec-race.php /var/www/html/wp-content/amsec-race-*.marker /var/www/html/wp-content/amsec-race-*.release" >/dev/null 2>&1 || true' EXIT
-docker cp "$script_dir/wordpress-fix-optout-race.php" "$site:/var/www/html/wp-content/amsec-race.php"
+trap 'rm -rf "$scratch"; docker exec "$site" sh -c "rm -f /var/www/html/wp-content/ironlatch-race.php /var/www/html/wp-content/ironlatch-race-*.marker /var/www/html/wp-content/ironlatch-race-*.release" >/dev/null 2>&1 || true' EXIT
+docker cp "$script_dir/wordpress-fix-optout-race.php" "$site:/var/www/html/wp-content/ironlatch-race.php"
 
 wp() {
   docker run --rm --network "$network" --volumes-from "$site" \
     -e "WORDPRESS_DB_HOST=$database_host" -e WORDPRESS_DB_USER=root \
     -e WORDPRESS_DB_PASSWORD= -e "WORDPRESS_DB_NAME=$database" \
-    -e "AMSEC_RACE_MODE=${AMSEC_RACE_MODE:-}" -e "AMSEC_RACE_ID=${AMSEC_RACE_ID:-}" \
-    -e "AMSEC_RACE_MARKER=${AMSEC_RACE_MARKER:-}" -e "AMSEC_RACE_RELEASE=${AMSEC_RACE_RELEASE:-}" \
-    --user 33:33 wordpress:cli wp eval-file wp-content/amsec-race.php --user=admin --quiet
+    -e "IRONLATCH_RACE_MODE=${IRONLATCH_RACE_MODE:-}" -e "IRONLATCH_RACE_ID=${IRONLATCH_RACE_ID:-}" \
+    -e "IRONLATCH_RACE_MARKER=${IRONLATCH_RACE_MARKER:-}" -e "IRONLATCH_RACE_RELEASE=${IRONLATCH_RACE_RELEASE:-}" \
+    --user 33:33 wordpress:cli wp eval-file wp-content/ironlatch-race.php --user=admin --quiet
 }
 
 wait_marker() {
@@ -44,13 +44,13 @@ wait_db_lock() {
 run_order() {
   local first="$1" second="$2" expected_first="$3" expected_second="$4" assertion="$5"
   local id marker release
-  id="$(AMSEC_RACE_MODE=setup wp)"
-  marker="/var/www/html/wp-content/amsec-race-$id.marker"
-  release="/var/www/html/wp-content/amsec-race-$id.release"
-  AMSEC_RACE_MODE="$first" AMSEC_RACE_ID="$id" AMSEC_RACE_MARKER="$marker" AMSEC_RACE_RELEASE="$release" wp >"$scratch/first" 2>&1 &
+  id="$(IRONLATCH_RACE_MODE=setup wp)"
+  marker="/var/www/html/wp-content/ironlatch-race-$id.marker"
+  release="/var/www/html/wp-content/ironlatch-race-$id.release"
+  IRONLATCH_RACE_MODE="$first" IRONLATCH_RACE_ID="$id" IRONLATCH_RACE_MARKER="$marker" IRONLATCH_RACE_RELEASE="$release" wp >"$scratch/first" 2>&1 &
   local first_pid=$!
   wait_marker "$marker"
-  AMSEC_RACE_MODE="$second" AMSEC_RACE_ID="$id" wp >"$scratch/second" 2>&1 &
+  IRONLATCH_RACE_MODE="$second" IRONLATCH_RACE_ID="$id" wp >"$scratch/second" 2>&1 &
   local second_pid=$!
   wait_db_lock
   docker exec "$site" touch "$release"
@@ -58,7 +58,7 @@ run_order() {
   wait "$second_pid"
   test "$(cat "$scratch/first")" = "$expected_first"
   test "$(cat "$scratch/second")" = "$expected_second"
-  AMSEC_RACE_MODE="$assertion" AMSEC_RACE_ID="$id" wp
+  IRONLATCH_RACE_MODE="$assertion" IRONLATCH_RACE_ID="$id" wp
   printf '%s then %s: %s / %s\n' "$first" "$second" "$expected_first" "$expected_second"
 }
 

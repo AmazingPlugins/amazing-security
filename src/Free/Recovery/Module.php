@@ -10,20 +10,20 @@ defined( 'ABSPATH' ) || exit;
 final class Module {
 	public static function boot(): void {
 		add_action( 'admin_menu', array( self::class, 'menu' ) );
-		add_action( 'admin_post_amsec_recovery_backup', array( self::class, 'backup' ) );
+		add_action( 'admin_post_ironlatch_recovery_backup', array( self::class, 'backup' ) );
 	}
 
 	public static function menu(): void {
-		add_submenu_page( 'amsec-security-scanner', __( 'Recovery', 'amsec-security-scanner' ), __( 'Recovery', 'amsec-security-scanner' ), 'manage_options', 'amsec-recovery', array( self::class, 'render' ) );
+		add_submenu_page( 'ironlatch-security-scanner', __( 'Recovery', 'ironlatch-security-scanner' ), __( 'Recovery', 'ironlatch-security-scanner' ), 'manage_options', 'ironlatch-recovery', array( self::class, 'render' ) );
 	}
 
 	public static function render(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'You do not have permission to run recovery tools.', 'amsec-security-scanner' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'You do not have permission to run recovery tools.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );
 		}
 		$https = is_ssl();
-		echo '<div class="wrap amsec-security-scanner-admin"><h1>' . esc_html__( 'Recovery', 'amsec-security-scanner' ) . '</h1>';
-		echo '<p>' . esc_html__( 'Directory modes are shown for review. Change them in your hosting file manager or over SFTP.', 'amsec-security-scanner' ) . '</p>';
+		echo '<div class="wrap ironlatch-security-scanner-admin"><h1>' . esc_html__( 'Recovery', 'ironlatch-security-scanner' ) . '</h1>';
+		echo '<p>' . esc_html__( 'Directory modes are shown for review. Change them in your hosting file manager or over SFTP.', 'ironlatch-security-scanner' ) . '</p>';
 		if ( ! $https ) {
 			echo '<div class="notice notice-error inline"><p>' . esc_html( ( new Approval( false, true, true ) )->denial() ?? '' ) . '</p></div>';
 		}
@@ -35,19 +35,19 @@ final class Module {
 	}
 
 	public static function backup(): void {
-		self::guard( 'amsec_recovery_backup' );
+		self::guard( 'ironlatch_recovery_backup' );
 		global $wpdb;
 		if ( ! isset( $wpdb ) || ! is_object( $wpdb ) || ! is_string( $wpdb->prefix ) ) {
-			wp_die( esc_html__( 'The database connection is unavailable. No SQL file was created.', 'amsec-security-scanner' ), '', array( 'response' => 400 ) );
+			wp_die( esc_html__( 'The database connection is unavailable. No SQL file was created.', 'ironlatch-security-scanner' ), '', array( 'response' => 400 ) );
 		}
 		$confirmed = isset( $_POST['confirm'] ) && '1' === sanitize_text_field( wp_unslash( $_POST['confirm'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce checked in guard().
 		$result    = ( new DatabaseDump( new WordPressTables( $wpdb ), array( WordPressTables::class, 'escape' ) ) )->build( $wpdb->prefix, self::approval(), $confirmed );
 		if ( ! $result->ok || '' === $result->body || preg_match( '/CREATE\s+DATABASE/i', $result->body ) ) {
-			wp_die( esc_html( '' === $result->message ? __( 'No SQL file was created.', 'amsec-security-scanner' ) : $result->message ), '', array( 'response' => 400 ) );
+			wp_die( esc_html( '' === $result->message ? __( 'No SQL file was created.', 'ironlatch-security-scanner' ) : $result->message ), '', array( 'response' => 400 ) );
 		}
 		nocache_headers();
 		header( 'Content-Type: application/octet-stream' );
-		header( 'Content-Disposition: attachment; filename="amsec-database.sql"' );
+		header( 'Content-Disposition: attachment; filename="ironlatch-database.sql"' );
 		header( 'Content-Length: ' . (string) strlen( $result->body ) );
 		header( 'X-Content-Type-Options: nosniff' );
 		echo $result->body; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- SQL download body, not HTML.
@@ -55,35 +55,35 @@ final class Module {
 	}
 
 	private static function renderModes(): void {
-		echo '<h2>' . esc_html__( 'Directory modes', 'amsec-security-scanner' ) . '</h2>';
-		echo '<p>' . esc_html__( 'The suggested mode for these directories is 0755. 0777 lets any user on the server write to them.', 'amsec-security-scanner' ) . '</p>';
-		echo '<table class="widefat striped"><thead><tr><th>' . esc_html__( 'Directory', 'amsec-security-scanner' ) . '</th><th>' . esc_html__( 'Current mode', 'amsec-security-scanner' ) . '</th><th>' . esc_html__( 'Suggested mode', 'amsec-security-scanner' ) . '</th></tr></thead><tbody>';
+		echo '<h2>' . esc_html__( 'Directory modes', 'ironlatch-security-scanner' ) . '</h2>';
+		echo '<p>' . esc_html__( 'The suggested mode for these directories is 0755. 0777 lets any user on the server write to them.', 'ironlatch-security-scanner' ) . '</p>';
+		echo '<table class="widefat striped"><thead><tr><th>' . esc_html__( 'Directory', 'ironlatch-security-scanner' ) . '</th><th>' . esc_html__( 'Current mode', 'ironlatch-security-scanner' ) . '</th><th>' . esc_html__( 'Suggested mode', 'ironlatch-security-scanner' ) . '</th></tr></thead><tbody>';
 		foreach ( DirectoryModes::forSite()->preview() as $row ) {
-			echo '<tr><td><code>' . esc_html( $row['path'] ) . '</code></td><td>' . esc_html( null === $row['octal'] ? __( 'Unavailable', 'amsec-security-scanner' ) : $row['octal'] ) . '</td><td><code>' . esc_html( $row['suggested'] ) . '</code></td></tr>';
+			echo '<tr><td><code>' . esc_html( $row['path'] ) . '</code></td><td>' . esc_html( null === $row['octal'] ? __( 'Unavailable', 'ironlatch-security-scanner' ) : $row['octal'] ) . '</td><td><code>' . esc_html( $row['suggested'] ) . '</code></td></tr>';
 		}
 		echo '</tbody></table>';
 	}
 
 	private static function renderBackup(): void {
-		echo '<h2>' . esc_html__( 'Database backup', 'amsec-security-scanner' ) . '</h2>';
-		echo '<p>' . esc_html__( 'Downloads tables whose names start with the site prefix. The file is not saved in the plugin or uploads. More than 50 tables, or more than 20 MB, is refused instead of a partial file.', 'amsec-security-scanner' ) . '</p>';
+		echo '<h2>' . esc_html__( 'Database backup', 'ironlatch-security-scanner' ) . '</h2>';
+		echo '<p>' . esc_html__( 'Downloads tables whose names start with the site prefix. The file is not saved in the plugin or uploads. More than 50 tables, or more than 20 MB, is refused instead of a partial file.', 'ironlatch-security-scanner' ) . '</p>';
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
-		echo '<input type="hidden" name="action" value="amsec_recovery_backup">';
-		wp_nonce_field( 'amsec_recovery_backup' );
-		echo '<p><label><input type="checkbox" name="confirm" value="1"> ' . esc_html__( 'Download the prefixed tables.', 'amsec-security-scanner' ) . '</label></p>';
-		echo '<p><button class="button button-primary" type="submit">' . esc_html__( 'Download SQL', 'amsec-security-scanner' ) . '</button></p></form>';
+		echo '<input type="hidden" name="action" value="ironlatch_recovery_backup">';
+		wp_nonce_field( 'ironlatch_recovery_backup' );
+		echo '<p><label><input type="checkbox" name="confirm" value="1"> ' . esc_html__( 'Download the prefixed tables.', 'ironlatch-security-scanner' ) . '</label></p>';
+		echo '<p><button class="button button-primary" type="submit">' . esc_html__( 'Download SQL', 'ironlatch-security-scanner' ) . '</button></p></form>';
 	}
 
 	private static function guard( string $action ): void {
 		$method = isset( $_SERVER['REQUEST_METHOD'] ) ? strtoupper( sanitize_text_field( wp_unslash( (string) $_SERVER['REQUEST_METHOD'] ) ) ) : '';
 		if ( 'POST' !== $method ) {
-			wp_die( esc_html__( 'Recovery tools run only from a submitted form.', 'amsec-security-scanner' ), '', array( 'response' => 405 ) );
+			wp_die( esc_html__( 'Recovery tools run only from a submitted form.', 'ironlatch-security-scanner' ), '', array( 'response' => 405 ) );
 		}
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'You do not have permission to run recovery tools.', 'amsec-security-scanner' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'You do not have permission to run recovery tools.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );
 		}
 		if ( ! is_ssl() ) {
-			wp_die( esc_html__( 'Recovery tools need HTTPS. No files were changed.', 'amsec-security-scanner' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'Recovery tools need HTTPS. No files were changed.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );
 		}
 		check_admin_referer( $action );
 	}

@@ -6,9 +6,9 @@ namespace AmazingPlugins\Security\Admin;
 
 defined( 'ABSPATH' ) || exit;
 
-/** Landing-page frame for AmSec Security Scanner screens. */
+/** Landing-page frame for Ironlatch Security Scanner screens. */
 final class Brand {
-	public const DOCS = 'https://amazingplugins.com/plugins/amsec-security-scanner/';
+	public const DOCS = 'https://amazingplugins.com/plugins/ironlatch-security-scanner/';
 
 	public const GUIDE = 'https://amazingplugins.com/wordpress-security/';
 
@@ -22,13 +22,13 @@ final class Brand {
 
 	/** Marks a settings redirect so the next screen confirms the save. */
 	public static function saved( string $url ): string {
-		return add_query_arg( 'amsec_saved', '1', $url );
+		return add_query_arg( 'ironlatch_saved', '1', $url );
 	}
 
 	public static function savedNotice(): void {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only flash flag after a nonce-checked save.
-		if ( self::onScreen() && isset( $_GET['amsec_saved'] ) && '1' === $_GET['amsec_saved'] ) {
-			echo '<div class="notice notice-success is-dismissible" role="status"><p>' . esc_html__( 'Settings saved.', 'amsec-security-scanner' ) . '</p></div>';
+		if ( self::onScreen() && isset( $_GET['ironlatch_saved'] ) && '1' === $_GET['ironlatch_saved'] ) {
+			echo '<div class="notice notice-success is-dismissible" role="status"><p>' . esc_html__( 'Settings saved.', 'ironlatch-security-scanner' ) . '</p></div>';
 		}
 	}
 
@@ -37,38 +37,38 @@ final class Brand {
 	 * @return array<int, string>
 	 */
 	public static function removableArgs( array $args ): array {
-		$args[] = 'amsec_saved';
+		$args[] = 'ironlatch_saved';
 		return $args;
 	}
 
 	public static function bodyClass( string $classes ): string {
-		return self::onScreen() ? $classes . ' amsec-app' : $classes;
+		return self::onScreen() ? $classes . ' ironlatch-app' : $classes;
 	}
 
 	public static function assets(): void {
 		if ( ! self::onScreen() ) {
 			return;
 		}
-		wp_enqueue_style( 'amsec-security-scanner-admin', plugins_url( 'assets/admin.css', AMSEC_SECURITY_SCANNER_FILE ), array(), '0.1.68' );
+		wp_enqueue_style( 'ironlatch-security-scanner-admin', plugins_url( 'assets/admin.css', IRONLATCH_SECURITY_SCANNER_FILE ), array(), '0.1.68' );
 		$page = self::page();
-		if ( in_array( $page, array( 'amsec-accounts', 'amsec-traffic-guard' ), true ) ) {
-			wp_enqueue_script( 'amsec-security-scanner-tabs', plugins_url( 'assets/admin-tabs.js', AMSEC_SECURITY_SCANNER_FILE ), array(), '0.1.1', true );
+		if ( in_array( $page, array( 'ironlatch-accounts', 'ironlatch-traffic-guard' ), true ) ) {
+			wp_enqueue_script( 'ironlatch-security-scanner-tabs', plugins_url( 'assets/admin-tabs.js', IRONLATCH_SECURITY_SCANNER_FILE ), array(), '0.1.1', true );
 		}
-		if ( 'amsec-security-scanner' !== $page ) {
+		if ( 'ironlatch-security-scanner' !== $page ) {
 			return;
 		}
-		wp_enqueue_script( 'amsec-security-scanner-scan', plugins_url( 'assets/admin-scan.js', AMSEC_SECURITY_SCANNER_FILE ), array(), '0.1.22', true );
+		wp_enqueue_script( 'ironlatch-security-scanner-scan', plugins_url( 'assets/admin-scan.js', IRONLATCH_SECURITY_SCANNER_FILE ), array(), '0.1.22', true );
 		wp_localize_script(
-			'amsec-security-scanner-scan',
-			'amsecScan',
+			'ironlatch-security-scanner-scan',
+			'ironlatchScan',
 			array(
-				'error'  => __( 'Scan could not be saved.', 'amsec-security-scanner' ),
+				'error'  => __( 'Scan could not be saved.', 'ironlatch-security-scanner' ),
 				'ajax'   => admin_url( 'admin-ajax.php' ),
-				'saving' => __( 'Saving the results', 'amsec-security-scanner' ),
+				'saving' => __( 'Saving the results', 'ironlatch-security-scanner' ),
 				/* translators: 1: current category letter, 2: number of categories. */
-				'group'  => __( 'Category %1$s of %2$s', 'amsec-security-scanner' ),
+				'group'  => __( 'Category %1$s of %2$s', 'ironlatch-security-scanner' ),
 				/* translators: 1: current step number, 2: total number of steps. */
-				'step'   => __( 'Step %1$s of %2$s', 'amsec-security-scanner' ),
+				'step'   => __( 'Step %1$s of %2$s', 'ironlatch-security-scanner' ),
 			)
 		);
 	}
@@ -79,35 +79,35 @@ final class Brand {
 		}
 		// WordPress moves notices to just after this marker, which keeps them above the plugin header.
 		echo '<hr class="wp-header-end">';
-		$logo    = plugins_url( 'assets/logo.png', AMSEC_SECURITY_SCANNER_FILE );
-		$docs    = plugins_url( 'assets/icon-docs.svg', AMSEC_SECURITY_SCANNER_FILE );
-		$guide   = plugins_url( 'assets/icon-guide.svg', AMSEC_SECURITY_SCANNER_FILE );
-		$headers = get_file_data( AMSEC_SECURITY_SCANNER_FILE, array( 'Version' => 'Version' ) );
+		$logo    = plugins_url( 'assets/logo.png', IRONLATCH_SECURITY_SCANNER_FILE );
+		$docs    = plugins_url( 'assets/icon-docs.svg', IRONLATCH_SECURITY_SCANNER_FILE );
+		$guide   = plugins_url( 'assets/icon-guide.svg', IRONLATCH_SECURITY_SCANNER_FILE );
+		$headers = get_file_data( IRONLATCH_SECURITY_SCANNER_FILE, array( 'Version' => 'Version' ) );
 		$version = is_string( $headers['Version'] ?? null ) ? $headers['Version'] : '';
-		echo '<div class="amsec-brand"><div class="amsec-brand-mark">';
-		echo '<img src="' . esc_url( $logo ) . '" alt="' . esc_attr__( 'AmazingPlugins', 'amsec-security-scanner' ) . '" width="44" height="44">';
-		echo '<div class="amsec-brand-title"><p class="amsec-brand-name">' . esc_html__( 'AmSec Security Scanner', 'amsec-security-scanner' ) . '</p>';
+		echo '<div class="ironlatch-brand"><div class="ironlatch-brand-mark">';
+		echo '<img src="' . esc_url( $logo ) . '" alt="' . esc_attr__( 'AmazingPlugins', 'ironlatch-security-scanner' ) . '" width="44" height="44">';
+		echo '<div class="ironlatch-brand-title"><p class="ironlatch-brand-name">' . esc_html__( 'Ironlatch Security Scanner', 'ironlatch-security-scanner' ) . '</p>';
 		if ( 1 === preg_match( '/^\d+\.\d+\.\d+$/', $version ) ) {
-			echo '<p class="amsec-brand-version">' . esc_html( $version ) . '</p>';
+			echo '<p class="ironlatch-brand-version">' . esc_html( $version ) . '</p>';
 		}
 		echo '</div></div>';
-		echo '<p class="amsec-brand-links"><a href="' . esc_url( self::DOCS ) . '" target="_blank" rel="noopener noreferrer">';
-		echo '<img src="' . esc_url( $docs . '?ver=0.1.18' ) . '" alt="" width="22" height="22">' . esc_html__( 'Docs', 'amsec-security-scanner' ) . '</a>';
+		echo '<p class="ironlatch-brand-links"><a href="' . esc_url( self::DOCS ) . '" target="_blank" rel="noopener noreferrer">';
+		echo '<img src="' . esc_url( $docs . '?ver=0.1.18' ) . '" alt="" width="22" height="22">' . esc_html__( 'Docs', 'ironlatch-security-scanner' ) . '</a>';
 		echo '<a href="' . esc_url( self::GUIDE ) . '" target="_blank" rel="noopener noreferrer">';
-		echo '<img src="' . esc_url( $guide . '?ver=0.1.18' ) . '" alt="" width="22" height="22">' . esc_html__( 'Security guide', 'amsec-security-scanner' ) . '</a></p></div>';
-		if ( 'amsec-security-scanner' === self::page() ) {
+		echo '<img src="' . esc_url( $guide . '?ver=0.1.18' ) . '" alt="" width="22" height="22">' . esc_html__( 'Security guide', 'ironlatch-security-scanner' ) . '</a></p></div>';
+		if ( 'ironlatch-security-scanner' === self::page() ) {
 			return;
 		}
 		$title = function_exists( 'get_admin_page_title' ) ? get_admin_page_title() : '';
 		if ( ! is_string( $title ) || '' === $title ) {
 			return;
 		}
-		echo '<div class="amsec-rescan-bar amsec-page-bar"><div class="amsec-rescan-row"><h1>' . esc_html( $title ) . '</h1></div></div>';
+		echo '<div class="ironlatch-rescan-bar ironlatch-page-bar"><div class="ironlatch-rescan-row"><h1>' . esc_html( $title ) . '</h1></div></div>';
 	}
 
 	public static function onScreen(): bool {
 		$page = self::page();
-		return 'amsec-security-scanner' === $page || str_starts_with( $page, 'amsec-' );
+		return 'ironlatch-security-scanner' === $page || str_starts_with( $page, 'ironlatch-' );
 	}
 
 	private static function page(): string {

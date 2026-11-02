@@ -37,7 +37,7 @@ final class NetworkPolicy {
 		return $s;
 	}
 	public function fingerprint( mixed $raw ): string {
-		return hash( 'sha256', is_string( $raw ) ? $raw : 'amsec-network-missing' );}
+		return hash( 'sha256', is_string( $raw ) ? $raw : 'ironlatch-network-missing' );}
 	public function matches( ?array $s, string $address, string $method, bool $administrator, bool $cli, bool $cron ): bool {
 		if ( null === $s || 'off' === $s['mode'] || $administrator || $cli || $cron || ! Cidr::validAddress( $address ) || ( array( '*' ) !== $s['methods'] && ! in_array( strtoupper( $method ), $s['methods'], true ) ) ) {
 			return false;}

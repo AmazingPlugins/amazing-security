@@ -24,7 +24,7 @@ final class ActivityHooks {
 			'wp_login_failed',
 			function ( ...$args ): void {
 				$error = $args[1] ?? null;
-				$this->record( $error instanceof \WP_Error && in_array( 'amsec_rate_limited', $error->get_error_codes(), true ) ? 'login_rate_blocked' : 'login_failed' );
+				$this->record( $error instanceof \WP_Error && in_array( 'ironlatch_rate_limited', $error->get_error_codes(), true ) ? 'login_rate_blocked' : 'login_failed' );
 			},
 			10,
 			2
@@ -88,7 +88,7 @@ final class ActivityHooks {
 		add_action( 'upgrader_process_complete', array( $this, 'upgraded' ), 10, 2 );
 		add_action( 'updated_option', array( $this, 'optionChanged' ), 10, 1 );
 		add_action( 'added_option', array( $this, 'optionChanged' ), 10, 1 );
-		add_action( 'amsec_option_written', array( $this, 'optionChanged' ), 10, 1 );
+		add_action( 'ironlatch_option_written', array( $this, 'optionChanged' ), 10, 1 );
 	}
 
 	public function upgraded( object $upgrader, array $extra ): void {
@@ -110,7 +110,7 @@ final class ActivityHooks {
 	}
 
 	public function optionChanged( string $name ): void {
-		if ( in_array( $name, array( 'amsec_login_rate_mode', 'amsec_login_xmlrpc_disabled', 'amsec_alerts_enabled', 'amsec_digest_enabled', 'amsec_security_scanner_mcp_enabled', 'amsec_security_scanner_vulnerability_direct_enabled', 'amsec_security_scanner_kev_enabled' ), true ) ) {
+		if ( in_array( $name, array( 'ironlatch_login_rate_mode', 'ironlatch_login_xmlrpc_disabled', 'ironlatch_alerts_enabled', 'ironlatch_digest_enabled', 'ironlatch_security_scanner_mcp_enabled', 'ironlatch_security_scanner_vulnerability_direct_enabled', 'ironlatch_security_scanner_kev_enabled' ), true ) ) {
 			$this->record( 'security_setting_changed', 0, $name );
 		}
 	}
@@ -120,8 +120,8 @@ final class ActivityHooks {
 	}
 
 	public function record( string $event, int $user = 0, string $target = '' ): void {
-		$enabled = function_exists( 'get_option' ) ? (string) get_option( 'amsec_activity_enabled', '0' ) : '0';
-		$schema  = function_exists( 'get_option' ) ? (string) get_option( 'amsec_activity_schema_version', '0' ) : '0';
+		$enabled = function_exists( 'get_option' ) ? (string) get_option( 'ironlatch_activity_enabled', '0' ) : '0';
+		$schema  = function_exists( 'get_option' ) ? (string) get_option( 'ironlatch_activity_schema_version', '0' ) : '0';
 		if ( ! self::recording( $this->recorded, $enabled, $schema ) ) {
 			return;
 		}

@@ -8,13 +8,13 @@ defined( 'ABSPATH' ) || exit;
 
 /** Email code checks. The stored record keeps a hash, never the code. */
 final class EmailFactor {
-	public const OPTION   = 'amsec_email_factor';
-	public const META     = 'amsec_email_factor_pending';
+	public const OPTION   = 'ironlatch_email_factor';
+	public const META     = 'ironlatch_email_factor_pending';
 	public const TTL      = 600;
 	public const INTERVAL = 60;
 	public const TRIES    = 5;
 
-	public const TRIES_META = 'amsec_email_factor_tries';
+	public const TRIES_META = 'ironlatch_email_factor_tries';
 
 	public static function code(): string {
 		return str_pad( (string) random_int( 0, 999999 ), 6, '0', STR_PAD_LEFT );

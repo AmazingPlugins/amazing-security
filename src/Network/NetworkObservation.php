@@ -10,7 +10,7 @@ final class NetworkObservation {
 	private mixed $raw = null;
 	public function __construct( private readonly OptionGateway $options ) {}
 	public function status(): array {
-		$this->raw = $this->options->get( 'amsec_network_observation' );
+		$this->raw = $this->options->get( 'ironlatch_network_observation' );
 		if ( null === $this->raw ) {
 			return array(
 				'version'     => 1,
@@ -41,6 +41,6 @@ final class NetworkObservation {
 		$s['captured_at'] = $now;
 	 // phpcs:ignore WordPress.WP.AlternativeFunctions.json_encode_json_encode -- Only revision/count/time are stored, never visitor information.
 		$encoded = json_encode( $s, JSON_THROW_ON_ERROR );
-		return null === $this->raw ? $this->options->add( 'amsec_network_observation', $encoded ) : $this->options->replaceIfSame( 'amsec_network_observation', $this->raw, $encoded );
+		return null === $this->raw ? $this->options->add( 'ironlatch_network_observation', $encoded ) : $this->options->replaceIfSame( 'ironlatch_network_observation', $this->raw, $encoded );
 	}
 }

@@ -13,12 +13,12 @@ final class PermissionsCheckTest extends TestCase {
   self::assertSame('unknown',FilesystemPermissionsCheck::modeState(null,false));
  }
  public function test_local_mode_results_do_not_disclose_paths_or_claim_acl_coverage(): void {
-  $path=realpath(tempnam(sys_get_temp_dir(),'amsec-mode-'));chmod($path,0600);
+  $path=realpath(tempnam(sys_get_temp_dir(),'ironlatch-mode-'));chmod($path,0600);
   try{$rows=(new FilesystemPermissionsCheck(['configuration'=>$path]))->run(new ScanContext());self::assertCount(1,$rows);self::assertSame('pass',$rows[0]->state);self::assertSame('partial',$rows[0]->coverage);self::assertSame('0600',$rows[0]->evidence['mode']);self::assertStringNotContainsString($path,json_encode($rows[0]->toArray()));}
   finally{unlink($path);}
  }
  public function test_symlink_is_unknown_and_never_followed(): void {
-  $path=realpath(tempnam(sys_get_temp_dir(),'amsec-mode-'));$link=$path.'.link';symlink($path,$link);
+  $path=realpath(tempnam(sys_get_temp_dir(),'ironlatch-mode-'));$link=$path.'.link';symlink($path,$link);
   try{$row=(new FilesystemPermissionsCheck(['configuration'=>$link]))->run(new ScanContext())[0];self::assertSame('unknown',$row->state);self::assertNull($row->evidence['mode']);}
   finally{unlink($link);unlink($path);}
  }

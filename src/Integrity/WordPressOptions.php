@@ -19,7 +19,7 @@ final class WordPressOptions implements OptionGateway {
 		wp_cache_delete( $key, 'options' );
 		wp_cache_delete( 'notoptions', 'options' );
 		if ( 1 === $added ) {
-			do_action( 'amsec_option_written', $key );
+			do_action( 'ironlatch_option_written', $key );
 		}
 		return 1 === $added;
 	}
@@ -40,7 +40,7 @@ final class WordPressOptions implements OptionGateway {
 		wp_cache_delete( $key, 'options' );
 		wp_cache_delete( 'notoptions', 'options' );
 		if ( 1 === $changed ) {
-			do_action( 'amsec_option_written', $key );
+			do_action( 'ironlatch_option_written', $key );
 		}
 		return 1 === $changed;
 	}
@@ -53,7 +53,7 @@ final class WordPressOptions implements OptionGateway {
 		wp_cache_delete( $key, 'options' );
 		wp_cache_delete( 'notoptions', 'options' );
 		if ( 1 === $changed ) {
-			do_action( 'amsec_option_written', $key );
+			do_action( 'ironlatch_option_written', $key );
 		}
 		return 1 === $changed;
 	}

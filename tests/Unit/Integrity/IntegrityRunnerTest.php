@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 
 final class IntegrityRunnerTest extends TestCase {
 	public function test_changed_and_missing_files_resume_without_duplicate_findings(): void {
-		$root = sys_get_temp_dir() . '/amsec-run-' . bin2hex( random_bytes( 4 ) );
+		$root = sys_get_temp_dir() . '/ironlatch-run-' . bin2hex( random_bytes( 4 ) );
 		mkdir( $root );
 		file_put_contents( $root . '/good.php', 'good' );
 		file_put_contents( $root . '/changed.php', 'changed' );
