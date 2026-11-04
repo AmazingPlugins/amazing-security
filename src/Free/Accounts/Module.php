@@ -308,12 +308,11 @@ final class Module {
 	}
 
 	private static function posted( string $key ): string {
-		// Login fields are checked by WordPress, not a plugin admin nonce. The value is not sanitized because it can be a password.
-		$value = isset( $_POST[ $key ] ) ? wp_unslash( $_POST[ $key ] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-		if ( ! is_string( $value ) ) {
+		// Login fields are checked by WordPress, not a plugin admin nonce. Callers only ask for the email code, the sum and the trap field.
+		if ( ! isset( $_POST[ $key ] ) || ! is_string( $_POST[ $key ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
 			return '';
 		}
-		$value = wp_unslash( $value );
+		$value = sanitize_text_field( wp_unslash( $_POST[ $key ] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 		return strlen( $value ) > 64 ? '' : $value;
 	}
 

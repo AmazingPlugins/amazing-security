@@ -33,21 +33,19 @@ final class WordPressValues implements Values {
 		return defined( 'WP_DEBUG' ) && WP_DEBUG ? true : false;
 	}
 
-	public function debugHiddenByPlugin(): bool {
-		return '1' === get_option( 'ironlatch_hide_debug_display', '0' );
-	}
-
 	public function fileEditorDisabled(): ?bool {
-		return defined( 'DISALLOW_FILE_EDIT' ) ? (bool) DISALLOW_FILE_EDIT : false;
+		if ( defined( 'DISALLOW_FILE_EDIT' ) && DISALLOW_FILE_EDIT ) {
+			return true;
+		}
+		return '1' === get_option( 'ironlatch_disallow_file_edit', '0' );
 	}
 
 	public function fileEditorFix(): string {
-		$ours = '1' === get_option( 'ironlatch_disallow_file_edit', '0' );
+		if ( '1' === get_option( 'ironlatch_disallow_file_edit', '0' ) ) {
+			return 'plugin-on';
+		}
 		if ( ! defined( 'DISALLOW_FILE_EDIT' ) ) {
 			return 'plugin';
-		}
-		if ( DISALLOW_FILE_EDIT && $ours ) {
-			return 'plugin-on';
 		}
 		return DISALLOW_FILE_EDIT ? 'config-on' : 'config';
 	}

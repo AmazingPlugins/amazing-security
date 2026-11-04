@@ -30,8 +30,26 @@ final class Module {
 		if ( '1' !== $option ) {
 			return;
 		}
-		$query = $_GET; // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.ValidatedSanitizedInput.MissingUnslash -- Public query marker check. Values are bounded and not stored or printed.
-		if ( ! is_array( $query ) || ! self::shouldBlock( self::queryStrings( $query ), '1', false ) ) {
+		// Public request: no nonce is possible, and nothing read here is stored or printed.
+		$pairs = array();
+		if ( isset( $_GET[ self::PROBE_KEY ] ) && is_string( $_GET[ self::PROBE_KEY ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$pairs[ self::PROBE_KEY ] = sanitize_text_field( wp_unslash( $_GET[ self::PROBE_KEY ] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		}
+		$used = 0;
+		foreach ( array_keys( $_GET ) as $i => $name ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			if ( $used >= self::QUERY_BUDGET ) {
+				break;
+			}
+			if ( ! is_string( $name ) || ! isset( $_GET[ $name ] ) || ! is_string( $_GET[ $name ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				continue;
+			}
+			// The marker holds "<", which sanitize_text_field would strip as a tag. Escape it first and restore it after.
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Public request with no nonce; sanitized in this expression.
+			$value             = sanitize_text_field( str_replace( '<', '&lt;', wp_unslash( $_GET[ $name ] ) ) );
+			$used             += strlen( $value );
+			$pairs[ 'q' . $i ] = str_replace( '&lt;', '<', $value );
+		}
+		if ( ! self::shouldBlock( $pairs, '1', false ) ) {
 			return;
 		}
 		wp_die( esc_html__( 'This request was refused.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );
@@ -71,8 +89,7 @@ final class Module {
 			wp_die( esc_html__( 'Administrator access required.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );
 		}
 		check_admin_referer( 'ironlatch_precise_block' );
-		$posted = isset( $_POST['ironlatch_precise_block'] ) ? sanitize_text_field( wp_unslash( $_POST['ironlatch_precise_block'] ) ) : '0'; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce checked above.
-		$raw    = is_string( $posted ) ? $posted : '0';
+		$raw = isset( $_POST['ironlatch_precise_block'] ) && is_string( $_POST['ironlatch_precise_block'] ) ? sanitize_text_field( wp_unslash( $_POST['ironlatch_precise_block'] ) ) : '0';
 		update_option( self::OPTION, '1' === $raw ? '1' : '0', false );
 		wp_safe_redirect( \AmazingPlugins\Security\Admin\Brand::saved( admin_url( 'admin.php?page=ironlatch-traffic-guard#precise' ) ) );
 		exit;
@@ -118,22 +135,5 @@ final class Module {
 			}
 		}
 		return false;
-	}
-
-	/**
-	 * String keys and values only, after unslashing.
-	 *
-	 * @param array<mixed> $query
-	 * @return array<string, string>
-	 */
-	private static function queryStrings( array $query ): array {
-		$pairs = array();
-		foreach ( $query as $key => $value ) {
-			if ( ! is_string( $key ) || ! is_string( $value ) ) {
-				continue;
-			}
-			$pairs[ wp_unslash( $key ) ] = wp_unslash( $value );
-		}
-		return $pairs;
 	}
 }

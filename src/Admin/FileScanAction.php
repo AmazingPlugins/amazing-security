@@ -23,6 +23,7 @@ use AmazingPlugins\Security\Integrity\WordPressOrgThemeManifestProvider;
 use AmazingPlugins\Security\Scan\ScanContext;
 use AmazingPlugins\Security\Schedule\SuiteCycle;
 use Throwable;
+use AmazingPlugins\Security\Paths;
 
 final class FileScanAction {
 	public function start(): void {
@@ -37,11 +38,13 @@ final class FileScanAction {
 	}
 
 	public function resume(): void {
-		$this->authorize( 'ironlatch_security_scanner_file_scan_resume' );
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'You are not allowed to run a file scan.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );
+		}
+		check_admin_referer( 'ironlatch_security_scanner_file_scan_resume' );
 		$store    = new WordPressFileScanStore( new WordPressOptions() );
 		$progress = $store->latestProgress();
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce was checked above.
-		$scanId = isset( $_POST['scan_id'] ) && is_string( $_POST['scan_id'] ) ? sanitize_text_field( wp_unslash( $_POST['scan_id'] ) ) : '';
+		$scanId   = isset( $_POST['scan_id'] ) && is_string( $_POST['scan_id'] ) ? sanitize_text_field( wp_unslash( $_POST['scan_id'] ) ) : '';
 		if ( null === $progress || $progress->finished || ! hash_equals( $progress->cursor->scanId, $scanId ) ) {
 			$this->redirect( true );
 		}
@@ -114,7 +117,7 @@ final class FileScanAction {
 			$plugins          = $this->plugins();
 			$themes           = $this->themes();
 			$client           = new WordPressHttpClient();
-			$discovery        = ( new TargetDiscovery( new WordPressOrgManifestProvider( $client ), new WordPressOrgThemeManifestProvider( new ThemeArchiveParser() ) ) )->discover( $this->coreVersion(), $this->coreLocale(), ABSPATH, $this->manifestPlugins( $plugins ), $themes );
+			$discovery        = ( new TargetDiscovery( new WordPressOrgManifestProvider( $client ), new WordPressOrgThemeManifestProvider( new ThemeArchiveParser() ) ) )->discover( $this->coreVersion(), $this->coreLocale(), Paths::core(), $this->manifestPlugins( $plugins ), $themes );
 			$cursor->elapsed += microtime( true ) - $started;
 			if ( $isStart ) {
 				$cursor->partial = $discovery->partial;
@@ -196,7 +199,7 @@ final class FileScanAction {
 				$plugins[] = array(
 					'slug'        => '.' === $slug ? basename( $file ) : $slug,
 					'version'     => (string) ( $data['Version'] ?? '' ),
-					'root'        => '.' === $slug ? WP_PLUGIN_DIR : WP_PLUGIN_DIR . '/' . $slug,
+					'root'        => '.' === $slug ? Paths::plugins() : Paths::plugins() . '/' . $slug,
 					'update_uri'  => 'unsupported_local_path',
 					'single_file' => '.' === $slug ? basename( $file ) : null,
 					'local_only'  => true,
@@ -206,7 +209,7 @@ final class FileScanAction {
 			$plugins[] = array(
 				'slug'       => $slug,
 				'version'    => (string) ( $data['Version'] ?? '' ),
-				'root'       => WP_PLUGIN_DIR . '/' . $slug,
+				'root'       => Paths::plugins() . '/' . $slug,
 				'update_uri' => (string) ( $data['UpdateURI'] ?? '' ),
 				'local_only' => plugin_basename( IRONLATCH_SECURITY_SCANNER_FILE ) === $file,
 			);

@@ -220,7 +220,7 @@ final class Module {
 	}
 
 	private static function postedPassword( string $key ): ?string {
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- The profile, reset, or checkout form nonce is already checked.
+		// Raw on purpose (wp_unslash only): sanitizing would change the password. The profile, reset, or checkout form nonce is already checked.
 		if ( ! isset( $_POST[ $key ] ) || ! is_string( $_POST[ $key ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- The password is measured, then dropped.
 			return null;
 		}

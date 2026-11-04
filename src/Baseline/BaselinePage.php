@@ -61,10 +61,12 @@ final class BaselinePage {
 			submit_button( __( 'Compare covered files', 'ironlatch-security-scanner' ), 'secondary' );
 			echo '</form>';
 		}
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Verified below before bounded read work.
-		$key = is_string( $_GET['compare'] ?? null ) ? sanitize_text_field( wp_unslash( $_GET['compare'] ) ) : '';
-		if ( '' !== $key ) {
+		$key = '';
+		if ( isset( $_GET['compare'] ) ) {
 			check_admin_referer( 'ironlatch_baseline_compare' );
+			$key = is_string( $_GET['compare'] ) ? sanitize_text_field( wp_unslash( $_GET['compare'] ) ) : '';
+		}
+		if ( '' !== $key ) {
 			try {
 				$changes = ( new BaselineService( $repository ) )->compare( ( new TargetResolver() )->resolve( $key ) );
 				foreach ( $changes as $kind => $files ) {

@@ -27,7 +27,6 @@ final class LoginRateModeCheckTest extends TestCase {
 			public function debugDisplayed(): ?bool { return false; }
 			public function fileEditorDisabled(): ?bool { return true; }
 			public function fileEditorFix(): string { return 'config-on'; }
-			public function debugHiddenByPlugin(): bool { return false; }
 			public function adminUsesHttps(): ?bool { return true; }
 			public function hasDefaultAdminLogin(): ?bool { return false; }
 		};

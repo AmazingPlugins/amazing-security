@@ -7,18 +7,21 @@ defined( 'ABSPATH' ) || exit;
 
 final class ContentAction {
 	public function handle(): void {
-		$method = is_string( $_SERVER['REQUEST_METHOD'] ?? null ) ? sanitize_key( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) : '';
-		if ( 'post' !== $method || ! current_user_can( 'manage_options' ) ) {
+		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_die( esc_html__( 'Administrator access and a POST request are required.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );
 		}
-	 // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Verified against the selected action and exact active scan before work.
-		$post      = wp_unslash( $_POST );
-		$operation = is_string( $post['operation'] ?? null ) ? $post['operation'] : '';
-		$id        = is_string( $post['scan_id'] ?? null ) ? $post['scan_id'] : '';
+		// phpcs:disable WordPress.Security.NonceVerification.Missing -- Read only to name the nonce action; verified right after validation.
+		$operation = isset( $_POST['operation'] ) && is_string( $_POST['operation'] ) ? sanitize_key( wp_unslash( $_POST['operation'] ) ) : '';
+		$id        = isset( $_POST['scan_id'] ) && is_string( $_POST['scan_id'] ) ? sanitize_key( wp_unslash( $_POST['scan_id'] ) ) : '';
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
 		if ( ! in_array( $operation, array( 'start', 'resume' ), true ) || ( 'resume' === $operation && ! preg_match( '/^[a-f0-9]{32}$/D', $id ) ) ) {
 			wp_die( esc_html__( 'Invalid scan request.', 'ironlatch-security-scanner' ), '', array( 'response' => 400 ) );
 		}
 		check_admin_referer( 'start' === $operation ? 'ironlatch_content_start' : 'ironlatch_content_resume_' . $id );
+		$method = isset( $_SERVER['REQUEST_METHOD'] ) && is_string( $_SERVER['REQUEST_METHOD'] ) ? sanitize_key( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) : '';
+		if ( 'post' !== $method ) {
+			wp_die( esc_html__( 'Administrator access and a POST request are required.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );
+		}
 		try {
 			$service = ( new WordPressContentService() )->create();
 			$result  = 'start' === $operation ? $service->start( time() ) : $service->step( time(), $id );

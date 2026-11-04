@@ -8,6 +8,7 @@ defined( 'ABSPATH' ) || exit;
 
 use AmazingPlugins\Security\Checks\UploadsExecutionCheck;
 use AmazingPlugins\Security\Hardening\UploadsRule;
+use AmazingPlugins\Security\Paths;
 
 /** Shows the Apache uploads rule and writes it only after confirmation. */
 final class UploadsRulePage {
@@ -100,10 +101,10 @@ final class UploadsRulePage {
 			return '';
 		}
 		$base = rtrim( $upload['basedir'], '/' );
-		if ( strlen( $base ) > 4000 || str_contains( $base, "\0" ) || ! defined( 'WP_CONTENT_DIR' ) ) {
+		if ( strlen( $base ) > 4000 || str_contains( $base, "\0" ) ) {
 			return '';
 		}
-		$root = rtrim( WP_CONTENT_DIR, '/' );
+		$root = rtrim( Paths::content(), '/' );
 		$real = realpath( $base );
 		if ( ! is_string( $real ) || ! str_starts_with( $real, $root . '/' ) || is_link( $base ) ) {
 			return '';

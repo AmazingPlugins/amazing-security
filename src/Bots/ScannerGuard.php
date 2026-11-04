@@ -9,6 +9,7 @@ defined( 'ABSPATH' ) || exit;
 use AmazingPlugins\Security\Activity\ActivityHooks;
 use AmazingPlugins\Security\Activity\ActivityRepository;
 use AmazingPlugins\Security\Proxy\WordPressClientAddress;
+use AmazingPlugins\Security\Paths;
 
 /** Counts guest requests that hunt for weak spots, and can pause an address that sends too many. */
 final class ScannerGuard {
@@ -30,8 +31,8 @@ final class ScannerGuard {
 		if ( RateLimiter::exempt( $client, RateLimiter::settings()['allow'] ) ) {
 			return;
 		}
-		$key   = $client->key( wp_salt( 'auth' ) . ':bot:scanner', true )->fromServer( $_SERVER );
-		$block = $client->key( wp_salt( 'auth' ) . RateLimiter::BLOCK_SALT, true )->fromServer( $_SERVER );
+		$key   = $client->key( wp_salt( 'auth' ) . ':bot:scanner', true )->fromServer( WordPressClientAddress::request() );
+		$block = $client->key( wp_salt( 'auth' ) . RateLimiter::BLOCK_SALT, true )->fromServer( WordPressClientAddress::request() );
 		if ( null === $key || null === $block ) {
 			return;
 		}
@@ -41,10 +42,10 @@ final class ScannerGuard {
 			self::deny();
 		}
 		$agent = is_string( $_SERVER['HTTP_USER_AGENT'] ?? null ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '';
-		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Only compared against fixed patterns; never stored or printed.
-		$uri  = is_string( $_SERVER['REQUEST_URI'] ?? null ) ? wp_unslash( $_SERVER['REQUEST_URI'] ) : '';
+		// esc_url_raw keeps percent-encoding intact, which the probe path match decodes itself; sanitize_text_field would strip it.
+		$uri  = is_string( $_SERVER['REQUEST_URI'] ?? null ) ? esc_url_raw( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '';
 		$path = (string) wp_parse_url( $uri, PHP_URL_PATH );
-		$hit  = ProbePolicy::agent( $agent ) || ( is_404() && ProbePolicy::path( $path, static fn( string $slug ): bool => is_dir( WP_PLUGIN_DIR . '/' . $slug ) ) );
+		$hit  = ProbePolicy::agent( $agent ) || ( is_404() && ProbePolicy::path( $path, static fn( string $slug ): bool => is_dir( Paths::plugins() . '/' . $slug ) ) );
 		if ( ! $hit ) {
 			return;
 		}

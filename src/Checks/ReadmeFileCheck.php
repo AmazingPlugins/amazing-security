@@ -13,6 +13,7 @@ use AmazingPlugins\Security\Scan\SecurityCheck;
 use Closure;
 use DateTimeImmutable;
 use DateTimeZone;
+use AmazingPlugins\Security\Paths;
 
 /** Reports a root readme.html file. It does not delete that file. */
 final class ReadmeFileCheck implements SecurityCheck {
@@ -39,7 +40,7 @@ final class ReadmeFileCheck implements SecurityCheck {
 		if ( ! defined( 'ABSPATH' ) ) {
 			return 'unknown';
 		}
-		$path = ABSPATH . 'readme.html';
+		$path = Paths::core() . 'readme.html';
 		if ( is_link( $path ) ) {
 			return 'unknown';
 		}

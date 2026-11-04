@@ -7,16 +7,21 @@ defined( 'ABSPATH' ) || exit;
 
 final class DirectoryAction {
 	public function handle(): void {
-		$method = is_string( $_SERVER['REQUEST_METHOD'] ?? null ) ? sanitize_key( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) : '';
-		if ( 'post' !== $method || ! current_user_can( 'manage_options' ) ) {
+		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_die( esc_html__( 'Administrator access and POST are required.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );}
-	 // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Exact selected-key/fingerprint nonce is checked below before any request.
-		$post = wp_unslash( $_POST );
-		$key  = is_string( $post['target'] ?? null ) ? $post['target'] : '';
-		$fp   = is_string( $post['fingerprint'] ?? null ) ? $post['fingerprint'] : '';
-		if ( ! preg_match( '/^[a-f0-9]{32}$/D', $key ) || ! preg_match( '/^[a-f0-9]{64}$/D', $fp ) || '1' !== ( $post['consent'] ?? null ) ) {
+		// phpcs:disable WordPress.Security.NonceVerification.Missing -- Read only to name the nonce action; verified right after validation.
+		$key = isset( $_POST['target'] ) && is_string( $_POST['target'] ) ? sanitize_key( wp_unslash( $_POST['target'] ) ) : '';
+		$fp  = isset( $_POST['fingerprint'] ) && is_string( $_POST['fingerprint'] ) ? sanitize_key( wp_unslash( $_POST['fingerprint'] ) ) : '';
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
+		if ( ! preg_match( '/^[a-f0-9]{32}$/D', $key ) || ! preg_match( '/^[a-f0-9]{64}$/D', $fp ) ) {
 			wp_die( esc_html__( 'Select a current target and consent to the WordPress.org lookup.', 'ironlatch-security-scanner' ), '', array( 'response' => 400 ) );}
 		check_admin_referer( 'ironlatch_repository_' . $key . '_' . $fp );
+		$method = isset( $_SERVER['REQUEST_METHOD'] ) && is_string( $_SERVER['REQUEST_METHOD'] ) ? sanitize_key( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) : '';
+		if ( 'post' !== $method ) {
+			wp_die( esc_html__( 'Administrator access and POST are required.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );}
+		$consent = isset( $_POST['consent'] ) && is_string( $_POST['consent'] ) ? sanitize_text_field( wp_unslash( $_POST['consent'] ) ) : '';
+		if ( '1' !== $consent ) {
+			wp_die( esc_html__( 'Select a current target and consent to the WordPress.org lookup.', 'ironlatch-security-scanner' ), '', array( 'response' => 400 ) );}
 		try {
 			$result = ( new WordPressDirectoryService() )->create()->lookup( $key, $fp, time() );
 		} catch ( \Throwable ) {

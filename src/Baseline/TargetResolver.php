@@ -7,6 +7,7 @@ namespace AmazingPlugins\Security\Baseline;
 defined( 'ABSPATH' ) || exit;
 
 use AmazingPlugins\Security\Integrity\WordPressOrgManifestProvider;
+use AmazingPlugins\Security\Paths;
 
 final class TargetResolver {
 	public function targets(): array {
@@ -17,7 +18,7 @@ final class TargetResolver {
 				continue;
 			}
 			$dir                       = dirname( $file );
-			$target                    = new BaselineTarget( 'plugin', $file, '.' === $dir ? WP_PLUGIN_DIR : WP_PLUGIN_DIR . '/' . $dir, '.' === $dir ? basename( $file ) : null );
+			$target                    = new BaselineTarget( 'plugin', $file, '.' === $dir ? Paths::plugins() : Paths::plugins() . '/' . $dir, '.' === $dir ? basename( $file ) : null );
 			$targets[ $target->key() ] = $target;
 		}
 		foreach ( array_slice( wp_get_themes(), 0, 200, true ) as $slug => $theme ) {
@@ -28,7 +29,7 @@ final class TargetResolver {
 		}
 		foreach ( array_slice( array_keys( get_mu_plugins() ), 0, 200 ) as $file ) {
 			if ( WordPressOrgManifestProvider::safePath( $file ) && ! str_contains( $file, '/' ) ) {
-				$target                    = new BaselineTarget( 'mu-plugin', $file, WPMU_PLUGIN_DIR, $file );
+				$target                    = new BaselineTarget( 'mu-plugin', $file, Paths::muPlugins(), $file );
 				$targets[ $target->key() ] = $target;
 			}
 		}

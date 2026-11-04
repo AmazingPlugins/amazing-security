@@ -14,6 +14,7 @@ use Closure;
 use DateTimeImmutable;
 use DateTimeZone;
 use Throwable;
+use AmazingPlugins\Security\Paths;
 
 /** Reports guest comments, registration, and AI crawler rules. It does not change them. */
 final class AiReadersCheck implements SecurityCheck {
@@ -133,7 +134,7 @@ final class AiReadersCheck implements SecurityCheck {
 		if ( ! defined( 'ABSPATH' ) ) {
 			return null;
 		}
-		$path = ABSPATH . 'robots.txt';
+		$path = Paths::home() . 'robots.txt';
 		if ( is_link( $path ) ) {
 			return null;
 		}
@@ -147,10 +148,10 @@ final class AiReadersCheck implements SecurityCheck {
 			return is_string( $text ) ? $text : null;
 		}
 		$public = get_option( 'blog_public', null );
-		// phpcs:ignore WordPress.WP.AlternativeFunctions.parse_url_parse_url -- Local site address path only, used to copy the virtual robots.txt prefix.
-		$site   = parse_url( (string) site_url() );
-		$prefix = is_array( $site ) && isset( $site['path'] ) && is_string( $site['path'] ) ? $site['path'] : '';
-		$body   = "User-agent: *\nDisallow: {$prefix}/wp-admin/\nAllow: {$prefix}/wp-admin/admin-ajax.php\n";
+		$admin  = (string) wp_parse_url( admin_url(), PHP_URL_PATH );
+		$ajax   = (string) wp_parse_url( admin_url( 'admin-ajax.php' ), PHP_URL_PATH );
+		$prefix = rtrim( (string) wp_parse_url( site_url(), PHP_URL_PATH ), '/' );
+		$body   = "User-agent: *\nDisallow: {$admin}\nAllow: {$ajax}\n";
 		if ( '0' === $public || 0 === $public ) {
 			$body .= "Disallow: {$prefix}/\n";
 		}

@@ -14,19 +14,26 @@ use AmazingPlugins\Security\Sessions\SessionPolicy;
 
 final class BaselineAction {
 	public function handle(): void {
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Verified before storing previews or baselines.
-		$post   = wp_unslash( $_POST );
-		$method = is_string( $_SERVER['REQUEST_METHOD'] ?? null ) ? sanitize_key( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) : '';
-		$auth   = wp_parse_auth_cookie( '', is_ssl() ? 'secure_auth' : 'auth' );
-		$mode   = is_string( $post['mode'] ?? null ) ? $post['mode'] : '';
-		$key    = is_string( $post['target'] ?? null ) && strlen( $post['target'] ) <= 256 ? $post['target'] : '';
-		$token  = is_string( $post['token'] ?? null ) ? $post['token'] : '';
-		if ( ! SessionPolicy::allowed( 'post' === $method, current_user_can( 'manage_options' ), '' !== $key, FixApprovalAction::cookieAuthenticated() && SessionPolicy::matchingTokens( is_array( $auth ) ? (string) $auth['token'] : '', wp_get_session_token() ), is_ssl(), 'preview' === $mode || '1' === ( $post['confirm'] ?? null ) ) || ! in_array( $mode, array( 'preview', 'approve' ), true ) || ( 'approve' === $mode && ! preg_match( '/^[a-f0-9]{32}$/D', $token ) ) ) {
+		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_die( esc_html__( 'A secure administrator session and exact baseline request are required.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );
 		}
+		// phpcs:disable WordPress.Security.NonceVerification.Missing -- Read only to name the nonce action; verified right after.
+		$mode  = isset( $_POST['mode'] ) && is_string( $_POST['mode'] ) ? sanitize_key( wp_unslash( $_POST['mode'] ) ) : '';
+		$token = isset( $_POST['token'] ) && is_string( $_POST['token'] ) ? sanitize_key( wp_unslash( $_POST['token'] ) ) : '';
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
 		check_admin_referer( 'preview' === $mode ? 'ironlatch_baseline_preview' : 'ironlatch_baseline_approve_' . $token );
+		$method    = isset( $_SERVER['REQUEST_METHOD'] ) && is_string( $_SERVER['REQUEST_METHOD'] ) ? sanitize_key( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) : '';
+		$auth      = wp_parse_auth_cookie( '', is_ssl() ? 'secure_auth' : 'auth' );
+		$target    = isset( $_POST['target'] ) && is_string( $_POST['target'] ) ? sanitize_text_field( wp_unslash( $_POST['target'] ) ) : '';
+		$key       = strlen( $target ) <= 256 ? $target : '';
+		$confirmed = isset( $_POST['confirm'] ) && is_string( $_POST['confirm'] ) ? sanitize_text_field( wp_unslash( $_POST['confirm'] ) ) : '';
+		if ( ! SessionPolicy::allowed( 'post' === $method, current_user_can( 'manage_options' ), '' !== $key, FixApprovalAction::cookieAuthenticated() && SessionPolicy::matchingTokens( is_array( $auth ) ? (string) $auth['token'] : '', wp_get_session_token() ), is_ssl(), 'preview' === $mode || '1' === $confirmed ) || ! in_array( $mode, array( 'preview', 'approve' ), true ) || ( 'approve' === $mode && ! preg_match( '/^[a-f0-9]{32}$/D', $token ) ) ) {
+			wp_die( esc_html__( 'A secure administrator session and exact baseline request are required.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );
+		}
 		if ( 'approve' === $mode ) {
-			$password = is_string( $post['password'] ?? null ) && strlen( $post['password'] ) <= 1024 ? $post['password'] : '';
+			// Passwords are compared as typed; sanitizing would change them.
+			$password = isset( $_POST['password'] ) && is_string( $_POST['password'] ) ? wp_unslash( $_POST['password'] ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Compared as typed; sanitizing would change the password.
+			$password = strlen( $password ) <= 1024 ? $password : '';
 			$user     = wp_get_current_user();
 			if ( '' === $password || ! wp_check_password( $password, $user->user_pass, $user->ID ) ) {
 				wp_die( esc_html__( 'Password confirmation failed.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );

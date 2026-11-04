@@ -40,7 +40,7 @@ final class FixReviewPage {
 		$enabled = ( new McpPreferences( new WordPressOptions() ) )->enabled();
 		$nonce   = wp_create_nonce( 'ironlatch_fix_approve_' . $id );
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only notice after a completed POST redirect.
-		$verification = isset( $_GET['verification'] ) && 'pending' === $_GET['verification'] ? 'pending' : '';
+		$verification = isset( $_GET['verification'] ) && is_string( $_GET['verification'] ) && 'pending' === sanitize_key( wp_unslash( $_GET['verification'] ) ) ? 'pending' : '';
 		$liveMode     = get_option( 'ironlatch_login_rate_mode', 'off' );
 		// html() escapes every dynamic field while preserving form markup.
 		echo wp_kses( $this->html( $proposal, $nonce, admin_url( 'admin-post.php' ), is_ssl(), $enabled, time(), wp_create_nonce( 'ironlatch_fix_rollback_' . $id ), $verification, is_string( $liveMode ) ? $liveMode : '' ), AdminHtml::allowed() );

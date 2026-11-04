@@ -110,11 +110,11 @@ final class Module {
 
 	private static function honeypot(): mixed {
 		// Public comment field. Guests have no admin nonce, and the value is not stored.
-		$raw = isset( $_POST[ Decision::FIELD ] ) ? wp_unslash( $_POST[ Decision::FIELD ] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-		if ( ! is_string( $raw ) ) {
-			return $raw;
+		if ( ! isset( $_POST[ Decision::FIELD ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			return '';
 		}
-		return wp_unslash( $raw );
+		// A non-string value stays "filled" in Decision::text(), so it is refused.
+		return is_string( $_POST[ Decision::FIELD ] ) ? sanitize_text_field( wp_unslash( $_POST[ Decision::FIELD ] ) ) : array(); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 	}
 
 	private static function rateStored(): string {

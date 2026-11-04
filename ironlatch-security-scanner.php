@@ -3,7 +3,7 @@
  * Plugin Name: Ironlatch Security Scanner
  * Plugin URI: https://amazingplugins.com/plugins/ironlatch-security-scanner/
  * Description: Local WordPress security checks and optional login protection.
- * Version: 0.1.6
+ * Version: 0.1.7
  * Requires at least: 6.6
  * Requires PHP: 8.1
  * Author: Amazing Plugins
@@ -19,15 +19,21 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 define( 'IRONLATCH_SECURITY_SCANNER_FILE', __FILE__ );
+define( 'IRONLATCH_SECURITY_SCANNER_DIR', plugin_dir_path( __FILE__ ) );
+define( 'IRONLATCH_SECURITY_SCANNER_URL', plugin_dir_url( __FILE__ ) );
 
-$ironlatch_file_editor = get_option( 'ironlatch_disallow_file_edit', '0' );
-if ( '1' === $ironlatch_file_editor && ! defined( 'DISALLOW_FILE_EDIT' ) ) {
-	define( 'DISALLOW_FILE_EDIT', true ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound -- This is the WordPress core file-editor constant.
-}
-if ( '1' === get_option( 'ironlatch_hide_debug_display', '0' ) ) {
-	// phpcs:ignore WordPress.PHP.IniSet.display_errors_Disallowed, PluginCheck.CodeAnalysis.PHPErrorReporting.IniDirectiveDisplay_errors, Squiz.PHP.DiscouragedFunctions.Discouraged -- Approved display hide. This does not edit wp-config.php.
-	ini_set( 'display_errors', '0' );
-}
+add_filter(
+	'map_meta_cap',
+	static function ( array $caps, string $cap ): array {
+		// Same effect as DISALLOW_FILE_EDIT, limited to the editor capabilities and only after an administrator approved it.
+		if ( in_array( $cap, array( 'edit_files', 'edit_plugins', 'edit_themes' ), true ) && '1' === get_option( 'ironlatch_disallow_file_edit', '0' ) ) {
+			return array( 'do_not_allow' );
+		}
+		return $caps;
+	},
+	10,
+	2
+);
 
 add_filter(
 	'wp_is_application_passwords_available',
@@ -49,7 +55,7 @@ spl_autoload_register(
 			return;
 		}
 		$relative = substr( $class_name, strlen( $prefix ) );
-		$path     = __DIR__ . '/src/' . str_replace( '\\', '/', $relative ) . '.php';
+		$path     = IRONLATCH_SECURITY_SCANNER_DIR . 'src/' . str_replace( '\\', '/', $relative ) . '.php';
 		if ( is_file( $path ) ) {
 			require $path;
 		}

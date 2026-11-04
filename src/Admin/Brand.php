@@ -27,7 +27,7 @@ final class Brand {
 
 	public static function savedNotice(): void {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only flash flag after a nonce-checked save.
-		if ( self::onScreen() && isset( $_GET['ironlatch_saved'] ) && '1' === $_GET['ironlatch_saved'] ) {
+		if ( self::onScreen() && isset( $_GET['ironlatch_saved'] ) && is_string( $_GET['ironlatch_saved'] ) && '1' === sanitize_key( wp_unslash( $_GET['ironlatch_saved'] ) ) ) {
 			echo '<div class="notice notice-success is-dismissible" role="status"><p>' . esc_html__( 'Settings saved.', 'ironlatch-security-scanner' ) . '</p></div>';
 		}
 	}

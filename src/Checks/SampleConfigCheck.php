@@ -13,6 +13,7 @@ use AmazingPlugins\Security\Scan\SecurityCheck;
 use Closure;
 use DateTimeImmutable;
 use DateTimeZone;
+use AmazingPlugins\Security\Paths;
 
 /** Reports a root wp-config-sample.php file. It does not delete that file. */
 final class SampleConfigCheck implements SecurityCheck {
@@ -39,7 +40,7 @@ final class SampleConfigCheck implements SecurityCheck {
 		if ( ! defined( 'ABSPATH' ) ) {
 			return 'unknown';
 		}
-		$path = ABSPATH . 'wp-config-sample.php';
+		$path = Paths::core() . 'wp-config-sample.php';
 		if ( is_link( $path ) ) {
 			return 'unknown';
 		}

@@ -23,25 +23,29 @@ final class ProxySettings {
 		);
 	}
 	public function handle(): void {
-	 // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Exact policy nonce and matched session checked before mutation.
-		$post    = wp_unslash( $_POST );
-		$method  = is_string( $_SERVER['REQUEST_METHOD'] ?? null ) ? sanitize_key( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) : '';
-		$auth    = wp_parse_auth_cookie( '', is_ssl() ? 'secure_auth' : 'auth' );
-		$mode    = is_string( $post['mode'] ?? null ) ? $post['mode'] : '';
-		$rules   = is_string( $post['rules'] ?? null ) ? $post['rules'] : null;
-		$service = $this->service();
-		$state   = $service->status();
-		$fp      = $service->fingerprint();
-		if ( ! SessionPolicy::allowed( 'post' === $method, current_user_can( 'manage_options' ), empty( $state['invalid'] ) && in_array( $mode, array( 'off', 'xff', 'single' ), true ) && null !== $rules && strlen( $rules ) <= 4096 && is_string( $post['fingerprint'] ?? null ) && $post['fingerprint'] === $fp, FixApprovalAction::cookieAuthenticated() && SessionPolicy::matchingTokens( is_array( $auth ) ? (string) $auth['token'] : '', wp_get_session_token() ), is_ssl(), '1' === ( $post['confirm'] ?? null ) ) ) {
+		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_die( esc_html__( 'Secure administrator approval of the current proxy policy is required.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) ); }
+		$service = $this->service();
+		$fp      = $service->fingerprint();
 		check_admin_referer( 'ironlatch_proxy_' . $fp );
-		$password = is_string( $post['password'] ?? null ) && strlen( $post['password'] ) <= 1024 ? $post['password'] : '';
+		$state     = $service->status();
+		$method    = isset( $_SERVER['REQUEST_METHOD'] ) && is_string( $_SERVER['REQUEST_METHOD'] ) ? sanitize_key( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) : '';
+		$auth      = wp_parse_auth_cookie( '', is_ssl() ? 'secure_auth' : 'auth' );
+		$mode      = isset( $_POST['mode'] ) && is_string( $_POST['mode'] ) ? sanitize_key( wp_unslash( $_POST['mode'] ) ) : '';
+		$rules     = isset( $_POST['rules'] ) && is_string( $_POST['rules'] ) ? sanitize_textarea_field( wp_unslash( $_POST['rules'] ) ) : null;
+		$posted_fp = isset( $_POST['fingerprint'] ) && is_string( $_POST['fingerprint'] ) ? sanitize_key( wp_unslash( $_POST['fingerprint'] ) ) : '';
+		$confirmed = isset( $_POST['confirm'] ) && is_string( $_POST['confirm'] ) ? sanitize_text_field( wp_unslash( $_POST['confirm'] ) ) : '';
+		if ( ! SessionPolicy::allowed( 'post' === $method, current_user_can( 'manage_options' ), empty( $state['invalid'] ) && in_array( $mode, array( 'off', 'xff', 'single' ), true ) && null !== $rules && strlen( $rules ) <= 4096 && $posted_fp === $fp, FixApprovalAction::cookieAuthenticated() && SessionPolicy::matchingTokens( is_array( $auth ) ? (string) $auth['token'] : '', wp_get_session_token() ), is_ssl(), '1' === $confirmed ) ) {
+			wp_die( esc_html__( 'Secure administrator approval of the current proxy policy is required.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) ); }
+		// Passwords are compared as typed; sanitizing would change them.
+		$password = isset( $_POST['password'] ) && is_string( $_POST['password'] ) ? wp_unslash( $_POST['password'] ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Compared as typed; sanitizing would change the password.
+		$password = strlen( $password ) <= 1024 ? $password : '';
 		$user     = wp_get_current_user();
 		if ( '' === $password || ! wp_check_password( $password, $user->user_pass, $user->ID ) ) {
 			wp_die( esc_html__( 'Password confirmation failed.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) ); }
 		$lines  = preg_split( '/\r?\n/', $rules );
 		$lines  = is_array( $lines ) ? array_values( array_filter( array_map( 'trim', $lines ), static fn( string $line ): bool=>'' !== $line ) ) : array();
-		$result = ( new SecurityApprovalLock( $GLOBALS['wpdb'] ) )->run( fn(): string=>$service->apply( $fp, $mode, $lines, $_SERVER, WordPressClientAddress::peerConfirmed() ) );
+		$result = ( new SecurityApprovalLock( $GLOBALS['wpdb'] ) )->run( fn(): string=>$service->apply( $fp, $mode, $lines, WordPressClientAddress::request(), WordPressClientAddress::peerConfirmed() ) );
 		if ( 'saved' !== $result ) {
 			wp_die( esc_html__( 'Proxy policy changed, approval is busy, host peer is unverified, rules are invalid or the operator cannot be resolved safely. Review host trust and network self-lockout before approving.', 'ironlatch-security-scanner' ), '', array( 'response' => 409 ) ); }
 		( new ActivityHooks( new ActivityRepository( $GLOBALS['wpdb'] ) ) )->record( 'security_setting_changed', 0, 'proxy-' . $mode );

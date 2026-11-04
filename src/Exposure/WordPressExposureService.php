@@ -6,14 +6,15 @@ namespace AmazingPlugins\Security\Exposure;
 defined( 'ABSPATH' ) || exit;
 
 use AmazingPlugins\Security\Integrity\WordPressOptions;
+use AmazingPlugins\Security\Paths;
 final class WordPressExposureService {
 	public function create(): ExposureService {
 		return new ExposureService( new WordPressOptions(), new ExposureScanner(), array( $this, 'root' ) );}
 	public function root( string $alias ): ?string {
 		if ( 'site' === $alias ) {
-			return ABSPATH;}
+			return Paths::core();}
 		if ( 'content' === $alias ) {
-			$path = WP_CONTENT_DIR;
+			$path = Paths::content();
 		} elseif ( 'uploads' === $alias ) {
 			$uploads = wp_upload_dir( null, false );
 			$path    = is_string( $uploads['basedir'] ?? null ) && empty( $uploads['error'] ) ? $uploads['basedir'] : null;
@@ -21,12 +22,14 @@ final class WordPressExposureService {
 			return null;}
 		if ( ! is_string( $path ) || str_contains( $path, '://' ) ) {
 			return null;
-		}$site = realpath( ABSPATH );
+		}$site = realpath( Paths::core() );
 		$root  = realpath( $path );
 		if ( false === $site || false === $root || '/' === $root || $site === $root || str_starts_with( $site, $root . '/' ) ) {
 			return null;}
 		if ( 'uploads' === $alias ) {
-			$excluded = array( WP_CONTENT_DIR, ABSPATH . 'wp-admin', ABSPATH . WPINC, WP_PLUGIN_DIR, WPMU_PLUGIN_DIR );
+			$excluded = array( Paths::content(), Paths::core() . 'wp-admin', Paths::core() . WPINC, Paths::plugins() );
+			if ( '' !== Paths::muPlugins() ) {
+				$excluded[] = Paths::muPlugins(); }
 			if ( function_exists( 'get_theme_root' ) ) {
 				$excluded[] = get_theme_root(); }
 			global $wp_theme_directories;

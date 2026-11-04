@@ -12,17 +12,21 @@ use AmazingPlugins\Security\Admin\FixApprovalAction;
 
 final class SessionAction {
 	public function handle(): void {
-		// Nonce is verified before any mutation.
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing
-		$post   = wp_unslash( $_POST );
-		$method = is_string( $_SERVER['REQUEST_METHOD'] ?? null ) ? sanitize_key( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) : '';
-		$auth   = wp_parse_auth_cookie( '', is_ssl() ? 'secure_auth' : 'auth' );
-		$id     = is_scalar( $post['user_id'] ?? null ) ? absint( $post['user_id'] ) : 0;
-		if ( ! SessionPolicy::allowed( 'post' === $method, current_user_can( 'manage_options' ), $id > 0 && current_user_can( 'edit_user', $id ), FixApprovalAction::cookieAuthenticated() && SessionPolicy::matchingTokens( is_array( $auth ) ? (string) $auth['token'] : '', wp_get_session_token() ), is_ssl(), '1' === ( $post['confirm'] ?? null ) ) ) {
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read only to name the nonce action; verified below.
+		$id = isset( $_POST['user_id'] ) && is_scalar( $_POST['user_id'] ) ? absint( wp_unslash( $_POST['user_id'] ) ) : 0;
+		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_die( esc_html__( 'A secure administrator session and explicit confirmation are required.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );
 		}
 		check_admin_referer( 'ironlatch_sessions_revoke_' . $id );
-		$password = is_string( $post['password'] ?? null ) && strlen( $post['password'] ) <= 1024 ? $post['password'] : '';
+		$method    = isset( $_SERVER['REQUEST_METHOD'] ) && is_string( $_SERVER['REQUEST_METHOD'] ) ? sanitize_key( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) : '';
+		$confirmed = isset( $_POST['confirm'] ) && is_string( $_POST['confirm'] ) ? sanitize_text_field( wp_unslash( $_POST['confirm'] ) ) : '';
+		$auth      = wp_parse_auth_cookie( '', is_ssl() ? 'secure_auth' : 'auth' );
+		if ( ! SessionPolicy::allowed( 'post' === $method, current_user_can( 'manage_options' ), $id > 0 && current_user_can( 'edit_user', $id ), FixApprovalAction::cookieAuthenticated() && SessionPolicy::matchingTokens( is_array( $auth ) ? (string) $auth['token'] : '', wp_get_session_token() ), is_ssl(), '1' === $confirmed ) ) {
+			wp_die( esc_html__( 'A secure administrator session and explicit confirmation are required.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );
+		}
+		// Passwords are compared as typed; sanitizing would change them.
+		$password = isset( $_POST['password'] ) && is_string( $_POST['password'] ) ? wp_unslash( $_POST['password'] ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Compared as typed; sanitizing would change the password.
+		$password = strlen( $password ) <= 1024 ? $password : '';
 		$user     = wp_get_current_user();
 		if ( '' === $password || ! wp_check_password( $password, $user->user_pass, $user->ID ) ) {
 			wp_die( esc_html__( 'Password confirmation failed.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );
@@ -30,9 +34,10 @@ final class SessionAction {
 		if ( ! get_userdata( $id ) ) {
 			wp_die( esc_html__( 'The selected account no longer exists.', 'ironlatch-security-scanner' ), '', array( 'response' => 409 ) );
 		}
-		$operation = isset( $post['operation'] ) && is_string( $post['operation'] ) ? sanitize_key( $post['operation'] ) : '';
+		$operation = isset( $_POST['operation'] ) && is_string( $_POST['operation'] ) ? sanitize_key( wp_unslash( $_POST['operation'] ) ) : '';
 		if ( 'revoke-application-password' === $operation ) {
-			$this->revokeApplicationPassword( $id, $post );
+			$uuid = isset( $_POST['uuid'] ) && is_string( $_POST['uuid'] ) ? sanitize_text_field( wp_unslash( $_POST['uuid'] ) ) : '';
+			$this->revokeApplicationPassword( $id, $uuid );
 		}
 		try {
 			$this->revoke( $id, $user->ID, wp_get_session_token() );
@@ -44,8 +49,8 @@ final class SessionAction {
 		exit;
 	}
 
-	private function revokeApplicationPassword( int $id, array $post ): void {
-		$uuid   = isset( $post['uuid'] ) && is_string( $post['uuid'] ) ? strtolower( $post['uuid'] ) : '';
+	private function revokeApplicationPassword( int $id, string $uuid ): void {
+		$uuid   = strtolower( $uuid );
 		$stored = class_exists( \WP_Application_Passwords::class ) ? \WP_Application_Passwords::get_user_application_passwords( $id ) : array();
 		$match  = ApplicationPasswordList::selected( ApplicationPasswordList::rows( is_array( $stored ) ? $stored : array() ), $uuid );
 		if ( '' === $match || ! \WP_Application_Passwords::delete_application_password( $id, $match ) ) {

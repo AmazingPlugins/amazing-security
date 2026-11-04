@@ -13,6 +13,7 @@ use AmazingPlugins\Security\Scan\SecurityCheck;
 use Closure;
 use DateTimeImmutable;
 use DateTimeZone;
+use AmazingPlugins\Security\Paths;
 
 /** Reports the default content-directory debug log. It does not read or delete that file. */
 final class DebugLogCheck implements SecurityCheck {
@@ -36,10 +37,7 @@ final class DebugLogCheck implements SecurityCheck {
 	}
 
 	public static function wordpressKind(): string {
-		if ( ! defined( 'WP_CONTENT_DIR' ) ) {
-			return 'unknown';
-		}
-		$path = WP_CONTENT_DIR . '/debug.log';
+		$path = Paths::content() . '/debug.log';
 		if ( is_link( $path ) ) {
 			return 'unknown';
 		}

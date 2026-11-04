@@ -4,7 +4,7 @@ Tags: security, hardening, malware scan, login security, file integrity
 Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 0.1.6
+Stable tag: 0.1.7
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -120,6 +120,12 @@ Run `wp ironlatch-security-scanner login disable` on the server. Other controls 
 * Vulnerability data from WPVulnerability, credited to its original sources.
 
 == Changelog ==
+
+= 0.1.7 =
+* Plugin, content, mu-plugin and site folders are now located through one helper instead of scattered path constants. The robots.txt check builds its admin and Ajax paths with admin_url().
+* Removed the one-click "hide error details" setting. The check now tells you to set WP_DEBUG_DISPLAY in wp-config.php yourself.
+* The "turn off the file editor" setting now blocks only the editor capabilities instead of defining a global constant.
+* Admin forms check the nonce and capability before they read any input, and every request value is read and sanitized one key at a time.
 
 = 0.1.6 =
 * Renamed to Ironlatch Security Scanner (slug ironlatch-security-scanner). The command is now wp ironlatch-security-scanner.

@@ -24,6 +24,7 @@ use AmazingPlugins\Security\Scan\ScanContext;
 use AmazingPlugins\Security\Schedule\SuiteCycle;
 use DateTimeImmutable;
 use Throwable;
+use AmazingPlugins\Security\Paths;
 
 final class IntegrityScanAction {
 	public function start(): void {
@@ -38,11 +39,13 @@ final class IntegrityScanAction {
 	}
 
 	public function resume(): void {
-		$this->authorize( 'ironlatch_security_scanner_integrity_resume' );
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'You are not allowed to run an integrity scan.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );
+		}
+		check_admin_referer( 'ironlatch_security_scanner_integrity_resume' );
 		$store    = new WordPressIntegrityStore( new WordPressOptions() );
 		$progress = $store->latestProgress();
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified above.
-		$scanId = isset( $_POST['scan_id'] ) && is_string( $_POST['scan_id'] ) ? sanitize_text_field( wp_unslash( $_POST['scan_id'] ) ) : '';
+		$scanId   = isset( $_POST['scan_id'] ) && is_string( $_POST['scan_id'] ) ? sanitize_text_field( wp_unslash( $_POST['scan_id'] ) ) : '';
 		if ( null === $progress || $progress->finished || ! hash_equals( $progress->cursor->scanId, $scanId ) ) {
 			$this->redirect( true );
 		}
@@ -116,7 +119,7 @@ final class IntegrityScanAction {
 		try {
 			$started          = microtime( true );
 			$client           = new WordPressHttpClient();
-			$discovery        = ( new TargetDiscovery( new WordPressOrgManifestProvider( $client ), new WordPressOrgThemeManifestProvider( new ThemeArchiveParser() ) ) )->discover( $this->coreVersion(), $this->coreLocale(), ABSPATH, $this->plugins(), $this->themes() );
+			$discovery        = ( new TargetDiscovery( new WordPressOrgManifestProvider( $client ), new WordPressOrgThemeManifestProvider( new ThemeArchiveParser() ) ) )->discover( $this->coreVersion(), $this->coreLocale(), Paths::core(), $this->plugins(), $this->themes() );
 			$cursor->elapsed += microtime( true ) - $started;
 			if ( $isStart ) {
 				$cursor->targetSignature = $discovery->signature;
@@ -185,7 +188,7 @@ final class IntegrityScanAction {
 				$plugins[] = array(
 					'slug'       => basename( $file ),
 					'version'    => (string) ( $data['Version'] ?? '' ),
-					'root'       => WP_PLUGIN_DIR,
+					'root'       => Paths::plugins(),
 					'update_uri' => 'unsupported_local_path',
 				);
 				continue;
@@ -193,7 +196,7 @@ final class IntegrityScanAction {
 			$plugins[] = array(
 				'slug'       => $slug,
 				'version'    => (string) ( $data['Version'] ?? '' ),
-				'root'       => WP_PLUGIN_DIR . '/' . $slug,
+				'root'       => Paths::plugins() . '/' . $slug,
 				'update_uri' => (string) ( $data['UpdateURI'] ?? '' ),
 			);
 		}

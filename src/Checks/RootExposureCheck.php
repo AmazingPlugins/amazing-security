@@ -7,6 +7,7 @@ namespace AmazingPlugins\Security\Checks;
 defined( 'ABSPATH' ) || exit;
 
 use AmazingPlugins\Security\Findings\CheckResult;
+use AmazingPlugins\Security\Paths;
 use AmazingPlugins\Security\Findings\State;
 use AmazingPlugins\Security\Scan\ScanContext;
 use AmazingPlugins\Security\Scan\SecurityCheck;
@@ -36,11 +37,8 @@ final class RootExposureCheck implements SecurityCheck {
 	}
 
 	public static function wordpressKind(): string {
-		if ( ! defined( 'ABSPATH' ) ) {
-			return 'unknown';
-		}
-		$env = self::entry( ABSPATH . '.env', true );
-		$git = self::entry( ABSPATH . '.git', false );
+		$env = self::both( '.env', true );
+		$git = self::both( '.git', false );
 		if ( 'unknown' === $env || 'unknown' === $git ) {
 			return 'unknown';
 		}
@@ -51,6 +49,18 @@ final class RootExposureCheck implements SecurityCheck {
 			return 'env';
 		}
 		return 'present' === $git ? 'git' : 'absent';
+	}
+
+	/** Looks in the install folder and the web root, which differ when WordPress sits in a subfolder. */
+	private static function both( string $name, bool $file ): string {
+		$seen = array();
+		foreach ( array_unique( array( Paths::core(), Paths::home() ) ) as $root ) {
+			$seen[] = self::entry( $root . $name, $file );
+		}
+		if ( in_array( 'present', $seen, true ) ) {
+			return 'present';
+		}
+		return in_array( 'unknown', $seen, true ) ? 'unknown' : 'absent';
 	}
 
 	private static function entry( string $path, bool $file ): string {

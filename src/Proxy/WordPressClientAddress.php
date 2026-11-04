@@ -29,6 +29,24 @@ final class WordPressClientAddress {
 	}
 	public function salt( string $salt ): string {
 		return ProxyNamespace::salt( $salt, $this->policy() ); }
+	/**
+	 * The only request headers address detection needs, each read and cleaned on its own.
+	 *
+	 * @return array<string, string>
+	 */
+	public static function request(): array {
+		$out = array();
+		foreach ( array( 'REMOTE_ADDR', 'HTTP_X_FORWARDED_FOR', 'HTTP_CF_CONNECTING_IP' ) as $key ) {
+			if ( ! isset( $_SERVER[ $key ] ) || ! is_string( $_SERVER[ $key ] ) ) {
+				continue;
+			}
+			$raw   = trim( wp_unslash( $_SERVER[ $key ] ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized on the next line; the unsanitized value is compared to detect forged headers.
+			$clean = sanitize_text_field( $raw );
+			// A header that sanitizing changes was forged or damaged. Keep it unusable instead of cleaning it into a valid address.
+			$out[ $key ] = $clean === $raw ? $clean : '';
+		}
+		return $out;
+	}
 	public function server( array $server ): array {
 		$server['REMOTE_ADDR'] = $this->address( $server ) ?? '';
 		return $server; }
