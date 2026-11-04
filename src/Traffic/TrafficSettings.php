@@ -25,23 +25,28 @@ final class TrafficSettings {
 		);
 	}
 	public function handle(): void {
-	 // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Exact-policy nonce checked before any mutation.
-		$post    = wp_unslash( $_POST );
-		$method  = is_string( $_SERVER['REQUEST_METHOD'] ?? null ) ? sanitize_key( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) : '';
-		$auth    = wp_parse_auth_cookie( '', is_ssl() ? 'secure_auth' : 'auth' );
-		$service = $this->service();
-		$state   = $service->status();
-		$fp      = $service->fingerprint();
-		if ( ! SessionPolicy::allowed( 'post' === $method, current_user_can( 'manage_options' ), empty( $state['invalid'] ) && in_array( $post['enabled'] ?? null, array( '0', '1' ), true ) && is_string( $post['fingerprint'] ?? null ) && $post['fingerprint'] === $fp, FixApprovalAction::cookieAuthenticated() && SessionPolicy::matchingTokens( is_array( $auth ) ? (string) $auth['token'] : '', wp_get_session_token() ), is_ssl(), '1' === ( $post['confirm'] ?? null ) ) ) {
+		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_die( esc_html__( 'Secure administrator approval of the current traffic policy is required.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) ); }
+		$service = $this->service();
+		$fp      = $service->fingerprint();
 		check_admin_referer( 'ironlatch_traffic_' . $fp );
-		$password = is_string( $post['password'] ?? null ) && strlen( $post['password'] ) <= 1024 ? $post['password'] : '';
+		$state     = $service->status();
+		$method    = isset( $_SERVER['REQUEST_METHOD'] ) && is_string( $_SERVER['REQUEST_METHOD'] ) ? sanitize_key( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) : '';
+		$auth      = wp_parse_auth_cookie( '', is_ssl() ? 'secure_auth' : 'auth' );
+		$enabled   = isset( $_POST['enabled'] ) && is_string( $_POST['enabled'] ) ? sanitize_key( wp_unslash( $_POST['enabled'] ) ) : '';
+		$posted_fp = isset( $_POST['fingerprint'] ) && is_string( $_POST['fingerprint'] ) ? sanitize_key( wp_unslash( $_POST['fingerprint'] ) ) : '';
+		$confirmed = isset( $_POST['confirm'] ) && is_string( $_POST['confirm'] ) ? sanitize_text_field( wp_unslash( $_POST['confirm'] ) ) : '';
+		if ( ! SessionPolicy::allowed( 'post' === $method, current_user_can( 'manage_options' ), empty( $state['invalid'] ) && in_array( $enabled, array( '0', '1' ), true ) && $posted_fp === $fp, FixApprovalAction::cookieAuthenticated() && SessionPolicy::matchingTokens( is_array( $auth ) ? (string) $auth['token'] : '', wp_get_session_token() ), is_ssl(), '1' === $confirmed ) ) {
+			wp_die( esc_html__( 'Secure administrator approval of the current traffic policy is required.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) ); }
+		// Passwords are compared as typed; sanitizing would change them.
+		$password = isset( $_POST['password'] ) && is_string( $_POST['password'] ) ? wp_unslash( $_POST['password'] ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Compared as typed; sanitizing would change the password.
+		$password = strlen( $password ) <= 1024 ? $password : '';
 		$user     = wp_get_current_user();
 		if ( '' === $password || ! wp_check_password( $password, $user->user_pass, $user->ID ) ) {
 			wp_die( esc_html__( 'Password confirmation failed.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) ); }
-		if ( 'saved' !== $service->apply( $fp, '1' === $post['enabled'] ) ) {
+		if ( 'saved' !== $service->apply( $fp, '1' === $enabled ) ) {
 			wp_die( esc_html__( 'Traffic policy changed or could not be saved. Review it before approving again.', 'ironlatch-security-scanner' ), '', array( 'response' => 409 ) ); }
-		( new ActivityHooks( new ActivityRepository( $GLOBALS['wpdb'] ) ) )->record( 'security_setting_changed', 0, 'traffic-' . ( '1' === $post['enabled'] ? 'on' : 'off' ) );
+		( new ActivityHooks( new ActivityRepository( $GLOBALS['wpdb'] ) ) )->record( 'security_setting_changed', 0, 'traffic-' . ( '1' === $enabled ? 'on' : 'off' ) );
 		wp_safe_redirect( \AmazingPlugins\Security\Admin\Brand::saved( admin_url( 'admin.php?page=ironlatch-traffic-guard#history' ) ) );
 		exit;
 	}

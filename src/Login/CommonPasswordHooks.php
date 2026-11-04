@@ -54,10 +54,11 @@ final class CommonPasswordHooks {
 	}
 
 	private function posted( string $key ): string {
-		// Password bytes stay exact. The profile, registration, or reset form already checked its nonce.
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.ValidatedSanitizedInput.MissingUnslash
-		$value = $_POST[ $key ] ?? '';
-		return is_string( $value ) ? wp_unslash( $value ) : '';
+		// Password bytes stay exact (wp_unslash only): sanitizing would change the password. The profile, registration, or reset form already checked its nonce.
+		if ( ! isset( $_POST[ $key ] ) || ! is_string( $_POST[ $key ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			return '';
+		}
+		return wp_unslash( $_POST[ $key ] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 	}
 
 	private function isEnabled(): bool {

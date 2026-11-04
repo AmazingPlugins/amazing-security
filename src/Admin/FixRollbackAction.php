@@ -12,18 +12,20 @@ use Throwable;
 
 final class FixRollbackAction {
 	public function handle(): void {
-		$method = is_string( $_SERVER['REQUEST_METHOD'] ?? null ) ? sanitize_key( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) : '';
-		if ( 'post' !== $method || ! current_user_can( 'manage_options' ) || ! FixApprovalAction::cookieAuthenticated() ) {
+		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_die( esc_html__( 'A current administrator session is required.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );
 		}
-		// The nonce is verified below before these fields affect a write.
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing
-		$post = wp_unslash( $_POST );
-		$id   = is_string( $post['proposal_id'] ?? null ) ? $post['proposal_id'] : '';
-		if ( ! preg_match( '/^[a-f0-9]{32}$/D', $id ) || '1' !== ( $post['confirm'] ?? null ) ) {
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read only to name the nonce action; verified on the next line.
+		$id = isset( $_POST['proposal_id'] ) && is_string( $_POST['proposal_id'] ) ? sanitize_key( wp_unslash( $_POST['proposal_id'] ) ) : '';
+		check_admin_referer( 'ironlatch_fix_rollback_' . $id );
+		$method = isset( $_SERVER['REQUEST_METHOD'] ) && is_string( $_SERVER['REQUEST_METHOD'] ) ? sanitize_key( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) : '';
+		if ( 'post' !== $method || ! FixApprovalAction::cookieAuthenticated() ) {
+			wp_die( esc_html__( 'A current administrator session is required.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );
+		}
+		$confirmed = isset( $_POST['confirm'] ) && is_string( $_POST['confirm'] ) ? sanitize_text_field( wp_unslash( $_POST['confirm'] ) ) : '';
+		if ( ! preg_match( '/^[a-f0-9]{32}$/D', $id ) || '1' !== $confirmed ) {
 			wp_die( esc_html__( 'Invalid rollback request.', 'ironlatch-security-scanner' ), '', array( 'response' => 400 ) );
 		}
-		check_admin_referer( 'ironlatch_fix_rollback_' . $id );
 		$repository = new WordPressFixRepository( $GLOBALS['wpdb'] );
 		if ( 'rolled_back' !== $repository->rollback( $id, get_current_user_id(), time() ) ) {
 			wp_die( esc_html__( 'The previous setting could not be restored.', 'ironlatch-security-scanner' ), '', array( 'response' => 409 ) );

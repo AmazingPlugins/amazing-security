@@ -150,24 +150,10 @@ final class StartHere {
 				'nonce'     => 'ironlatch_approved_setting',
 				'operation' => 'close-pingbacks',
 			) : null,
-			'debug-display' => match ( $result->evidence['fix'] ?? '' ) {
-				'plugin' => State::WARN === $result->state ? array(
-					'label'     => __( 'Hide error details', 'ironlatch-security-scanner' ),
-					'action'    => 'ironlatch_approved_setting',
-					'nonce'     => 'ironlatch_approved_setting',
-					'operation' => 'hide-debug-display',
-				) : null,
-				'plugin-on' => array(
-					'label'     => __( 'Use the wp-config.php display again', 'ironlatch-security-scanner' ),
-					'action'    => 'ironlatch_approved_setting',
-					'nonce'     => 'ironlatch_approved_setting',
-					'operation' => 'restore-debug-display',
-				),
-				default => State::PASS === $result->state ? null : array(
-					'label'  => __( 'Open Site Health', 'ironlatch-security-scanner' ),
-					'screen' => 'site-health.php',
-				),
-			},
+			'debug-display' => State::PASS === $result->state ? null : array(
+				'label'  => __( 'Open Site Health', 'ironlatch-security-scanner' ),
+				'screen' => 'site-health.php',
+			),
 			'file-editor' => match ( $result->evidence['fix'] ?? '' ) {
 				'plugin' => State::WARN === $result->state ? array(
 					'label'     => __( 'Turn off the file editor', 'ironlatch-security-scanner' ),

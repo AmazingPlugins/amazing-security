@@ -56,9 +56,8 @@ final class Module {
 			wp_die( esc_html__( 'HTTPS and administrator access are required.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );
 		}
 		check_admin_referer( 'ironlatch_event_mail' );
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce checked above.
-		$raw = isset( $_POST[ Notice::OPTION ] ) ? sanitize_text_field( wp_unslash( $_POST[ Notice::OPTION ] ) ) : '0';
-		update_option( Notice::OPTION, Notice::flag( is_string( $raw ) ? $raw : '0' ), false );
+		$raw = isset( $_POST[ Notice::OPTION ] ) && is_string( $_POST[ Notice::OPTION ] ) ? sanitize_text_field( wp_unslash( $_POST[ Notice::OPTION ] ) ) : '0';
+		update_option( Notice::OPTION, Notice::flag( $raw ), false );
 		wp_safe_redirect( \AmazingPlugins\Security\Admin\Brand::saved( admin_url( 'admin.php?page=ironlatch-settings#ironlatch-event-mail' ) ) );
 		exit;
 	}

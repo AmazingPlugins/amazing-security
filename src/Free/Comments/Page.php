@@ -64,10 +64,20 @@ final class Page {
 	}
 
 	public static function save(): void {
-		self::guard();
-		update_option( Decision::OPTION, Decision::flag( self::posted( Decision::OPTION ) ) );
-		update_option( Rate::OPTION, Rate::flag( self::posted( Rate::OPTION ) ) );
-		update_option( SpamHold::OPTION, SpamHold::flag( self::posted( SpamHold::OPTION ) ) );
+		if ( ! self::postRequest() ) {
+			wp_die( esc_html__( 'Open the comment checks page and use the form.', 'ironlatch-security-scanner' ), '', array( 'response' => 405 ) );
+		}
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'Administrator access required.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );
+		}
+		check_admin_referer( 'ironlatch_comments_save' );
+		$flags = array();
+		foreach ( array( Decision::OPTION, Rate::OPTION, SpamHold::OPTION ) as $key ) {
+			$flags[ $key ] = isset( $_POST[ $key ] ) && is_string( $_POST[ $key ] ) ? sanitize_text_field( wp_unslash( $_POST[ $key ] ) ) : '0';
+		}
+		update_option( Decision::OPTION, Decision::flag( $flags[ Decision::OPTION ] ) );
+		update_option( Rate::OPTION, Rate::flag( $flags[ Rate::OPTION ] ) );
+		update_option( SpamHold::OPTION, SpamHold::flag( $flags[ SpamHold::OPTION ] ) );
 		wp_safe_redirect( \AmazingPlugins\Security\Admin\Brand::saved( admin_url( 'admin.php?page=ironlatch-traffic-guard#bots' ) ) );
 		exit;
 	}
@@ -79,25 +89,9 @@ final class Page {
 		return __( 'Comment checks are off.', 'ironlatch-security-scanner' );
 	}
 
-	private static function guard(): void {
-		if ( ! self::postRequest() ) {
-			wp_die( esc_html__( 'Open the comment checks page and use the form.', 'ironlatch-security-scanner' ), '', array( 'response' => 405 ) );
-		}
-		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'Administrator access required.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );
-		}
-		check_admin_referer( 'ironlatch_comments_save' );
-	}
-
 	private static function postRequest(): bool {
 		$method = isset( $_SERVER['REQUEST_METHOD'] ) ? sanitize_key( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) : '';
 		return 'post' === $method;
-	}
-
-	private static function posted( string $key ): string {
-		// Nonce is checked in guard() before this runs.
-		$raw = isset( $_POST[ $key ] ) ? sanitize_text_field( wp_unslash( $_POST[ $key ] ) ) : '0'; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce checked in guard().
-		return is_string( $raw ) ? $raw : '0';
 	}
 
 	private static function holdStored(): string {

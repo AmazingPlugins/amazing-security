@@ -23,19 +23,25 @@ final class RestRateSettings {
 				}}
 		);}
 	public function handle(): void {
-	 // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Exact policy nonce and authenticated approval checked before mutation.
-		$post       = wp_unslash( $_POST );
-		$method     = is_string( $_SERVER['REQUEST_METHOD'] ?? null ) ? sanitize_key( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) : '';
-		$auth       = wp_parse_auth_cookie( '', is_ssl() ? 'secure_auth' : 'auth' );
-		$mode       = is_string( $post['mode'] ?? null ) ? $post['mode'] : '';
-		$exemptions = is_array( $post['exemptions'] ?? null ) ? $post['exemptions'] : array();
-		$s          = $this->service();
-		$state      = $s->status();
-		$fp         = $s->fingerprint();
-		if ( ! SessionPolicy::allowed( 'post' === $method, current_user_can( 'manage_options' ), empty( $state['invalid'] ) && ( ! isset( $post['exemptions'] ) || is_array( $post['exemptions'] ) ) && in_array( $mode, array( 'off', 'observe', 'block' ), true ) && is_string( $post['fingerprint'] ?? null ) && $post['fingerprint'] === $fp, FixApprovalAction::cookieAuthenticated() && SessionPolicy::matchingTokens( is_array( $auth ) ? (string) $auth['token'] : '', wp_get_session_token() ), is_ssl(), '1' === ( $post['confirm'] ?? null ) ) ) {
+		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_die( esc_html__( 'Secure administrator approval of the current policy is required.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );}
+		$s  = $this->service();
+		$fp = $s->fingerprint();
 		check_admin_referer( 'ironlatch_rest_rates_' . $fp );
-		$password = is_string( $post['password'] ?? null ) && strlen( $post['password'] ) <= 1024 ? $post['password'] : '';
+		$state         = $s->status();
+		$method        = isset( $_SERVER['REQUEST_METHOD'] ) && is_string( $_SERVER['REQUEST_METHOD'] ) ? sanitize_key( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) : '';
+		$auth          = wp_parse_auth_cookie( '', is_ssl() ? 'secure_auth' : 'auth' );
+		$mode          = isset( $_POST['mode'] ) && is_string( $_POST['mode'] ) ? sanitize_key( wp_unslash( $_POST['mode'] ) ) : '';
+		$exemptions_ok = ! isset( $_POST['exemptions'] ) || is_array( $_POST['exemptions'] );
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Unslashed here and sanitized per item in the callback.
+		$exemptions = isset( $_POST['exemptions'] ) && is_array( $_POST['exemptions'] ) ? array_map( static fn( mixed $id ): string => is_string( $id ) ? sanitize_key( $id ) : '', wp_unslash( $_POST['exemptions'] ) ) : array();
+		$posted_fp  = isset( $_POST['fingerprint'] ) && is_string( $_POST['fingerprint'] ) ? sanitize_key( wp_unslash( $_POST['fingerprint'] ) ) : '';
+		$confirmed  = isset( $_POST['confirm'] ) && is_string( $_POST['confirm'] ) ? sanitize_text_field( wp_unslash( $_POST['confirm'] ) ) : '';
+		if ( ! SessionPolicy::allowed( 'post' === $method, current_user_can( 'manage_options' ), empty( $state['invalid'] ) && $exemptions_ok && in_array( $mode, array( 'off', 'observe', 'block' ), true ) && $posted_fp === $fp, FixApprovalAction::cookieAuthenticated() && SessionPolicy::matchingTokens( is_array( $auth ) ? (string) $auth['token'] : '', wp_get_session_token() ), is_ssl(), '1' === $confirmed ) ) {
+			wp_die( esc_html__( 'Secure administrator approval of the current policy is required.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );}
+		// Passwords are compared as typed; sanitizing would change them.
+		$password = isset( $_POST['password'] ) && is_string( $_POST['password'] ) ? wp_unslash( $_POST['password'] ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Compared as typed; sanitizing would change the password.
+		$password = strlen( $password ) <= 1024 ? $password : '';
 		$user     = wp_get_current_user();
 		if ( '' === $password || ! wp_check_password( $password, $user->user_pass, $user->ID ) ) {
 			wp_die( esc_html__( 'Password confirmation failed.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );}

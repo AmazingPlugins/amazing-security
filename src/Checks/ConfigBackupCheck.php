@@ -13,6 +13,7 @@ use AmazingPlugins\Security\Scan\SecurityCheck;
 use Closure;
 use DateTimeImmutable;
 use DateTimeZone;
+use AmazingPlugins\Security\Paths;
 
 /** Reports a root backup of wp-config.php. It does not read or delete that file. */
 final class ConfigBackupCheck implements SecurityCheck {
@@ -42,7 +43,7 @@ final class ConfigBackupCheck implements SecurityCheck {
 		}
 		$sawFile = false;
 		foreach ( self::NAMES as $name ) {
-			$path = ABSPATH . $name;
+			$path = Paths::core() . $name;
 			if ( is_link( $path ) ) {
 				return 'unknown';
 			}

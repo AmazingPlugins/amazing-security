@@ -16,7 +16,7 @@ final class NetworkHook {
 		$options       = new WordPressOptions();
 		try {
 			$state   = ( new NetworkPolicy() )->read( $options->get( 'ironlatch_network_policy' ) );
-			$address = ( new \AmazingPlugins\Security\Proxy\WordPressClientAddress() )->address( $_SERVER ) ?? '';
+			$address = ( new \AmazingPlugins\Security\Proxy\WordPressClientAddress() )->address( \AmazingPlugins\Security\Proxy\WordPressClientAddress::request() ) ?? '';
 			$method  = is_string( $_SERVER['REQUEST_METHOD'] ?? null ) ? sanitize_key( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) : '';
 			$match   = ( new NetworkPolicy() )->matches( $state, $address, $method, current_user_can( 'manage_options' ), defined( 'WP_CLI' ) && WP_CLI, defined( 'DOING_CRON' ) && DOING_CRON );
 		} catch ( \Throwable ) {

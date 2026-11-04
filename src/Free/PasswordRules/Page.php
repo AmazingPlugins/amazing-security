@@ -53,12 +53,13 @@ final class Page {
 		}
 		check_admin_referer( 'ironlatch_password_rules_save' );
 		$posted = '0';
-		if ( isset( $_POST[ Decision::OPTION ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing -- check_admin_referer already ran for this save.
-			$posted = sanitize_text_field( wp_unslash( (string) $_POST[ Decision::OPTION ] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing -- check_admin_referer already ran for this save.
+		if ( isset( $_POST[ Decision::OPTION ] ) && is_string( $_POST[ Decision::OPTION ] ) ) {
+			$posted = sanitize_text_field( wp_unslash( $_POST[ Decision::OPTION ] ) );
 		}
 		update_option( Decision::OPTION, Decision::normalize( $posted ) );
 		foreach ( array_keys( $this->flags() ) as $option ) {
-			update_option( $option, $this->postedFlag( $option ), false );
+			$raw = isset( $_POST[ $option ] ) && is_string( $_POST[ $option ] ) ? sanitize_text_field( wp_unslash( $_POST[ $option ] ) ) : '0';
+			update_option( $option, '1' === $raw ? '1' : '0', false );
 		}
 		wp_safe_redirect( admin_url( 'admin.php?page=ironlatch-accounts&ironlatch_password_rules=updated#password-rules' ) );
 		exit;
@@ -92,14 +93,6 @@ final class Page {
 	private function flag( string $option ): string {
 		$value = get_option( $option, '0' );
 		return Decision::enabled( is_scalar( $value ) ? (string) $value : '0' ) ? '1' : '0';
-	}
-
-	private function postedFlag( string $option ): string {
-		if ( ! isset( $_POST[ $option ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing -- check_admin_referer already ran for this save.
-			return '0';
-		}
-		$raw = sanitize_text_field( wp_unslash( (string) $_POST[ $option ] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing -- check_admin_referer already ran for this save.
-		return '1' === $raw ? '1' : '0';
 	}
 
 	private function notice(): string {

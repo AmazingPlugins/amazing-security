@@ -13,6 +13,7 @@ use AmazingPlugins\Security\Scan\SecurityCheck;
 use Closure;
 use DateTimeImmutable;
 use DateTimeZone;
+use AmazingPlugins\Security\Paths;
 
 /** Reports the default content-directory error_log. It does not read or delete that file. */
 final class ErrorLogCheck implements SecurityCheck {
@@ -36,10 +37,7 @@ final class ErrorLogCheck implements SecurityCheck {
 	}
 
 	public static function wordpressKind(): string {
-		if ( ! defined( 'WP_CONTENT_DIR' ) ) {
-			return 'unknown';
-		}
-		$path = WP_CONTENT_DIR . '/error_log';
+		$path = Paths::content() . '/error_log';
 		if ( is_link( $path ) ) {
 			return 'unknown';
 		}

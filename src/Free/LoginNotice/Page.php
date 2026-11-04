@@ -49,7 +49,8 @@ final class Page {
 			wp_die( esc_html__( 'Administrator access required.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );
 		}
 		check_admin_referer( 'ironlatch_login_notice_save' );
-		update_option( Decision::OPTION, self::postedFlag() );
+		$raw = isset( $_POST[ Decision::OPTION ] ) && is_string( $_POST[ Decision::OPTION ] ) ? sanitize_text_field( wp_unslash( $_POST[ Decision::OPTION ] ) ) : '0';
+		update_option( Decision::OPTION, Decision::flag( $raw ) );
 		wp_safe_redirect( \AmazingPlugins\Security\Admin\Brand::saved( admin_url( 'admin.php?page=ironlatch-accounts#sign-in-email' ) ) );
 		exit;
 	}
@@ -59,12 +60,6 @@ final class Page {
 			return __( 'Sign-in email is on.', 'ironlatch-security-scanner' );
 		}
 		return __( 'Sign-in email is off.', 'ironlatch-security-scanner' );
-	}
-
-	private static function postedFlag(): string {
-		// Nonce is checked in save() before this runs.
-		$raw = isset( $_POST[ Decision::OPTION ] ) ? sanitize_text_field( wp_unslash( $_POST[ Decision::OPTION ] ) ) : '0'; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce checked in save().
-		return Decision::flag( is_string( $raw ) ? $raw : '0' );
 	}
 
 	private static function stored(): string {

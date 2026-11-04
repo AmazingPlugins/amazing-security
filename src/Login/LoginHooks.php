@@ -20,7 +20,7 @@ final class LoginHooks {
 		if ( '' === $username || '' === $password || ! $this->interactive() ) {
 			return $user;
 		}
-		$decision = $this->limiter->beforePassword( $this->addresses->fromServer( $_SERVER ), time() );
+		$decision = $this->limiter->beforePassword( $this->addresses->fromServer( \AmazingPlugins\Security\Proxy\WordPressClientAddress::request() ), time() );
 		if ( $decision->blocked ) {
 			return new \WP_Error( 'ironlatch_rate_limited', __( 'Please try again shortly.', 'ironlatch-security-scanner' ) );
 		}
@@ -34,14 +34,22 @@ final class LoginHooks {
 		if ( ! $this->interactive() || array_intersect( $ignored, $error->get_error_codes() ) ) {
 			return;
 		}
-		$this->limiter->afterFailure( $this->addresses->fromServer( $_SERVER ), time() );
+		$this->limiter->afterFailure( $this->addresses->fromServer( \AmazingPlugins\Security\Proxy\WordPressClientAddress::request() ), time() );
 	}
 
 	private function interactive(): bool {
 		$xmlRpc = defined( 'XMLRPC_REQUEST' ) && XMLRPC_REQUEST;
 		$app    = ( defined( 'REST_REQUEST' ) && REST_REQUEST ) || ( defined( 'WP_CLI' ) && WP_CLI );
-		// Login POSTs are authenticated by WordPress; they have no plugin admin nonce.
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing
-		return self::isInteractiveRequest( $_SERVER, $_POST, $xmlRpc, $app );
+		// Login POSTs are authenticated by WordPress; they have no plugin admin nonce. Only the keys the check reads are passed on.
+		$server = array( 'REQUEST_METHOD' => isset( $_SERVER['REQUEST_METHOD'] ) && is_string( $_SERVER['REQUEST_METHOD'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) : '' );
+		$post   = array();
+		// phpcs:disable WordPress.Security.NonceVerification.Missing -- Login form; only whether each field was sent is passed on, never its value.
+		foreach ( array( 'log', 'pwd', 'username', 'password' ) as $field ) {
+			if ( isset( $_POST[ $field ] ) ) {
+				$post[ $field ] = true;
+			}
+		}
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
+		return self::isInteractiveRequest( $server, $post, $xmlRpc, $app );
 	}
 }

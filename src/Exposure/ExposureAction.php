@@ -7,15 +7,16 @@ defined( 'ABSPATH' ) || exit;
 
 final class ExposureAction {
 	public function handle(): void {
-		$method = is_string( $_SERVER['REQUEST_METHOD'] ?? null ) ? sanitize_key( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) : '';
-		if ( 'post' !== $method || ! current_user_can( 'manage_options' ) ) {
+		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_die( esc_html__( 'Administrator access and POST are required.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );}
-	 // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Fixed root-specific nonce is verified before any inventory work.
-		$post  = wp_unslash( $_POST );
-		$alias = is_string( $post['root'] ?? null ) ? $post['root'] : '';
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read only to name the nonce action; verified right after validation.
+		$alias = isset( $_POST['root'] ) && is_string( $_POST['root'] ) ? sanitize_key( wp_unslash( $_POST['root'] ) ) : '';
 		if ( ! in_array( $alias, array( 'site', 'content', 'uploads' ), true ) ) {
 			wp_die( esc_html__( 'Select a supported local root.', 'ironlatch-security-scanner' ), '', array( 'response' => 400 ) );}
 		check_admin_referer( 'ironlatch_exposure_' . $alias );
+		$method = isset( $_SERVER['REQUEST_METHOD'] ) && is_string( $_SERVER['REQUEST_METHOD'] ) ? sanitize_key( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) : '';
+		if ( 'post' !== $method ) {
+			wp_die( esc_html__( 'Administrator access and POST are required.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );}
 		try {
 			$result = ( new WordPressExposureService() )->create()->scan( $alias, time() );
 		} catch ( \Throwable ) {

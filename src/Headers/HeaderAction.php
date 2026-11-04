@@ -7,16 +7,18 @@ defined( 'ABSPATH' ) || exit;
 
 final class HeaderAction {
 	public function handle(): void {
-		$method = is_string( $_SERVER['REQUEST_METHOD'] ?? null ) ? sanitize_key( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) : '';
-		if ( 'post' !== $method || ! current_user_can( 'manage_options' ) ) {
+		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_die( esc_html__( 'Administrator access and POST required.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );}
-	 // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Exact configured-home nonce checked before network request.
-		$post = wp_unslash( $_POST );
-		$s    = ( new WordPressHeaderService() )->create();
-		$fp   = $s->fingerprint();
-		if ( ! is_string( $post['fingerprint'] ?? null ) || $post['fingerprint'] !== $fp || ( $post['consent'] ?? null ) !== '1' ) {
-			wp_die( esc_html__( 'Confirm the current homepage assessment and consent.', 'ironlatch-security-scanner' ), '', array( 'response' => 400 ) );}
+		$s  = ( new WordPressHeaderService() )->create();
+		$fp = $s->fingerprint();
 		check_admin_referer( 'ironlatch_headers_' . $fp );
+		$method = isset( $_SERVER['REQUEST_METHOD'] ) && is_string( $_SERVER['REQUEST_METHOD'] ) ? sanitize_key( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) : '';
+		if ( 'post' !== $method ) {
+			wp_die( esc_html__( 'Administrator access and POST required.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );}
+		$posted_fp = isset( $_POST['fingerprint'] ) && is_string( $_POST['fingerprint'] ) ? sanitize_key( wp_unslash( $_POST['fingerprint'] ) ) : '';
+		$consent   = isset( $_POST['consent'] ) && is_string( $_POST['consent'] ) ? sanitize_text_field( wp_unslash( $_POST['consent'] ) ) : '';
+		if ( $posted_fp !== $fp || '1' !== $consent ) {
+			wp_die( esc_html__( 'Confirm the current homepage assessment and consent.', 'ironlatch-security-scanner' ), '', array( 'response' => 400 ) );}
 		try {
 			$result = $s->check( $fp, time() );
 		} catch ( \Throwable ) {

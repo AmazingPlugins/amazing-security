@@ -28,9 +28,11 @@ final class LoginSettingsAction {
 		}
 		check_admin_referer( 'ironlatch_login_settings' );
 		try {
-			// This action already verified its nonce above.
-			// phpcs:ignore WordPress.Security.NonceVerification.Missing
-			list( $mode, $xmlRpc, $erase ) = self::parse( wp_unslash( $_POST ) );
+			$fields = array();
+			foreach ( array( 'rate_mode', 'xmlrpc_disabled', 'erase_on_uninstall' ) as $field ) {
+				$fields[ $field ] = isset( $_POST[ $field ] ) && is_string( $_POST[ $field ] ) ? sanitize_key( wp_unslash( $_POST[ $field ] ) ) : null;
+			}
+			list( $mode, $xmlRpc, $erase ) = self::parse( $fields );
 			$settings                      = new WordPressLoginSettings( new WordPressOptions() );
 			$settings->setRateMode( $mode );
 			if ( 'off' === $mode ) {

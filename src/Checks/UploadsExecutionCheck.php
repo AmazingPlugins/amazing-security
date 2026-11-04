@@ -12,6 +12,7 @@ use AmazingPlugins\Security\Scan\ScanContext;
 use AmazingPlugins\Security\Scan\SecurityCheck;
 use Closure;
 use DateTimeImmutable;
+use AmazingPlugins\Security\Paths;
 
 /**
  * Reports a visible local uploads rule without proving PHP cannot run there.
@@ -74,7 +75,7 @@ final class UploadsExecutionCheck implements SecurityCheck {
 	}
 
 	private static function visibleRule(): string {
-		if ( ! function_exists( 'wp_upload_dir' ) || ! defined( 'WP_CONTENT_DIR' ) ) {
+		if ( ! function_exists( 'wp_upload_dir' ) ) {
 			return '';
 		}
 		$upload     = wp_upload_dir( null, false );
@@ -84,7 +85,7 @@ final class UploadsExecutionCheck implements SecurityCheck {
 			$candidates[] = $base . '/.htaccess';
 			$candidates[] = $base . '/.user.ini';
 		}
-		$content      = rtrim( WP_CONTENT_DIR, '/' );
+		$content      = rtrim( Paths::content(), '/' );
 		$candidates[] = $content . '/.htaccess';
 		$candidates[] = $content . '/.user.ini';
 		foreach ( $candidates as $path ) {
@@ -97,7 +98,7 @@ final class UploadsExecutionCheck implements SecurityCheck {
 	}
 
 	private static function ruleIn( string $path ): string {
-		$root = rtrim( WP_CONTENT_DIR, '/' );
+		$root = rtrim( Paths::content(), '/' );
 		if ( strlen( $path ) > 4096 || str_contains( $path, "\0" ) || ! str_starts_with( $path, $root . '/' ) || is_link( $path ) || ! is_file( $path ) ) {
 			return '';
 		}

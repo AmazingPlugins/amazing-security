@@ -14,6 +14,7 @@ use Closure;
 use DateTimeImmutable;
 use DateTimeZone;
 use Throwable;
+use AmazingPlugins\Security\Paths;
 
 /** Reports application passwords, assistant access, and an llms.txt guide. It does not change them. */
 final class AiReadinessCheck implements SecurityCheck {
@@ -101,7 +102,7 @@ final class AiReadinessCheck implements SecurityCheck {
 		if ( ! defined( 'ABSPATH' ) ) {
 			return 'unknown';
 		}
-		$path = ABSPATH . 'llms.txt';
+		$path = Paths::home() . 'llms.txt';
 		if ( is_link( $path ) ) {
 			return 'unknown';
 		}

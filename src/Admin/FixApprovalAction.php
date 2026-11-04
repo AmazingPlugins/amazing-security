@@ -15,18 +15,20 @@ use Throwable;
 
 final class FixApprovalAction {
 	public function handle(): void {
-		$method = is_string( $_SERVER['REQUEST_METHOD'] ?? null ) ? sanitize_key( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) : '';
-		if ( 'post' !== $method || ! current_user_can( 'manage_options' ) || ! self::cookieAuthenticated() ) {
+		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_die( esc_html__( 'A current administrator session is required.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );
 		}
-		// The nonce is verified below before these fields affect a write.
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing
-		$post = wp_unslash( $_POST );
-		$id   = is_string( $post['proposal_id'] ?? null ) ? $post['proposal_id'] : '';
-		if ( ! preg_match( '/^[a-f0-9]{32}$/D', $id ) || '1' !== ( $post['confirm'] ?? null ) ) {
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read only to name the nonce action; verified on the next line.
+		$id = isset( $_POST['proposal_id'] ) && is_string( $_POST['proposal_id'] ) ? sanitize_key( wp_unslash( $_POST['proposal_id'] ) ) : '';
+		check_admin_referer( 'ironlatch_fix_approve_' . $id );
+		$method = isset( $_SERVER['REQUEST_METHOD'] ) && is_string( $_SERVER['REQUEST_METHOD'] ) ? sanitize_key( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) : '';
+		if ( 'post' !== $method || ! self::cookieAuthenticated() ) {
+			wp_die( esc_html__( 'A current administrator session is required.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );
+		}
+		$confirmed = isset( $_POST['confirm'] ) && is_string( $_POST['confirm'] ) ? sanitize_text_field( wp_unslash( $_POST['confirm'] ) ) : '';
+		if ( ! preg_match( '/^[a-f0-9]{32}$/D', $id ) || '1' !== $confirmed ) {
 			wp_die( esc_html__( 'Invalid proposal request.', 'ironlatch-security-scanner' ), '', array( 'response' => 400 ) );
 		}
-		check_admin_referer( 'ironlatch_fix_approve_' . $id );
 		if ( ! ( new McpPreferences( new WordPressOptions() ) )->enabled() ) {
 			wp_die( esc_html__( 'AI assistant access is off.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );
 		}
@@ -39,7 +41,9 @@ final class FixApprovalAction {
 		if ( null === $proposal || 'pending' !== $proposal->status || $proposal->isExpired( time() ) ) {
 			wp_die( esc_html__( 'This proposal is no longer available.', 'ironlatch-security-scanner' ), '', array( 'response' => 409 ) );
 		}
-		$password      = is_string( $post['password'] ?? null ) && strlen( $post['password'] ) <= 1024 ? $post['password'] : '';
+		// Passwords are compared as typed; sanitizing would change them.
+		$password      = isset( $_POST['password'] ) && is_string( $_POST['password'] ) ? wp_unslash( $_POST['password'] ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Compared as typed; sanitizing would change the password.
+		$password      = strlen( $password ) <= 1024 ? $password : '';
 		$checkPassword = static function ( string $value ): bool {
 			$user = wp_get_current_user();
 			return wp_check_password( $value, $user->user_pass, $user->ID );

@@ -3,6 +3,8 @@
 declare(strict_types=1);
 namespace AmazingPlugins\Security\Repository;
 
+use AmazingPlugins\Security\Paths;
+
 defined( 'ABSPATH' ) || exit;
 
 final class WordPressDirectoryInventory {
@@ -20,7 +22,7 @@ final class WordPressDirectoryInventory {
 		foreach ( $this->all() as $item ) {
 			if ( $item['key'] === $key ) {
 				$file = $item['file'];
-				$path = WP_PLUGIN_DIR . '/' . $file;
+				$path = Paths::plugins() . '/' . $file;
 				if ( ! $this->regular( $path ) ) {
 					return null;
 				}return $this->item( $file, get_plugin_data( $path, false, false ) );}
@@ -28,14 +30,14 @@ final class WordPressDirectoryInventory {
 		return null;
 	}
 	private function regular( string $path ): bool {
-		$root = realpath( WP_PLUGIN_DIR );
-		return false !== $root && ! is_link( $path ) && is_file( $path ) && realpath( $path ) === $root . '/' . substr( $path, strlen( WP_PLUGIN_DIR ) + 1 );
+		$root = realpath( Paths::plugins() );
+		return false !== $root && ! is_link( $path ) && is_file( $path ) && realpath( $path ) === $root . '/' . substr( $path, strlen( Paths::plugins() ) + 1 );
 	}
 	private function item( string $file, array $data ): array {
 		$slug      = dirname( $file );
 		$version   = is_string( $data['Version'] ?? null ) ? $data['Version'] : '';
 		$uri       = is_string( $data['UpdateURI'] ?? null ) ? $data['UpdateURI'] : '';
-		$supported = strlen( $file ) <= 190 && strlen( $slug ) <= 64 && 1 === preg_match( '/^[a-z0-9]+(?:-[a-z0-9]+)*$/D', $slug ) && '' === $uri && strlen( $version ) <= 64 && 1 === preg_match( '/^[0-9]+(?:\.[0-9]+)*(?:[-.][a-zA-Z0-9]+)*$/D', $version ) && $this->regular( WP_PLUGIN_DIR . '/' . $file );
+		$supported = strlen( $file ) <= 190 && strlen( $slug ) <= 64 && 1 === preg_match( '/^[a-z0-9]+(?:-[a-z0-9]+)*$/D', $slug ) && '' === $uri && strlen( $version ) <= 64 && 1 === preg_match( '/^[0-9]+(?:\.[0-9]+)*(?:[-.][a-zA-Z0-9]+)*$/D', $version ) && $this->regular( Paths::plugins() . '/' . $file );
 		return array(
 			'key'         => substr( hash( 'sha256', $file ), 0, 32 ),
 			'file'        => $file,

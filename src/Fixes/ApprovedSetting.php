@@ -16,14 +16,6 @@ final class ApprovedSetting {
 		return $constantDefined ? '' : '1';
 	}
 
-	public static function debugHide( string $current ): string {
-		return '1' === $current ? '' : '1';
-	}
-
-	public static function debugRestore( string $current ): string {
-		return '1' === $current ? '0' : '';
-	}
-
 	public static function fileEditorRestore( string $current ): string {
 		return '1' === $current ? '0' : '';
 	}

@@ -24,8 +24,7 @@ final class AlertSettingsAction {
 		}
 		check_admin_referer( 'ironlatch_alert_settings' );
 		try {
-			// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce checked above.
-			$enabled = self::parse( wp_unslash( $_POST ) );
+			$enabled = self::parse( array( 'enabled' => isset( $_POST['enabled'] ) && is_string( $_POST['enabled'] ) ? sanitize_key( wp_unslash( $_POST['enabled'] ) ) : null ) );
 		} catch ( InvalidArgumentException ) {
 			wp_die( esc_html__( 'Choose an alert setting.', 'ironlatch-security-scanner' ), '', array( 'response' => 400 ) );
 		}

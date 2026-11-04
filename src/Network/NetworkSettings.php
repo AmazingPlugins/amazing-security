@@ -22,20 +22,25 @@ final class NetworkSettings {
 				}}
 		);}
 	public function handle(): void {
-	 // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Exact policy nonce and session approval checked before mutation.
-		$post    = wp_unslash( $_POST );
-		$method  = is_string( $_SERVER['REQUEST_METHOD'] ?? null ) ? sanitize_key( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) : '';
-		$auth    = wp_parse_auth_cookie( '', is_ssl() ? 'secure_auth' : 'auth' );
-		$mode    = is_string( $post['mode'] ?? null ) ? $post['mode'] : '';
-		$rules   = is_string( $post['rules'] ?? null ) ? $post['rules'] : null;
-		$methods = is_array( $post['methods'] ?? null ) ? $post['methods'] : null;
-		$s       = $this->service();
-		$state   = $s->status();
-		$fp      = $s->fingerprint();
-		if ( ! SessionPolicy::allowed( 'post' === $method, current_user_can( 'manage_options' ), empty( $state['invalid'] ) && in_array( $mode, array( 'off', 'observe', 'block' ), true ) && null !== $rules && strlen( $rules ) <= 4096 && null !== $methods && is_string( $post['fingerprint'] ?? null ) && $post['fingerprint'] === $fp, FixApprovalAction::cookieAuthenticated() && SessionPolicy::matchingTokens( is_array( $auth ) ? (string) $auth['token'] : '', wp_get_session_token() ), is_ssl(), '1' === ( $post['confirm'] ?? null ) ) ) {
+		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_die( esc_html__( 'Secure administrator approval of the current network policy is required.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );}
+		$s  = $this->service();
+		$fp = $s->fingerprint();
 		check_admin_referer( 'ironlatch_network_' . $fp );
-		$password = is_string( $post['password'] ?? null ) && strlen( $post['password'] ) <= 1024 ? $post['password'] : '';
+		$state  = $s->status();
+		$method = isset( $_SERVER['REQUEST_METHOD'] ) && is_string( $_SERVER['REQUEST_METHOD'] ) ? sanitize_key( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) : '';
+		$auth   = wp_parse_auth_cookie( '', is_ssl() ? 'secure_auth' : 'auth' );
+		$mode   = isset( $_POST['mode'] ) && is_string( $_POST['mode'] ) ? sanitize_key( wp_unslash( $_POST['mode'] ) ) : '';
+		$rules  = isset( $_POST['rules'] ) && is_string( $_POST['rules'] ) ? sanitize_textarea_field( wp_unslash( $_POST['rules'] ) ) : null;
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Unslashed here and sanitized per item in the callback.
+		$methods   = isset( $_POST['methods'] ) && is_array( $_POST['methods'] ) ? array_map( static fn( mixed $m ): string => is_string( $m ) ? sanitize_text_field( $m ) : '', wp_unslash( $_POST['methods'] ) ) : null;
+		$posted_fp = isset( $_POST['fingerprint'] ) && is_string( $_POST['fingerprint'] ) ? sanitize_key( wp_unslash( $_POST['fingerprint'] ) ) : '';
+		$confirmed = isset( $_POST['confirm'] ) && is_string( $_POST['confirm'] ) ? sanitize_text_field( wp_unslash( $_POST['confirm'] ) ) : '';
+		if ( ! SessionPolicy::allowed( 'post' === $method, current_user_can( 'manage_options' ), empty( $state['invalid'] ) && in_array( $mode, array( 'off', 'observe', 'block' ), true ) && null !== $rules && strlen( $rules ) <= 4096 && null !== $methods && $posted_fp === $fp, FixApprovalAction::cookieAuthenticated() && SessionPolicy::matchingTokens( is_array( $auth ) ? (string) $auth['token'] : '', wp_get_session_token() ), is_ssl(), '1' === $confirmed ) ) {
+			wp_die( esc_html__( 'Secure administrator approval of the current network policy is required.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );}
+		// Passwords are compared as typed; sanitizing would change them.
+		$password = isset( $_POST['password'] ) && is_string( $_POST['password'] ) ? wp_unslash( $_POST['password'] ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Compared as typed; sanitizing would change the password.
+		$password = strlen( $password ) <= 1024 ? $password : '';
 		$user     = wp_get_current_user();
 		if ( '' === $password || ! wp_check_password( $password, $user->user_pass, $user->ID ) ) {
 			wp_die( esc_html__( 'Password confirmation failed.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );}
@@ -44,7 +49,7 @@ final class NetworkSettings {
 		$result = ( new \AmazingPlugins\Security\Proxy\SecurityApprovalLock( $GLOBALS['wpdb'] ) )->run(
 			function () use ( $s, $fp, $mode, $lines, $methods ): string {
 				$options  = new \AmazingPlugins\Security\Proxy\FreshSecurityOptions( $GLOBALS['wpdb'], new WordPressOptions() );
-				$operator = ( new \AmazingPlugins\Security\Proxy\WordPressClientAddress() )->address( $_SERVER, $options ) ?? '';
+				$operator = ( new \AmazingPlugins\Security\Proxy\WordPressClientAddress() )->address( \AmazingPlugins\Security\Proxy\WordPressClientAddress::request(), $options ) ?? '';
 				return $s->apply( $fp, $mode, $lines, $methods, $operator );
 			}
 		);

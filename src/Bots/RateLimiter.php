@@ -33,8 +33,8 @@ final class RateLimiter {
 		if ( is_user_logged_in() || wp_doing_cron() || ( defined( 'WP_CLI' ) && WP_CLI ) || ( defined( 'IRONLATCH_DISABLE_FIREWALL' ) && IRONLATCH_DISABLE_FIREWALL ) ) {
 			return;
 		}
-		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Only the path is compared against a fixed prefix.
-		$uri  = is_string( $_SERVER['REQUEST_URI'] ?? null ) ? wp_unslash( $_SERVER['REQUEST_URI'] ) : '';
+		// esc_url_raw keeps percent-encoding intact, which path matching relies on; sanitize_text_field would strip it.
+		$uri  = is_string( $_SERVER['REQUEST_URI'] ?? null ) ? esc_url_raw( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '';
 		$kind = RatePolicy::classify(
 			(string) wp_parse_url( $uri, PHP_URL_PATH ),
 			isset( $_GET['rest_route'] ) && '' !== sanitize_text_field( wp_unslash( $_GET['rest_route'] ) ), // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Only tested for being empty.
@@ -63,7 +63,7 @@ final class RateLimiter {
 
 	/** True for addresses that are never counted or blocked: unknown, on the never-limit list, or the site calling itself. */
 	public static function exempt( WordPressClientAddress $client, array $allow ): bool {
-		$address = $client->address( $_SERVER );
+		$address = $client->address( WordPressClientAddress::request() );
 		if ( null === $address || RatePolicy::listed( $address, $allow ) ) {
 			return true;
 		}
@@ -80,7 +80,7 @@ final class RateLimiter {
 		}
 		$store = new BotCounterStore( $GLOBALS['wpdb'] );
 		$now   = time();
-		$block = $client->key( wp_salt( 'auth' ) . self::BLOCK_SALT, true )->fromServer( $_SERVER );
+		$block = $client->key( wp_salt( 'auth' ) . self::BLOCK_SALT, true )->fromServer( WordPressClientAddress::request() );
 		if ( null === $block ) {
 			return;
 		}
@@ -94,7 +94,7 @@ final class RateLimiter {
 			return;
 		}
 		$this->counted = true;
-		$key           = $client->key( wp_salt( 'auth' ) . ':bot:rate:' . ( 'xmlrpc' === $kind ? 'rest' : $kind ), true )->fromServer( $_SERVER );
+		$key           = $client->key( wp_salt( 'auth' ) . ':bot:rate:' . ( 'xmlrpc' === $kind ? 'rest' : $kind ), true )->fromServer( WordPressClientAddress::request() );
 		if ( null === $key ) {
 			return;
 		}
@@ -144,10 +144,10 @@ final class RateLimiter {
 	public static function proxyUnresolved(): bool {
 		$forwarded = false;
 		foreach ( array( 'HTTP_X_FORWARDED_FOR', 'HTTP_CF_CONNECTING_IP', 'HTTP_X_REAL_IP', 'HTTP_FORWARDED' ) as $header ) {
-			$forwarded = $forwarded || ( is_string( $_SERVER[ $header ] ?? null ) && '' !== $_SERVER[ $header ] );
+			$forwarded = $forwarded || ( isset( $_SERVER[ $header ] ) && is_string( $_SERVER[ $header ] ) && '' !== sanitize_text_field( wp_unslash( $_SERVER[ $header ] ) ) );
 		}
 		$peer = is_string( $_SERVER['REMOTE_ADDR'] ?? null ) ? Cidr::canonical( sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) ) : null;
-		return $forwarded && null !== $peer && ( new WordPressClientAddress() )->address( $_SERVER ) === explode( '/', $peer )[0];
+		return $forwarded && null !== $peer && ( new WordPressClientAddress() )->address( WordPressClientAddress::request() ) === explode( '/', $peer )[0];
 	}
 
 	public static function recentCount( int $now ): int {

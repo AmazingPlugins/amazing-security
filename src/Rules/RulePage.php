@@ -19,7 +19,7 @@ final class RulePage {
 	public function render(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_die( esc_html__( 'Administrator access required.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );}
-		$packs = ( new RuleCatalog( dirname( IRONLATCH_SECURITY_SCANNER_FILE ) ) )->status( time() );
+		$packs = ( new RuleCatalog( IRONLATCH_SECURITY_SCANNER_DIR ) )->status( time() );
 		echo '<div class="wrap ironlatch-security-scanner-admin"><header class="ironlatch-header"><div><h1>' . esc_html__( 'Rule information', 'ironlatch-security-scanner' ) . '</h1><p>' . esc_html__( 'Versions and review records for the local patterns installed with this plugin.', 'ironlatch-security-scanner' ) . '</p></div></header><section class="ironlatch-overview"><h2>' . esc_html__( 'What the review date means', 'ironlatch-security-scanner' ) . '</h2><p>' . esc_html__( 'The date records bundled metadata review. It does not establish current threat coverage, a maintained malware feed or a clean site. After 90 days, metadata review is marked overdue. Missing, changed or invalid source records are unknown. Scanning behavior is unchanged by these advisory labels.', 'ironlatch-security-scanner' ) . '</p><p>' . esc_html__( 'Source hashes are compared with a record in the same plugin package. This can reveal package drift, but it is not independent proof of authenticity. Existing findings retain their recorded rule version; installing another version does not refresh old scans.', 'ironlatch-security-scanner' ) . '</p></section>';
 		foreach ( $packs as $pack ) {
 			$label = match ( $pack['status'] ) {

@@ -16,19 +16,23 @@ use AmazingPlugins\Security\Admin\FixApprovalAction;
 
 final class IncidentAction {
 	public function handle(): void {
-		// Nonce is verified before any mutation.
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing
-		$post    = wp_unslash( $_POST );
-		$method  = is_string( $_SERVER['REQUEST_METHOD'] ?? null ) ? sanitize_key( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) : '';
-		$auth    = wp_parse_auth_cookie( '', is_ssl() ? 'secure_auth' : 'auth' );
-		$id      = is_scalar( $post['user_id'] ?? null ) ? absint( $post['user_id'] ) : 0;
-		$viewer  = get_current_user_id();
-		$allowed = Access::otherAccount( current_user_can( 'manage_options' ), $viewer, $id ) && current_user_can( 'edit_user', $id );
-		if ( ! SessionPolicy::allowed( 'post' === $method, current_user_can( 'manage_options' ), $allowed, FixApprovalAction::cookieAuthenticated() && SessionPolicy::matchingTokens( is_array( $auth ) ? (string) $auth['token'] : '', wp_get_session_token() ), is_ssl(), '1' === ( $post['confirm'] ?? null ) ) ) {
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read only to name the nonce action; verified below.
+		$id = isset( $_POST['user_id'] ) && is_scalar( $_POST['user_id'] ) ? absint( wp_unslash( $_POST['user_id'] ) ) : 0;
+		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_die( esc_html__( 'A secure administrator session and explicit confirmation are required.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );
 		}
 		check_admin_referer( 'ironlatch_incident_reset_' . $id );
-		$password = is_string( $post['password'] ?? null ) && strlen( $post['password'] ) <= 1024 ? $post['password'] : '';
+		$method    = isset( $_SERVER['REQUEST_METHOD'] ) && is_string( $_SERVER['REQUEST_METHOD'] ) ? sanitize_key( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) : '';
+		$confirmed = isset( $_POST['confirm'] ) && is_string( $_POST['confirm'] ) ? sanitize_text_field( wp_unslash( $_POST['confirm'] ) ) : '';
+		$auth      = wp_parse_auth_cookie( '', is_ssl() ? 'secure_auth' : 'auth' );
+		$viewer    = get_current_user_id();
+		$allowed   = Access::otherAccount( current_user_can( 'manage_options' ), $viewer, $id ) && current_user_can( 'edit_user', $id );
+		if ( ! SessionPolicy::allowed( 'post' === $method, current_user_can( 'manage_options' ), $allowed, FixApprovalAction::cookieAuthenticated() && SessionPolicy::matchingTokens( is_array( $auth ) ? (string) $auth['token'] : '', wp_get_session_token() ), is_ssl(), '1' === $confirmed ) ) {
+			wp_die( esc_html__( 'A secure administrator session and explicit confirmation are required.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );
+		}
+		// Passwords are compared as typed; sanitizing would change them.
+		$password = isset( $_POST['password'] ) && is_string( $_POST['password'] ) ? wp_unslash( $_POST['password'] ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Compared as typed; sanitizing would change the password.
+		$password = strlen( $password ) <= 1024 ? $password : '';
 		$user     = wp_get_current_user();
 		if ( '' === $password || ! wp_check_password( $password, $user->user_pass, $user->ID ) ) {
 			wp_die( esc_html__( 'Password confirmation failed.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );

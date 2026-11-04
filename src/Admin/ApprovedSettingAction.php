@@ -24,8 +24,6 @@ final class ApprovedSettingAction {
 			'close-pingbacks' => $this->closePingbacks(),
 			'disable-file-editor' => $this->disableFileEditor(),
 			'restore-file-editor' => $this->restoreFileEditor(),
-			'hide-debug-display' => $this->hideDebugDisplay(),
-			'restore-debug-display' => $this->restoreDebugDisplay(),
 			'enable-login-confirm' => $this->writeGate( 'ironlatch_login_confirm', ApprovedSetting::gateOn( $this->gateValue( 'ironlatch_login_confirm' ) ) ),
 			'disable-login-confirm' => $this->writeGate( 'ironlatch_login_confirm', ApprovedSetting::gateOff( $this->gateValue( 'ironlatch_login_confirm' ) ) ),
 			'enable-common-passwords' => $this->writeGate( 'ironlatch_common_passwords', ApprovedSetting::gateOn( $this->gateValue( 'ironlatch_common_passwords' ) ) ),
@@ -72,9 +70,6 @@ final class ApprovedSettingAction {
 		if ( true !== update_option( 'ironlatch_disallow_file_edit', '1' ) && '1' !== get_option( 'ironlatch_disallow_file_edit', '0' ) ) {
 			return false;
 		}
-		if ( ! defined( 'DISALLOW_FILE_EDIT' ) ) {
-			define( 'DISALLOW_FILE_EDIT', true ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound -- This is the WordPress core file-editor constant.
-		}
 		return true;
 	}
 
@@ -82,28 +77,6 @@ final class ApprovedSettingAction {
 		$current = get_option( 'ironlatch_disallow_file_edit', '0' );
 		$next    = ApprovedSetting::fileEditorRestore( is_string( $current ) ? $current : '' );
 		return '' !== $next && true === update_option( 'ironlatch_disallow_file_edit', $next );
-	}
-
-	private function hideDebugDisplay(): bool {
-		if ( ! defined( 'WP_DEBUG' ) || ! WP_DEBUG || ! defined( 'WP_DEBUG_DISPLAY' ) || ! WP_DEBUG_DISPLAY ) {
-			return false;
-		}
-		$current = get_option( 'ironlatch_hide_debug_display', '0' );
-		if ( '' === ApprovedSetting::debugHide( is_string( $current ) ? $current : '0' ) ) {
-			return false;
-		}
-		if ( true !== update_option( 'ironlatch_hide_debug_display', '1' ) && '1' !== get_option( 'ironlatch_hide_debug_display', '0' ) ) {
-			return false;
-		}
-		// phpcs:ignore WordPress.PHP.IniSet.display_errors_Disallowed, PluginCheck.CodeAnalysis.PHPErrorReporting.IniDirectiveDisplay_errors, Squiz.PHP.DiscouragedFunctions.Discouraged -- Approved display hide. This does not edit wp-config.php.
-		ini_set( 'display_errors', '0' );
-		return true;
-	}
-
-	private function restoreDebugDisplay(): bool {
-		$current = get_option( 'ironlatch_hide_debug_display', '0' );
-		$next    = ApprovedSetting::debugRestore( is_string( $current ) ? $current : '' );
-		return '' !== $next && true === update_option( 'ironlatch_hide_debug_display', $next );
 	}
 
 	private function gateValue( string $option ): string {

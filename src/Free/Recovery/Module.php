@@ -35,12 +35,22 @@ final class Module {
 	}
 
 	public static function backup(): void {
-		self::guard( 'ironlatch_recovery_backup' );
+		$method = isset( $_SERVER['REQUEST_METHOD'] ) && is_string( $_SERVER['REQUEST_METHOD'] ) ? strtoupper( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) ) : '';
+		if ( 'POST' !== $method ) {
+			wp_die( esc_html__( 'Recovery tools run only from a submitted form.', 'ironlatch-security-scanner' ), '', array( 'response' => 405 ) );
+		}
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'You do not have permission to run recovery tools.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );
+		}
+		if ( ! is_ssl() ) {
+			wp_die( esc_html__( 'Recovery tools need HTTPS. No files were changed.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );
+		}
+		check_admin_referer( 'ironlatch_recovery_backup' );
 		global $wpdb;
 		if ( ! isset( $wpdb ) || ! is_object( $wpdb ) || ! is_string( $wpdb->prefix ) ) {
 			wp_die( esc_html__( 'The database connection is unavailable. No SQL file was created.', 'ironlatch-security-scanner' ), '', array( 'response' => 400 ) );
 		}
-		$confirmed = isset( $_POST['confirm'] ) && '1' === sanitize_text_field( wp_unslash( $_POST['confirm'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce checked in guard().
+		$confirmed = isset( $_POST['confirm'] ) && is_string( $_POST['confirm'] ) && '1' === sanitize_text_field( wp_unslash( $_POST['confirm'] ) );
 		$result    = ( new DatabaseDump( new WordPressTables( $wpdb ), array( WordPressTables::class, 'escape' ) ) )->build( $wpdb->prefix, self::approval(), $confirmed );
 		if ( ! $result->ok || '' === $result->body || preg_match( '/CREATE\s+DATABASE/i', $result->body ) ) {
 			wp_die( esc_html( '' === $result->message ? __( 'No SQL file was created.', 'ironlatch-security-scanner' ) : $result->message ), '', array( 'response' => 400 ) );
@@ -72,20 +82,6 @@ final class Module {
 		wp_nonce_field( 'ironlatch_recovery_backup' );
 		echo '<p><label><input type="checkbox" name="confirm" value="1"> ' . esc_html__( 'Download the prefixed tables.', 'ironlatch-security-scanner' ) . '</label></p>';
 		echo '<p><button class="button button-primary" type="submit">' . esc_html__( 'Download SQL', 'ironlatch-security-scanner' ) . '</button></p></form>';
-	}
-
-	private static function guard( string $action ): void {
-		$method = isset( $_SERVER['REQUEST_METHOD'] ) ? strtoupper( sanitize_text_field( wp_unslash( (string) $_SERVER['REQUEST_METHOD'] ) ) ) : '';
-		if ( 'POST' !== $method ) {
-			wp_die( esc_html__( 'Recovery tools run only from a submitted form.', 'ironlatch-security-scanner' ), '', array( 'response' => 405 ) );
-		}
-		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'You do not have permission to run recovery tools.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );
-		}
-		if ( ! is_ssl() ) {
-			wp_die( esc_html__( 'Recovery tools need HTTPS. No files were changed.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );
-		}
-		check_admin_referer( $action );
 	}
 
 	private static function approval(): Approval {

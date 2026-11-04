@@ -9,7 +9,6 @@ defined( 'ABSPATH' ) || exit;
 interface Values {
 	public function coreUpdateAvailable(): ?bool;
 	public function debugDisplayed(): ?bool;
-	public function debugHiddenByPlugin(): bool;
 	public function fileEditorDisabled(): ?bool;
 
 	public function fileEditorFix(): string;

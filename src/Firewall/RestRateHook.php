@@ -14,7 +14,7 @@ final class RestRateHook {
 		try {
 			$state      = ( new RestRatePolicy() )->read( get_option( 'ironlatch_rest_rate_policy', null ) );
 			$this->gate = $this->gate ?? new RestRateGate( ( new \AmazingPlugins\Security\Proxy\WordPressClientAddress() )->salt( wp_salt( 'auth' ) ), static fn( string $key, int $window, int $now ): ?int=>( new BotCounterStore( $GLOBALS['wpdb'] ) )->record( $key, $window, $now ) );
-			if ( $this->gate->reject( $request, $state, $request->get_route(), $request->get_method(), is_user_logged_in(), $result, ( new \AmazingPlugins\Security\Proxy\WordPressClientAddress() )->server( $_SERVER ), time() ) ) {
+			if ( $this->gate->reject( $request, $state, $request->get_route(), $request->get_method(), is_user_logged_in(), $result, ( new \AmazingPlugins\Security\Proxy\WordPressClientAddress() )->server( \AmazingPlugins\Security\Proxy\WordPressClientAddress::request() ), time() ) ) {
 				\AmazingPlugins\Security\Traffic\TrafficHooks::mark( 'rest-rate-block' );
 				return new \WP_Error( 'ironlatch_rest_rate', __( 'Too many requests to this endpoint. Retry later or contact the site owner.', 'ironlatch-security-scanner' ), array( 'status' => 429 ) );}
 		} catch ( \Throwable ) {

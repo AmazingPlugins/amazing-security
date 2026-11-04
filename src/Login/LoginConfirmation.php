@@ -48,11 +48,16 @@ final class LoginConfirmation {
 		$keys = array( 'log', 'pwd', self::FIELD );
 		$post = array();
 		foreach ( $keys as $key ) {
-			// Login fields stay exact. WordPress checks this form, not a plugin admin nonce.
-			// phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.ValidatedSanitizedInput.MissingUnslash
-			$value = $_POST[ $key ] ?? null;
-			if ( is_string( $value ) ) {
-				$post[ $key ] = wp_unslash( $value );
+			// WordPress checks this form, not a plugin admin nonce.
+			if ( ! isset( $_POST[ $key ] ) || ! is_string( $_POST[ $key ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+				continue;
+			}
+			if ( 'log' === $key ) {
+				$post[ $key ] = sanitize_user( wp_unslash( $_POST[ $key ] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			} elseif ( 'pwd' === $key ) {
+				$post[ $key ] = wp_unslash( $_POST[ $key ] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitizing would change the password; it is only tested for being empty.
+			} else {
+				$post[ $key ] = sanitize_text_field( wp_unslash( $_POST[ $key ] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 			}
 		}
 		return $post;

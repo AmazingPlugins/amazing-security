@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Free\Recovery;
 
+use AmazingPlugins\Security\Paths;
+
 defined( 'ABSPATH' ) || exit;
 
 /** Read-only mode preview for the main content directories. */
@@ -13,7 +15,7 @@ final class DirectoryModes {
 
 	public static function forSite(): self {
 		$uploads = wp_upload_dir( null, false );
-		return new self( array_values( array_unique( array( WP_CONTENT_DIR, (string) $uploads['basedir'], WP_PLUGIN_DIR, get_theme_root() ) ) ) );
+		return new self( array_values( array_unique( array( Paths::content(), (string) $uploads['basedir'], Paths::plugins(), get_theme_root() ) ) ) );
 	}
 
 	/**

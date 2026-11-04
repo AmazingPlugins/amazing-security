@@ -15,6 +15,7 @@ use AmazingPlugins\Security\Checks\LocalCodeCheck;
 use AmazingPlugins\Security\Findings\CheckResult;
 use AmazingPlugins\Security\Findings\FindingsRepository;
 use Throwable;
+use AmazingPlugins\Security\Paths;
 
 /** Scans plugin, theme, and uploads PHP with the local patterns. It does not contact WordPress.org. */
 final class LocalCodeScan {
@@ -166,8 +167,9 @@ final class LocalCodeScan {
 		$uploads = function_exists( 'wp_upload_dir' ) ? wp_upload_dir( null, false ) : array();
 		$root    = is_array( $uploads ) && empty( $uploads['error'] ) && is_string( $uploads['basedir'] ?? null ) ? $uploads['basedir'] : '';
 		$targets = ( new FileScanPlanBuilder() )->build( new DiscoveryResult( array(), array(), '', false ), $this->plugins(), $this->themes(), $root );
-		if ( defined( 'WPMU_PLUGIN_DIR' ) && is_dir( WPMU_PLUGIN_DIR ) ) {
-			$targets[] = new FileScanTarget( 'mu-plugins', 'plugin', WPMU_PLUGIN_DIR );
+		$mu      = Paths::muPlugins();
+		if ( '' !== $mu && is_dir( $mu ) ) {
+			$targets[] = new FileScanTarget( 'mu-plugins', 'plugin', $mu );
 		}
 		// Folders WordPress does not list as a plugin or theme, for example a dropped folder without a header.
 		$listed = array();
@@ -175,7 +177,7 @@ final class LocalCodeScan {
 			$listed[ rtrim( $target->root, '/' ) . '/' . ( $target->singleFile ?? '' ) ] = true;
 		}
 		foreach ( array(
-			'plugin' => defined( 'WP_PLUGIN_DIR' ) ? WP_PLUGIN_DIR : '',
+			'plugin' => Paths::plugins(),
 			'theme'  => function_exists( 'get_theme_root' ) ? get_theme_root() : '',
 		) as $kind => $dir ) {
 			$dir = rtrim( $dir, '/' );
@@ -192,8 +194,8 @@ final class LocalCodeScan {
 		}
 		// Loose PHP in the site root and in wp-content is a common hiding place. Folders there are covered above or by the release check.
 		foreach ( array(
-			'site'    => defined( 'ABSPATH' ) ? ABSPATH : '',
-			'content' => defined( 'WP_CONTENT_DIR' ) ? WP_CONTENT_DIR : '',
+			'site'    => Paths::core(),
+			'content' => Paths::content(),
 		) as $kind => $dir ) {
 			$dir   = rtrim( $dir, '/' );
 			$names = array_values( preg_grep( '/\.(?:php|phtml|php[0-9]+|pht)$/iD', $this->entries( $dir ) ) );
@@ -244,7 +246,7 @@ final class LocalCodeScan {
 				require_once $plugin_file;
 			}
 		}
-		if ( ! function_exists( 'get_plugins' ) || ! defined( 'WP_PLUGIN_DIR' ) ) {
+		if ( ! function_exists( 'get_plugins' ) ) {
 			return array();
 		}
 		$rows = array();
@@ -256,7 +258,7 @@ final class LocalCodeScan {
 			$rows[] = array(
 				'slug'        => '.' === $slug ? basename( $file ) : $slug,
 				'version'     => is_array( $data ) ? (string) ( $data['Version'] ?? '' ) : '',
-				'root'        => '.' === $slug ? WP_PLUGIN_DIR : WP_PLUGIN_DIR . '/' . $slug,
+				'root'        => '.' === $slug ? Paths::plugins() : Paths::plugins() . '/' . $slug,
 				'update_uri'  => '',
 				'single_file' => '.' === $slug ? basename( $file ) : null,
 				'local_only'  => true,

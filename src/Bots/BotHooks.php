@@ -46,10 +46,10 @@ final class BotHooks {
 			return false;
 		}
 		$this->checked = true;
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Public native forms have no plugin nonce. Only type/emptiness is inspected; no input contents are stored or echoed.
-		$trap       = isset( $_POST['ironlatch_contact_hint'] ) ? wp_unslash( $_POST['ironlatch_contact_hint'] ) : null;
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Public native forms have no plugin nonce. Only emptiness is inspected; no input contents are stored or echoed.
+		$trap       = isset( $_POST['ironlatch_contact_hint'] ) ? ( is_string( $_POST['ironlatch_contact_hint'] ) ? sanitize_text_field( wp_unslash( $_POST['ironlatch_contact_hint'] ) ) : false ) : null; // A non-string value stays suspicious.
 		$suspicious = BotPolicy::trapSuspicious( $trap );
-		$key        = ( new \AmazingPlugins\Security\Proxy\WordPressClientAddress() )->key( wp_salt( 'auth' ) . ':bot:' . $kind )->fromServer( $_SERVER );
+		$key        = ( new \AmazingPlugins\Security\Proxy\WordPressClientAddress() )->key( wp_salt( 'auth' ) . ':bot:' . $kind )->fromServer( \AmazingPlugins\Security\Proxy\WordPressClientAddress::request() );
 		$count      = null === $key ? null : ( new BotCounterStore( $GLOBALS['wpdb'] ) )->record( $key, $window, time() );
 		return BotPolicy::reject( $mode, $suspicious, $count, $limit );
 	}

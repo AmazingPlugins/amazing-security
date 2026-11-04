@@ -26,9 +26,7 @@ final class McpSettingsAction {
 		}
 		check_admin_referer( 'ironlatch_mcp_settings' );
 		try {
-			// Nonce verified above.
-			// phpcs:ignore WordPress.Security.NonceVerification.Missing
-			$enabled = self::parse( wp_unslash( $_POST ) );
+			$enabled = self::parse( array( 'enabled' => isset( $_POST['enabled'] ) && is_string( $_POST['enabled'] ) ? sanitize_key( wp_unslash( $_POST['enabled'] ) ) : null ) );
 			( new McpPreferences( new WordPressOptions() ) )->setEnabled( $enabled );
 		} catch ( Throwable ) {
 			wp_die( esc_html__( 'MCP setting could not be saved.', 'ironlatch-security-scanner' ), '', array( 'response' => 400 ) );

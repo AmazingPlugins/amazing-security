@@ -9,7 +9,7 @@ defined( 'ABSPATH' ) || exit;
 /** Loads each src/Free/<Name>/Module.php without a shared edit point. */
 final class FreeSuite {
 	public static function boot(): void {
-		$paths = glob( __DIR__ . '/*/Module.php' );
+		$paths = glob( IRONLATCH_SECURITY_SCANNER_DIR . 'src/Free/*/Module.php' );
 		if ( ! is_array( $paths ) ) {
 			return;
 		}

@@ -11,6 +11,7 @@ use AmazingPlugins\Security\Findings\State;
 use AmazingPlugins\Security\Scan\ScanContext;
 use AmazingPlugins\Security\Scan\SecurityCheck;
 use DateTimeImmutable;
+use AmazingPlugins\Security\Paths;
 
 final class FilesystemPermissionsCheck implements SecurityCheck {
 	private const LABELS = array( 'root', 'configuration', 'content', 'uploads', 'plugins', 'themes', 'mu-plugins' );
@@ -67,7 +68,7 @@ final class FilesystemPermissionsCheck implements SecurityCheck {
 	}
 
 	public static function wordpressPaths(): array {
-		$root   = rtrim( ABSPATH, '/' );
+		$root   = rtrim( Paths::core(), '/' );
 		$config = $root . '/wp-config.php';
 		if ( ! file_exists( $config ) && ! file_exists( dirname( $root ) . '/wp-settings.php' ) ) {
 			$config = dirname( $root ) . '/wp-config.php';
@@ -76,11 +77,11 @@ final class FilesystemPermissionsCheck implements SecurityCheck {
 		$paths  = array(
 			'root'          => $root,
 			'configuration' => $config,
-			'content'       => WP_CONTENT_DIR,
+			'content'       => Paths::content(),
 			'uploads'       => empty( $upload['error'] ) ? ( $upload['basedir'] ?? null ) : null,
-			'plugins'       => WP_PLUGIN_DIR,
+			'plugins'       => Paths::plugins(),
 			'themes'        => get_theme_root(),
-			'mu-plugins'    => WPMU_PLUGIN_DIR,
+			'mu-plugins'    => Paths::muPlugins(),
 		);
 		return $paths;
 	}

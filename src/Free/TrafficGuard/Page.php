@@ -136,22 +136,22 @@ final class Page {
 			wp_die( esc_html__( 'Administrator access required.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );
 		}
 		check_admin_referer( 'ironlatch_traffic_guard_save' );
-		$post = wp_unslash( $_POST ); // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Nonce checked above. Each field is sanitized before it is saved.
-		if ( ! is_array( $post ) ) {
-			$post = array();
+		$lines = array();
+		foreach ( array( Options::HOSTNAMES, Options::AGENTS, Options::REFERRERS ) as $key ) {
+			$lines[ $key ] = isset( $_POST[ $key ] ) && is_string( $_POST[ $key ] ) ? sanitize_textarea_field( wp_unslash( $_POST[ $key ] ) ) : '';
 		}
+		$live      = isset( $_POST[ Options::LIVE ] ) && is_string( $_POST[ Options::LIVE ] ) && '1' === sanitize_text_field( wp_unslash( $_POST[ Options::LIVE ] ) ) ? '1' : '0';
+		$hotlink   = isset( $_POST[ Options::HOTLINK ] ) && is_string( $_POST[ Options::HOTLINK ] ) && '1' === sanitize_text_field( wp_unslash( $_POST[ Options::HOTLINK ] ) ) ? '1' : '0';
 		$server    = ( new Guard() )->snapshot();
 		$lists     = new BlockList();
-		$hostnames = $lists->prepare( $this->postedList( $post, Options::HOSTNAMES ), 'host', $server['HTTP_HOST'] ?? '' );
-		$agents    = $lists->prepare( $this->postedList( $post, Options::AGENTS ), 'agent', $server['HTTP_USER_AGENT'] ?? '' );
-		$referrers = $lists->prepare( $this->postedList( $post, Options::REFERRERS ), 'referrer', $server['HTTP_REFERER'] ?? '' );
+		$hostnames = $lists->prepare( $this->postedList( $lines[ Options::HOSTNAMES ] ), 'host', $server['HTTP_HOST'] ?? '' );
+		$agents    = $lists->prepare( $this->postedList( $lines[ Options::AGENTS ] ), 'agent', $server['HTTP_USER_AGENT'] ?? '' );
+		$referrers = $lists->prepare( $this->postedList( $lines[ Options::REFERRERS ] ), 'referrer', $server['HTTP_REFERER'] ?? '' );
 		foreach ( array( $hostnames, $agents, $referrers ) as $result ) {
 			if ( empty( $result['ok'] ) ) {
 				$this->redirect( is_string( $result['error'] ?? null ) ? $result['error'] : 'count' );
 			}
 		}
-		$live    = $this->postedFlag( $post, Options::LIVE );
-		$hotlink = $this->postedFlag( $post, Options::HOTLINK );
 		try {
 			update_option( Options::HOSTNAMES, $hostnames['value'] );
 			update_option( Options::AGENTS, $agents['value'] );
@@ -227,14 +227,8 @@ final class Page {
 		return $notes[ $status ] ?? '';
 	}
 
-	/**
-	 * @param array<mixed> $post
-	 */
-	private function postedList( array $post, string $key ): string {
-		$raw = $post[ $key ] ?? '';
-		if ( ! is_string( $raw ) ) {
-			return '';
-		}
+	/** Cleans each line of a list that was already read, unslashed and sanitized from the verified request. */
+	private function postedList( string $raw ): string {
 		$parts = preg_split( "/\r\n|\n|\r/", $raw );
 		if ( ! is_array( $parts ) ) {
 			return '';
@@ -247,14 +241,6 @@ final class Page {
 			$lines[] = sanitize_text_field( $part );
 		}
 		return implode( "\n", $lines );
-	}
-
-	/**
-	 * @param array<mixed> $post
-	 */
-	private function postedFlag( array $post, string $key ): string {
-		$value = $post[ $key ] ?? '0';
-		return is_string( $value ) && '1' === $value ? '1' : '0';
 	}
 
 	private function stored( string $name ): string {

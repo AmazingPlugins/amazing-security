@@ -112,19 +112,22 @@ final class AccountPage {
 	}
 
 	public static function save(): void {
-		self::guard( 'ironlatch_accounts_save' );
+		self::requirePost();
+		check_admin_referer( 'ironlatch_accounts_save' );
 		$post = array();
 		foreach ( array_keys( Settings::fromPost( array() ) ) as $key ) {
-			$post[ $key ] = self::posted( $key );
+			$post[ $key ] = isset( $_POST[ $key ] ) && is_string( $_POST[ $key ] ) ? sanitize_text_field( wp_unslash( $_POST[ $key ] ) ) : '0';
 		}
+		$rate_raw   = isset( $_POST[ LoginExtras::RATE ] ) && is_string( $_POST[ LoginExtras::RATE ] ) ? sanitize_text_field( wp_unslash( $_POST[ LoginExtras::RATE ] ) ) : '0';
+		$xmlrpc_raw = isset( $_POST[ LoginExtras::XMLRPC ] ) && is_string( $_POST[ LoginExtras::XMLRPC ] ) ? sanitize_text_field( wp_unslash( $_POST[ LoginExtras::XMLRPC ] ) ) : '0';
 		foreach ( Settings::fromPost( $post ) as $key => $value ) {
 			update_option( $key, $value );
 		}
-		$rate = LoginExtras::rate( self::posted( LoginExtras::RATE ) );
+		$rate = LoginExtras::rate( $rate_raw );
 		if ( null !== $rate ) {
 			update_option( LoginExtras::RATE, $rate );
 		}
-		$xmlrpc = LoginExtras::xmlrpc( self::posted( LoginExtras::XMLRPC ) );
+		$xmlrpc = LoginExtras::xmlrpc( $xmlrpc_raw );
 		if ( null !== $xmlrpc ) {
 			update_option( LoginExtras::XMLRPC, $xmlrpc );
 		}
@@ -134,9 +137,8 @@ final class AccountPage {
 
 	public static function approve(): void {
 		self::requirePost();
-		// The nonce name includes this id, so the id is read before the check.
-		$user_id = isset( $_POST['user_id'] ) ? absint( wp_unslash( $_POST['user_id'] ) ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		check_admin_referer( 'ironlatch_accounts_approve_' . $user_id );
+		check_admin_referer( 'ironlatch_accounts_approve' );
+		$user_id = isset( $_POST['user_id'] ) ? absint( wp_unslash( $_POST['user_id'] ) ) : 0;
 		if ( $user_id > 0 && get_userdata( $user_id ) ) {
 			delete_user_meta( $user_id, RegistrationApproval::META );
 		}
@@ -186,7 +188,7 @@ final class AccountPage {
 			echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" style="display:inline">';
 			echo '<input type="hidden" name="action" value="ironlatch_accounts_approve">';
 			echo '<input type="hidden" name="user_id" value="' . esc_attr( (string) $account->ID ) . '">';
-			wp_nonce_field( 'ironlatch_accounts_approve_' . $account->ID );
+			wp_nonce_field( 'ironlatch_accounts_approve' );
 			submit_button( __( 'Approve', 'ironlatch-security-scanner' ), 'secondary', 'submit', false );
 			echo '</form></li>';
 		}
@@ -198,11 +200,6 @@ final class AccountPage {
 		$url    = RequiredTotpPage::directoryUrl( (string) ( $factor['suggest_slug'] ?? 'two-factor' ) );
 		echo '<p>' . esc_html__( 'Ironlatch Security Scanner reports whether a passkey plugin is present. It does not enroll devices.', 'ironlatch-security-scanner' ) . '</p>';
 		echo wp_kses( AuthFactorPanel::html( __( 'Passkeys', 'ironlatch-security-scanner' ), $factor, $url, 'passkeys' ), \AmazingPlugins\Security\Admin\AdminHtml::allowed() );
-	}
-
-	private static function guard( string $nonce ): void {
-		self::requirePost();
-		check_admin_referer( $nonce );
 	}
 
 	private static function requirePost(): void {
@@ -217,12 +214,6 @@ final class AccountPage {
 	private static function postRequest(): bool {
 		$method = isset( $_SERVER['REQUEST_METHOD'] ) ? sanitize_key( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) : '';
 		return 'post' === $method;
-	}
-
-	private static function posted( string $key ): string {
-		// Nonce is checked in guard() before this runs.
-		$raw = isset( $_POST[ $key ] ) ? sanitize_text_field( wp_unslash( $_POST[ $key ] ) ) : '0'; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce checked in guard().
-		return is_string( $raw ) ? $raw : '0';
 	}
 
 	private static function stored( string $key ): string {

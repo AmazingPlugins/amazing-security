@@ -13,6 +13,7 @@ use AmazingPlugins\Security\Scan\SecurityCheck;
 use Closure;
 use DateTimeImmutable;
 use DateTimeZone;
+use AmazingPlugins\Security\Paths;
 
 /** Reports a root license.txt file. It does not delete that file. */
 final class LicenseFileCheck implements SecurityCheck {
@@ -39,7 +40,7 @@ final class LicenseFileCheck implements SecurityCheck {
 		if ( ! defined( 'ABSPATH' ) ) {
 			return 'unknown';
 		}
-		$path = ABSPATH . 'license.txt';
+		$path = Paths::core() . 'license.txt';
 		if ( is_link( $path ) ) {
 			return 'unknown';
 		}

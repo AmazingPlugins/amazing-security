@@ -8,6 +8,7 @@ defined( 'ABSPATH' ) || exit;
 
 use AmazingPlugins\Security\Integrity\WordPressHttpClient;
 use AmazingPlugins\Security\Integrity\WordPressOrgManifestProvider;
+use AmazingPlugins\Security\Paths;
 
 final class WordPressReleaseProvenance {
 	public function verify( InstalledSoftware $item ): bool {
@@ -35,7 +36,7 @@ final class WordPressReleaseProvenance {
 			return null;
 		}
 		$checker = new ReleaseProvenance();
-		$root    = WP_PLUGIN_DIR . '/' . $item->slug;
+		$root    = Paths::plugins() . '/' . $item->slug;
 		$before  = $checker->fileState( $root );
 		if ( null === $before || ! $checker->verify( $manifest, $root ) || $before !== $checker->fileState( $root ) ) {
 			return null;
@@ -47,7 +48,7 @@ final class WordPressReleaseProvenance {
 		if ( 'plugin' !== $item->type || ! preg_match( '/^([0-9]{10}):([a-f0-9]{64})$/D', $proof, $matches ) || (int) $matches[1] < time() - HOUR_IN_SECONDS ) {
 			return false;
 		}
-		$current = ( new ReleaseProvenance() )->fileState( WP_PLUGIN_DIR . '/' . $item->slug );
+		$current = ( new ReleaseProvenance() )->fileState( Paths::plugins() . '/' . $item->slug );
 		return null !== $current && hash_equals( $matches[2], $current );
 	}
 }

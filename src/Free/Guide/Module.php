@@ -55,7 +55,7 @@ final class Module {
 			echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
 			echo '<input type="hidden" name="action" value="ironlatch_guide_preset">';
 			echo '<input type="hidden" name="preset" value="' . esc_attr( $name ) . '">';
-			wp_nonce_field( 'ironlatch_guide_preset_' . $name );
+			wp_nonce_field( 'ironlatch_guide_preset' );
 			submit_button( 'blog' === $name ? __( 'Apply the blog preset', 'ironlatch-security-scanner' ) : __( 'Apply the shop preset', 'ironlatch-security-scanner' ), 'primary', 'submit', false );
 			echo '</form>';
 		}
@@ -121,8 +121,8 @@ final class Module {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_die( esc_html__( 'Administrator access required.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );
 		}
-		$name = isset( $_POST['preset'] ) ? sanitize_text_field( wp_unslash( (string) $_POST['preset'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- The nonce is checked on the next line for this preset name.
-		check_admin_referer( 'ironlatch_guide_preset_' . $name );
+		check_admin_referer( 'ironlatch_guide_preset' );
+		$name = isset( $_POST['preset'] ) && is_string( $_POST['preset'] ) ? sanitize_key( wp_unslash( $_POST['preset'] ) ) : '';
 		foreach ( Score::preset( $name ) as $key => $value ) {
 			update_option( $key, $value );
 		}

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Login;
 
+use AmazingPlugins\Security\Paths;
+
 defined( 'ABSPATH' ) || exit;
 
 /** Status-only Verification tab. Enrollment lives in a dedicated 2FA plugin. */
@@ -48,6 +50,6 @@ final class RequiredTotpPage {
 	}
 
 	public static function installed( string $slug ): bool {
-		return defined( 'WP_PLUGIN_DIR' ) && 1 === preg_match( '/^[a-z0-9-]+$/D', $slug ) && is_dir( WP_PLUGIN_DIR . '/' . $slug );
+		return defined( 'IRONLATCH_SECURITY_SCANNER_DIR' ) && 1 === preg_match( '/^[a-z0-9-]+$/D', $slug ) && is_dir( Paths::plugins() . '/' . $slug );
 	}
 }
