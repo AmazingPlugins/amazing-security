@@ -8,6 +8,7 @@ defined( 'ABSPATH' ) || exit;
 
 use AmazingPlugins\Security\Admin\FixApprovalAction;
 use AmazingPlugins\Security\Sessions\SessionPolicy;
+use AmazingPlugins\Security\Request\PostedPassword;
 
 final class DigestSettings {
 	public function register(): void {
@@ -27,8 +28,7 @@ final class DigestSettings {
 			wp_die( esc_html__( 'Secure administrator approval and acknowledgement are required.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );
 		}
 		// Passwords are compared as typed; sanitizing would change them.
-		$password = isset( $_POST['password'] ) && is_string( $_POST['password'] ) ? wp_unslash( $_POST['password'] ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Compared as typed; sanitizing would change the password.
-		$password = strlen( $password ) <= 1024 ? $password : '';
+		$password = PostedPassword::read( 'password' ) ?? '';
 		$user     = wp_get_current_user();
 		if ( '' === $password || ! wp_check_password( $password, $user->user_pass, $user->ID ) ) {
 			wp_die( esc_html__( 'Password confirmation failed.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );

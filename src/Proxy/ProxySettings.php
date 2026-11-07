@@ -9,6 +9,7 @@ use AmazingPlugins\Security\Integrity\WordPressOptions;
 use AmazingPlugins\Security\Admin\FixApprovalAction;
 use AmazingPlugins\Security\Sessions\SessionPolicy;
 use AmazingPlugins\Security\Activity\{ActivityHooks, ActivityRepository};
+use AmazingPlugins\Security\Request\PostedPassword;
 final class ProxySettings {
 	private function service(): ProxySettingsService {
 		return new ProxySettingsService( new FreshSecurityOptions( $GLOBALS['wpdb'], new WordPressOptions() ) ); }
@@ -38,8 +39,7 @@ final class ProxySettings {
 		if ( ! SessionPolicy::allowed( 'post' === $method, current_user_can( 'manage_options' ), empty( $state['invalid'] ) && in_array( $mode, array( 'off', 'xff', 'single' ), true ) && null !== $rules && strlen( $rules ) <= 4096 && $posted_fp === $fp, FixApprovalAction::cookieAuthenticated() && SessionPolicy::matchingTokens( is_array( $auth ) ? (string) $auth['token'] : '', wp_get_session_token() ), is_ssl(), '1' === $confirmed ) ) {
 			wp_die( esc_html__( 'Secure administrator approval of the current proxy policy is required.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) ); }
 		// Passwords are compared as typed; sanitizing would change them.
-		$password = isset( $_POST['password'] ) && is_string( $_POST['password'] ) ? wp_unslash( $_POST['password'] ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Compared as typed; sanitizing would change the password.
-		$password = strlen( $password ) <= 1024 ? $password : '';
+		$password = PostedPassword::read( 'password' ) ?? '';
 		$user     = wp_get_current_user();
 		if ( '' === $password || ! wp_check_password( $password, $user->user_pass, $user->ID ) ) {
 			wp_die( esc_html__( 'Password confirmation failed.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) ); }

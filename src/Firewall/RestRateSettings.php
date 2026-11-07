@@ -10,6 +10,7 @@ use AmazingPlugins\Security\Sessions\SessionPolicy;
 use AmazingPlugins\Security\Integrity\WordPressOptions;
 use AmazingPlugins\Security\Bots\BotCounterStore;
 use AmazingPlugins\Security\Activity\{ActivityHooks, ActivityRepository};
+use AmazingPlugins\Security\Request\PostedPassword;
 final class RestRateSettings {
 	private function service(): RestRateSettingsService {
 		return new RestRateSettingsService( new WordPressOptions() );}
@@ -33,15 +34,13 @@ final class RestRateSettings {
 		$auth          = wp_parse_auth_cookie( '', is_ssl() ? 'secure_auth' : 'auth' );
 		$mode          = isset( $_POST['mode'] ) && is_string( $_POST['mode'] ) ? sanitize_key( wp_unslash( $_POST['mode'] ) ) : '';
 		$exemptions_ok = ! isset( $_POST['exemptions'] ) || is_array( $_POST['exemptions'] );
-		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Unslashed here and sanitized per item in the callback.
-		$exemptions = isset( $_POST['exemptions'] ) && is_array( $_POST['exemptions'] ) ? array_map( static fn( mixed $id ): string => is_string( $id ) ? sanitize_key( $id ) : '', wp_unslash( $_POST['exemptions'] ) ) : array();
-		$posted_fp  = isset( $_POST['fingerprint'] ) && is_string( $_POST['fingerprint'] ) ? sanitize_key( wp_unslash( $_POST['fingerprint'] ) ) : '';
-		$confirmed  = isset( $_POST['confirm'] ) && is_string( $_POST['confirm'] ) ? sanitize_text_field( wp_unslash( $_POST['confirm'] ) ) : '';
+		$exemptions    = isset( $_POST['exemptions'] ) && is_array( $_POST['exemptions'] ) ? array_values( array_filter( map_deep( wp_unslash( $_POST['exemptions'] ), 'sanitize_key' ), 'is_string' ) ) : array();
+		$posted_fp     = isset( $_POST['fingerprint'] ) && is_string( $_POST['fingerprint'] ) ? sanitize_key( wp_unslash( $_POST['fingerprint'] ) ) : '';
+		$confirmed     = isset( $_POST['confirm'] ) && is_string( $_POST['confirm'] ) ? sanitize_text_field( wp_unslash( $_POST['confirm'] ) ) : '';
 		if ( ! SessionPolicy::allowed( 'post' === $method, current_user_can( 'manage_options' ), empty( $state['invalid'] ) && $exemptions_ok && in_array( $mode, array( 'off', 'observe', 'block' ), true ) && $posted_fp === $fp, FixApprovalAction::cookieAuthenticated() && SessionPolicy::matchingTokens( is_array( $auth ) ? (string) $auth['token'] : '', wp_get_session_token() ), is_ssl(), '1' === $confirmed ) ) {
 			wp_die( esc_html__( 'Secure administrator approval of the current policy is required.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );}
 		// Passwords are compared as typed; sanitizing would change them.
-		$password = isset( $_POST['password'] ) && is_string( $_POST['password'] ) ? wp_unslash( $_POST['password'] ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Compared as typed; sanitizing would change the password.
-		$password = strlen( $password ) <= 1024 ? $password : '';
+		$password = PostedPassword::read( 'password' ) ?? '';
 		$user     = wp_get_current_user();
 		if ( '' === $password || ! wp_check_password( $password, $user->user_pass, $user->ID ) ) {
 			wp_die( esc_html__( 'Password confirmation failed.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );}

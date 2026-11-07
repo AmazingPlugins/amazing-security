@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Free\PasswordRules;
 
+use AmazingPlugins\Security\Request\PostedPassword;
+
 defined( 'ABSPATH' ) || exit;
 
 /** Boots the password-rule screen and rejects a new or reset password that fails an enabled rule. */
@@ -209,6 +211,10 @@ final class Module {
 	 */
 	private static function rejectPosted( \WP_Error $errors, array $keys, string $when, string $username, string $email, int $user_id ): void {
 		foreach ( $keys as $key ) {
+			if ( PostedPassword::rejected( $key, 4096 ) ) {
+				$errors->add( 'ironlatch_invalid_password', __( 'Choose a different password without control characters.', 'ironlatch-security-scanner' ) );
+				return;
+			}
 			$password = self::postedPassword( $key );
 			if ( null === $password || '' === $password ) {
 				continue;
@@ -220,15 +226,8 @@ final class Module {
 	}
 
 	private static function postedPassword( string $key ): ?string {
-		// Raw on purpose (wp_unslash only): sanitizing would change the password. The profile, reset, or checkout form nonce is already checked.
-		if ( ! isset( $_POST[ $key ] ) || ! is_string( $_POST[ $key ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- The password is measured, then dropped.
-			return null;
-		}
-		$value = wp_unslash( $_POST[ $key ] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- The password is measured, then dropped.
-		if ( ! is_string( $value ) ) {
-			return null;
-		}
-		return trim( $value );
+		$value = PostedPassword::read( $key, 4096 );
+		return null === $value ? null : trim( $value );
 	}
 
 	/**

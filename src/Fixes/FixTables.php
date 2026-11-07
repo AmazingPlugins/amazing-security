@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Fixes;
 
+use AmazingPlugins\Security\Database\SchemaCheck;
+
 defined( 'ABSPATH' ) || exit;
 
 final class FixTables {
@@ -46,7 +48,7 @@ final class FixTables {
 		) {$collate} ENGINE=InnoDB;";
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange -- Versioned plugin-owned audit table.
 		dbDelta( $schema );
-		update_option( 'ironlatch_fix_schema_version', '1', false );
+		SchemaCheck::record( 'ironlatch_fix_schema_version', '1', $wpdb, $proposals, $audit );
 		self::ensureScheduled();
 	}
 

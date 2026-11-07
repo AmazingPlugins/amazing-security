@@ -7,6 +7,7 @@ namespace AmazingPlugins\Security\Login;
 defined( 'ABSPATH' ) || exit;
 
 use Closure;
+use AmazingPlugins\Security\Request\PostedPassword;
 
 /** Rejects a new password on the local list or a breach-list prefix. It does not block an existing sign-in. */
 final class CommonPasswordHooks {
@@ -21,18 +22,18 @@ final class CommonPasswordHooks {
 	// WordPress passes a stdClass here, not a WP_User (see edit_user()).
 	public function profile( \WP_Error $errors, bool $update, object $user ): void {
 		unset( $update, $user );
-		$this->reject( $errors, $this->posted( 'pass1' ) );
+		$this->rejectPosted( $errors, 'pass1' );
 	}
 
 	public function registration( \WP_Error $errors, string $login, string $email ): \WP_Error {
 		unset( $login, $email );
-		$this->reject( $errors, $this->posted( 'user_pass' ) );
+		$this->rejectPosted( $errors, 'user_pass' );
 		return $errors;
 	}
 
 	public function reset( \WP_Error $errors, \WP_User $user ): void {
 		unset( $user );
-		$this->reject( $errors, $this->posted( 'pass1' ) );
+		$this->rejectPosted( $errors, 'pass1' );
 	}
 
 	private function reject( \WP_Error $errors, string $password ): void {
@@ -53,12 +54,12 @@ final class CommonPasswordHooks {
 		}
 	}
 
-	private function posted( string $key ): string {
-		// Password bytes stay exact (wp_unslash only): sanitizing would change the password. The profile, registration, or reset form already checked its nonce.
-		if ( ! isset( $_POST[ $key ] ) || ! is_string( $_POST[ $key ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
-			return '';
+	private function rejectPosted( \WP_Error $errors, string $key ): void {
+		if ( $this->isEnabled() && PostedPassword::rejected( $key, 4096 ) ) {
+			$errors->add( 'ironlatch_invalid_password', __( 'Choose a different password without control characters.', 'ironlatch-security-scanner' ) );
+			return;
 		}
-		return wp_unslash( $_POST[ $key ] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		$this->reject( $errors, PostedPassword::read( $key, 4096 ) ?? '' );
 	}
 
 	private function isEnabled(): bool {

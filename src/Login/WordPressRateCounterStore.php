@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Login;
 
+use AmazingPlugins\Security\Database\SchemaCheck;
+
 defined( 'ABSPATH' ) || exit;
 
 final class WordPressRateCounterStore implements RateCounterStore {
@@ -27,7 +29,7 @@ final class WordPressRateCounterStore implements RateCounterStore {
 			KEY updated_at (updated_at)
 		) {$wpdb->get_charset_collate()};";
 		dbDelta( $sql );
-		update_option( 'ironlatch_login_schema_version', '1', false );
+		SchemaCheck::record( 'ironlatch_login_schema_version', '1', $wpdb, $table );
 		self::ensureScheduled();
 	}
 

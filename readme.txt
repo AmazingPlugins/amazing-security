@@ -4,7 +4,7 @@ Tags: security, hardening, malware scan, login security, file integrity
 Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 0.1.7
+Stable tag: 0.1.8
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -120,6 +120,11 @@ Run `wp ironlatch-security-scanner login disable` on the server. Other controls 
 * Vulnerability data from WPVulnerability, credited to its original sources.
 
 == Changelog ==
+
+= 0.1.8 =
+* The database tables for fixes, login limits, traffic and activity are now checked after they are created. The schema version is saved only when every table exists, so a failed install is retried on the next load.
+* Passwords typed into the plugin's forms are validated (text, valid encoding, no control characters, length limit) and used exactly as typed. Weak-password checks now reject a password they cannot read instead of skipping it.
+* List fields in the network and REST rate settings are sanitized item by item with core helpers.
 
 = 0.1.7 =
 * Plugin, content, mu-plugin and site folders are now located through one helper instead of scattered path constants. The robots.txt check builds its admin and Ajax paths with admin_url().

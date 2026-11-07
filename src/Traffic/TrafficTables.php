@@ -3,6 +3,8 @@
 declare(strict_types=1);
 namespace AmazingPlugins\Security\Traffic;
 
+use AmazingPlugins\Security\Database\SchemaCheck;
+
 defined( 'ABSPATH' ) || exit;
 
 final class TrafficTables {
@@ -25,8 +27,7 @@ final class TrafficTables {
   KEY category_time (category, created_at)
   ) {$collate} ENGINE=InnoDB;"
 		);
-		if ( '' === $wpdb->last_error ) {
-			update_option( 'ironlatch_traffic_schema_version', '1', false ); }
+		SchemaCheck::record( 'ironlatch_traffic_schema_version', '1', $wpdb, $table );
 		self::ensureScheduled();
 	}
 	public static function ensureScheduled(): void {

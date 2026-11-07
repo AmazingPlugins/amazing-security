@@ -12,6 +12,7 @@ use AmazingPlugins\Security\Integrity\WordPressOptions;
 use AmazingPlugins\Security\Mcp\McpPreferences;
 use AmazingPlugins\Security\Scan\LocalHardeningScanService;
 use Throwable;
+use AmazingPlugins\Security\Request\PostedPassword;
 
 final class FixApprovalAction {
 	public function handle(): void {
@@ -42,8 +43,7 @@ final class FixApprovalAction {
 			wp_die( esc_html__( 'This proposal is no longer available.', 'ironlatch-security-scanner' ), '', array( 'response' => 409 ) );
 		}
 		// Passwords are compared as typed; sanitizing would change them.
-		$password      = isset( $_POST['password'] ) && is_string( $_POST['password'] ) ? wp_unslash( $_POST['password'] ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Compared as typed; sanitizing would change the password.
-		$password      = strlen( $password ) <= 1024 ? $password : '';
+		$password      = PostedPassword::read( 'password' ) ?? '';
 		$checkPassword = static function ( string $value ): bool {
 			$user = wp_get_current_user();
 			return wp_check_password( $value, $user->user_pass, $user->ID );

@@ -7,6 +7,7 @@ namespace AmazingPlugins\Security\Login;
 defined( 'ABSPATH' ) || exit;
 
 use Closure;
+use AmazingPlugins\Security\Request\PostedPassword;
 
 /** Hidden bot trap on the WordPress login form. Nothing to tick, and no outside CAPTCHA service. */
 final class LoginConfirmation {
@@ -49,13 +50,18 @@ final class LoginConfirmation {
 		$post = array();
 		foreach ( $keys as $key ) {
 			// WordPress checks this form, not a plugin admin nonce.
+			if ( 'pwd' === $key ) {
+				$pwd = PostedPassword::read( 'pwd' );
+				if ( null !== $pwd ) {
+					$post[ $key ] = $pwd; // Only tested for being empty.
+				}
+				continue;
+			}
 			if ( ! isset( $_POST[ $key ] ) || ! is_string( $_POST[ $key ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
 				continue;
 			}
 			if ( 'log' === $key ) {
 				$post[ $key ] = sanitize_user( wp_unslash( $_POST[ $key ] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
-			} elseif ( 'pwd' === $key ) {
-				$post[ $key ] = wp_unslash( $_POST[ $key ] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitizing would change the password; it is only tested for being empty.
 			} else {
 				$post[ $key ] = sanitize_text_field( wp_unslash( $_POST[ $key ] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 			}
