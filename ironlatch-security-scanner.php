@@ -3,7 +3,7 @@
  * Plugin Name: Ironlatch Security Scanner
  * Plugin URI: https://amazingplugins.com/plugins/ironlatch-security-scanner/
  * Description: Local WordPress security checks and optional login protection.
- * Version: 0.1.7
+ * Version: 0.1.8
  * Requires at least: 6.6
  * Requires PHP: 8.1
  * Author: Amazing Plugins

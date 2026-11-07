@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AmazingPlugins\Security\Activity;
 
+use AmazingPlugins\Security\Database\SchemaCheck;
+
 defined( 'ABSPATH' ) || exit;
 
 final class ActivityTables {
@@ -26,9 +28,7 @@ final class ActivityTables {
 			KEY created_at (created_at)
 		) {$collate} ENGINE=InnoDB;"
 		);
-		if ( '' === $wpdb->last_error ) {
-			update_option( 'ironlatch_activity_schema_version', '1', false );
-		}
+		SchemaCheck::record( 'ironlatch_activity_schema_version', '1', $wpdb, $table );
 		self::ensureScheduled();
 	}
 

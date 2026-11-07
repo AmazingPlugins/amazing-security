@@ -11,6 +11,7 @@ use AmazingPlugins\Security\Activity\ActivityRepository;
 use AmazingPlugins\Security\Admin\FixApprovalAction;
 use AmazingPlugins\Security\Integrity\WordPressOptions;
 use AmazingPlugins\Security\Sessions\SessionPolicy;
+use AmazingPlugins\Security\Request\PostedPassword;
 
 final class BaselineAction {
 	public function handle(): void {
@@ -32,8 +33,7 @@ final class BaselineAction {
 		}
 		if ( 'approve' === $mode ) {
 			// Passwords are compared as typed; sanitizing would change them.
-			$password = isset( $_POST['password'] ) && is_string( $_POST['password'] ) ? wp_unslash( $_POST['password'] ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Compared as typed; sanitizing would change the password.
-			$password = strlen( $password ) <= 1024 ? $password : '';
+			$password = PostedPassword::read( 'password' ) ?? '';
 			$user     = wp_get_current_user();
 			if ( '' === $password || ! wp_check_password( $password, $user->user_pass, $user->ID ) ) {
 				wp_die( esc_html__( 'Password confirmation failed.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );
