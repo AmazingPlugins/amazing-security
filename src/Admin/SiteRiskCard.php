@@ -36,7 +36,7 @@ final class SiteRiskCard {
 			'bots:all-off' => __( 'Bot controls, the scanner guard and rate limits are all off.', 'ironlatch-security-scanner' ),
 			'bots:watch-only' => __( 'Bot protection is watching but not blocking anything yet.', 'ironlatch-security-scanner' ),
 			'bots:on' => __( 'At least one bot protection is blocking.', 'ironlatch-security-scanner' ),
-			'ai:assistant-plain' => __( 'AI assistant access is on while the admin is not on HTTPS.', 'ironlatch-security-scanner' ),
+			'ai:assistant-plain' => __( 'AI agent access is on while the admin is not on HTTPS.', 'ironlatch-security-scanner' ),
 			'ai:crawlers' => __( 'AI crawlers are not told whether they may read the site.', 'ironlatch-security-scanner' ),
 			'ai:no-guide' => __( 'There is no llms.txt guide for AI tools.', 'ironlatch-security-scanner' ),
 			'ai:ready' => __( 'AI access and crawler rules are set.', 'ironlatch-security-scanner' ),

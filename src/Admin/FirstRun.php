@@ -85,7 +85,7 @@ final class FirstRun {
 			array(
 				'target' => $link( 'ironlatch-assistant' ),
 				'title'  => __( 'AI & MCP', 'ironlatch-security-scanner' ),
-				'text'   => __( 'Optional access for an AI assistant.', 'ironlatch-security-scanner' ),
+				'text'   => __( 'Optional access for an AI agent.', 'ironlatch-security-scanner' ),
 			),
 			array(
 				'target' => '.ironlatch-scan-button',

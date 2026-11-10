@@ -187,14 +187,14 @@ final class StartSuggestionsTest extends TestCase {
 
 		self::assertSame( 'warn', $open->state );
 		self::assertStringContainsString( 'Application passwords are available', $open->summary );
-		self::assertStringContainsString( 'not ready to connect an assistant', $open->summary );
+		self::assertStringContainsString( 'not ready to connect an agent', $open->summary );
 		self::assertStringContainsString( 'No llms.txt guide', $open->summary );
 		self::assertStringContainsString( 'does not send', $open->summary );
 		self::assertStringNotContainsString( 'safe', $open->summary );
 		self::assertSame( 'disable-application-passwords', StartHere::control( $open )['operation'] );
 
 		self::assertSame( 'warn', $on->state );
-		self::assertStringContainsString( 'AI assistant access is on', $on->summary );
+		self::assertStringContainsString( 'AI agent access is on', $on->summary );
 		self::assertStringContainsString( 'llms.txt guide is published', $on->summary );
 		self::assertSame( 'ironlatch-assistant', StartHere::control( $on )['page'] );
 		self::assertSame( 'ironlatch-mcp', StartHere::control( $on )['hash'] );

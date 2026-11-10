@@ -371,7 +371,7 @@ final class StartHere {
 			) : null,
 			'ai-readiness' => match ( true ) {
 				'on' === ( $result->evidence['assistant'] ?? '' ) => array(
-					'label' => __( 'Review AI assistant access', 'ironlatch-security-scanner' ),
+					'label' => __( 'Review AI agent access', 'ironlatch-security-scanner' ),
 					'page'  => 'ironlatch-assistant',
 					'hash'  => 'ironlatch-mcp',
 				),

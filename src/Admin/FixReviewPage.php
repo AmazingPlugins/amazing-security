@@ -76,7 +76,7 @@ final class FixReviewPage {
 		if ( 'applied' === $proposal->status && $proposal->canRollback( $now ) ) {
 			$html .= '<p role="status">' . esc_html__( 'This change was applied. You can restore the previous mode for 24 hours.', 'ironlatch-security-scanner' ) . '</p><form method="post" action="' . esc_url( $actionUrl ) . '"><input type="hidden" name="action" value="ironlatch_fix_rollback"><input type="hidden" name="proposal_id" value="' . esc_attr( $proposal->id ) . '"><input type="hidden" name="_wpnonce" value="' . esc_attr( $rollbackNonce ) . '"><input type="hidden" name="confirm" value="1"><button type="submit" class="button">' . esc_html__( 'Restore previous mode', 'ironlatch-security-scanner' ) . '</button></form>';
 		} elseif ( ! $enabled ) {
-			$html .= '<p role="status">' . esc_html__( 'AI assistant access is off. This proposal cannot be approved.', 'ironlatch-security-scanner' ) . '</p>';
+			$html .= '<p role="status">' . esc_html__( 'AI agent access is off. This proposal cannot be approved.', 'ironlatch-security-scanner' ) . '</p>';
 		} elseif ( 'pending' === $proposal->status && ! $stale && ! $proposal->isExpired( $now ) && ( 'block' !== $proposal->afterMode || $secure ) ) {
 			$html .= '<form method="post" action="' . esc_url( $actionUrl ) . '"><input type="hidden" name="action" value="ironlatch_fix_approve"><input type="hidden" name="proposal_id" value="' . esc_attr( $proposal->id ) . '"><input type="hidden" name="_wpnonce" value="' . esc_attr( $nonce ) . '"><input type="hidden" name="confirm" value="1">';
 			if ( 'block' === $proposal->afterMode ) {
