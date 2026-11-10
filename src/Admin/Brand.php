@@ -11,6 +11,8 @@ final class Brand {
 	public const DOCS = 'https://amazingplugins.com/plugins/ironlatch-security-scanner/';
 
 	public const GUIDE = 'https://amazingplugins.com/wordpress-security/';
+	/** Single-colour shield with a padlock; WordPress recolours it to follow the admin colour scheme. */
+	public const MENU_ICON = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMCAyMCI+PHBhdGggZmlsbD0iI2E3YWFhZCIgZmlsbC1ydWxlPSJldmVub2RkIiBkPSJNMTAgMSAxNyAzLjVWOS41QzE3IDEzLjggMTQgMTYuOCAxMCAxOSA2IDE2LjggMyAxMy44IDMgOS41VjMuNVpNMTAgMi43IDQuNSA0LjZWOS41QzQuNSAxMyA2LjkgMTUuNiAxMCAxNy40IDEzLjEgMTUuNiAxNS41IDEzIDE1LjUgOS41VjQuNloiLz48cGF0aCBmaWxsPSIjYTdhYWFkIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik03IDkuNEgxM0ExIDEgMCAwIDEgMTQgMTAuNFYxMy4yQTEgMSAwIDAgMSAxMyAxNC4ySDdBMSAxIDAgMCAxIDYgMTMuMlYxMC40QTEgMSAwIDAgMSA3IDkuNFpNNy43IDkuNFY3LjlBMi4zIDIuMyAwIDAgMSAxMi4zIDcuOVY5LjRIMTEuMVY3LjlBMS4xIDEuMSAwIDAgMCA4LjkgNy45VjkuNFoiLz48L3N2Zz4K';
 
 	public static function boot(): void {
 		add_filter( 'admin_body_class', array( self::class, 'bodyClass' ) );
