@@ -85,7 +85,7 @@ final class Brand {
 		$headers = get_file_data( IRONLATCH_SECURITY_SCANNER_FILE, array( 'Version' => 'Version' ) );
 		$version = is_string( $headers['Version'] ?? null ) ? $headers['Version'] : '';
 		echo '<div class="ironlatch-brand"><div class="ironlatch-brand-mark">';
-		echo '<img src="' . esc_url( $logo ) . '" alt="' . esc_attr__( 'AmazingPlugins', 'ironlatch-security-scanner' ) . '" width="44" height="44">';
+		echo '<img src="' . esc_url( $logo ) . '" alt="" width="44" height="44">';
 		echo '<div class="ironlatch-brand-title"><p class="ironlatch-brand-name">' . esc_html__( 'Ironlatch Security Scanner', 'ironlatch-security-scanner' ) . '</p>';
 		if ( 1 === preg_match( '/^\d+\.\d+\.\d+$/', $version ) ) {
 			echo '<p class="ironlatch-brand-version">' . esc_html( $version ) . '</p>';
