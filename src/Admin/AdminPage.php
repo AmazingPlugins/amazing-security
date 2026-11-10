@@ -28,7 +28,7 @@ use AmazingPlugins\Security\Vulnerabilities\WordPressVulnerabilityReportStore;
 
 final class AdminPage {
 	public function register(): void {
-		add_menu_page( __( 'Ironlatch Security Scanner', 'ironlatch-security-scanner' ), __( 'Ironlatch Security Scanner', 'ironlatch-security-scanner' ), 'manage_options', 'ironlatch-security-scanner', array( $this, 'render' ), 'dashicons-shield-alt', 81 );
+		add_menu_page( __( 'Ironlatch Security Scanner', 'ironlatch-security-scanner' ), __( 'Ironlatch Security Scanner', 'ironlatch-security-scanner' ), 'manage_options', 'ironlatch-security-scanner', array( $this, 'render' ), Brand::MENU_ICON, 81 );
 		add_action( 'admin_menu', array( new FilesPage(), 'register' ), 20 );
 		add_action( 'admin_menu', array( new FollowUpPages(), 'register' ), 20 );
 		add_action( 'admin_menu', array( new RecordsPage(), 'register' ), 20 );

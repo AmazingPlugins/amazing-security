@@ -4,7 +4,7 @@ Tags: security, hardening, malware scan, login security, file integrity
 Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 0.1.10
+Stable tag: 0.1.11
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -120,6 +120,9 @@ Run `wp ironlatch-security-scanner login disable` on the server. Other controls 
 * Vulnerability data from WPVulnerability, credited to its original sources.
 
 == Changelog ==
+
+= 0.1.11 =
+* The admin menu icon is now a shield with a padlock instead of the stock WordPress shield. It follows your admin color scheme.
 
 = 0.1.10 =
 * The logo in the admin header now matches the plugin icon (shield with a padlock). The decorative logo no longer carries the old brand name as alt text.
