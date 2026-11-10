@@ -1,10 +1,10 @@
-=== Ironlatch Security Scanner & AI Assistant Reviewer ===
+=== Ironlatch Security Scanner & AI Agent Reviewer ===
 Contributors: amazingplugins
 Tags: security, hardening, malware scan, login security, file integrity
 Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 0.1.11
+Stable tag: 0.1.12
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -12,7 +12,7 @@ Security checks that show their evidence: hardening, file integrity, suspicious 
 
 == Description ==
 
-Ironlatch Security Scanner & AI Assistant Reviewer scans your site and shows what it found, with the evidence. Nothing changes until you approve it. Every protection is off when you install the plugin, so you choose what to turn on. Nothing runs in the background until you press Scan for the first time. After that, the scan repeats once a day. An optional connection, off by default, lets an outside AI assistant review the findings through the plugin; it changes nothing until an administrator approves it.
+Ironlatch Security Scanner & AI Agent Reviewer scans your site and shows what it found, with the evidence. Nothing changes until you approve it. Every protection is off when you install the plugin, so you choose what to turn on. Nothing runs in the background until you press Scan for the first time. After that, the scan repeats once a day. An optional connection, off by default, lets an outside AI agent review the findings through the plugin; it changes nothing until an administrator approves it.
 
 = Scan =
 
@@ -57,9 +57,9 @@ The REST request watch is on from the start. It only records matches, on your se
 
 Optional emails for changed files, suspicious PHP matches, and high-severity plugin vulnerabilities, plus a weekly digest. They use your site's WordPress mail and go to the admin email. Both are off by default.
 
-= AI assistant access (MCP) =
+= AI agent access (MCP) =
 
-Off by default. On WordPress 6.9 or newer, with the official MCP Adapter plugin installed, an administrator can let an AI assistant list findings, run the local hardening checks, and propose a sign-in limit change. A proposal changes nothing until an administrator approves it in wp-admin.
+Off by default. On WordPress 6.9 or newer, with the official MCP Adapter plugin installed, an administrator can let an AI agent list findings, run the local hardening checks, and propose a sign-in limit change. A proposal changes nothing until an administrator approves it in wp-admin.
 
 = What this plugin doesn't do =
 
@@ -120,6 +120,9 @@ Run `wp ironlatch-security-scanner login disable` on the server. Other controls 
 * Vulnerability data from WPVulnerability, credited to its original sources.
 
 == Changelog ==
+
+= 0.1.12 =
+* New display title: Ironlatch Security Scanner & AI Agent Reviewer. The optional AI agent connection (off by default) is described the same way in the readme and inside the plugin. Wording only; settings and saved options are unchanged.
 
 = 0.1.11 =
 * The admin menu icon is now a shield with a padlock instead of the stock WordPress shield. It follows your admin color scheme.

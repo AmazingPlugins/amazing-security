@@ -1,9 +1,9 @@
 <?php
 /**
- * Plugin Name: Ironlatch Security Scanner & AI Assistant Reviewer
+ * Plugin Name: Ironlatch Security Scanner & AI Agent Reviewer
  * Plugin URI: https://amazingplugins.com/plugins/ironlatch-security-scanner/
  * Description: Local WordPress security checks and optional login protection.
- * Version: 0.1.11
+ * Version: 0.1.12
  * Requires at least: 6.6
  * Requires PHP: 8.1
  * Author: Amazing Plugins

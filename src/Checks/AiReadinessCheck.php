@@ -124,11 +124,11 @@ final class AiReadinessCheck implements SecurityCheck {
 			default => __( 'Application password availability could not be read.', 'ironlatch-security-scanner' ),
 		};
 		$access = match ( true ) {
-			'on' === $assistant => __( 'AI assistant access is on.', 'ironlatch-security-scanner' ),
-			'off' === $assistant && 'yes' === $ready => __( 'AI assistant access is off. This site can connect an assistant when you turn that on.', 'ironlatch-security-scanner' ),
-			'off' === $assistant && 'no' === $ready => __( 'AI assistant access is off. This site is not ready to connect an assistant yet.', 'ironlatch-security-scanner' ),
-			'off' === $assistant => __( 'AI assistant access is off. Assistant readiness could not be read.', 'ironlatch-security-scanner' ),
-			default => __( 'AI assistant access could not be read.', 'ironlatch-security-scanner' ),
+			'on' === $assistant => __( 'AI agent access is on.', 'ironlatch-security-scanner' ),
+			'off' === $assistant && 'yes' === $ready => __( 'AI agent access is off. This site can connect an agent when you turn that on.', 'ironlatch-security-scanner' ),
+			'off' === $assistant && 'no' === $ready => __( 'AI agent access is off. This site is not ready to connect an agent yet.', 'ironlatch-security-scanner' ),
+			'off' === $assistant => __( 'AI agent access is off. Agent readiness could not be read.', 'ironlatch-security-scanner' ),
+			default => __( 'AI agent access could not be read.', 'ironlatch-security-scanner' ),
 		};
 		$file = match ( $guide ) {
 			'present' => __( 'An llms.txt guide is published for AI readers.', 'ironlatch-security-scanner' ),

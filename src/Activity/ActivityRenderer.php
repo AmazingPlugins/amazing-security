@@ -141,7 +141,7 @@ final class ActivityRenderer {
 			'ironlatch_login_xmlrpc_disabled'        => __( 'XML-RPC sign-in', 'ironlatch-security-scanner' ),
 			'ironlatch_alerts_enabled'               => __( 'Alert email', 'ironlatch-security-scanner' ),
 			'ironlatch_digest_enabled'               => __( 'Weekly digest', 'ironlatch-security-scanner' ),
-			'ironlatch_security_scanner_mcp_enabled' => __( 'Assistant connection', 'ironlatch-security-scanner' ),
+			'ironlatch_security_scanner_mcp_enabled' => __( 'Agent connection', 'ironlatch-security-scanner' ),
 			'ironlatch_security_scanner_vulnerability_direct_enabled' => __( 'Direct vulnerability lookup', 'ironlatch-security-scanner' ),
 			'ironlatch_security_scanner_kev_enabled' => __( 'CISA list of exploited holes', 'ironlatch-security-scanner' ),
 		);

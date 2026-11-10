@@ -31,7 +31,7 @@ final class FixApprovalAction {
 			wp_die( esc_html__( 'Invalid proposal request.', 'ironlatch-security-scanner' ), '', array( 'response' => 400 ) );
 		}
 		if ( ! ( new McpPreferences( new WordPressOptions() ) )->enabled() ) {
-			wp_die( esc_html__( 'AI assistant access is off.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'AI agent access is off.', 'ironlatch-security-scanner' ), '', array( 'response' => 403 ) );
 		}
 		$repository = new WordPressFixRepository( $GLOBALS['wpdb'] );
 		try {
