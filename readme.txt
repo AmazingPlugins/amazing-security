@@ -1,10 +1,10 @@
-=== Ironlatch Security Scanner ===
+=== Ironlatch Security Scanner & AI Assistant Reviewer ===
 Contributors: amazingplugins
 Tags: security, hardening, malware scan, login security, file integrity
 Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 0.1.8
+Stable tag: 0.1.9
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -12,7 +12,7 @@ Security checks that show their evidence: hardening, file integrity, suspicious 
 
 == Description ==
 
-Ironlatch Security Scanner scans your site and shows what it found, with the evidence. Nothing changes until you approve it. Every protection is off when you install the plugin, so you choose what to turn on. Nothing runs in the background until you press Scan for the first time. After that, the scan repeats once a day.
+Ironlatch Security Scanner & AI Assistant Reviewer scans your site and shows what it found, with the evidence. Nothing changes until you approve it. Every protection is off when you install the plugin, so you choose what to turn on. Nothing runs in the background until you press Scan for the first time. After that, the scan repeats once a day. An optional connection, off by default, lets an outside AI assistant review the findings through the plugin; it changes nothing until an administrator approves it.
 
 = Scan =
 
@@ -120,6 +120,9 @@ Run `wp ironlatch-security-scanner login disable` on the server. Other controls 
 * Vulnerability data from WPVulnerability, credited to its original sources.
 
 == Changelog ==
+
+= 0.1.9 =
+* New display title: Ironlatch Security Scanner & AI Assistant Reviewer. The optional AI assistant connection (off by default) is named in the description. No code changes.
 
 = 0.1.8 =
 * The database tables for fixes, login limits, traffic and activity are now checked after they are created. The schema version is saved only when every table exists, so a failed install is retried on the next load.
